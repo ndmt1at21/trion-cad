@@ -212,7 +212,7 @@
     'SCALETEXT|SCALETEXT|PRO|4|Đổi tỉ lệ chữ|ti le chu|mtext|Chú thích › Văn bản',
     'JUSTIFYTEXT|JUSTIFYTEXT|PRO|4|Đổi điểm canh chữ|canh chu|mtext|Chú thích › Văn bản',
     'TXT2MTXT|TXT2MTXT|PRO|4|Gộp chữ thành MText|gop chu|mtext|Chú thích › Văn bản',
-    'SPELL|SP|PRO|5|Kiểm tra chính tả|chinh ta|findtext|Chú thích › Văn bản',
+    'SPELL|SP|PRO|5|Kiểm tra chính tả|chinh ta|spell|Chú thích › Văn bản',
     'XATTACH|XA|PRO|3|Gắn DWG làm xref|gan xref, tham chieu ngoai|xref|Chèn › Tham chiếu',
     'IMAGEATTACH|IAT|PRO|3|Gắn ảnh|gan anh, chen anh|image|Chèn › Tham chiếu',
     'ATTACH|ATTACH|PRO|3|Gắn tham chiếu (DWG, ảnh, PDF)|gan tham chieu|xref|Chèn › Tham chiếu',
@@ -538,7 +538,7 @@
     var job = { name:c.name }; running = job;
     if (!HIDDEN[c.name]) line('Lệnh: <b>' + c.name + '</b>');
     if (preset == null && /\s/.test(raw)) preset = raw.split(/\s+/)[1];
-    Promise.resolve(impl(ctxFor(job), preset)).catch(function(err){ if (err !== 'cancel') console.error(err); }).then(function(){ if (running === job){ running = null; prompt = null; renderPrompt(); TC.app.view.badge = null; } TC.emit('cmdend', c.name); });
+    Promise.resolve(impl(ctxFor(job), preset)).catch(function(err){ if (err !== 'cancel') console.error(err); }).then(function(){ if (running === job){ running = null; prompt = null; renderPrompt(); TC.app.view.badge = null; TC.app.view.drawOver(); } TC.emit('cmdend', c.name); });
   };
   function ctxFor(job, nested){
     function alive(){ return nested || running === job; }

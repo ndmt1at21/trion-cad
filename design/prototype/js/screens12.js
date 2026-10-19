@@ -173,7 +173,9 @@
   function dxProps(d, objs){
     var tags = [];
     objs.forEach(function(o){ if (o.e.t === 'insert' && d.blocks[o.e.name]) d.blocks[o.e.name].ents.forEach(function(a){ if (a.t === 'attdef' && tags.indexOf(a.tag) < 0) tags.push(a.tag); }); });
+    var dyn = []; objs.forEach(function(o){ if (SC.dyn) SC.dyn.props(d, o.e).forEach(function(r){ if (dyn.indexOf(r[0]) < 0) dyn.push(r[0]); }); });
     return DXP.concat(tags.map(function(t){ return ['a:' + t, t, 'Attribute', function(d2, e){ return e.t === 'insert' ? SC.att.attrsOf(d2, e)[t] || '' : ''; }]; }))
+      .concat(dyn.map(function(n){ return ['y:' + n, n, 'Block động', function(d2, e){ var r = SC.dyn.props(d2, e).filter(function(x){ return x[0] === n; })[0]; return !r ? '' : typeof r[1] === 'number' ? num2(r[1]) : r[1]; }]; }))
       .filter(function(p){ return objs.some(function(o){ var v = p[3](d, o.e, o.sp); return v !== '' && v != null; }); });
   }
   function dxLab(p){ return DX.names[p[0]] || p[1]; }
@@ -497,7 +499,8 @@
   };
   OPEN['UI-I06'] = function(){
     var d = SC.cat.MOD(); TC.cad.clearSel();
-    Object.assign(DX, { src:'doc', ids:null, kind:'block', att:false, on:{ 'B:CUA-DI-1C':true, 'B:CUA-SO':true }, cats:{}, props:{ name:true, sx:true }, names:{ name:'Loại cửa', sx:'Bề rộng (mm)' }, comb:true, cnt:true, sort:'name', dir:1, q:'', tq:'', pq:'', table:true, file:true, fmt:'XLSX', open:true, title:'BẢNG THỐNG KÊ CỬA' });
+    var dyn = SC.dyn && SC.dyn.isDyn(d.blocks['CUA-DI-1C']), w = dyn ? 'y:Bề rộng' : 'sx', P = { name:true }, N = { name:'Loại cửa' }; P[w] = true; N[w] = 'Bề rộng (mm)';
+    Object.assign(DX, { src:'doc', ids:null, kind:'block', att:false, on:dyn ? { 'B:CUA-DI-1C':true } : { 'B:CUA-DI-1C':true, 'B:CUA-SO':true }, cats:{}, props:P, names:N, comb:true, cnt:true, sort:'name', dir:1, q:'', tq:'', pq:'', table:true, file:true, fmt:'XLSX', open:true, title:dyn ? 'BẢNG THỐNG KÊ CỬA ĐI' : 'BẢNG THỐNG KÊ CỬA' });
     setTimeout(function(){ TC.cmd.run('DATAEXTRACTION', 4); }, 60);
   };
   OPEN['UI-J15'] = function(){ var d = SC.cat.PRO(); AI.file = null; SC.attLast = 'Khung-ten_' + SC.att.ascii(SC.att.base(d.name)) + '.xlsx'; SC.attIn(); };

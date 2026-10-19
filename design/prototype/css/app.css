@@ -182,6 +182,14 @@ select.inp{ appearance:none; padding-right:22px; background-image:linear-gradien
 .tree .tn{ display:flex; align-items:center; gap:5px; height:22px; padding:0 6px; border-radius:var(--r); white-space:nowrap; color:var(--c-text-2); width:100% }
 .tree .tn:hover{ background:var(--c-hover); color:var(--c-text) }
 .tree .tn[aria-selected="true"]{ background:var(--c-accent-soft); color:var(--c-text) }
+/* dòng đang chọn sáng nền lên: chữ phụ và tag màu vẫn phải đạt 4,5:1 */
+:is(.is-sel, [aria-selected="true"]) .faint, .rv-row.is-sel .m{ color:var(--c-text-2) }
+:is(.is-sel, [aria-selected="true"]) .tag:is(.warn, .danger, .ok, .info, .acc){ background-color:var(--c-base) }
+:is(.is-sel, [aria-selected="true"]) .tag.warn{ background-image:linear-gradient(var(--c-warn-soft), var(--c-warn-soft)) }
+:is(.is-sel, [aria-selected="true"]) .tag.danger{ background-image:linear-gradient(var(--c-danger-soft), var(--c-danger-soft)) }
+:is(.is-sel, [aria-selected="true"]) .tag.ok{ background-image:linear-gradient(var(--c-ok-soft), var(--c-ok-soft)) }
+:is(.is-sel, [aria-selected="true"]) .tag.info{ background-image:linear-gradient(var(--c-info-soft), var(--c-info-soft)) }
+:is(.is-sel, [aria-selected="true"]) .tag.acc{ background-image:linear-gradient(var(--c-accent-soft), var(--c-accent-soft)) }
 .tree .tn .cnt{ margin-left:auto; color:var(--c-text-3); font-family:var(--f-mono); font-size:var(--fs-xs) }
 
 /* =================================== KHUNG ỨNG DỤNG =================================== */
@@ -998,7 +1006,7 @@ kbd.kc{ display:inline-flex; align-items:center; height:18px; padding:0 5px; mar
 .pcd .ic{ width:10px; height:10px; stroke-width:1.6; opacity:.85 }
 .pcd:hover, .pcd.is-hot, .pcd:focus-visible{ border-color:var(--c-accent); outline:none }
 .pcd.is-ref{ border-style:dashed } .pcd.is-pv{ opacity:.8 }
-.pc-ed{ position:absolute; z-index:7; transform:translate(-50%, -50%); display:grid; gap:3px; justify-items:center }
+.pc-ed{ position:absolute; z-index:7; transform:translate(-50%, -11px); display:grid; gap:3px; justify-items:center }
 .pc-ed .inp{ width:170px; height:22px; font-family:var(--f-mono); text-align:center }
 .pc-ed .fmsg{ max-width:280px; padding:3px 7px; white-space:normal; background:var(--c-dyn-bg); border:1px solid var(--c-danger); border-radius:var(--r) }
 /* palette Trình quản lý tham số */
@@ -1007,7 +1015,7 @@ kbd.kc{ display:inline-flex; align-items:center; height:18px; padding:0 5px; mar
 .pm-t tr[data-pk]{ outline:none } .pm-t tr[data-pk]:focus-visible td{ box-shadow:inset 0 1px 0 var(--c-focus), inset 0 -1px 0 var(--c-focus) }
 .pm-t tr.pm-g td{ padding:0; height:auto } .pm-t tr.pm-g:hover td{ background:none }
 .pm-t td.ed{ padding:0 2px } .pm-t td.ed .inp{ width:100%; height:20px; font-family:var(--f-mono) }
-.pm-t tr.is-ref td{ color:var(--c-text-2) }
+.pm-t tr.is-ref td{ color:var(--c-text-2) } .pm-t .pm-ref{ font-family:var(--f-ui) }
 .pm-t tr.pm-err td{ height:auto; padding:3px 8px; white-space:normal; color:var(--c-danger); background:var(--c-danger-soft); font-size:var(--fs-xs) } .pm-t tr.pm-err .ic{ vertical-align:-1px }
 .pm-bad{ color:var(--c-danger) } .pm .empty .btn .ic{ width:14px; height:14px; stroke-width:var(--sw); color:inherit }
 /* hộp Thiết lập ràng buộc */
@@ -1264,15 +1272,15 @@ kbd.kc{ display:inline-flex; align-items:center; height:18px; padding:0 5px; mar
 .lspr{ color:var(--c-accent); flex:none; font-family:var(--f-mono) }
 .lse.res{ display:flex; gap:6px; align-items:baseline; color:var(--c-text); padding-left:22px } .lse.res .lv{ min-width:0 }
 .lty{ flex:none; padding:0 4px; border-radius:var(--r); font:var(--fw-b) 9.5px/15px var(--f-ui); letter-spacing:.03em; background:var(--c-active); color:var(--c-text-2); white-space:nowrap }
-.lty[data-ty="INT"], .lty[data-ty="REAL"]{ background:var(--c-info-soft); color:var(--c-info) } .lty[data-ty="STR"]{ background:var(--c-ok-soft); color:var(--c-ok) }
-.lty[data-ty="LIST"]{ background:var(--c-accent-soft); color:var(--c-accent) } .lty[data-ty="ENAME"], .lty[data-ty="PICKSET"]{ background:var(--c-warn-soft); color:var(--c-warn) }
+.lty[data-ty="INT"], .lty[data-ty="REAL"]{ background:linear-gradient(var(--c-info-soft), var(--c-info-soft)), var(--c-base); color:var(--c-info) } .lty[data-ty="STR"]{ background:linear-gradient(var(--c-ok-soft), var(--c-ok-soft)), var(--c-base); color:var(--c-ok) }
+.lty[data-ty="LIST"]{ background:linear-gradient(var(--c-accent-soft), var(--c-accent-soft)), var(--c-base); color:var(--c-accent) } .lty[data-ty="ENAME"], .lty[data-ty="PICKSET"]{ background:linear-gradient(var(--c-warn-soft), var(--c-warn-soft)), var(--c-base); color:var(--c-warn) }
 .lms{ margin-left:auto; flex:none; padding-left:8px; color:var(--c-text-3); font:var(--fs-2xs) var(--f-ui) }
 .lse.out{ color:var(--c-text-2); padding-left:22px; font-family:var(--f-ui) }
-.lse.cmd{ color:var(--c-info); padding-left:22px }
+.lse.lcmd{ color:var(--c-info); padding-left:22px }
 .lse.info{ display:flex; gap:6px; align-items:flex-start; padding-left:22px; color:var(--c-text-3); font:var(--fs-xs)/1.45 var(--f-ui) } .lse.info .ic{ margin-top:2px }
 .lse.err{ display:grid; gap:6px; margin:2px 0 4px 22px; padding:6px 8px; border-left:2px solid var(--c-danger); background:var(--c-danger-soft); font-family:var(--f-ui) }
-.lerr{ display:flex; gap:6px; align-items:flex-start; color:var(--c-danger) } .lerr .ic{ margin-top:2px } .lerr b{ font-weight:var(--fw-b) } .lerr .faint{ color:var(--c-text-3) }
-.ltr{ display:grid; gap:1px } .ltr-h{ margin-bottom:2px; font-size:var(--fs-2xs); font-weight:var(--fw-b); letter-spacing:.06em; text-transform:uppercase; color:var(--c-text-3) }
+.lerr{ display:flex; gap:6px; align-items:flex-start; color:var(--c-danger) } .lerr .ic{ margin-top:2px } .lerr b{ font-weight:var(--fw-b) } .lerr .faint{ color:var(--c-text-2) }
+.lstr{ display:grid; gap:1px } .lstr-h{ margin-bottom:2px; font-size:var(--fs-2xs); font-weight:var(--fw-b); letter-spacing:.06em; text-transform:uppercase; color:var(--c-text-3) }
 .ltf{ display:flex; gap:8px; align-items:center; justify-content:space-between; min-width:0; padding:2px 6px; border-radius:var(--r); text-align:left; color:var(--c-text); font-size:var(--fs-s) } .ltf:hover{ background:var(--c-hover) } .ltf.on{ background:var(--c-active) }
 .ltf .mono{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap } .ltf .faint{ flex:none; font-size:var(--fs-xs) }
 .lvars{ display:flex; flex-wrap:wrap; gap:2px 12px; padding:4px 6px 0; font-size:var(--fs-xs); color:var(--c-text-2) }
@@ -1287,14 +1295,14 @@ kbd.kc{ display:inline-flex; align-items:center; height:18px; padding:0 5px; mar
 /* UI-K07 tùy biến giao diện: cây tùy biến, danh sách lệnh | xem trước | thuộc tính; tab Chuyển */
 .cuw{ display:flex; flex-direction:column; height:100%; min-height:0 } .cuw > .tabs{ padding:0 10px; flex:none }
 .cumain{ display:grid; grid-template-columns:292px minmax(0,1fr) 296px; flex:1; min-height:0 }
-.cul, .cur{ display:flex; flex-direction:column; min-height:0; min-width:0 } .cul{ border-right:1px solid var(--c-border) } .cur{ border-left:1px solid var(--c-border) }
+.cul, .cu-rcol{ display:flex; flex-direction:column; min-height:0; min-width:0 } .cul{ border-right:1px solid var(--c-border) } .cu-rcol{ border-left:1px solid var(--c-border) }
 .cu-h{ display:flex; align-items:center; gap:4px; height:30px; padding:0 6px 0 10px; flex:none; font-size:var(--fs-s); border-bottom:1px solid var(--c-border) } .cu-h b{ font-weight:var(--fw-b) } .cu-h .faint{ font-size:var(--fs-xs); margin-left:4px }
 .cul > .cu-h + .cu-tree + .cu-h{ border-top:1px solid var(--c-border) }
 .cu-tree{ flex:1 1 55%; min-height:110px; overflow:auto; padding:4px; outline:none }
 .cu-tree .tn{ gap:4px; padding-right:6px } .cu-tree .tn .tg{ display:inline-grid; place-items:center; width:12px; flex:none; color:var(--c-text-3) } .cu-tree .tn .ic{ flex:none }
 .cu-tree .tn .nm{ min-width:0; overflow:hidden; text-overflow:ellipsis } .cu-tree .tn .tag{ flex:none; height:15px; padding:0 4px; font-size:var(--fs-2xs) } .cu-tree .tn.dim .nm{ opacity:.55; text-decoration:line-through }
 .cu-tree:focus-visible .tn[aria-selected="true"], .cu-cl:focus-visible .cu-ci.is-sel{ box-shadow:inset 0 0 0 1px var(--c-focus) }
-.cu-drop.is-drop, .tn.is-drop{ box-shadow:inset 0 0 0 2px var(--c-accent) !important; background:var(--c-accent-soft) }
+.cu-drop.is-drop, .cu-tree .tn.is-drop{ box-shadow:inset 0 0 0 2px var(--c-accent) !important; background:var(--c-accent-soft) }
 .cu-dragging .cu-tree .tn[data-drop]:not([aria-selected="true"]){ background:var(--c-hover) }
 .cu-cf{ display:grid; grid-template-columns:minmax(0,1fr) 112px; gap:4px; padding:6px; flex:none; border-bottom:1px solid var(--c-border) }
 .cu-cl{ flex:1 1 45%; min-height:110px; overflow:auto; padding:2px 4px; outline:none }
@@ -1325,11 +1333,11 @@ kbd.kc{ display:inline-flex; align-items:center; height:18px; padding:0 5px; mar
 .cu-pr{ display:grid; grid-template-columns:90px minmax(0,1fr); gap:6px; align-items:center; font-size:var(--fs-s) } .cu-pr > .k{ color:var(--c-text-2) } .cu-pr > .v{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; min-width:0 }
 .cu-pr .inp{ width:100% } .cu-pr textarea.inp{ height:auto; padding:3px 6px; resize:vertical; line-height:1.4 } .cu-pr .seg button{ height:20px; padding:0 8px; font-size:var(--fs-s) } .cu-pr .v > .mono{ overflow-wrap:anywhere }
 .cu-icb{ gap:6px; max-width:100% } .cu-icb .faint{ font-size:var(--fs-xs) }
-.cur .fmsg{ align-items:flex-start } .cur .fmsg.warn{ color:var(--c-warn) } .cur .fmsg .ic{ margin-top:2px } .cu-mm, #cu-cnm{ margin:-3px 0 0 96px }
+.cu-rcol .fmsg{ align-items:flex-start } .cu-rcol .fmsg.warn{ color:var(--c-warn) } .cu-rcol .fmsg .ic{ margin-top:2px } .cu-mm, #cu-cnm{ margin:-3px 0 0 96px }
 .cu-note{ display:flex; gap:6px; align-items:flex-start; margin:0; font-size:var(--fs-xs); color:var(--c-text-2) } .cu-note .ic{ margin-top:1px }
 .cu-chips{ display:flex; flex-wrap:wrap; gap:3px } .cu-chips .chip{ height:18px; font-size:var(--fs-xs) }
 .cu-acts{ padding-top:6px; border-top:1px solid var(--c-border) }
-.cur .pal-desc{ min-height:62px }
+.cu-rcol .pal-desc{ min-height:62px }
 .cu-n{ color:var(--c-info) }
 .cux{ display:grid; grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr); flex:1; min-height:0 }
 .cux-c{ display:flex; flex-direction:column; min-width:0; min-height:0 } .cux-c:first-child{ border-right:1px solid var(--c-border) } .cux-c:last-child{ border-left:1px solid var(--c-border) }

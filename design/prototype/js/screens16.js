@@ -672,6 +672,8 @@
   TC.on('bclose', function(o){ setTimeout(function(){ var d = D(); if (!d || !d.bedit) hideAuthor(); }, 0); if (DEMO && USERCLOSE && o.name === 'CUA-DI-1C') setTimeout(function(){ doorShow(o.d); }, 60); DEMO = false; });
   // palette Blocks (screens7): đánh dấu block động, trạng thái hiển thị khi chèn
   SC.dyn = { isDyn:isDyn,
+    // [[tên, giá trị]] của tham chiếu: số giữ dạng số, còn lại là chữ như nhóm Tùy biến
+    props:function(d, e){ var bd = e.t === 'insert' && d.blocks[e.name]; if (!isDyn(bd)) return []; var l = bd.ents, out = []; pars(l).forEach(function(p){ partsOf(l, p).forEach(function(pt){ var v = pt[1](e.dyn); out.push([pt[0], typeof v === 'number' && p.k !== 'flip' ? v : fmtV(p, v, pt[4])]); }); }); return out; },
     visStates:function(bd){ var vp = isDyn(bd) && visPar(bd.ents); return vp ? vp.states.map(function(s){ return s.n; }) : null; },
     insDyn:function(bd, st){ var vp = isDyn(bd) && visPar(bd.ents); if (!vp || !st || st === vp.states[0].n) return undefined; var o = {}; o[vp.bk] = st; return o; } };
 

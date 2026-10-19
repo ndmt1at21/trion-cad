@@ -58,6 +58,7 @@
 | 05 | [Kiến trúc kỹ thuật](docs/05-kien-truc-ky-thuat.md) | Ranh giới "tự viết", ngân sách hiệu năng và độ chính xác, codec DWG, kernel hình học, regen, renderer, **tận dụng phần cứng**, LISP, SDK, kiểm thử, pháp lý, ước lượng khối lượng, spike |
 | 06 | [Lộ trình triển khai](docs/06-lo-trinh-trien-khai.md) | Kế hoạch 90 ngày, các giai đoạn và mốc, cổng G0–G3, đội ngũ, ngân sách, vốn, phương án tinh gọn, sổ rủi ro |
 | 07 | Đặc tả chức năng cho thiết kế UI: [1. Khung ứng dụng](docs/07-dac-ta-ui-1-khung-ung-dung.md) · [2. Palette và hộp thoại](docs/07-dac-ta-ui-2-bang-va-hop-thoai.md) · [3. Tính năng VN, Viewer, hệ thống](docs/07-dac-ta-ui-3-tinh-nang-vn-va-he-thong.md) | 172 màn hình và thành phần có mã UI-xxx. Mỗi mục ghi: mở từ đâu, thành phần, hành vi, trạng thái, phiên bản phát hành. Kèm ribbon đầy đủ (cả tab Mở rộng), prompt của các lệnh P0/P1, tương tác trên vùng vẽ, thanh trạng thái, phím tắt, khác biệt macOS/Linux, tên lệnh của tính năng riêng, công cụ miễn phí, danh mục màn hình, các đợt thiết kế, danh sách kiểm, phạm vi chưa đặc tả |
+| 08 | [Phân rã task cho agent](docs/08-phan-ra-task/README.md) | Task lõi và UI vừa sức một agent, mỗi task có đầu vào, đầu ra, tiêu chí nghiệm thu đo được. Kèm định nghĩa hoàn thành chung (hiệu năng, tận dụng phần cứng, độ trễ, độ đúng), task neo giữa các module, thứ tự theo mốc |
 
 ## Quyết định cần chốt trong 90 ngày
 

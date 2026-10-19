@@ -24,7 +24,7 @@
   function colorCell(d, e){ var c = e.color != null ? e.color : null; var lc = lay(d, e).color; var hex = TC.ACI[c != null ? c : lc] || '#FFF'; if ((c != null ? c : lc) === 7) hex = '#FFFFFF'; return '<i class="sw" style="background:' + hex + '"></i>' + (c == null ? 'ByLayer' : TC.aciName(c)); }
   function ltCell(e, d){ var lt = e.lt || 'ByLayer'; var real = e.lt || lay(d, e).lt; return '<span class="lt-s' + (real === 'CENTER' ? ' center' : real === 'DASHED' ? ' dash' : '') + '"></span>' + esc(lt); }
   function common(d, e){
-    return [['Màu', colorCell(d, e), 'html'], ['Layer', esc(e.layer)], ['Linetype', ltCell(e, d), 'html'], ['Tỉ lệ linetype', '1.0000', 'num'], ['Plot style', 'ByColor'], ['Độ dày nét', '<span class="lw-s" style="height:' + Math.max(1, Math.round((e.lw || lay(d, e).lw || .25) * 4)) + 'px"></span>' + (e.lw != null ? TC.d(e.lw) + ' mm' : 'ByLayer'), 'html'], ['Độ trong suốt', 'ByLayer'], ['Độ dày đùn', TC.d(e.thick || 0), 'num']];
+    return [['Màu', colorCell(d, e), 'html'], ['Layer', esc(e.layer)], ['Linetype', ltCell(e, d), 'html'], ['Tỉ lệ linetype', '1.0000', 'num'], ['Plot style', 'ByColor'], ['Độ dày nét', '<span class="lw-s" style="height:' + Math.max(1, Math.round((e.lw || lay(d, e).lw || .25) * 4)) + 'px"></span>' + (e.lw != null ? TC.d(e.lw) + ' mm' : 'ByLayer'), 'html'], ['Độ trong suốt', 'ByLayer'], ['Độ dày đùn', TC.d(e.thick || 0), 'num'], ['Hyperlink', e.link ? esc(e.link.t || e.link.a) : '']];
   }
   function geom(d, e){
     var rows = [], f = function(v, p){ return TC.d(v, p); };

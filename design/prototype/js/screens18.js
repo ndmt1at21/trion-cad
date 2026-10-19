@@ -284,7 +284,6 @@
   function gcClick(e){
     var d = GP.d, S = gcOf(d), b = e.target.closest('[data-gc]'), f = e.target.closest('[data-gf]'), r = e.target.closest('.rv-row[data-k]'), a = e.target.closest('[data-ga]');
     if (e.target.closest('#gc-hl') || e.target.closest('[data-hk]')) return hlClick(e);
-    if (e.target.closest('[data-pick]') && e.target.closest('.rv-set')){ pickLen(e.target.closest('[data-num]')); return; }
     if (f){ S.filter = f.dataset.gf; var v = gcVis(d); if (!v.some(function(x){ return x.key === S.sel; })) S.sel = v.length ? v[0].key : null; gcRender(); V().drawOver(); return; }
     if (a && r){ gcAct(a.dataset.ga, r.dataset.k); return; }
     if (a){ var c = gcCur(d); if (c) gcAct(a.dataset.ga, c.key); return; }
@@ -320,12 +319,6 @@
     var enter = function(e){ if (e.key === 'Enter' && !e.target.closest('.dlg')){ e.preventDefault(); document.removeEventListener('keydown', enter, true); TC.cad.endSel(); } }; document.addEventListener('keydown', enter, true);
   }
   // nút lấy từ bản vẽ của ô dung sai (UI-C09): chỉ hai điểm, khoảng cách thành giá trị
-  function pickLen(box){
-    var dlg = GP.dlg; dlg.hide(true); TC.cmdline.msg('Chỉ điểm thứ nhất để đo dung sai (Esc để hủy).');
-    var stop = function(e){ if (e.key === 'Escape') TC.cad.endMode(); }; document.addEventListener('keydown', stop, true);
-    var fin = function(v){ document.removeEventListener('keydown', stop, true); dlg.hide(false); if (v != null){ $('input', box).value = TC.d(v, 3); TC.numCommit(box); } };
-    TC.cad.getPoint({}).then(function(a){ if (!a) return fin(); TC.cmdline.msg('Chỉ điểm thứ hai.'); TC.cad.getPoint({ base:a.p }).then(function(b){ fin(b ? G.dist(a.p, b.p) : null); }); });
-  }
   // lớp phủ: hình đánh dấu theo loại kèm số thứ tự; dòng đang rê hoặc chọn tô sáng đối tượng và hiện cách sửa
   TC.overlays.push(function(ctx, v){
     var d = v.doc; if (!GP.dlg || !document.contains(GP.dlg.el) || GP.d !== d || GP.tab !== 'geo' || GP.set || (d.space !== 'model' && !d.activeVp)) return;

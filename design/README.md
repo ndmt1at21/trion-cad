@@ -16,7 +16,7 @@ Viết bằng HTML, CSS và JS thuần, không cần build. Mở tệp bằng tr
 
 Trong prototype, nút **Prototype** trên thanh tiêu đề dùng để:
 
-- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro, Đợt 3 và Đợt 4 cần Pro; mở từ Danh mục thì prototype tự chuyển;
+- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro, Đợt 3 đến Đợt 5 cần Pro; mở từ Danh mục thì prototype tự chuyển;
 - đổi chủ đề, mật độ, Giao diện nhẹ;
 - đổi **Nền tảng** Windows hoặc macOS (thanh menu hệ thống, phím ⌘, hộp thoại dạng sheet);
 - xem khung 1366 hoặc 1920;
@@ -62,11 +62,11 @@ prototype/
   js/screens14.js  Đợt 4: Thuộc tính nhanh, trạng thái và bộ lọc layer, duyệt layer, quản lý view và UCS, ViewCube, phím tắt, workspace, biến hệ thống, bản macOS, chia ô cửa sổ
   js/screens15.js  Đợt 5: tab Tham số (ràng buộc hình học và kích thước, quản lý tham số, suy luận ràng buộc)
   js/screens16.js  Đợt 5: dynamic block (palette tạo block, tham số và action, trạng thái hiển thị, thử block)
-  js/screens17.js  Đợt 5: Sheet Set Manager, quản lý máy in và PC3, thống kê thép
+  js/screens17.js  Đợt 5: Sheet Set Manager (tab View của tờ, View Model trong palette Bộ bản vẽ), quản lý máy in và PC3, thống kê thép
   js/screens18.js  Đợt 5: làm sạch hình học, sức khỏe bản vẽ, kiểm tra TCVN, chuẩn .dws, dịch layer
   js/screens19.js  Đợt 5: máy tính nhanh, kiểm tra chính tả, hyperlink
   js/screens20.js  Đợt 5: tùy biến giao diện (CUI), bảng điều khiển LISP, quản lý plugin
-  js/screens21.js  Đợt 5: tab Mở rộng phần P2
+  js/screens21.js  Đợt 5: tab Mở rộng phần P2 (29 lệnh kiểu Express Tools: ARCTEXT, TEXTMASK, SUPERHATCH, VPSYNC, REDIR…)
   js/catalog.js    danh mục 172 mã, trạng thái thiết kế
 ```
 
@@ -79,7 +79,7 @@ prototype/
 | 2 | 12 | 12 | 0 | Viewer Pro. Các nút VP trên ribbon Viewer đều chạy được: G09, H04, H06, I04, I07, J03, J15, L01–L03, L16, M02 |
 | 3 | 59 | 59 | 0 | Pro EA (bản biên tập): ribbon đủ 8 tab và workspace Cổ điển, grip, nhập động, lệnh vẽ, sửa có hoàn tác, chú thích, kiểu, hatch, mảng, block, xref, layout, TCVN, LISP |
 | 4 | 38 | 38 | 0 | Pro 1.0: bảng và field, Block Editor, PDF, DesignCenter, Tool Palettes, bộ bản vẽ, công cụ VN, trích xuất dữ liệu, đóng gói, cổng quản trị, phím tắt, biến hệ thống, bản macOS, tab Mở rộng, 30 lệnh dòng lệnh |
-| 5 | 12 | 0 | 0 | Sau 1.0 |
+| 5 | 12 | 12 | 0 | Sau v1.0 (Pro): tab Tham số, dynamic block, Sheet Set Manager, máy in và PC3, thống kê thép, làm sạch hình học, kiểm tra TCVN và chuẩn .dws, máy tính nhanh, chính tả, hyperlink, CUI, bảng điều khiển LISP, plugin, tab Mở rộng phần P2 |
 
 Danh mục trong prototype luôn hiện trạng thái mới nhất.
 
@@ -96,4 +96,5 @@ Danh mục trong prototype luôn hiện trạng thái mới nhất.
 - **Prompt:** chip tùy chọn ghi nhãn tiếng Việt kèm chữ tắt tiếng Anh (Bán kính · R). Gõ chữ tắt kiểu AutoCAD luôn chạy, kể cả từ khóa ẩn của grip (MO, RO, SC, MI).
 - **Phím tắt một nguồn:** bảng `KDEF` trong `screens14.js` là nguồn duy nhất cho phím tắt (hộp Phím tắt, bảng in, tooltip, menu). Trên macOS, `TC.keyLabel` đổi Ctrl thành ⌘ hoặc ⌃.
 - **macOS:** cùng bố cục với Windows; khác ở thanh menu hệ thống, nút cửa sổ bên trái, hộp thoại tệp và in dạng sheet, “Cài đặt” thay “Tùy chọn”, kéo hai ngón để pan.
-- **Lệnh chưa đến đợt:** mọi lệnh v1.0 đã chạy được. Nút của lệnh sau v1.0 vẫn hiện, mờ, ghi “sau v1.0”; bấm thì báo.
+- **Điểm mở rộng:** loại đối tượng mới tự đăng ký cách vẽ (`TC.flatExt`), hàng Thuộc tính (`TC.propsExt`), cách phá khối (`TC.explodeExt`) và grip riêng (`TC.gripsExt`: kéo, bấm, menu, tự vẽ). Tệp mới bọc hàm cũ (`TC.prepEnt`, `ED.ctxRefresh`, `TC.cad.hook`…) và luôn gọi lại hàm cũ, không sửa lõi.
+- **Lệnh chưa có màn hình:** 172 mã của Đợt 0–5 đã chạy được. Nút của tính năng chưa xếp đợt (DATALINK, OLE, DIMINSPECT, DGN, SVG, chia sẻ link…) và các nhóm ở 07.3 §8 (3D, đám mây, AI) vẫn hiện, mờ, ghi “sau v1.0”; bấm thì báo.

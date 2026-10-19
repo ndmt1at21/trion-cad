@@ -111,7 +111,7 @@
     if (a.n != null) return a.n; if (a.v) return look(a.v); if (a.u) return -run(a.x, look);
     if (a.f) return FN[a.f].apply(null, a.a.map(function(z){ return run(z, look); }));
     var l = run(a.l, look), r = run(a.r, look);
-    switch (a.o){ case '+': return l + r; case '-': return l - r; case '*': return l * r; case '/': if (r === 0) throw { pe:'Chia cho 0' }; return l / r; case '%': return l % r; default: return Math.pow(l, r); }
+    switch (a.o){ case '+': return l + r; case '-': return l - r; case '*': return l * r; case '/': if (r === 0) throw { pe:'Chia cho 0: sửa để số chia khác 0' }; return l / r; case '%': return l % r; default: return Math.pow(l, r); }
   }
   var IDRE = /[A-Za-z_][A-Za-z0-9_]*/g;
   // mọi tham số của bản vẽ: kích thước chủ động, kích thước tham chiếu, biến người dùng
@@ -127,7 +127,7 @@
       try {
         var val;
         if (it.ref) val = measure(d, it.o);
-        else { var r = parse(it.expr); if (r.err) throw { pe:r.err }; val = run(r.ast, function(nm){ var t = by[nm.toLowerCase()]; if (!t) throw { pe:'Không có tham số “' + nm + '”' }; try { return get(t, path.concat(it.name)); } catch (z){ throw z.cyc ? z : { pe:'Phụ thuộc tham số “' + t.name + '” đang lỗi' }; } }); }
+        else { var r = parse(it.expr); if (r.err) throw { pe:r.err }; val = run(r.ast, function(nm){ var t = by[nm.toLowerCase()]; if (!t) throw { pe:'Không có tham số “' + nm + '”: kiểm tra tên hoặc tạo biến người dùng' }; try { return get(t, path.concat(it.name)); } catch (z){ throw z.cyc ? z : { pe:'Phụ thuộc tham số “' + t.name + '” đang lỗi' }; } }); }
         if (!isFinite(val)) throw { pe:'Kết quả không xác định (ngoài miền của hàm)' };
         v[it.key] = val; return val;
       } catch (x){ if (!err[it.key]) err[it.key] = x && x.pe || String(x); throw x; } finally { st[it.key] = 0; }
@@ -434,7 +434,7 @@
   TC.on('cmdend', function(name){
     LIVE = { sig:null }; PK.mark = null; PV = null;
     var k = Object.keys(INFN); if (k.length){ var n = k.reduce(function(s, t){ return s + INFN[t]; }, 0); TC.cmdline.msg('Suy luận ràng buộc: đã gắn ' + n + ' ràng buộc (' + k.map(function(t){ return GT[t][0] + ' ' + INFN[t]; }).join(', ') + ').'); INFN = {}; }
-    if (name === 'GRIPEDIT' || name === 'MOVE' || name === 'STRETCH') V().drawOver();
+    if (/^(GRIPEDIT|MOVE|STRETCH|GC|DC)|CONSTRAIN/.test(name || '')) V().drawOver(); // xóa ký hiệu lệnh, dấu điểm, kích thước xem trước còn trên lớp nổi
   });
 
   /* ================= suy luận ràng buộc khi vẽ (nút trên thanh trạng thái, Ctrl+Shift+I) ================= */
@@ -528,12 +528,16 @@
     return new Promise(function(resolve){
       var isDim = c.t === 'dim', list = res.conflict || [], sel = list.length === 1 ? list[0].id : null;
       var row = function(o){ return '<tr data-cf="' + o.id + '" class="' + (o.id === sel ? 'is-sel' : '') + '" tabindex="-1"><td class="ctr"><input type="radio" name="pcf" value="' + o.id + '"' + (o.id === sel ? ' checked' : '') + ' aria-label="Chọn ' + esc(consName(d, o)) + '"></td><td>' + ic(o.t === 'dim' ? DT[o.k][1] : GT[o.t][1], 's12') + ' ' + esc(consName(d, o)) + '</td><td class="faint">' + esc(consDesc(d, o)) + '</td></tr>'; };
-      var dlg = TC.dialog({ id:'pcf', title:res.fail ? 'Ràng buộc mâu thuẫn' : 'Thừa ràng buộc', code:'UI-PAR', cmd:isDim ? DT[c.k][2] : GT[c.t][2], w:560, help:true,
+      var dlg = TC.dialog({ id:'pcf', title:res.fail ? 'Ràng buộc mâu thuẫn' : 'Thừa ràng buộc', code:'UI-PAR', cmd:isDim ? DT[c.k][2] : GT[c.t][2], w:560, help:true, focus:!isDim && list.length && !sel ? '.pcf-t input' : null,
         body:'<div class="stack"><div class="hrow" style="flex-wrap:nowrap;align-items:flex-start;gap:10px">' + ic('warn', 'st') + '<p>' + (res.fail ? 'Không thể gắn ' : 'Gắn ') + '<b>' + esc(isDim ? c.name + ' (' + DT[c.k][0].toLowerCase() + ')' : GT[c.t][0]) + '</b> cho ' + esc(consDesc(d, c)) + (res.fail ? ': hình không thỏa đồng thời với các ràng buộc đang có.' : ' sẽ thừa ràng buộc: hình đã được xác định bởi các ràng buộc dưới đây.') + '</p></div>' +
           (list.length ? '<div class="tblwrap" style="max-height:180px"><table class="tbl pcf-t"><thead><tr><th class="ctr" style="width:28px"></th><th style="width:170px">Ràng buộc đang có</th><th>Đối tượng</th></tr></thead><tbody>' + list.map(row).join('') + '</tbody></table></div><p class="faint" style="font-size:var(--fs-s)">Rê lên một dòng để thấy đối tượng trên bản vẽ. Chọn một ràng buộc rồi bấm Thay để xóa nó và gắn ràng buộc mới.</p>' : '') +
           (isDim ? '<div class="note">' + ic('info') + '<span>Tham số tham chiếu chỉ đo và hiện giá trị trong ngoặc, không điều khiển hình; dùng được trong biểu thức của tham số khác.</span></div>' : '') + '</div>',
-        foot:'<span class="grow"></span><button class="btn ghost" type="button" data-x="cancel">Không gắn</button>' + (list.length ? '<button class="btn" type="button" id="pcf-rep"' + (sel ? '' : ' disabled') + '>Thay ràng buộc đã chọn</button>' : '') + (isDim ? '<button class="btn primary" type="button" id="pcf-ref">Tạo tham số tham chiếu</button>' : ''),
+        foot:'<span class="grow"></span><button class="btn ghost" type="button" data-x="cancel">Không gắn</button>' + (list.length ? '<button class="btn' + (isDim ? '' : ' primary') + '" type="button" id="pcf-rep"' + (sel ? '' : ' disabled') + '>Thay ràng buộc đã chọn</button>' : '') + (isDim ? '<button class="btn primary" type="button" id="pcf-ref">Tạo tham số tham chiếu</button>' : ''),
         onClose:function(r){ HOT = null; V().drawOver(); resolve(r || null); } });
+      // hộp che các đối tượng liên quan thì dời lên trên hoặc xuống dưới chúng (phía rộng hơn), để rê dòng thấy được hình
+      var cr = $('#cv').getBoundingClientRect(), dr = dlg.el.getBoundingClientRect(), b = null;
+      [c].concat(list).forEach(function(o){ entsOf(o).forEach(function(id){ var e = d.byId[id]; if (e && e._bb) [[e._bb[0], e._bb[1]], [e._bb[2], e._bb[3]]].forEach(function(q){ var s = V().mToS(q), x = cr.left + s[0], y = cr.top + s[1]; b = b ? [Math.min(b[0], x), Math.min(b[1], y), Math.max(b[2], x), Math.max(b[3], y)] : [x, y, x, y]; }); }); });
+      if (b && dr.top < b[3] && dr.bottom > b[1] && dr.left < b[2] && dr.right > b[0]){ var top = b[1] > innerHeight - b[3] ? b[1] - 16 - dr.height : b[3] + 16; if (top >= 8 && top + dr.height <= innerHeight - 8) dlg.el.style.top = Math.round(top) + 'px'; }
       dlg.el.addEventListener('click', function(e){ var tr = e.target.closest('[data-cf]'); if (tr){ sel = tr.dataset.cf; $$('[data-cf]', dlg.el).forEach(function(x){ x.classList.toggle('is-sel', x === tr); $('input', x).checked = x === tr; }); var rb = $('#pcf-rep', dlg.el); if (rb) rb.disabled = false; } });
       dlg.el.addEventListener('mouseover', function(e){ var tr = e.target.closest('[data-cf]'); var o = tr && byCid(d, tr.dataset.cf); hot(o ? [o] : null); });
       var rep = $('#pcf-rep', dlg.el); if (rep) rep.addEventListener('click', function(){ dlg.close({ k:'rep', id:sel }); });
@@ -662,7 +666,7 @@
   // tạo ràng buộc kích thước rồi mở ô sửa giá trị tại chỗ (Enter áp dụng, Esc giữ giá trị đo)
   function dimCreate(ctx, d, c){
     var val = measure(d, c);
-    if (!(val > 1e-9)){ ctx.out('<span class="err">Không đo được:</span> hai điểm trùng nhau hoặc hai đường song song.'); return; }
+    if (!(val > 1e-9)){ ctx.out('<span class="err">Không đo được:</span> giá trị đo bằng 0. Chọn hai điểm lệch nhau theo phương đo, hoặc hai đường không song song.'); return; }
     var p = P(d); c.val = val; c.expr = numStr(val); c.name = nextName(p, DT[c.k][3]);
     return addFlow(ctx, d, c).then(function(ok){
       if (!ok || c.ref) return;
@@ -670,8 +674,10 @@
       ctx.out('Giá trị đo = <b class="mono">' + fmtV(val, c.k === 'ang') + '</b>. Gõ giá trị hoặc biểu thức rồi Enter, ví dụ ' + esc(c.name) + '=' + (oth ? esc(oth.name) + '/2' : numStr(Math.round(val * 1.5))) + '; Esc giữ giá trị đo.', 'faint');
       V().draw(); var ed = editor(d, c);
       return Promise.race([ed.done, ctx.val('Giá trị hoặc biểu thức', c.name + '=' + c.expr, { allowSpace:true })]).then(function(v){
-        ed.close(); if (typeof v !== 'string' || !v.trim() || v.trim() === c.name + '=' + c.expr) return;
-        var ne = splitNE(v, c.name), r = setParam(d, c.id, ne[0], ne[1], DT[c.k][2]); if (r.err) ctx.out('<span class="err">' + esc(r.err) + '</span> Giữ giá trị đo ' + fmtV(val, c.k === 'ang') + '. Sửa lại bằng nhấp đúp vào ' + esc(c.name) + '.');
+        ed.close();
+        if (v !== true){ if (typeof v !== 'string' || !v.trim() || v.trim() === c.name + '=' + c.expr) return;
+          var ne = splitNE(v, c.name), r = setParam(d, c.id, ne[0], ne[1], DT[c.k][2]); if (r.err){ ctx.out('<span class="err">' + esc(r.err.replace(/\.?$/, '.')) + '</span> Giữ giá trị đo ' + fmtV(val, c.k === 'ang') + '. Sửa lại bằng nhấp đúp vào ' + esc(c.name) + '.'); return; } }
+        var cc = byCid(d, c.id); if (cc) ctx.out('Đã đặt <b class="mono">' + esc(cc.name + '=' + cc.expr) + '</b>' + (cc.expr !== numStr(cc.val) ? ' = ' + fmtV(cc.val, cc.k === 'ang') : '') + '.'); // ô sửa tại chỗ (v === true) hoặc dòng lệnh
       }, function(err){ ed.close(); throw err; });
     });
   }
@@ -950,7 +956,7 @@
       var cell = function(f, txt){ return ed === f ? '<td class="ed"><input class="inp sm" data-pe="' + f + '" value="' + esc(PM.err && PM.err.key === it.key && PM.err.f === f ? PM.err.val : f === 'name' ? it.name : it.expr) + '" spellcheck="false" autocomplete="off" aria-label="' + (f === 'name' ? 'Tên' : 'Biểu thức') + ' của ' + esc(it.name) + '"></td>' : txt; };
       return '<tr data-pk="' + it.key + '" class="' + (PM.sel === it.key ? 'is-sel' : '') + (it.ref ? ' is-ref' : '') + '" tabindex="' + (PM.sel === it.key ? 0 : -1) + '" title="' + esc(it.dim ? consDesc(d, c) : 'Biến người dùng') + '">' +
         cell('name', '<td data-pf="name"><span class="pm-n">' + ic(it.dim ? DT[c.k][1] : 'params', 's12') + '<span class="mono">' + esc(it.name) + '</span></span></td>') +
-        cell('expr', '<td data-pf="expr" class="mono' + (er ? ' pm-bad' : '') + '">' + (it.ref ? '<span class="faint">(tham chiếu)</span>' : esc(it.expr)) + '</td>') +
+        cell('expr', '<td data-pf="expr" class="mono' + (er ? ' pm-bad' : '') + '">' + (it.ref ? '<span class="faint pm-ref">tham chiếu</span>' : esc(it.expr)) + '</td>') +
         '<td class="num">' + (er ? '<span class="pm-bad" title="' + esc(er) + '">' + ic('warn', 'xs') + '</span>' : it.ref ? '(' + fmtV(val, ang) + ')' : fmtV(val, ang)) + '</td><td class="faint">' + (it.dim ? KIND[c.k] : 'Biến') + '</td></tr>' +
         (PM.err && PM.err.key === it.key ? '<tr class="pm-err"><td colspan="4">' + ic('warn', 'xs') + ' ' + esc(PM.err.msg) + '</td></tr>' : er ? '<tr class="pm-err"><td colspan="4">' + ic('warn', 'xs') + ' ' + esc(er) + '</td></tr>' : '');
     };

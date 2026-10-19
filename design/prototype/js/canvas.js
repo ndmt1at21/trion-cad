@@ -116,7 +116,7 @@
   TC.docExt = function(doc){ var b = [Infinity, Infinity, -Infinity, -Infinity]; doc.ents.forEach(function(e){ if (e.t === 'xline' || e.t === 'ray' || !e._bb) return; if (e._bb[0] < b[0]) b[0] = e._bb[0]; if (e._bb[1] < b[1]) b[1] = e._bb[1]; if (e._bb[2] > b[2]) b[2] = e._bb[2]; if (e._bb[3] > b[3]) b[3] = e._bb[3]; }); if (b[0] < Infinity) doc.ext = b; return doc.ext; };
   TC.layerOf = function(doc, e){ return doc.layerMap[e.layer] || doc.layerMap['0']; };
   TC.layerVisible = function(doc, name){ var l = doc.layerMap[name]; if (!l) return true; var t = doc.tempLayers[name] || {}; var on = t.on != null ? t.on : l.on, frz = t.frz != null ? t.frz : l.frz; return on && !frz; };
-  TC.entVisible = function(doc, e){ return TC.layerVisible(doc, e.layer); };
+  TC.entVisible = function(doc, e){ return !e._ed && TC.layerVisible(doc, e.layer); };
 
   /* ---------- hình học ---------- */
   var G = TC.geo = {

@@ -27,7 +27,7 @@
         if (it.dis) return;
         if (it.sub){ openSub(b, it.sub); return; }
         closeMenus(0);
-        if (lockEd) { TC.upgrade(it.feature || it.label.replace(/<[^>]+>/g, ''), it.need); return; }
+        if (lockEd) { TC.screens.upgrade(it.feature || it.label.replace(/<[^>]+>/g, ''), it.need); return; }
         if (it.act) it.act();
       });
       b.addEventListener('mouseenter', function(){
@@ -226,6 +226,21 @@
     var s = e.target.closest('.numf .stepr button'); if (s) { step(s.closest('[data-num]'), Number(s.dataset.step)); return; }
     var p = e.target.closest('[data-pick]'); if (p && TC.pickValue) TC.pickValue(p.closest('[data-num]'));
   });
+  // nút ⌖ (UI-C09): ẩn hộp thoại chứa ô, chỉ 2 điểm → khoảng cách (ô góc: góc của đoạn); Esc quay lại hộp thoại
+  TC.pickValue = function(box){
+    if (!TC.app.doc() || $('input', box).readOnly) return;
+    var host = box.closest('.dlg'), api = dlgStack.filter(function(d){ return d.el === host; })[0], ang = box.dataset.unit === 'deg';
+    var stop = function(e){ if (e.key === 'Escape'){ e.stopPropagation(); TC.cad.endMode(); } };
+    var fin = function(v){ document.removeEventListener('keydown', stop, true); if (api) api.hide(false); var inp = $('input', box); if (v != null){ inp.value = TC.d(v, Number(box.dataset.prec)); numCommit(box); } inp.focus(); };
+    if (document.activeElement) document.activeElement.blur();
+    if (api) api.hide(true); document.addEventListener('keydown', stop, true);
+    TC.cmdline.msg((ang ? 'Chỉ điểm đầu của đoạn đo góc' : 'Chỉ điểm thứ nhất để đo khoảng cách') + ' (Esc để quay lại).');
+    TC.cad.getPoint({}).then(function(a){
+      if (!a) return fin();
+      TC.cmdline.msg('Chỉ điểm thứ hai.');
+      TC.cad.getPoint({ base:a.p, rubber:true }).then(function(b){ fin(b ? (ang ? (TC.geo.ang(a.p, b.p) + 360) % 360 : TC.geo.dist(a.p, b.p)) : null); });
+    });
+  };
   function step(box, dir){
     var inp = $('input', box); if (inp.readOnly) return;
     var r = TC.parseNum(inp.value, box.dataset.unit); var v = (r.err ? 0 : r.v) + dir * Number(box.dataset.step);
