@@ -104,7 +104,7 @@
     ['INSUNITS', 'e', 4, W_D, 'Đơn vị của nội dung chèn vào', { 0:'Không đơn vị', 1:'Inch', 2:'Feet', 4:'Milimét', 5:'Xentimét', 6:'Mét' }], ['LTSCALE', 'r', 100, W_D, 'Tỉ lệ linetype toàn cục', [0]],
     ['LUNITS', 'e', 2, W_D, 'Đơn vị độ dài', { 1:'Khoa học', 2:'Thập phân', 3:'Kỹ thuật', 4:'Kiến trúc', 5:'Phân số' }], ['LUPREC', 'i', 2, W_D, 'Số chữ số thập phân của độ dài', [0, 8]],
     ['LWDISPLAY', 'b', 0, W_D, 'Hiển thị độ dày nét'], ['MEASUREMENT', 'e', 1, W_D, 'Hệ đo cho mẫu hatch và linetype', { 0:'Anh (inch)', 1:'Mét' }],
-    ['MIRRTEXT', 'b', 0, W_D, 'Lật chữ khi đối xứng (MIRROR)'], ['MODEMACRO', 's', '', W_N, 'Chuỗi DIESEL hiện ở ô tùy biến trên thanh trạng thái'],
+    ['MIRRTEXT', 'b', 0, W_D, 'Lật chữ khi đối xứng (MIRROR)'], ['MODEMACRO', 's', '', W_N, 'Chuỗi DIESEL hiện ở ô tùy biến trên thanh trạng thái'], ['MOVEBAK', 's', '', W_U, 'Thư mục chứa tệp .bak khi lưu (MOVEBAK)'],
     ['ORTHOMODE', 'b', 0, W_D, 'Chế độ Ortho'], ['OSMODE', 'bit', 255, W_U, 'Chế độ bắt điểm đang bật (mã bit, 16384 = tắt tạm)', [0, 32767]],
     ['PDMODE', 'i', 0, W_D, 'Kiểu hiển thị của điểm (DDPTYPE)', [0, 100]], ['PDSIZE', 'r', 0, W_D, 'Cỡ hiển thị của điểm'],
     ['PEDITACCEPT', 'b', 0, W_U, 'PEDIT tự chuyển line, arc thành polyline, không hỏi'], ['PICKADD', 'e', 2, W_U, 'Cách cộng dồn vùng chọn', { 0:'Thay vùng chọn', 1:'Cộng dồn', 2:'Cộng dồn, giữ khi gọi SELECT' }],
@@ -675,13 +675,13 @@
     ['grid', 'Hỗ trợ vẽ', 'Lưới', 'GRIDMODE', 'F7 · Ctrl+G', 'Toàn cục', '⌃G'], ['ortho', 'Hỗ trợ vẽ', 'Ortho', 'ORTHOMODE', 'F8 · Ctrl+L', 'Toàn cục', '⌃L'],
     ['snap', 'Hỗ trợ vẽ', 'Snap', 'SNAPMODE', 'F9 · Ctrl+B', 'Toàn cục', '⌃B'], ['polar', 'Hỗ trợ vẽ', 'Polar', 'AUTOSNAP', 'F10 · Ctrl+U', 'Toàn cục', '⌃U'],
     ['otrack', 'Hỗ trợ vẽ', 'Theo dõi bắt điểm', 'AUTOSNAP', 'F11', 'Toàn cục', '⌃K'], ['dyn', 'Hỗ trợ vẽ', 'Nhập động', 'DYNMODE', 'F12', 'Toàn cục', '⌃D'],
-    ['qp', 'Hỗ trợ vẽ', 'Thuộc tính nhanh', 'QPMODE', 'Ctrl+Shift+P', 'Toàn cục'], ['cycle', 'Hỗ trợ vẽ', 'Chọn luân phiên', 'SELECTIONCYCLING', 'Ctrl+W', 'Vùng vẽ'],
+    ['qp', 'Hỗ trợ vẽ', 'Thuộc tính nhanh', 'QPMODE', 'Ctrl+Shift+P', 'Toàn cục'], ['infer', 'Hỗ trợ vẽ', 'Suy luận ràng buộc', 'CONSTRAINTINFER', 'Ctrl+Shift+I', 'Toàn cục'], ['cycle', 'Hỗ trợ vẽ', 'Chọn luân phiên', 'SELECTIONCYCLING', 'Ctrl+W', 'Vùng vẽ'],
     ['new', 'Tệp', 'Bản vẽ mới', 'NEW', 'Ctrl+N', 'Toàn cục'], ['open', 'Tệp', 'Mở bản vẽ', 'OPEN', 'Ctrl+O', 'Toàn cục'], ['save', 'Tệp', 'Lưu', 'QSAVE', 'Ctrl+S', 'Toàn cục'], ['saveas', 'Tệp', 'Lưu thành', 'SAVEAS', 'Ctrl+Shift+S', 'Toàn cục'],
     ['plot', 'Tệp', 'In', 'PLOT', 'Ctrl+P', 'Toàn cục'], ['close', 'Tệp', 'Đóng bản vẽ', 'CLOSE', 'Ctrl+F4', 'Toàn cục'], ['quit', 'Tệp', 'Thoát TrionCAD', 'QUIT', 'Ctrl+Q', 'Toàn cục'],
     ['undo', 'Sửa', 'Hoàn tác', 'U', 'Ctrl+Z', 'Toàn cục'], ['redo', 'Sửa', 'Làm lại', 'REDO', 'Ctrl+Y', 'Toàn cục'], ['cut', 'Sửa', 'Cắt', 'CUTCLIP', 'Ctrl+X', 'Vùng vẽ'], ['copy', 'Sửa', 'Sao chép', 'COPYCLIP', 'Ctrl+C', 'Vùng vẽ'],
     ['copybase', 'Sửa', 'Sao chép có điểm gốc', 'COPYBASE', 'Ctrl+Shift+C', 'Vùng vẽ'], ['paste', 'Sửa', 'Dán', 'PASTECLIP', 'Ctrl+V', 'Vùng vẽ'], ['pasteblock', 'Sửa', 'Dán dạng block', 'PASTEBLOCK', 'Ctrl+Shift+V', 'Vùng vẽ'],
     ['selall', 'Sửa', 'Chọn tất cả', 'SELECTALL', 'Ctrl+A', 'Vùng vẽ'], ['erase', 'Sửa', 'Xóa đối tượng đã chọn', 'ERASE', 'Delete', 'Vùng vẽ'],
-    ['props', 'Palette, hiển thị', 'Palette Thuộc tính', 'PROPERTIES', 'Ctrl+1', 'Toàn cục'], ['dc', 'Palette, hiển thị', 'DesignCenter', 'ADCENTER', 'Ctrl+2', 'Toàn cục'], ['tp', 'Palette, hiển thị', 'Tool Palettes', 'TOOLPALETTES', 'Ctrl+3', 'Toàn cục'],
+    ['props', 'Palette, hiển thị', 'Palette Thuộc tính', 'PROPERTIES', 'Ctrl+1', 'Toàn cục'], ['dc', 'Palette, hiển thị', 'DesignCenter', 'ADCENTER', 'Ctrl+2', 'Toàn cục'], ['tp', 'Palette, hiển thị', 'Tool Palettes', 'TOOLPALETTES', 'Ctrl+3', 'Toàn cục'], ['ssm', 'Palette, hiển thị', 'Sheet Set Manager', 'SHEETSET', 'Ctrl+4', 'Toàn cục'], ['qc', 'Palette, hiển thị', 'Máy tính nhanh', 'QUICKCALC', 'Ctrl+8', 'Toàn cục'],
     ['cmdl', 'Palette, hiển thị', 'Bật/tắt dòng lệnh', 'COMMANDLINE', 'Ctrl+9', 'Toàn cục'], ['clean', 'Palette, hiển thị', 'Clean Screen', 'CLEANSCREENON', 'Ctrl+0', 'Toàn cục'], ['coord', 'Palette, hiển thị', 'Kiểu hiển thị tọa độ', 'COORDS', 'Ctrl+I', 'Toàn cục'],
     ['ntab', 'Palette, hiển thị', 'Tab tệp kế / trước', '—', 'Ctrl+Tab · Ctrl+Shift+Tab', 'Toàn cục'], ['nlay', 'Palette, hiển thị', 'Layout kế / trước', '—', 'Ctrl+PgDn · Ctrl+PgUp', 'Toàn cục'], ['vpnext', 'Palette, hiển thị', 'Chuyển viewport kích hoạt', 'VPNEXT', 'Ctrl+R', 'Vùng vẽ']
   ];
@@ -692,11 +692,11 @@
   function allRows(){ var seen = {}; KDEF.forEach(function(k){ seen[k[3]] = 1; }); return KDEF.map(function(k){ return { id:k[0], grp:k[1], name:k[2], cmd:k[3], scope:k[5], alt:k[6] }; }).concat(Object.keys(TC.CMDS).filter(function(n){ return !seen[n]; }).sort().map(function(n){ var c = TC.CMDS[n]; return { id:n, grp:'Lệnh khác', name:c.desc, cmd:n, scope:'Toàn cục' }; })); }
   function owner(combo, except){ var hit = null; allRows().forEach(function(r){ if (r.id !== except && keysOf(r.id).split(' · ').indexOf(combo) >= 0) hit = r; }); return hit; }
   function comboOf(e){ var k = e.key; if (/^(Control|Shift|Alt|Meta)$/.test(k)) return null; if (k === ' ') k = 'Space'; else if (k.length === 1) k = k.toUpperCase(); else if (k === 'PageDown') k = 'PgDn'; else if (k === 'PageUp') k = 'PgUp'; return (e.ctrlKey || e.metaKey ? 'Ctrl+' : '') + (e.altKey ? 'Alt+' : '') + (e.shiftKey ? 'Shift+' : '') + k; }
-  var ACT = { osnap:function(){ A().toggle('osnap'); }, grid:function(){ A().toggle('grid'); }, ortho:function(){ A().toggle('ortho'); }, snap:function(){ A().toggle('snap'); }, polar:function(){ A().toggle('polar'); }, otrack:function(){ A().toggle('otrack'); }, dyn:function(){ A().toggle('dyn'); }, qp:function(){ A().toggle('qp'); }, cycle:function(){ A().toggle('cycle'); }, isop:function(){ TC.S.isoFace = ((TC.S.isoFace || 0) + 1) % 3; TC.cmdline.msg('&lt;Mặt isometric: ' + ['Trái', 'Trên', 'Phải'][TC.S.isoFace] + '&gt;'); },
+  var ACT = { infer:function(){ A().toggle('infer'); }, osnap:function(){ A().toggle('osnap'); }, grid:function(){ A().toggle('grid'); }, ortho:function(){ A().toggle('ortho'); }, snap:function(){ A().toggle('snap'); }, polar:function(){ A().toggle('polar'); }, otrack:function(){ A().toggle('otrack'); }, dyn:function(){ A().toggle('dyn'); }, qp:function(){ A().toggle('qp'); }, cycle:function(){ A().toggle('cycle'); }, isop:function(){ TC.S.isoFace = ((TC.S.isoFace || 0) + 1) % 3; TC.cmdline.msg('&lt;Mặt isometric: ' + ['Trái', 'Trên', 'Phải'][TC.S.isoFace] + '&gt;'); },
     cmdl:function(){ $('#app').classList.toggle('no-cmd'); setTimeout(function(){ V().resize(); }, 0); }, clean:function(){ A().cleanScreen(); }, help:function(){ TC.openHelp(TC.cmdline.current()); }, hist:function(){ SC.textWindow(); },
     vpnext:function(){ var d = D(); if (!d || d.space === 'model'){ TC.cmdline.msg('&lt;Ctrl+R: chỉ dùng trong layout có nhiều viewport&gt;'); return; } var vps = d.layouts[d.space].vports; if (!vps.length) return; var i = vps.map(function(v){ return v.id; }).indexOf(d.activeVp); d.activeVp = vps[(i + 1) % vps.length].id; V().draw(); A().renderStatus(); TC.cmdline.msg('&lt;Viewport kích hoạt: ' + ((i + 1) % vps.length + 1) + '/' + vps.length + '&gt;'); } };
   // phím mới của Đợt 4 và phím người dùng gán: chạy trước bộ xử lý phím của khung (shell.js)
-  var NEWDEF = { 'Ctrl+E':'isop', F5:'isop', 'Ctrl+G':'grid', 'Ctrl+L':'ortho', 'Ctrl+B':'snap', 'Ctrl+U':'polar', 'Ctrl+W':'cycle', 'Ctrl+Shift+P':'qp', 'Ctrl+2':'dc', 'Ctrl+3':'tp', 'Ctrl+R':'vpnext', 'Ctrl+Q':'quit' };
+  var NEWDEF = { 'Ctrl+E':'isop', F5:'isop', 'Ctrl+G':'grid', 'Ctrl+L':'ortho', 'Ctrl+B':'snap', 'Ctrl+U':'polar', 'Ctrl+W':'cycle', 'Ctrl+Shift+P':'qp', 'Ctrl+2':'dc', 'Ctrl+3':'tp', 'Ctrl+4':'ssm', 'Ctrl+8':'qc', 'Ctrl+Shift+I':'infer', 'Ctrl+R':'vpnext', 'Ctrl+Q':'quit' };
   document.addEventListener('keydown', function(e){
     if (e.defaultPrevented || A().active === 'start' && !/^F\d+$/.test(e.key)) return;
     var t = e.target, inField = (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) && t.id !== 'cmd-in';
@@ -707,7 +707,7 @@
     if (hit && (hit.id in userKeys || NEWDEF[c] === hit.id || hit.grp === 'Lệnh khác')){ e.preventDefault(); run(hit.id, hit.cmd); return; }
     if (!hit && KDEF.some(function(k){ return k[4].split(' · ').indexOf(c) >= 0 && k[0] in userKeys; })){ e.preventDefault(); } // phím mặc định đã bị người dùng gỡ
   });
-  function run(id, cmd){ if (ACT[id]){ if (TC.isViewer() && /grid|ortho|snap|polar|otrack|dyn|qp|cycle|isop/.test(id)){ TC.cmdline.msg('&lt;Có trong TrionCAD Pro&gt;'); return; } ACT[id](); } else if (cmd && TC.CMDS[cmd]) TC.cmd.run(cmd); }
+  function run(id, cmd){ if (ACT[id]){ if (TC.isViewer() && /grid|ortho|snap|polar|otrack|dyn|qp|cycle|isop|infer/.test(id)){ TC.cmdline.msg('&lt;Có trong TrionCAD Pro&gt;'); return; } ACT[id](); } else if (cmd && TC.CMDS[cmd]) TC.cmd.run(cmd); }
   var keyCap = false;
   SC.shortcuts = function(selId){
     var st = { q:'', f:'all', sel:selId || 'save', cap:false }, draft = JSON.parse(JSON.stringify(userKeys));
@@ -904,6 +904,6 @@
   TC.on('theme', function(){ if (TILE.view) TILE.view.draw(); });
   TC.tileMenu = function(){ return [{ label:'Một cửa sổ (tab)', check:!TILE.mode, act:function(){ SC.tile(null); } }, { label:'Chia ô dọc', check:TILE.mode === 'v', act:function(){ SC.tile('v'); } }, { label:'Chia ô ngang', check:TILE.mode === 'h', act:function(){ SC.tile('h'); } }]; };
 
-  OPEN['UI-MR'] = function(){ SC.cat.plan(); setTimeout(function(){ var t = $$('.rb-tab').filter(function(b){ return b.textContent.trim() === 'Mở rộng'; })[0]; if (t) t.click(); SC.cat.flash('#rb'); TC.toast('Tab Mở rộng: công cụ kiểu Express Tools, giữ tên lệnh gốc (BURST, NCOPY, GATTE, TXTEXP, FLATTEN, EXTRIM, MPEDIT, SAVEALL…). Nút ghi “sau v1.0” là phần P2.', { type:'info', log:false, ms:9000 }); }, 80); };
+  OPEN['UI-MR'] = function(){ SC.cat.plan(); setTimeout(function(){ var t = $$('.rb-tab').filter(function(b){ return b.textContent.trim() === 'Mở rộng'; })[0]; if (t) t.click(); SC.cat.flash('#rb'); TC.toast('Tab Mở rộng: công cụ kiểu Express Tools, giữ tên lệnh gốc (BURST, NCOPY, GATTE, TXTEXP, FLATTEN, EXTRIM, MPEDIT, SAVEALL…). Phần P2 (ARCTEXT, TEXTMASK, BREAKLINE, SUPERHATCH…) có từ bản sau v1.0, xem mục UI-MR2.', { type:'info', log:false, ms:9000 }); }, 80); };
 
 })();

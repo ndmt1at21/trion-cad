@@ -20,7 +20,7 @@
   var ITEMS = RAW.split(';').map(function(r){ var f = r.split('|'); return { code:'UI-' + f[0], name:f[1], rel:f[2], wave:Number(f[3]), st:f[4] }; });
   TC.CATALOG = ITEMS;
   // phần của Đợt 4 không có mã màn hình riêng (07.3 Phụ lục B)
-  var EXTRA = [{ code:'UI-MAC', name:'Bản macOS: thanh menu hệ thống, nút cửa sổ, phím ⌘, hộp thoại dạng sheet, touchpad', rel:'1.0', wave:4, st:'d' }, { code:'UI-MR', name:'Tab Mở rộng phần P1 (công cụ kiểu Express Tools)', rel:'1.0', wave:4, st:'d' }];
+  var EXTRA = [{ code:'UI-MAC', name:'Bản macOS: thanh menu hệ thống, nút cửa sổ, phím ⌘, hộp thoại dạng sheet, touchpad', rel:'1.0', wave:4, st:'d' }, { code:'UI-MR', name:'Tab Mở rộng phần P1 (công cụ kiểu Express Tools)', rel:'1.0', wave:4, st:'d' }, { code:'UI-PAR', name:'Tab Tham số: ràng buộc hình học và kích thước, quản lý tham số', rel:'Sau', wave:5, st:'' }, { code:'UI-MR2', name:'Tab Mở rộng phần P2 (Express Tools còn lại)', rel:'Sau', wave:5, st:'' }];
   function D1(){ if (A().active === 'start' || !A().doc()) A().activate(A().docs.filter(function(d){ return d.open; })[0] ? A().docs.filter(function(d){ return d.open; })[0].id : 'd1'); return A().doc(); }
   function flash(sel){ var el = $(sel); if (!el) return; var r = el.getBoundingClientRect(); var f = TC.el('<div style="position:fixed;z-index:870;border:2px solid var(--c-accent);border-radius:3px;pointer-events:none;transition:opacity .6s"></div>'); f.style.cssText += ';left:' + (r.left - 2) + 'px;top:' + (r.top - 2) + 'px;width:' + (r.width + 4) + 'px;height:' + (r.height + 4) + 'px'; document.body.appendChild(f); setTimeout(function(){ f.style.opacity = 0; }, 1400); setTimeout(function(){ f.remove(); }, 2100); }
   function VP(){ if (!TC.can('VP')){ TC.S.edition = 'vp'; TC.save('edition', 'vp'); TC.emit('edition'); } return D1(); }
@@ -86,8 +86,8 @@
     'UI-L05':function(){ SC.trialExpired(); TC.toast('Trong thời gian dùng thử: nhắc hạn ở mốc 7, 3, 1 ngày (toast có nút Mua). Hết hạn: màn hình này, chuyển về Viewer, dữ liệu an toàn.', { type:'info', log:false }); }
   });
   ['N01','N02','N03'].forEach(function(n){ OPEN['UI-' + n] = function(){ location.href = 'cong-cu-mien-phi.html#' + n.toLowerCase(); }; });
-  // Đợt 4: mỗi tệp screens9–14 đăng ký cách mở màn hình vào SC.open4; SC.cat cho các tệp đó dùng lại tiện ích ở đây
-  Object.assign(OPEN, SC.open4 || {});
+  // Đợt 4, 5: mỗi tệp screens9–21 đăng ký cách mở màn hình vào SC.open4/open5; SC.cat cho các tệp đó dùng lại tiện ích ở đây
+  Object.assign(OPEN, SC.open4 || {}, SC.open5 || {});
   SC.cat = { D1:D1, PRO:PRO, MOD:MOD, RUN:RUN, plan:plan, pick:pick, flash:flash };
   TC.openScreen = function(code){ var fn = OPEN[code]; if (fn) fn(); return !!fn; };
   SC.catalog = function(){
@@ -100,9 +100,9 @@
       var W = ['Đợt 0 · Công cụ miễn phí','Đợt 1 · Hệ thống thiết kế và Viewer','Đợt 2 · Viewer Pro','Đợt 3 · Bản biên tập (EA)','Đợt 4 · v1.0','Đợt 5 · Sau v1.0'], h = '';
       W.forEach(function(wn, w){
         var list = ITEMS.filter(function(i){ return i.wave === w && (filt === 'all' || (filt === 'x' ? !i.st : i.st === filt)) && (!q || TC.fold(i.code + ' ' + i.name).indexOf(TC.fold(q)) >= 0); });
-        var ex = w === 4 ? EXTRA.filter(function(i){ return OPEN[i.code] && (filt === 'all' || filt === 'd') && (!q || TC.fold(i.code + ' ' + i.name).indexOf(TC.fold(q)) >= 0); }) : [];
+        var ex = w >= 4 ? EXTRA.filter(function(i){ return i.wave === w && OPEN[i.code] && (filt === 'all' || filt === 'd') && (!q || TC.fold(i.code + ' ' + i.name).indexOf(TC.fold(q)) >= 0); }) : [];
         if (!list.length && !ex.length) return;
-        h += '<div class="cat-group">' + wn + ' · ' + list.length + '</div>' + list.concat(ex.length ? [{ sub:'Đi kèm Đợt 4, không có mã riêng' }] : []).concat(ex).map(function(i){ if (i.sub) return '<div class="cat-sub">' + i.sub + '</div>'; var can = OPEN[i.code]; return '<button class="cat-row" type="button" data-code="' + i.code + '"' + (can ? '' : ' aria-disabled="true"') + '><span class="cd">' + i.code + '</span><span>' + esc(i.name) + '</span><span class="faint" style="font-size:var(--fs-xs)">' + i.rel + '</span><span class="st">' + (i.st === 'd' ? '<span class="tag ok">Đã thiết kế</span>' : i.st === 'p' ? '<span class="tag info">Một phần</span>' : '<span class="tag">Đợt ' + i.wave + '</span>') + '</span></button>'; }).join('');
+        h += '<div class="cat-group">' + wn + ' · ' + list.length + '</div>' + list.concat(ex.length ? [{ sub:'Đi kèm Đợt ' + w + ', không có mã riêng' }] : []).concat(ex).map(function(i){ if (i.sub) return '<div class="cat-sub">' + i.sub + '</div>'; var can = OPEN[i.code]; return '<button class="cat-row" type="button" data-code="' + i.code + '"' + (can ? '' : ' aria-disabled="true"') + '><span class="cd">' + i.code + '</span><span>' + esc(i.name) + '</span><span class="faint" style="font-size:var(--fs-xs)">' + i.rel + '</span><span class="st">' + (i.st === 'd' ? '<span class="tag ok">Đã thiết kế</span>' : i.st === 'p' ? '<span class="tag info">Một phần</span>' : '<span class="tag">Đợt ' + i.wave + '</span>') + '</span></button>'; }).join('');
       });
       $('#ct-l', dlg.el).innerHTML = h || '<div class="empty">Không có màn hình khớp.</div>';
     }

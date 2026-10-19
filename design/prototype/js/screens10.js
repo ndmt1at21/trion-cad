@@ -7,7 +7,6 @@
   var T = ED.T, P = TC.PALETTES;
   function num(v, d){ var n = TC.parseNum(v, 'none'); return n.err ? d : n.v; }
   function rp(x0, y0, x1, y1){ return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]; }
-  function later(what){ TC.toast('<b>' + esc(what) + '</b> có ở sau v1.0.', { type:'info', log:false }); }
   function bad(msg){ var m = V().mouse || [140, 140]; TC.ctip($('#cv'), m[0], m[1], msg); }
   function nowStr(){ return TC.date() + ' ' + new Date().toTimeString().slice(0, 5); }
   var BADNAME = /[<>\/\\":;?*|,=`]/, BADMSG = 'Tên không chứa < > / \\ " : ; ? * | , = `';
@@ -60,6 +59,7 @@
     TC.cmdline.msg('Block Editor: <b>' + esc(name) + '</b>' + (bd ? ' · ' + d.ents.length + ' đối tượng' : ' · block mới') + '. Vẽ, sửa như bình thường; BSAVE để lưu, BCLOSE để đóng.');
   }
   SC.bedit = function(name){ var d = D(); if (d && !TC.isViewer()) beEnter(d, name); };
+  SC.beQuit = function(){ var d = D(); if (d && d.bedit) beExit(d); };
   // vừa khung nhìn với vùng b, chừa chỗ cho các banner phía trên vùng vẽ
   function fitView(d, b){ var v = V(), bh = ($('#banners') || {}).offsetHeight || 0, w = Math.max(b[2] - b[0], 1e-6), h = Math.max(b[3] - b[1], 1e-6), s = Math.min(v.W / (w * 1.3), (v.H - bh) / (h * 1.3)); v.pushHist(); d.view = { cx:(b[0] + b[2]) / 2, cy:(b[1] + b[3]) / 2 + bh / 2 / s, s:s }; v.draw(); TC.emit('view'); }
   function beChrome(d){
@@ -67,16 +67,13 @@
     A().banner(d, { id:'bedit', icon:'bedit', html:'Đang sửa block <b>' + esc(B.name) + '</b>' + (B.origs[B.name] ? ' · ' + n + ' tham chiếu sẽ cập nhật khi lưu' : ' · block mới, tạo khi lưu') + '. Gốc tọa độ là điểm gốc của block.', acts:[{ label:'Lưu block', primary:true, fn:function(){ TC.cmd.run('BSAVE'); } }, { label:'Đóng Block Editor', fn:function(){ TC.cmd.run('BCLOSE'); } }], onClose:function(){ TC.cmd.run('BCLOSE'); } });
     modeAttr(); A().setCtxTab(beTab(d), A().ctxTab && A().ctxTab.id === 'bedit'); V().draw(); A().refreshPalettes();
   }
-  function p2(id, label, icon, t){ return { t:t || 's', label:label, icon:icon, id:'be-p2-' + id, desc:'Dynamic block (UI-G05): có ở sau v1.0.', act:function(){ later(label.replace(/\n/g, ' ')); } }; }
   function beTab(d){ return { id:'bedit', name:'Block Editor', ctx:true, panels:[
     { name:'Mở/Lưu', icon:'save', prio:1, items:[ { t:'lg', label:'Lưu\nblock', icon:'save', id:'be-save', cmd:'BSAVE', desc:'Lưu định nghĩa block. Mọi tham chiếu cập nhật khi đóng Block Editor.' }, { t:'col', items:[ { t:'s', label:'Sửa block khác', icon:'bedit', id:'be-other', cmd:'BEDIT' }, { t:'s', label:'Lưu thành…', icon:'saveas', id:'be-saveas', act:function(){ beSaveAs(D()); } } ] } ] },
-    { name:'Hình học', icon:'line', prio:3, items:[ { t:'col', items:[ { t:'s', label:'Đường thẳng', icon:'line', id:'be-line', cmd:'LINE' }, { t:'s', label:'Polyline', icon:'pline', id:'be-pl', cmd:'PLINE' }, { t:'s', label:'Đường tròn', icon:'circle', id:'be-c', cmd:'CIRCLE' } ] }, { t:'col', items:[ { t:'s', label:'Đặt điểm gốc', icon:'idpoint', id:'be-base', cmd:'BASE', desc:'Chỉ một điểm: điểm đó thành gốc của block. Tham chiếu giữ điểm chèn, hình học dịch theo.' }, p2('auto', 'Tự ràng buộc', 'snap'), p2('geo', 'Ràng buộc hình học', 'osnap') ] } ] },
-    { name:'Quản lý', icon:'gear', prio:2, items:[ { t:'col', items:[ { t:'s', label:'Xóa', icon:'erase', id:'be-erase', cmd:'ERASE' }, { t:'s', label:'Đối tượng dựng hình', icon:'construct', id:'be-cons', desc:'Chọn đối tượng rồi bấm: đối tượng dựng hình chỉ hiện trong Block Editor, không hiện ở tham chiếu. Bấm lần nữa để bỏ.', act:beCons }, { t:'s', label:'Định nghĩa attribute', icon:'attedit', id:'be-att', cmd:'ATTDEF' } ] }, { t:'col', items:[ p2('cs', 'Hiện ràng buộc', 'eye'), p2('pm', 'Quản lý tham số', 'list'), p2('pal', 'Palette tạo block', 'blocks') ] } ] },
-    { name:'Tham số, Action · sau v1.0', icon:'param', prio:4, items:[ p2('par', 'Tham số', 'param', 'lg'), p2('act', 'Action', 'move', 'lg'), p2('tbl', 'Bảng\nthuộc tính', 'table', 'lg') ] },
-    { name:'Visibility · sau v1.0', icon:'eye', prio:5, items:[ { t:'col', items:[ p2('vm', 'Chế độ hiển thị', 'eye'), p2('vs', 'Trạng thái hiển thị', 'layers'), p2('vh', 'Hiện, ẩn theo trạng thái', 'eyeoff') ] } ] },
-    { name:'Thử · sau v1.0', icon:'play', prio:5, items:[ p2('test', 'Thử\nblock', 'play', 'lg') ] },
+    { name:'Hình học', icon:'line', prio:4, items:[ { t:'col', items:[ { t:'s', label:'Đường thẳng', icon:'line', id:'be-line', cmd:'LINE' }, { t:'s', label:'Polyline', icon:'pline', id:'be-pl', cmd:'PLINE' }, { t:'s', label:'Đường tròn', icon:'circle', id:'be-c', cmd:'CIRCLE' } ] }, { t:'col', items:[ { t:'s', label:'Đặt điểm gốc', icon:'idpoint', id:'be-base', cmd:'BASE', desc:'Chỉ một điểm: điểm đó thành gốc của block. Tham chiếu giữ điểm chèn, hình học dịch theo.' }, { t:'s', label:'Tự ràng buộc', icon:'gauto', id:'be-auto', cmd:'AUTOCONSTRAIN' }, { t:'s', label:'Ràng buộc hình học', icon:'gcoin', id:'be-geo', cmd:'GEOMCONSTRAINT' } ] } ] },
+    { name:'Quản lý', icon:'gear', prio:3, items:[ { t:'col', items:[ { t:'s', label:'Xóa', icon:'erase', id:'be-erase', cmd:'ERASE' }, { t:'s', label:'Đối tượng dựng hình', icon:'construct', id:'be-cons', desc:'Chọn đối tượng rồi bấm: đối tượng dựng hình chỉ hiện trong Block Editor, không hiện ở tham chiếu. Bấm lần nữa để bỏ.', act:beCons }, { t:'s', label:'Định nghĩa attribute', icon:'attedit', id:'be-att', cmd:'ATTDEF' } ] }, { t:'col', items:[ { t:'s', label:'Hiện ràng buộc', icon:'gbar', id:'be-cs', cmd:'CONSTRAINTBAR' }, { t:'s', label:'Quản lý tham số', icon:'params', id:'be-pm', cmd:'PARAMETERS' }, { t:'s', label:'Palette tạo block', icon:'dauthor', id:'be-pal', cmd:'BAUTHORPALETTE', desc:'Bật, tắt palette Tạo block: tham số, action, bộ tham số, ràng buộc (UI-G05).' } ] } ] }
+  ].concat(SC.dynPanels ? SC.dynPanels(d) : [], [ // Tham số và Action, Visibility, Thử: screens16.js
     { name:'Đóng', icon:'close', prio:1, items:[ { t:'lg', label:'Đóng\nBlock Editor', icon:'close', id:'be-close', cmd:'BCLOSE', desc:'Đóng Block Editor; hỏi lưu nếu có thay đổi.' } ] }
-  ] }; }
+  ]) }; }
   function beCons(){ var d = D(), ids = ED.editable(d.sel.slice()); if (!d.bedit) return; if (!ids.length){ TC.cmdline.msg('Chọn đối tượng trước, rồi bấm <b>Đối tượng dựng hình</b>.'); return; }
     var on = !ids.every(function(id){ return d.byId[id] && d.byId[id].cons; }); ED.run('BCONSTRUCTION', function(){ ids.forEach(function(id){ ED.mod(d.byId[id], function(x){ if (on) x.cons = true; else delete x.cons; }); }); }); TC.cad.clearSel(); V().draw();
     TC.cmdline.msg(ids.length + ' đối tượng ' + (on ? 'thành đối tượng dựng hình (hiện mờ, không hiện ở tham chiếu).' : 'trở lại đối tượng thường.')); }
@@ -108,6 +105,7 @@
     A().unbanner(d, 'bedit'); modeAttr(); if (A().ctxTab && A().ctxTab.id === 'bedit') A().setCtxTab(null); ED.ctxRefresh();
     if (ops.length) ED.changed(d); else { V().draw(); TC.emit('sel'); } A().refreshPalettes();
     TC.cmdline.msg(ops.length ? 'Đã đóng Block Editor: ' + ops.map(function(o){ return '<b>' + esc(o.a.n) + '</b> (' + allIns(d, o.a.n).length + ' tham chiếu)'; }).join(', ') + ' đã cập nhật. Ctrl+Z để hoàn tác cả phiên sửa.' : 'Đã đóng Block Editor.');
+    TC.emit('bclose', { d:d, name:B.name, saved:ops.length > 0 }); // screens16: đóng palette tạo block
   }
   IMPL.BSAVE = function(ctx){ var d = D(); if (!d.bedit){ ctx.out('BSAVE dùng trong Block Editor. Mở Block Editor bằng BEDIT.'); return; } if (!d.ents.length) return TC.confirm({ title:'Lưu block rỗng', msg:'Block <b>' + esc(d.bedit.name) + '</b> không còn đối tượng nào. Vẫn lưu?', detail:'Các tham chiếu của block sẽ không còn hiện gì.', ok:'Lưu block rỗng' }).then(function(y){ if (y) beSave(d); }); beSave(d); };
   IMPL.BCLOSE = function(ctx){ var d = D(); if (!d.bedit){ ctx.out('Block Editor đang không mở.'); return; } return beClose(d); };
@@ -129,7 +127,7 @@
         var list = names(), typed = q.trim(), isNew = typed && !d.blocks[typed] && !list.length;
         if (cur && !list.some(function(x){ return x[0] === cur; })) cur = list.length ? list[0][0] : null;
         if (!cur && list.length && !isNew) cur = list[0][0];
-        $('#be-l', dlg.el).innerHTML = list.length ? list.map(function(x){ var bd = d.blocks[x[0]]; return '<button class="bei" type="button" role="option" data-bn="' + esc(x[0]) + '" aria-selected="' + (x[0] === cur) + '"><span class="nm">' + esc(x[0]) + '</span>' + (attDefs(bd).length ? '<span class="tag">attribute</span>' : '') + (bd.lib ? '<span class="tag">thư viện</span>' : '') + '<span class="mono" data-tip="Số tham chiếu">' + x[1] + '</span></button>'; }).join('')
+        $('#be-l', dlg.el).innerHTML = list.length ? list.map(function(x){ var bd = d.blocks[x[0]]; return '<button class="bei" type="button" role="option" data-bn="' + esc(x[0]) + '" aria-selected="' + (x[0] === cur) + '"><span class="nm">' + esc(x[0]) + '</span>' + (attDefs(bd).length ? '<span class="tag">attribute</span>' : '') + (SC.dyn && SC.dyn.isDyn(bd) ? '<span class="tag acc">block động</span>' : '') + (bd.lib ? '<span class="tag">thư viện</span>' : '') + '<span class="mono" data-tip="Số tham chiếu">' + x[1] + '</span></button>'; }).join('')
           : '<div class="empty">' + ic('blocks') + (typed ? '<b>Chưa có block “' + esc(typed) + '”</b>Bấm Tạo block để vẽ block mới trong Block Editor.' : '<b>Bản vẽ chưa có block</b>Gõ tên để tạo block mới, hoặc mở Thư viện TCVN.') + '</div>';
         var bad = isNew && BADNAME.test(typed), m = $('#be-m', dlg.el), ok = $('#be-ok', dlg.el);
         m.className = 'fmsg ' + (bad ? 'err' : 'hint'); m.innerHTML = bad ? ic('warn', 'xs') + BADMSG : list.length + ' block · ↑↓ để chọn, Enter để sửa';
@@ -191,7 +189,7 @@
   TC.View.prototype.drawPrims = function(ctx, e, v, onPaper, style){
     var d = this.doc, k = 1;
     if (e.t === 'pdfu' && style){ var all = e._p, fr = all.filter(function(pr){ return pr.fr; }); if (fr.length){ e._p = fr; try { dp0.call(this, ctx, e, v, onPaper, style); } finally { e._p = all; } return; } }
-    if (!style){ if (e.t === 'pdfu') k = pdfAlpha(e); if (d && d.refedit && e.id && d.byId[e.id] === e && !d.refedit.ws[e.id]) k *= 1 - refFade(); if (d && d.bedit && e.cons) k *= .45; }
+    if (!style){ if (e.t === 'pdfu') k = pdfAlpha(e); if (d && d.refedit && e.id && d.byId[e.id] === e && !d.refedit.ws[e.id]) k *= 1 - refFade(); if (d && d.bedit && e.cons) k *= .45; if (d && d.bedit && SC.bvFade) k *= SC.bvFade(d, e); }
     if (k === 1) return dp0.apply(this, arguments);
     var g = ctx.globalAlpha; ctx.globalAlpha = g * k; dp0.call(this, alphaCtx(ctx, k), e, v, onPaper, style); ctx.globalAlpha = g;
   };

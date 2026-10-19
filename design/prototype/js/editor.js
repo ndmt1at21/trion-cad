@@ -169,14 +169,17 @@
       case 'xline': case 'ray': add(e.p, 'p'); add([e.p[0] + e.dir[0] * 1500, e.p[1] + e.dir[1] * 1500], 'dir', 'circ'); break;
       case 'vpframe': { var vp = vpOf(d, e); if (!vp) break; [[vp.x, vp.y], [vp.x + vp.w, vp.y], [vp.x + vp.w, vp.y + vp.h], [vp.x, vp.y + vp.h]].forEach(function(p, i){ add(p, 'k' + i); }); add([vp.x + vp.w / 2, vp.y + vp.h / 2], 'vc', 'sq'); add([vp.x + vp.w + 4, vp.y + vp.h / 2], 'vs', 'tri', { multi:'vps' }); break; }
     }
+    TC.gripsExt.forEach(function(f){ f(add, e, d); });
     return g;
   }
+  TC.gripsExt = []; // Đợt 5: hàm (add, e, d) thêm grip; grip có drag(e, p, g, op) / click(g) / menu(g) / draw(ctx, s, st) riêng
   ED.gripsOf = gripsOf;
   function gripOn(){ var d = D(); if (!d || TC.isViewer() || d.cmp || !d.sel.length || d.sel.length > 1000) return false; var c = TC.cmdline.current(); return !c || c === 'GRIPEDIT'; }
   function scrOf(e, p){ var v = V(); return e._paper ? v.toS(p) : v.mToS(p); }
   function same(a, b){ return a && b && a.e === b.e && a.key === b.key; }
   ED.drawGrip = function(ctx, g, st){ drawGrip(ctx, g, st); };
   function drawGrip(ctx, g, st){
+    if (g.draw){ g.draw(ctx, g.s, st); return; }
     var s = [Math.round(g.s[0]) + .5, Math.round(g.s[1]) + .5], z = st === 'cold' ? 9 : 11;
     ctx.fillStyle = TC.cssv(st === 'hot' ? '--c-grip-hot' : st === 'hover' ? '--c-grip-hover' : '--c-grip-cold'); ctx.strokeStyle = st === 'hot' ? '#FFFFFF' : TC.cssv('--c-grip-border'); ctx.lineWidth = st === 'cold' ? 1 : st === 'hover' ? 1.5 : 2.5; ctx.setLineDash([]);
     ctx.beginPath();
@@ -204,11 +207,12 @@
     var tip = $('.snap-tip'); if (tip) tip.remove();
     return true;
   };
-  cad.hook.gripDown = function(m, e){ if (!GR.hover || TC.cmdline.busy()) return false; var g = GR.hover; clearTimeout(GR.t); TC.closeMenus(0); GR.menu = null; TC.cmd.run('GRIPEDIT', g); return true; };
+  cad.hook.gripDown = function(m, e){ if (!GR.hover || TC.cmdline.busy()) return false; var g = GR.hover; clearTimeout(GR.t); TC.closeMenus(0); GR.menu = null; if (g.click){ g.click(g); return true; } TC.cmd.run('GRIPEDIT', g); return true; };
   // menu grip đa năng khi rê lên grip (07.1 §9.5; kích thước: UI-F05)
   function gripMenu(g){
     var r = $('#cv').getBoundingClientRect(), it = [], run = function(op, mode){ return function(){ TC.cmd.run('GRIPEDIT', Object.assign({}, g, { op:op, mode:mode || 0 })); }; };
-    if (g.multi === 'vtx') it = [{ label:'Kéo giãn', act:run() }, { label:'Thêm đỉnh', act:run('addv') }, { label:'Bớt đỉnh', act:function(){ removeVertex(g); } }];
+    if (g.menu) it = g.menu(g, run);
+    else if (g.multi === 'vtx') it = [{ label:'Kéo giãn', act:run() }, { label:'Thêm đỉnh', act:run('addv') }, { label:'Bớt đỉnh', act:function(){ removeVertex(g); } }];
     else if (g.multi === 'seg'){ var bul = (g.e.bulges || [])[g.si]; it = [{ label:'Kéo giãn', act:run() }, { label:'Thêm đỉnh', act:run('addv') }, bul ? { label:'Chuyển thành đoạn thẳng', act:function(){ toLine(g); } } : { label:'Chuyển thành cung', act:run('toarc') }]; }
     else if (g.multi === 'spl') it = [{ label:'Kéo giãn', act:run() }, { label:'Thêm điểm', act:run('addv') }, { label:'Bớt điểm', act:function(){ removeVertex(g); } }];
     else if (g.multi === 'arc') it = [{ label:'Kéo giãn', act:run() }, { label:'Bán kính', act:run('radius') }];
@@ -226,6 +230,7 @@
 
   // kéo giãn một grip: sửa trực tiếp đối tượng (bản thật hoặc bản xem trước)
   function stretchGrip(e, g, p, op){
+    if (g.drag){ g.drag(e, p, g, op); return e; }
     var k = g.key, dx = p[0] - g.p[0], dy = p[1] - g.p[1], sh = function(q){ return [q[0] + dx, q[1] + dy]; };
     switch (e.t){
       case 'line': if (k === 'mid'){ e.p1 = sh(e.p1); e.p2 = sh(e.p2); } else e[k] = p; break;

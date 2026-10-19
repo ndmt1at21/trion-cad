@@ -581,6 +581,7 @@
     if (sx * sy > 0) return { f:f, rot:sx > 0 ? r : r + 180, k:Math.abs(sx) };
     return { f:f, rot:0, k:Math.abs(sx), mir:true, th:(sx > 0 ? r : r + 180) / 2 }; }
   function explode(d, e){
+    if (TC.explodeExt[e.t]) return TC.explodeExt[e.t](d, e); // loại mới (Đợt 4–5) tự phá: trả mảng đối tượng hoặc null
     if (e.t === 'insert'){ var bd = d.blocks[e.name]; if (!bd) return null; var t = insT(e);
       return bd.ents.map(function(be){ var c = ED.clean(be); delete c.id;
         if (c.t === 'attdef'){ c.t = 'text'; c.s = e.attrs && e.attrs[c.tag] != null ? e.attrs[c.tag] : c.s; delete c.tag; }
@@ -598,6 +599,7 @@
     }
     return null;
   }
+  TC.explodeExt = TC.explodeExt || {};
   IMPL.EXPLODE = function(ctx){ return selEdit(ctx).then(function(ids){ if (!ids.length) return; var d = D(), n = 0, skip = 0, made = 0;
     return ED.run('EXPLODE', function(){ ids.forEach(function(id){ var e = d.byId[id], parts = e && explode(d, e); if (!parts){ skip++; return; } var list = ED.listOf(d, e); ED.del(e); parts.forEach(function(p){ ED.add(p, list); made++; }); n++; }); TC.cad.clearSel(); ctx.out('Đã phá ' + n + ' đối tượng thành ' + made + ' đối tượng.' + (skip ? ' ' + skip + ' đối tượng không phá được (line, cung, tròn, chữ, hatch).' : '')); }); }); };
   // nối các đoạn có điểm cuối trùng nhau thành một polyline

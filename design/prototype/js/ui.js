@@ -200,6 +200,8 @@
   TC.numField = function(o){
     return '<span class="numf' + (o.cls ? ' ' + o.cls : '') + '" data-num data-min="' + (o.min != null ? o.min : '') + '" data-step="' + (o.step || 1) + '" data-prec="' + (o.prec != null ? o.prec : 2) + '" data-unit="' + (o.unit || 'len') + '"' + (o.style ? ' style="' + o.style + '"' : '') + '>' +
       '<input id="' + o.id + '" value="' + esc(o.value) + '"' + (o.ro ? ' readonly' : '') + ' aria-label="' + esc(o.label || '') + '" autocomplete="off" spellcheck="false">' +
+      // nút máy tính (UI-I10): chỉ hiện khi rê chuột hoặc focus, lấy chỗ của phần chữ nên ô không rộng thêm; screens19.js mở "tính cho ô này"
+      (o.ro ? '' : '<button type="button" class="calc" data-calc tabindex="-1" aria-label="Máy tính nhanh" data-tip="Máy tính nhanh" data-cmd="QUICKCALC" data-key="Ctrl+8" data-need="PRO" data-desc="Tính giá trị cho ô này rồi bấm Áp dụng.">' + TC.ic('calc') + '</button>') +
       (o.pick !== false ? '<button type="button" class="pick" data-pick tabindex="-1" aria-label="Lấy từ bản vẽ" data-tip="Lấy từ bản vẽ" data-desc="Ẩn hộp thoại để chỉ điểm hoặc khoảng cách trên bản vẽ.">' + TC.ic('idpoint') + '</button>' : '') +
       '<span class="stepr"><button type="button" tabindex="-1" data-step="1" aria-label="Tăng">' + TC.ic('up') + '</button><button type="button" tabindex="-1" data-step="-1" aria-label="Giảm">' + TC.ic('down') + '</button></span></span>' +
       '<span class="fmsg" id="' + o.id + '-msg" aria-live="polite"></span>';

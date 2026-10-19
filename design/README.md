@@ -60,6 +60,13 @@ prototype/
   js/screens12.js  Đợt 4: bảng diện tích phòng, trích xuất dữ liệu, nhập attribute, Excel đầy đủ, đóng gói gửi đi, xử lý tệp hàng loạt
   js/screens13.js  Đợt 4: lệnh v1.0 chạy trên dòng lệnh (GRADIENT, REGION, WIPEOUT, MLINE, ALIGN, GROUP, QDIM, DIMBREAK…)
   js/screens14.js  Đợt 4: Thuộc tính nhanh, trạng thái và bộ lọc layer, duyệt layer, quản lý view và UCS, ViewCube, phím tắt, workspace, biến hệ thống, bản macOS, chia ô cửa sổ
+  js/screens15.js  Đợt 5: tab Tham số (ràng buộc hình học và kích thước, quản lý tham số, suy luận ràng buộc)
+  js/screens16.js  Đợt 5: dynamic block (palette tạo block, tham số và action, trạng thái hiển thị, thử block)
+  js/screens17.js  Đợt 5: Sheet Set Manager, quản lý máy in và PC3, thống kê thép
+  js/screens18.js  Đợt 5: làm sạch hình học, sức khỏe bản vẽ, kiểm tra TCVN, chuẩn .dws, dịch layer
+  js/screens19.js  Đợt 5: máy tính nhanh, kiểm tra chính tả, hyperlink
+  js/screens20.js  Đợt 5: tùy biến giao diện (CUI), bảng điều khiển LISP, quản lý plugin
+  js/screens21.js  Đợt 5: tab Mở rộng phần P2
   js/catalog.js    danh mục 172 mã, trạng thái thiết kế
 ```
 

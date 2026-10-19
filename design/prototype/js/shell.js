@@ -372,7 +372,7 @@
     $('#sb').innerHTML = (A.active === 'start' ? '<span class="sb-txt">Start</span>' :
       '<button class="sb-coord" type="button" id="sb-coord" data-tip="Tọa độ con trỏ" data-key="Ctrl+I" data-desc="Bấm để đổi kiểu hiển thị: tuyệt đối, tương đối, tắt.">0.00, 0.00, 0.00</button>' +
       '<button class="sb-txt" type="button" id="sb-space" data-tip="Không gian làm việc" data-desc="Trong layout: chuyển giữa Paper và Model trong viewport.">' + sp + '</button><span class="sb-sep"></span>' +
-      (viewer ? '' : tg('grid','grid','Lưới','F7','GRIDMODE') + tg('snap','snap','Snap','F9','SNAPMODE') + tg('dyn','dyn','Nhập động','F12','DYNMODE') + tg('ortho','ortho','Ortho','F8','ORTHOMODE') + tg('polar','polar','Polar','F10','AUTOSNAP') + '<span class="hide-1366">' + tg('iso','iso','Isometric','F5','ISODRAFT') + '</span>' + tg('otrack','otrack','Theo dõi bắt điểm','F11','AUTOSNAP')) +
+      (viewer ? '' : tg('grid','grid','Lưới','F7','GRIDMODE') + tg('snap','snap','Snap','F9','SNAPMODE') + '<span class="hide-1366">' + tg('infer','infer','Suy luận ràng buộc','Ctrl+Shift+I','CONSTRAINTINFER') + '</span>' + tg('dyn','dyn','Nhập động','F12','DYNMODE') + tg('ortho','ortho','Ortho','F8','ORTHOMODE') + tg('polar','polar','Polar','F10','AUTOSNAP') + '<span class="hide-1366">' + tg('iso','iso','Isometric','F5','ISODRAFT') + '</span>' + tg('otrack','otrack','Theo dõi bắt điểm','F11','AUTOSNAP')) +
       tg('osnap','osnap','Bắt điểm' + (viewer ? ' (khi đo)' : ''),'F3','OSMODE') + tg('lw','lw','Hiển thị độ dày nét','','LWDISPLAY') + (viewer ? '' : tg('transp','transp','Hiển thị độ trong suốt','','TRANSPARENCYDISPLAY') + tg('cycle','cycle','Chọn luân phiên','Ctrl+W','SELECTIONCYCLING') + tg('qp','qprops','Thuộc tính nhanh','Ctrl+Shift+P','QPMODE')) +
       '<span class="sb-sep"></span>' +
       (d && d.space !== 'model' ? '<button class="sb-txt" type="button" id="sb-vpscale" data-tip="Tỉ lệ viewport" data-desc="' + (viewer ? 'Viewer chỉ xem tỉ lệ, không đổi được.' : 'Đổi tỉ lệ viewport đang kích hoạt.') + '">' + ic('vplock') + (vpScale || 'Paper') + (viewer ? '' : ic('down', 'xs')) + '</button>' :
@@ -427,7 +427,7 @@
   TC.osnapMenu = osnapMenu;
   function toggle(k){
     var T = TC.S.toggles; T[k] = !T[k]; TC.save('toggles', T);
-    var names = { grid:'Lưới', snap:'Snap', ortho:'Ortho', polar:'Polar', osnap:'Bắt điểm', otrack:'Theo dõi bắt điểm', dyn:'Nhập động', lw:'Hiển thị độ dày nét', transp:'Độ trong suốt', cycle:'Chọn luân phiên', iso:'Isometric', qp:'Thuộc tính nhanh', annovis:'Hiển thị chú thích ở mọi tỉ lệ', annoauto:'Tự thêm tỉ lệ' };
+    var names = { grid:'Lưới', snap:'Snap', ortho:'Ortho', polar:'Polar', osnap:'Bắt điểm', otrack:'Theo dõi bắt điểm', dyn:'Nhập động', lw:'Hiển thị độ dày nét', transp:'Độ trong suốt', cycle:'Chọn luân phiên', iso:'Isometric', qp:'Thuộc tính nhanh', annovis:'Hiển thị chú thích ở mọi tỉ lệ', annoauto:'Tự thêm tỉ lệ', infer:'Suy luận ràng buộc' };
     TC.cmdline.msg('&lt;' + names[k] + ' ' + (T[k] ? 'bật' : 'tắt') + '&gt;');
     renderStatus(); if (k === 'lw' || k === 'grid' || k === 'annovis') A.view.draw(); TC.emit('toggle', k);
   }

@@ -209,7 +209,7 @@
     if (pr && pr.src && pr.src !== e && (pr.src.layer !== '0' || pr.src.color != null)) { var bl = this.doc.layerMap[pr.src.layer]; if (pr.src.color == null && bl) c = bl.color; }
     if (c == null) c = (this.doc.layerMap[e.layer] || {}).color || 7;
     if (c === 7 || c === 255) return onPaper ? '#000000' : '#FFFFFF';
-    if (typeof c === 'string') return c;
+    if (typeof c === 'string') return TC.ACI[c] || c;
     return ACI[c] || '#FFFFFF';
   };
   View.prototype.lw = function(e){ if (!TC.S.toggles.lw) return 1; var w = e.lw != null ? e.lw : (this.doc.layerMap[e.layer] || {}).lw || 0.25; return Math.max(1, Math.round(w * 4 * 10) / 10); };

@@ -269,6 +269,92 @@ TC.ICONS = {
   qprops:'<path d="M2.5 3.5h8v7h-8z" class="f"/><path d="M2.5 3.5h8v7h-8z"/><path d="M4.5 5.5h4M4.5 7.5h2.5"/><path d="M9.5 9.5l4.5 1.8-1.8.8-.8 1.9z"/>',
   annoauto:'<path d="M1.5 13.5 5.4 3.5h1.2l3.9 10"/><path d="M3.1 9.5h5.3"/><path d="M12.5 2.5v5M10 5h5"/>',
   // ==== hết screens14.js ====
+  // ==== Đợt 5 · screens15.js · tab Tham số ====
+  // ràng buộc hình học: ký hiệu tự vẽ (chấm điểm, ống thủy, gối đỡ), ràng buộc kích thước: kích thước kèm khóa nhỏ góc phải dưới
+  gcoin:'<path d="M2.5 3 6.6 10.2M13.5 3 9.4 10.2"/><rect fill="currentColor" x="6.4" y="9.8" width="3.2" height="3.2"/>',
+  gcoll:'<path d="M1.5 14.5 5.8 10.2M10.2 5.8l4.3-4.3"/><path class="dash" d="M6.8 9.2l2.4-2.4"/><path d="M4.2 8.6l3.2 3.2M8.6 4.2l3.2 3.2"/>',
+  gconc:'<circle cx="8" cy="8" r="6.2"/><circle class="dash" cx="8" cy="8" r="3.3"/><path d="M8 6.8v2.4M6.8 8h2.4"/>',
+  gfix:'<circle cx="8" cy="4.2" r="1.9"/><path d="M8 6.1 4.6 11h6.8z"/><path d="M2.5 11h11"/><path d="M3.6 14.5 5.1 11.6M7.1 14.5l1.5-2.9M10.6 14.5l1.5-2.9"/>',
+  gpar:'<path d="M2.5 12.5 9 3.5M7 12.5l6.5-9"/>',
+  gperp:'<path d="M8 2.5v11M2.5 13.5h11"/><path d="M8 10h3.5v3.5"/>',
+  ghor:'<path d="M1.5 5.5h13v5h-13z"/><path d="M5.8 5.5v5M10.2 5.5v5"/><circle fill="currentColor" cx="8" cy="8" r="1"/>',
+  gvert:'<path d="M5.5 1.5h5v13h-5z"/><path d="M5.5 5.8h5M5.5 10.2h5"/><circle fill="currentColor" cx="8" cy="8" r="1"/>',
+  gtan:'<circle cx="8" cy="9.6" r="4.6"/><path d="M1.5 5h13"/><circle fill="currentColor" cx="8" cy="5" r="1"/>',
+  gsmooth:'<path d="M1.5 12.5H7c3.6 0 3.9-9 7.5-9"/><circle fill="currentColor" cx="7" cy="12.5" r="1.1"/>',
+  gsym:'<path class="dash" d="M8 1.5v13"/><path d="M2 4.5 5.5 8 2 11.5M14 4.5 10.5 8l3.5 3.5"/>',
+  gequal:'<path d="M3 5.5h10M3 10.5h10"/><path d="M3 4v3M13 4v3M3 9v3M13 9v3"/>',
+  gauto:'<path d="M2.5 5.5h8v8h-8z"/><rect fill="currentColor" x="1.5" y="4.5" width="2" height="2"/><rect fill="currentColor" x="9.5" y="12.5" width="2" height="2"/><path fill="currentColor" d="M12.6 1.4l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6z"/>',
+  gbar:'<path d="M2.5 6.5 13.5 2.5"/><path d="M1.5 9.5h13v4.5h-13z"/><path d="M5.8 9.5V14M10.2 9.5V14"/>',
+  gdel:'<path d="M2 11.5 6.5 2.5M5.5 11.5 10 2.5"/><path d="M10 10l4.5 4.5M14.5 10 10 14.5"/>',
+  dclin:'<path d="M2.5 11 10 5"/><path d="M2.5 11V1.5M10 5V1.5M2.5 3h7.5"/><path d="M4.3 2 2.5 3l1.8 1M8.2 2 10 3 8.2 4"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dchor:'<path d="M2.5 10V1.5M13.5 7.5V1.5M2.5 3.5h11"/><path d="M4.5 2.3 2.5 3.5l2 1.2M11.5 2.3l2 1.2-2 1.2"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcver:'<path d="M1.5 2.5h7M1.5 13.5h5M3 2.5v11"/><path d="M1.8 4.5 3 2.5l1.2 2M1.8 11.5l1.2 2 1.2-2"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcali:'<path d="M2.5 11.5l7-7"/><path d="M1.2 10.2l2.6 2.6M8.2 3.2l2.6 2.6"/><path d="M2.6 9.6 2.5 11.5l1.9-.1M7.6 4.6l1.9-.1-.1 1.9"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcrad:'<circle cx="6" cy="7" r="4.5"/><path d="M6 7l3.2-3.2"/><circle fill="currentColor" cx="6" cy="7" r=".8"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcdia:'<circle cx="6" cy="7" r="4.5"/><path d="M2.8 10.2l6.4-6.4"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcang:'<path d="M1.5 12.5h7.5M1.5 12.5 8 3"/><path d="M6 12.5a4.5 4.5 0 0 0-2-3.7"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcconv:'<path d="M1.5 1.5v5M8.5 1.5v5M1.5 3h7"/><path d="M2.5 10.5h5M5.8 8.8l1.7 1.7-1.7 1.7"/><path class="f" d="M9.5 11.2h5v3.8h-5z"/><path d="M10.8 11.2v-1.1a1.2 1.2 0 0 1 2.4 0v1.1"/>',
+  dcshow:'<path d="M2.5 1.5v6M13.5 1.5v6M2.5 3h11"/><path d="M2.5 12s2.2-3 5.5-3 5.5 3 5.5 3-2.2 3-5.5 3-5.5-3-5.5-3z"/><circle fill="currentColor" cx="8" cy="12" r="1"/>',
+  params:'<path d="M1.5 2.5h13v11h-13z"/><path d="M1.5 5.5h13M6 5.5v8"/><path d="M8.5 8.5h4M8.5 10.5h4"/>',
+  infer:'<path d="M2 14 7.5 8.5h6"/><rect fill="currentColor" x="6.4" y="7.4" width="2.2" height="2.2"/><path fill="currentColor" d="M12.6 1.4l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6z"/>',
+  // ==== hết screens15.js ====
+  // ==== Đợt 5 · screens16.js · dynamic block ====
+  // tham số: hình học kèm grip đặc (mũi tên, tam giác ▼) đúng hình grip trên bản vẽ
+  dlinear:'<path d="M2.5 4.5v7M2.5 8H10"/><path fill="currentColor" d="M10 5.3 14.2 8 10 10.7z"/>',
+  dpoint:'<circle cx="5.5" cy="10.5" r="2.5"/><path d="M7.4 8.6 13 3M9.6 3H13v3.4"/>',
+  dpolar:'<path d="M2.5 13.5h11M2.5 13.5 11.5 4.5"/><path d="M7 13.5a4.5 4.5 0 0 0-1.3-3.2"/><path fill="currentColor" d="M13.6 2.4l-1 4.4-3.4-3.4z"/>',
+  dxy:'<path d="M2.5 2.5v11h11"/><path class="dash" d="M2.5 5.5h8v8"/><rect fill="currentColor" x="9" y="4" width="3" height="3"/>',
+  drot:'<path d="M13.5 8A5.5 5.5 0 1 1 8 2.5"/><path d="M8 8l3.3-3.3"/><circle fill="currentColor" cx="12.4" cy="3.6" r="1.7"/>',
+  dalign:'<path d="M2 13.5h12M8 13.5V5.5"/><path fill="currentColor" d="M5.4 6.4 8 2.2l2.6 4.2z"/>',
+  dflip:'<path class="dash" d="M8 1.5v13"/><path d="M4.5 8h-2M13.5 8h-2"/><path fill="currentColor" d="M1.6 8l3.4-2.6v5.2zM14.4 8 11 5.4v5.2z"/>',
+  dvis:'<path d="M1.5 7S3.8 3.5 8 3.5 14.5 7 14.5 7 12.2 10.5 8 10.5 1.5 7 1.5 7z"/><circle cx="8" cy="7" r="1.5"/><path fill="currentColor" d="M5.5 12.3h5L8 15.2z"/>',
+  dlookup:'<path d="M2.5 2.5h11v8h-11z"/><path d="M2.5 5.5h11M7 2.5v8"/><path fill="currentColor" d="M5.5 12.3h5L8 15.2z"/>',
+  dbase:'<circle cx="8" cy="8" r="4.5"/><path d="M8 1.5v3M8 11.5v3M1.5 8h3M11.5 8h3"/><circle fill="currentColor" cx="8" cy="8" r="1.2"/>',
+  dpstretch:'<path d="M2.5 13.5h4.5M2.5 13.5 8 8"/><path class="dash" d="M8 8h5.5v5.5H8"/><path d="M10 2.5h3.5V6M13.5 2.5 10 6"/>',
+  dauthor:'<path d="M1.5 2.5h13v11h-13z"/><path d="M5 2.5v11"/><path d="M7 6v4M7 8h3.5"/><path fill="currentColor" d="M10.3 5.9 13 8l-2.7 2.1z"/>',
+  dynblk:'<path d="M1.5 4.5h7.5v7H1.5z"/><path fill="currentColor" d="M10.6 5 14.8 8l-4.2 3z"/>',
+  dvmode:'<path d="M8 3.5C3.8 3.5 1.5 8 1.5 8s2.3 4.5 6.5 4.5"/><path class="dash" d="M8 3.5c4.2 0 6.5 4.5 6.5 4.5S12.2 12.5 8 12.5"/><circle cx="8" cy="8" r="1.8"/>',
+  // ==== hết screens16.js ====
+  // ==== Đợt 5 · screens17.js · bộ bản vẽ, máy in, thép ====
+  rebar:'<path class="f" d="M2.5 1.5h11v13h-11z"/><path d="M2.5 1.5h11v13h-11z"/><path d="M5.8 4h4.4a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5.8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><circle class="dot" cx="6.5" cy="5.7" r="1"/><circle class="dot" cx="9.5" cy="5.7" r="1"/><circle class="dot" cx="6.5" cy="10.3" r="1"/><circle class="dot" cx="9.5" cy="10.3" r="1"/>',
+  // ==== hết screens17.js ====
+  // ==== Đợt 5 · screens18.js · làm sạch, chuẩn CAD ====
+  geoclean:'<path d="M1.5 12.5H8M12.5 1.5V8"/><path class="dash" d="M8 12.5h4.5V8"/><path d="M2 5.4l1.8 1.8 3.7-4"/>',
+  // ==== hết screens18.js ====
+  // ==== Đợt 5 · screens19.js · máy tính, chính tả, hyperlink ====
+  // máy tính nhanh: thân máy, màn số, phím cộng và bằng; hyperlink: hai nửa mắt xích nằm ngang nối bằng một thanh (xref là xích chéo)
+  calc:'<path d="M3.5 1.5h9v13h-9z"/><path class="f" d="M5.5 3.5h5v2.5h-5z"/><path d="M5.5 3.5h5v2.5h-5z"/><path d="M6.25 8.25v3.5M4.5 10h3.5M9.5 9.25h2M9.5 10.75h2"/>',
+  link:'<path d="M6.5 4.5H5a3.5 3.5 0 0 0 0 7h1.5M9.5 4.5H11a3.5 3.5 0 0 1 0 7H9.5M5.5 8h5"/>',
+  inters:'<path d="M2.5 4l11 8M2.5 12l11-8"/><circle cx="8" cy="8" r="1.7"/><rect class="dot" x="1.5" y="3" width="2" height="2"/><rect class="dot" x="12.5" y="11" width="2" height="2"/><rect class="dot" x="1.5" y="11" width="2" height="2"/><rect class="dot" x="12.5" y="3" width="2" height="2"/>',
+  swap:'<path d="M2.5 5.5h10.5M10.5 3 13 5.5 10.5 8M13.5 10.5H3M5.5 8 3 10.5 5.5 13"/>',
+  // ==== hết screens19.js ====
+  // ==== Đợt 5 · screens20.js · CUI, LISP, plugin ====
+  lisp:'<path d="M4.5 2.5C2.9 4.1 2 6 2 8s.9 3.9 2.5 5.5M11.5 2.5c1.6 1.6 2.5 3.5 2.5 5.5s-.9 3.9-2.5 5.5"/><path d="M6 3.5h.7c.5 0 .9.3 1.1.8l2.4 7.7M8.8 7.6 6 12"/>',
+  stop:'<path d="M4.5 4.5h7v7h-7z"/>',
+  // ==== hết screens20.js ====
+  // ==== Đợt 5 · screens21.js · Mở rộng P2 ====
+  breakline:'<path d="M1.5 8.5h4.3l1.1-3.7 2.2 7.4 1.1-3.7h4.3"/>',
+  arctext:'<path d="M2.5 13.5A5.5 5.5 0 0 1 13.5 13.5"/><path d="M8 6.2V2.5M6.3 2.5h3.4"/><path d="M3.4 8.4 2 7M12.6 8.4 14 7"/>',
+  textfit:'<path d="M4.5 2.5h7M8 2.5v6.5"/><path d="M1.5 12.5h13"/><path d="M3.5 10.5l-2 2 2 2M12.5 10.5l2 2-2 2"/>',
+  torient:'<path d="M2.5 3.5h6M5.5 3.5v7"/><path d="M13.6 8.8a4.3 4.3 0 0 1-6.8 4"/><path d="M13.9 12.1l-.3-3.3-3.2.6"/>',
+  rtext:'<path d="M2.5 3.5h8M2.5 6.5h6M2.5 9.5h3.5"/><path d="M9.4 12.6a1.8 1.8 0 0 0 2.5 0l1.6-1.6a1.8 1.8 0 0 0-2.5-2.5l-.5.5"/><path d="M11.6 10.4a1.8 1.8 0 0 0-2.5 0l-1.6 1.6a1.8 1.8 0 0 0 2.5 2.5l.5-.5"/>',
+  mocoro:'<path d="M2.5 8.5h5v5h-5z" class="f"/><path d="M2.5 8.5h5v5h-5z"/><path d="M6 4.3A5.3 5.3 0 0 1 13.4 9.5"/><path d="M14.4 6.9l-1 2.6-2.6-1"/>',
+  mstretch:'<path d="M1.5 9.5v-7h5v4" class="dash"/><path d="M9.5 9.5v-7h5v7" class="dash"/><path d="M1.5 13.5h13"/><path d="M4 11.5h8M10 9.5l2 2-2 2"/>',
+  superhatch:'<path class="f" d="M2.5 2.5H8V8H2.5zM8 8h5.5v5.5H8z"/><path d="M2.5 2.5h11v11h-11zM8 2.5v11M2.5 8h11"/>',
+  mkshape:'<path class="f" d="M2.5 10.5 5 3.5l4.5 2.7-1.8 5.6z"/><path d="M2.5 10.5 5 3.5l4.5 2.7-1.8 5.6z"/><path d="M12 9v5.5M9.3 11.7h5.4"/>',
+  mkltype:'<path d="M1.5 8h3.3M11.2 8h3.3"/><path class="f" d="M8 5.2 10.8 8 8 10.8 5.2 8z"/><path d="M8 5.2 10.8 8 8 10.8 5.2 8z"/>',
+  alignspace:'<path d="M1.5 2.5h7v6h-7z"/><path class="f" d="M7.5 7.5h7v6h-7z"/><path d="M7.5 7.5h7v6h-7z"/><path d="M4.5 5.5 11 10.5" class="dash"/><circle class="dot" cx="4.5" cy="5.5" r="1.1"/><circle class="dot" cx="11" cy="10.5" r="1.1"/>',
+  vpsync:'<path d="M1.5 3.5h5.5v9H1.5zM9 3.5h5.5v9H9z"/><path d="M3 8h10" class="dash"/><circle class="dot" cx="4.2" cy="8" r="1.1"/><circle class="dot" cx="11.8" cy="8" r="1.1"/>',
+  vpscale:'<path d="M1.5 2.5h13v11h-13z"/><path d="M4 10.5h8M4 9v3M8 9.5v2M12 9v3"/><path d="M4.5 5.5h2.5"/>',
+  dimex:'<path d="M2 2.5V9M8.5 2.5V9M2 6h6.5"/><path d="M9.5 12.5h5M12.5 10.5l2 2-2 2"/>',
+  dimim:'<path d="M7.5 2.5V9M14 2.5V9M7.5 6H14"/><path d="M1.5 12.5h5M4.5 10.5l2 2-2 2"/>',
+  qlattach:'<path d="M2.5 13.5 7 9h1.5"/><path class="f" d="M9.5 6.5h5v5h-5z"/><path d="M9.5 6.5h5v5h-5z"/><path d="M1.5 14.5l.7-2.7 2 2z" class="dot"/><path d="M11 2v3M9.5 3.5h3"/>',
+  movebak:'<path class="f" d="M1.5 14V8.5h3.5l1 1h8.5V14z"/><path d="M1.5 14V8.5h3.5l1 1h8.5V14z"/><path d="M8 1.5V7M5.8 4.8 8 7l2.2-2.2"/>',
+  redir:'<path d="M1.5 12.5v-7h3.5l1 1h5"/><path d="M8 10.5h6.5M12.5 8.5l2 2-2 2"/><path d="M8 13.5h4" class="dash"/>',
+  xdata:'<path class="f" d="M2.5 2.5h6l5 5-6 6-5-5z"/><path d="M2.5 2.5h6l5 5-6 6-5-5z"/><circle class="dot" cx="5.5" cy="5.5" r="1.1"/>',
+  shp2blk:'<path d="M1.5 10 4 3.5l3 2.7-1.2 4.8z"/><path d="M7.5 8.5h3M9.3 7l1.5 1.5L9.3 10"/><path class="f" d="M11.5 6h3.5v5h-3.5z"/><path d="M11.5 6h3.5v5h-3.5z"/>',
+  xlist:'<path d="M1.5 2.5h8v8h-8z"/><path class="f" d="M3.5 4.5h4v4h-4z"/><path d="M3.5 4.5h4v4h-4z"/><path d="M11.5 4.5h3M11.5 7.5h3M11.5 10.5h3M4.5 13.5h10"/>',
+  // ==== hết screens21.js ====
 };
 TC.ic = function(name, cls){ return '<svg class="ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
 (function(){
