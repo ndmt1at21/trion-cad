@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hệ thống thiết kế TrionCAD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<style>
+/* Trang tra cứu: thanh mục lục trái + nội dung một cột. Mọi mẫu dùng đúng lớp CSS của ứng dụng. */
+html, body{ height:auto; overflow:auto }
+body{ font-size:13px; line-height:var(--lh-text) }
+.sg{ display:grid; grid-template-columns:220px minmax(0,1fr); min-height:100vh }
+.sg-nav{ position:sticky; top:0; height:100vh; overflow:auto; padding:20px 12px; border-right:1px solid var(--c-border); background:var(--c-sunken); display:grid; align-content:start; gap:2px }
+.sg-nav .brand{ display:flex; gap:8px; align-items:center; font-weight:600; font-size:15px; margin:0 6px 4px }
+.sg-nav .brand .ic{ width:20px; height:20px; color:var(--c-accent) }
+.sg-nav a{ color:var(--c-text-2); text-decoration:none; padding:4px 8px; border-radius:var(--r); font-size:12.5px }
+.sg-nav a:hover{ background:var(--c-hover); color:var(--c-text) }
+.sg-nav .grp-t{ margin:12px 8px 4px; font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--c-text-3) }
+.sg-main{ padding:28px max(16px, env(safe-area-inset-right, 0px)) 80px max(28px, env(safe-area-inset-left, 0px)); max-width:1160px; display:grid; gap:48px; min-width:0 }
+.sg-h1{ margin:0; font-size:30px; line-height:1.15; font-weight:600; letter-spacing:-.01em }
+.sg-lead{ margin:6px 0 0; color:var(--c-text-2); max-width:76ch; font-size:14px }
+section.sgs{ display:grid; gap:14px; scroll-margin-top:16px; min-width:0 }
+section.sgs > h2{ margin:0; font-size:20px; font-weight:600; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap }
+section.sgs > h2 .code-tag{ font-family:var(--f-mono); font-size:11.5px; font-weight:500; padding:1px 6px; border-radius:var(--r); background:var(--c-active); color:var(--c-text-2) }
+.sgs > p, .sgs .desc{ margin:0; color:var(--c-text-2); max-width:80ch }
+.sgs h3{ margin:8px 0 0; font-size:13px; font-weight:600; color:var(--c-text) }
+.card{ border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-base); padding:16px; display:grid; gap:12px; min-width:0 }
+.card.sunk{ background:var(--c-sunken) }
+.cols{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px }
+.tok{ display:grid; grid-template-columns:34px minmax(0,1fr); gap:3px 10px; align-items:start; padding:8px; border:1px solid var(--c-border); border-radius:var(--r-lg); background:var(--c-raised) }
+.tok i{ grid-row:1 / span 3; width:34px; height:34px; border-radius:var(--r); box-shadow:inset 0 0 0 1px rgba(128,128,128,.35) }
+.tok code{ font-family:var(--f-mono); font-size:11px; color:var(--c-text); word-break:break-all }
+.tok span{ font-size:11.5px; color:var(--c-text-2) }
+.tok .v{ font-family:var(--f-mono); font-size:10.5px; color:var(--c-text-3) }
+.typo{ display:grid; grid-template-columns:120px minmax(0,1fr); gap:6px 16px; align-items:baseline }
+.typo .k{ font-family:var(--f-mono); font-size:11px; color:var(--c-text-3) }
+.icons{ display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:6px }
+.icons button{ display:grid; justify-items:center; gap:6px; padding:10px 4px; border-radius:var(--r); border:1px solid transparent; color:var(--c-text); font-size:10.5px; font-family:var(--f-mono) }
+.icons button:hover{ border-color:var(--c-border); background:var(--c-raised) }
+.icons button span{ color:var(--c-text-3); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.spec{ width:100%; border-collapse:collapse; font-size:12px }
+.spec th, .spec td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--c-border); vertical-align:top }
+.spec th{ color:var(--c-text-3); font-weight:600; font-size:11px }
+.spec td code{ font-family:var(--f-mono); font-size:11px }
+.wrapx{ overflow-x:auto }
+.row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+.stage-cv{ background:var(--c-canvas); border-radius:var(--r-lg); padding:14px; display:flex; flex-wrap:wrap; gap:14px; color:#C9CED6; font-size:11px }
+.stage-cv figure{ margin:0; display:grid; gap:6px; justify-items:center; min-width:76px }
+.stage-cv canvas{ display:block }
+.do{ border-left:0; padding:10px 12px; border-radius:var(--r-lg); background:var(--c-ok-soft) } .dont{ padding:10px 12px; border-radius:var(--r-lg); background:var(--c-danger-soft) }
+.do b, .dont b{ display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px }
+.static-menu{ position:static; box-shadow:none; align-self:start; justify-self:start; width:270px }
+.static-tip{ position:static; justify-self:start; box-shadow:none }
+.icons-lg{ display:flex; flex-wrap:wrap; gap:18px; color:var(--c-text) }
+.icons-lg figure{ margin:0; display:grid; justify-items:center; gap:4px; font:10.5px var(--f-mono); color:var(--c-text-3) }
+.static-dlg{ position:static; max-width:100% }
+.checklist{ margin:0; padding-left:20px; display:grid; gap:6px; color:var(--c-text-2) }
+#toasts{ position:fixed }
+.wide2{ grid-column:span 2; min-width:0 } .wide2 .cbar{ max-width:100%; overflow:hidden }
+.topbar{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+@media (max-width:860px){ .wide2{ grid-column:auto } .sg{ grid-template-columns:minmax(0,1fr) } .sg-nav{ position:static; height:auto; grid-auto-flow:row; border-right:0; border-bottom:1px solid var(--c-border) } .sg-main{ padding-left:max(16px, env(safe-area-inset-left, 0px)) } }
+</style>
+</head>
+<body>
+<div class="sg">
+  <nav class="sg-nav" aria-label="Mục lục hệ thống thiết kế">
+    <span class="brand"><svg class="ic" aria-hidden="true"><use href="#i-logo"/></svg>TrionCAD</span>
+    <span class="faint" style="margin:0 8px 6px;font-size:11px">Hệ thống thiết kế · hướng A Than chì</span>
+    <a href="index.html">← Mở prototype</a>
+    <span class="grp-t">Nền tảng</span><a href="#nguyen-tac">Nguyên tắc</a><a href="#mau">Màu</a><a href="#chu">Chữ</a><a href="#kich-thuoc">Khoảng cách, kích thước</a><a href="#hinh-khoi">Hình khối, chuyển động</a><a href="#bieu-tuong">Biểu tượng</a>
+    <span class="grp-t">Thành phần</span><a href="#nut">Nút</a><a href="#o-nhap">Ô nhập, chọn</a><a href="#c09">Ô nhập số UI-C09</a><a href="#bang">Bảng, cây</a><a href="#menu">Menu, tooltip</a><a href="#hop-thoai">Hộp thoại</a><a href="#thong-diep">Thông điệp</a><a href="#phien-ban">Phiên bản, khóa</a>
+    <span class="grp-t">Khung ứng dụng</span><a href="#ribbon">Ribbon</a><a href="#palette">Palette</a><a href="#dong-lenh">Dòng lệnh</a><a href="#trang-thai">Thanh trạng thái</a><a href="#vung-ve">Vùng vẽ</a>
+    <span class="grp-t">Đợt 2</span><a href="#dot2">Trình theo bước, tác vụ nền</a><span class="grp-t">Nội dung</span><a href="#van-phong">Văn phong</a><a href="#kiem-tra">Danh sách kiểm</a>
+  </nav>
+  <main class="sg-main">
+    <header class="stack" style="gap:10px">
+      <p class="faint" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin:0">Đợt 1 · Phụ lục B 07.3</p>
+      <h1 class="sg-h1">Hệ thống thiết kế TrionCAD</h1>
+      <p class="sg-lead">Token màu cho chủ đề Tối và Sáng, chữ, lưới, biểu tượng và thành phần cơ bản. Prototype và trang này dùng chung một tệp CSS; giá trị hiển thị dưới đây đọc trực tiếp từ token đang áp dụng. Bản Qt làm theo tên token và kích thước ở đây.</p>
+      <div class="topbar"><span class="muted">Xem ở</span><span class="seg" role="group" aria-label="Chủ đề"><button type="button" data-th="auto">Theo hệ thống</button><button type="button" data-th="dark">Tối</button><button type="button" data-th="light">Sáng</button></span><span class="seg" role="group" aria-label="Mật độ"><button type="button" data-dn="compact">Gọn</button><button type="button" data-dn="comfortable">Thoáng</button></span><label class="chk"><input type="checkbox" id="sg-lite"> Giao diện nhẹ</label></div>
+    </header>
+
+    <section class="sgs" id="nguyen-tac"><h2>Nguyên tắc</h2>
+      <div class="cols">
+        <div class="card"><b>Vùng vẽ là trung tâm</b><p class="muted">Khung giao diện xám than trung tính để màu ACI của bản vẽ không bị lẫn. Một màu nhấn xanh ngọc, chỉ dùng cho trạng thái đang bật, tiêu điểm và hành động chính.</p></div>
+        <div class="card"><b>Gọn mà đọc được</b><p class="muted">Mật độ gọn mặc định: dòng palette 22 px, ribbon 87 px. Dùng tốt ở 1366×768. Chữ giao diện 12 px, nhãn phụ 11,5 px; tương phản chữ ≥ 4,5:1 ở cả hai chủ đề.</p></div>
+        <div class="card"><b>Bàn phím trước</b><p class="muted">Mọi nút có tên lệnh tiếng Anh trong tooltip; phím tắt giữ như AutoCAD. Tiêu điểm luôn nhìn thấy: viền 2 px màu <code>--c-focus</code>.</p></div>
+        <div class="card"><b>Minh bạch về phiên bản</b><p class="muted">Tính năng chưa có trong phiên bản hiện hành hiện huy hiệu khóa, không ẩn đi. Bấm vào thì mở trang nâng cấp, mỗi tính năng tối đa một lần mỗi phiên.</p></div>
+        <div class="card"><b>Không dùng màu làm tín hiệu duy nhất</b><p class="muted">Window viền liền, Crossing viền đứt; grip nguội/rê/nóng khác cả màu lẫn cỡ; trạng thái bật của toggle có nền nhạt kèm màu.</p></div>
+        <div class="card"><b>Nhẹ cho máy yếu</b><p class="muted">Không làm mờ, không đổ bóng lớn. Bóng chỉ cho menu và hộp thoại để tách lớp; Giao diện nhẹ thay bằng viền 1 px và tắt chuyển động.</p></div>
+      </div>
+    </section>
+
+    <section class="sgs" id="mau"><h2>Màu <span class="code-tag">07.1 §13.2</span></h2>
+      <p>Tên token là hợp đồng giữa thiết kế và mã. Giá trị bên dưới là của chủ đề đang xem; đổi chủ đề ở đầu trang để xem bộ còn lại. Nền vùng vẽ không đổi theo chủ đề giao diện (mặc định tối cho Model, trắng cho Layout).</p>
+      <div id="sw"></div>
+    </section>
+
+    <section class="sgs" id="chu"><h2>Chữ</h2>
+      <p>IBM Plex Sans cho giao diện, IBM Plex Mono cho tọa độ, giá trị số, tên lệnh và dòng lệnh. Cả hai dùng giấy phép SIL OFL, đóng gói được vào bản Qt và hỗ trợ đủ dấu tiếng Việt.</p>
+      <div class="card"><div class="typo" id="ty"></div></div>
+      <div class="card sunk"><b>Thử dấu tiếng Việt chồng tầng</b><p style="font-size:15px;margin:0">ẤẦẨẪẬ ẮẰẲẴẶ ẾỀỂỄỆ ỐỒỔỖỘ ỚỜỞỠỢ ỨỪỬỮỰ Đ · Quản lý thiết lập trang · Đóng băng ở viewport mới</p><p class="faint" style="margin:0;font-size:12px">Chuỗi tiếng Việt thường dài hơn tiếng Anh 20–40%: nhãn nút và cột phải chịu được (07.1 §13.4).</p></div>
+    </section>
+
+    <section class="sgs" id="kich-thuoc"><h2>Khoảng cách, kích thước</h2>
+      <div class="card"><div class="row" id="spc" style="align-items:end"></div></div>
+      <div class="card wrapx"><table class="spec"><thead><tr><th>Vùng</th><th>Token</th><th>Gọn (mặc định)</th><th>Thoáng</th><th>Ghi chú</th></tr></thead><tbody>
+        <tr><td>Thanh tiêu đề</td><td><code>--h-title</code></td><td>32 px</td><td>32 px</td><td>Menu ứng dụng, QAT, tên tệp, ô Tìm lệnh</td></tr>
+        <tr><td>Tab ribbon</td><td><code>--h-tab</code></td><td>26 px</td><td>26 px</td><td>Gạch chân 2 px màu nhấn ở tab đang mở</td></tr>
+        <tr><td>Thân ribbon</td><td><code>--h-btn</code> × 3 + 8 + <code>--h-lbl</code></td><td>87 px</td><td>94 px</td><td>Ba hàng nút nhỏ; nút lớn có biểu tượng 32 px</td></tr>
+        <tr><td>Tab tệp, tab layout</td><td><code>--h-ftab</code>, <code>--h-ltab</code></td><td>28, 24 px</td><td>30, 26 px</td><td></td></tr>
+        <tr><td>Dòng palette, bảng</td><td><code>--h-row</code></td><td>22 px</td><td>26 px</td><td></td></tr>
+        <tr><td>Điều khiển trong hộp thoại</td><td><code>--h-ctl</code></td><td>24 px</td><td>26 px</td><td>Ô nhập, nút, danh sách thả xuống</td></tr>
+        <tr><td>Dòng lệnh</td><td><code>--h-cmdl</code> × 3 + <code>--h-cmdin</code></td><td>3 dòng lịch sử + 26 px</td><td>3 dòng + 28 px</td><td>Dưới 1600 px còn 1 dòng lịch sử</td></tr>
+        <tr><td>Thanh trạng thái</td><td><code>--h-status</code></td><td>26 px</td><td>28 px</td><td></td></tr>
+        <tr><td>Palette dock</td><td><code>--pal-w</code></td><td>272 px</td><td>272 px</td><td>Mở sẵn ở ≥ 1600 px; hẹp hơn thì tự ẩn thành dải 22 px</td></tr>
+      </tbody></table></div>
+      <div class="note acc"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span>Ở 1920×1080 với palette Thuộc tính mở sẵn, vùng vẽ chiếm khoảng 60% màn hình; khi palette tự ẩn hoặc bật Clean Screen thì ≥ 75% (đã cập nhật vào 07.1 §1 mục 6). Ribbon co theo thứ tự: thu panel ưu tiên thấp thành nút, ẩn nhãn nút nhỏ, rồi thu nốt.</span></div>
+    </section>
+
+    <section class="sgs" id="hinh-khoi"><h2>Hình khối, chuyển động</h2>
+      <div class="cols">
+        <div class="card"><b>Bo góc</b><div class="row"><span style="width:60px;height:36px;border:1px solid var(--c-border-ctl);border-radius:var(--r)"></span><code>--r 2px</code><span style="width:60px;height:36px;border:1px solid var(--c-border-ctl);border-radius:var(--r-lg)"></span><code>--r-lg 3px</code><span style="width:60px;height:36px;border:1px solid var(--c-border-ctl);border-radius:var(--r-xl)"></span><code>--r-xl 4px</code></div><p class="muted">Nút, ô nhập 2 px; nhóm, thẻ 3 px; hộp thoại 4 px.</p></div>
+        <div class="card"><b>Viền và bóng</b><div class="row"><span style="width:90px;height:44px;background:var(--c-raised);border-radius:var(--r-lg);box-shadow:var(--sh-pop)"></span><code>--sh-pop</code><span style="width:90px;height:44px;background:var(--c-raised);border-radius:var(--r-lg);box-shadow:var(--sh-dlg)"></span><code>--sh-dlg</code></div><p class="muted">Đường chia vùng <code>--c-border</code>; viền điều khiển <code>--c-border-ctl</code> đạt 3:1 với nền.</p></div>
+        <div class="card"><b>Chuyển động</b><p class="muted"><code>--t-fast 80ms</code>, <code>--t 120ms</code>, không quá 150 ms. Tắt hoàn toàn khi bật Giao diện nhẹ hoặc hệ điều hành đặt “giảm chuyển động”. Không bao giờ chờ animation xong mới cho thao tác.</p></div>
+      </div>
+    </section>
+
+    <section class="sgs" id="bieu-tuong"><h2>Biểu tượng <span class="code-tag">07.1 §13.5</span></h2>
+      <p>Bộ tự vẽ trên lưới 16 px, nét <code>--sw</code> 1,25 px, đầu vuông. Cỡ 32 px dùng cùng hình với nét mảnh hơn. Lớp <code>.f</code> là mảng tô nhạt, <code>.dot</code> là tô đặc. Không mô phỏng biểu tượng của Autodesk. Bấm một biểu tượng để sao chép tên.</p>
+      <div class="card"><div class="icons" id="icg"></div></div>
+      <div class="card"><b>Cỡ 32 px (nút lớn trên ribbon)</b><div class="icons-lg" id="icl"></div></div>
+      <div class="card"><b>Trạng thái</b><div class="row"><button class="ib" type="button"><svg class="ic"><use href="#i-line"/></svg></button><span class="faint">thường</span><button class="ib" type="button" style="background:var(--c-hover);color:var(--c-text)"><svg class="ic"><use href="#i-line"/></svg></button><span class="faint">rê chuột</span><button class="ib" type="button" aria-pressed="true"><svg class="ic"><use href="#i-osnap"/></svg></button><span class="faint">đang bật</span><button class="ib" type="button" disabled><svg class="ic"><use href="#i-line"/></svg></button><span class="faint">vô hiệu</span><span class="rb-s locked" style="position:relative"><svg class="ic"><use href="#i-compare"/></svg><span class="t">So sánh</span><span class="lkb"><svg class="ic"><use href="#i-lock"/></svg>VP</span></span><span class="faint">khóa theo phiên bản</span></div></div>
+    </section>
+
+    <section class="sgs" id="nut"><h2>Nút</h2>
+      <div class="card"><div class="row"><button class="btn primary" type="button">In</button><button class="btn" type="button">Xem trước…</button><button class="btn ghost" type="button">Hủy</button><button class="btn danger" type="button">Xóa 3 layout</button><button class="btn" type="button" disabled>Áp dụng</button><button class="btn" type="button"><svg class="ic"><use href="#i-lock"/></svg>In hàng loạt <span class="ed xs" data-ed="vp">Viewer Pro</span></button></div>
+        <div class="row"><button class="btn sm" type="button">Nhỏ</button><button class="btn" type="button">Mặc định</button><button class="btn lg primary" type="button">Lớn</button><button class="ib" type="button" aria-label="Tìm"><svg class="ic"><use href="#i-search"/></svg></button><button class="ib" type="button" aria-pressed="true" aria-label="Bắt điểm"><svg class="ic"><use href="#i-osnap"/></svg></button></div>
+        <p class="muted">Nút chính mang tên hành động (“In”, “Tạo block”, “Xóa 1.250 đối tượng”), không dùng “OK”. Mỗi hộp thoại tối đa một nút chính, đặt ngoài cùng bên phải; Enter kích hoạt nút chính, Esc đóng.</p></div>
+    </section>
+
+    <section class="sgs" id="o-nhap"><h2>Ô nhập, chọn</h2>
+      <div class="card"><div class="grid2">
+        <div class="stack"><div class="field"><label for="s-t">Ô chữ</label><input class="inp" id="s-t" value="Mặt bằng tầng 1"></div><div class="field"><label for="s-e">Có lỗi</label><input class="inp err" id="s-e" value="KT-01?" aria-invalid="true"><span class="fmsg err"><svg class="ic xs"><use href="#i-warn"/></svg>Tên layer không được có ký tự ?</span></div><label class="search"><svg class="ic"><use href="#i-search"/></svg><input placeholder="Tìm layer, ví dụ KT-*" aria-label="Tìm"></label></div>
+        <div class="stack"><div class="field"><label for="s-s">Danh sách thả xuống</label><select class="inp" id="s-s"><option>ISO A1 (841 × 594 mm)</option><option>ISO A3 (420 × 297 mm)</option></select></div><button class="dd" type="button" style="width:220px"><span class="lbl"><i class="sw" style="background:#FFFF00"></i>KT-CUA</span><svg class="ic xs"><use href="#i-down"/></svg></button><div class="row"><label class="chk"><input type="checkbox" checked> Gồm block lồng</label><label class="chk"><input type="radio" name="r1" checked> Cả bản vẽ</label><label class="chk"><input type="radio" name="r1"> Vùng chọn</label></div><span class="seg" role="group"><button type="button" aria-pressed="true">mm</button><button type="button" aria-pressed="false">m</button></span></div>
+      </div>
+      <div class="tabs" role="tablist" style="padding:0"><button class="tab" type="button" aria-selected="true">Chung</button><button class="tab" type="button" aria-selected="false">Tóm tắt</button><button class="tab" type="button" aria-selected="false">Thống kê</button></div></div>
+    </section>
+
+    <section class="sgs" id="c09"><h2>Ô nhập số chuẩn <span class="code-tag">UI-C09</span></h2>
+      <p>Một kiểu ô số cho mọi palette và hộp thoại. Nhận số thường, số có đơn vị (<code>12.5m</code>, <code>250cm</code>, <code>3'6"</code>), biểu thức (<code>=1200/2+50</code>). Dấu thập phân luôn là “.”, gõ “,” thì nhắc. ↑/↓ tăng giảm theo bước; nút Lấy từ bản vẽ ẩn hộp thoại để lấy giá trị từ bản vẽ. Thử gõ vào các ô dưới.</p>
+      <div class="card"><div class="row" style="align-items:flex-start;gap:20px" id="c09-box"></div></div>
+    </section>
+
+    <section class="sgs" id="bang"><h2>Bảng, cây</h2>
+      <div class="card"><div class="tblwrap"><table class="tbl"><colgroup><col style="width:26px"><col><col style="width:44px"><col style="width:52px"><col style="width:90px"><col style="width:60px"></colgroup><thead><tr><th></th><th class="sortable">Tên ▲</th><th class="ctr">Bật</th><th class="ctr">Băng</th><th>Màu</th><th class="num">Số</th></tr></thead><tbody>
+        <tr><td class="ctr faint">●</td><td>KT-CUA</td><td class="ctr"><button class="tgl" type="button" aria-label="Bật"><svg class="ic"><use href="#i-bulb"/></svg></button></td><td class="ctr"><button class="tgl" type="button" aria-label="Đóng băng"><svg class="ic"><use href="#i-sun"/></svg></button></td><td><i class="sw" style="background:#FFFF00"></i> Vàng</td><td class="num">11</td></tr>
+        <tr class="is-sel"><td class="ctr"><span class="tag acc" style="height:16px;padding:0 4px"><svg class="ic s12"><use href="#i-check"/></svg></span></td><td>KT-TUONG <span class="faint">(đang chọn, hiện hành)</span></td><td class="ctr"><button class="tgl" type="button" aria-label="Bật"><svg class="ic"><use href="#i-bulb"/></svg></button></td><td class="ctr"><button class="tgl" type="button" aria-label="Đóng băng"><svg class="ic"><use href="#i-sun"/></svg></button></td><td><i class="sw" style="background:#FFF"></i> Trắng</td><td class="num">182</td></tr>
+        <tr><td class="ctr faint">○</td><td>KT-NOITHAT <span class="tag info" style="height:15px;font-size:9.5px">tạm</span></td><td class="ctr"><button class="tgl off" type="button" aria-label="Bật"><svg class="ic"><use href="#i-bulboff"/></svg></button></td><td class="ctr"><button class="tgl off" type="button" aria-label="Đóng băng"><svg class="ic"><use href="#i-snow"/></svg></button></td><td><i class="sw" style="background:#808080"></i> 8</td><td class="num">28</td></tr>
+      </tbody></table></div><p class="muted">Danh sách dài luôn có ô tìm kiếm và sắp xếp được. Cột số canh phải, dùng chữ số đều. Hàng đang chọn có nền <code>--c-accent-soft</code>.</p></div>
+    </section>
+
+    <section class="sgs" id="menu"><h2>Menu, tooltip</h2>
+      <div class="cols">
+        <div class="card"><div class="menu static-menu" role="menu"><div class="mh">Có vùng chọn</div><button class="mi" type="button"><span class="ico"></span><span>Lặp lệnh DIST</span><span class="k">Enter</span></button><button class="mi sub" type="button"><span class="ico"></span><span>Lệnh gần đây</span></button><div class="ms"></div><button class="mi" type="button"><span class="chkm"><svg class="ic s12"><use href="#i-check"/></svg></span><span>Điểm cuối</span></button><button class="mi" type="button"><span class="ico"><svg class="ic"><use href="#i-props"/></svg></span><span>Thuộc tính</span><span class="k">Ctrl+1</span></button><button class="mi" type="button"><span class="ico"></span><span>Chọn tương tự</span><span class="ed xs" data-ed="pro">Pro</span></button><button class="mi" type="button" aria-disabled="true"><span class="ico"></span><span>Dán</span><span class="k">Ctrl+V</span></button></div></div>
+        <div class="card"><div class="tip static-tip"><span class="tn">Đường tròn</span><span class="tc">CIRCLE · C</span></div><div class="tip static-tip"><span class="tn">Đo nhanh</span><span class="tc">MEASUREGEOM · MEA</span><span class="td">Rê chuột để thấy khoảng cách quanh con trỏ; bấm trong vùng kín để có diện tích.</span><span class="tf">Nhấn F1 để xem trợ giúp</span></div><p class="muted">Mức 1 hiện sau 0,45 giây: tên, tên lệnh tiếng Anh, phím tắt. Rê thêm 1,5 giây ra mức 2 có mô tả.</p></div>
+      </div>
+    </section>
+
+    <section class="sgs" id="hop-thoai"><h2>Hộp thoại</h2>
+      <div class="card"><section class="dlg static-dlg" style="width:520px" aria-label="Mẫu hộp thoại"><header class="dlg-h"><span class="t">Xuất PDF <span class="cmdn">EXPORTPDF</span></span><span class="tag">UI-H05</span><button class="ib" type="button" aria-label="Trợ giúp"><svg class="ic"><use href="#i-help"/></svg></button><button class="ib" type="button" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></header><div class="dlg-b"><div class="grp"><span class="gh">Preset</span><span class="seg"><button type="button" aria-pressed="true">Chất lượng cao</button><button type="button" aria-pressed="false">Dung lượng nhỏ</button></span></div></div><footer class="dlg-f"><span class="faint" style="font-size:var(--fs-s)">Ước tính 2,1 MB</span><span class="grow"></span><button class="btn ghost" type="button">Hủy</button><button class="btn primary" type="button">Xuất PDF</button></footer></section>
+        <p class="muted">Thanh tiêu đề: tên, tên lệnh, mã màn hình (chỉ trong prototype), Trợ giúp (F1), Đóng (Esc). Kéo thanh tiêu đề để dời. Hạn chế hộp thoại modal: thứ gì xem trước được thì để ở palette hoặc tab ngữ cảnh.</p></div>
+    </section>
+
+    <section class="sgs" id="thong-diep"><h2>Thông điệp, tiến trình, trạng thái rỗng <span class="code-tag">07.1 §12</span></h2>
+      <div class="card"><div class="banner" style="border:1px solid var(--c-border);border-radius:var(--r-lg)"><svg class="ic"><use href="#i-fontdoc"/></svg><p><b>Bác sĩ Font:</b> bản vẽ dùng 3 font không có trên máy. TrionCAD đã tự hiển thị đúng.</p><span class="acts"><button class="btn sm" type="button">Xem chi tiết</button></span><button class="ib" type="button" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        <div class="banner warn" style="border:1px solid var(--c-border);border-radius:var(--r-lg)"><svg class="ic"><use href="#i-warn"/></svg><p>Thiếu 1 xref, 1 ảnh. Phần còn lại của bản vẽ vẫn xem được.</p><span class="acts"><button class="btn sm" type="button">Xem chi tiết</button></span></div>
+        <div class="row"><div class="toast" style="position:static"><svg class="ic st"><use href="#i-okc"/></svg><p>Đã xuất 24 tờ PDF</p><button class="btn sm" type="button">Mở thư mục</button></div><div class="toast err" style="position:static"><svg class="ic st"><use href="#i-error"/></svg><p>Chuyển font xong 48/50 tệp: 2 lỗi</p><button class="btn sm" type="button">Xem</button></div></div>
+        <div class="row"><span class="ctip" style="position:static">Không có giao điểm với đường biên</span><span class="sb-task" style="background:var(--c-chrome);border-radius:var(--r)"><span class="spin"></span>Đang nạp 63% · 1.240.000 đối tượng<span class="prog"><i style="width:63%"></i></span></span><div class="prog ind" style="width:160px"><i></i></div></div>
+        <div class="empty" style="border:1px dashed var(--c-border);border-radius:var(--r-lg)"><svg class="ic"><use href="#i-blocks"/></svg><b>Bản vẽ chưa có block</b>Mở Thư viện TCVN để chèn ký hiệu chuẩn.<button class="btn sm" type="button">Mở Thư viện TCVN</button></div>
+        <div class="wrapx"><table class="spec"><thead><tr><th>Loại</th><th>Dùng khi</th><th>Hành vi</th></tr></thead><tbody><tr><td>Dòng lệnh</td><td>Kết quả bình thường</td><td>Ghi vào lịch sử</td></tr><tr><td>Cạnh con trỏ</td><td>Lỗi tức thời trong lệnh</td><td>Tự ẩn sau 2 giây</td></tr><tr><td>Banner</td><td>Trạng thái bản vẽ cần biết</td><td>Ở lại đến khi đóng, có hành động</td></tr><tr><td>Toast</td><td>Tác vụ nền xong hoặc lỗi</td><td>Tự ẩn sau 5 giây; lỗi ở lại; vào trung tâm thông báo</td></tr><tr><td>Tiến trình</td><td>Thao tác trên 0,5 giây</td><td>Dưới 2 giây: con trỏ bận; trên 2 giây: % và nút hủy</td></tr></tbody></table></div></div>
+    </section>
+
+    <section class="sgs" id="phien-ban"><h2>Phiên bản và khóa tính năng <span class="code-tag">07.1 §2</span></h2>
+      <div class="card"><div class="row"><span class="ed" data-ed="viewer">Viewer</span><span class="ed" data-ed="vp">Viewer Pro</span><span class="ed" data-ed="pro">Pro</span><span class="ed" data-ed="trial">Dùng thử: còn 12 ngày</span><span class="ed" data-ed="edu">Giáo dục</span><span class="ed" data-ed="ent">Doanh nghiệp</span><span class="ed" data-ed="beta">Beta</span></div>
+        <div class="row"><span class="rb-lg locked" style="position:relative;width:64px"><svg class="ic lg"><use href="#i-compare"/></svg><span>So sánh</span><span class="lkb"><svg class="ic"><use href="#i-lock"/></svg>VP</span></span><span class="rb-s locked"><svg class="ic"><use href="#i-erase"/></svg><span class="t">Xóa</span><span class="lkb" data-ed="pro"><svg class="ic"><use href="#i-lock"/></svg>Pro</span></span></div>
+        <div class="cmd-hist" style="height:auto;padding:0"><p>Lệnh <b>LINE</b> có trong TrionCAD Pro. <span class="chip">Dùng thử 30 ngày</span> <span class="chip">Tìm hiểu</span></p></div></div>
+    </section>
+
+    <section class="sgs" id="ribbon"><h2>Ribbon <span class="code-tag">07.1 §7.1</span></h2>
+      <div class="card"><div class="rb" style="border:1px solid var(--c-border);border-radius:var(--r-lg);overflow:hidden"><div class="rb-tabs"><button class="rb-tab" type="button" aria-selected="true">Xem</button><button class="rb-tab" type="button" aria-selected="false">Đo</button><button class="rb-tab" type="button" aria-selected="false">Ghi chú <span class="ed xs" data-ed="vp">VP</span></button></div><div class="rb-body"><div class="rb-p"><div class="rb-c"><button class="rb-lg" type="button"><svg class="ic lg"><use href="#i-pan"/></svg><span>Pan</span></button><button class="rb-lg" type="button"><svg class="ic lg"><use href="#i-zoom"/></svg><span>Zoom<svg class="ic xs"><use href="#i-down"/></svg></span></button><div class="rb-col"><button class="rb-s" type="button"><svg class="ic"><use href="#i-zext"/></svg><span class="t">Toàn bộ</span></button><button class="rb-s" type="button"><svg class="ic"><use href="#i-views"/></svg><span class="t">View đã lưu</span><svg class="ic xs"><use href="#i-down"/></svg></button><button class="rb-s" type="button"><svg class="ic"><use href="#i-regen"/></svg><span class="t">Tạo lại hình</span></button></div></div><div class="rb-l">Điều hướng</div></div><div class="rb-p"><div class="rb-c"><div class="rb-col" style="gap:3px"><button class="rb-dd" type="button" style="width:200px"><svg class="ic"><use href="#i-bulb"/></svg><svg class="ic"><use href="#i-sun"/></svg><i class="sw" style="background:#FFF"></i><span class="grow">KT-TUONG</span><svg class="ic xs"><use href="#i-down"/></svg></button><div class="rb-row"><button class="rb-s" type="button" aria-label="Cô lập"><svg class="ic"><use href="#i-isolate"/></svg></button><button class="rb-s" type="button" aria-label="Tắt"><svg class="ic"><use href="#i-bulboff"/></svg></button><button class="rb-s" type="button" aria-label="Đóng băng"><svg class="ic"><use href="#i-snow"/></svg></button></div></div></div><div class="rb-l">Layer</div></div><div class="rb-p is-collapsed"><button class="rb-coll" type="button"><svg class="ic lg"><use href="#i-print"/></svg><span>In<svg class="ic xs"><use href="#i-down"/></svg></span></button></div></div></div>
+        <div class="wrapx"><table class="spec"><thead><tr><th>Điều khiển</th><th>Lớp</th><th>Quy tắc</th></tr></thead><tbody><tr><td>Nút lớn</td><td><code>.rb-lg</code></td><td>Biểu tượng 32 px, nhãn tối đa 2 dòng, rộng 52–66 px</td></tr><tr><td>Nút nhỏ</td><td><code>.rb-s</code></td><td>Biểu tượng 16 px + nhãn; khi thiếu chỗ chỉ còn biểu tượng (<code>.is-compact</code>)</td></tr><tr><td>Split button</td><td>mũi tên <code>.ic.xs</code></td><td>Phần chính chạy lựa chọn gần nhất; mũi tên mở danh sách</td></tr><tr><td>Danh sách</td><td><code>.rb-dd</code></td><td>Layer, màu, linetype; mỗi dòng có nút bật/tắt ngay trong danh sách</td></tr><tr><td>Panel thu gọn</td><td><code>.is-collapsed</code></td><td>Thu theo ưu tiên: panel ít dùng trước</td></tr></tbody></table></div></div>
+    </section>
+
+    <section class="sgs" id="palette"><h2>Palette <span class="code-tag">UI-C01</span></h2>
+      <div class="card" style="max-width:300px;padding:0;overflow:hidden"><div class="pal-tabs"><button class="pal-tab" type="button" aria-selected="true">Thuộc tính</button><button class="pal-tab" type="button" aria-selected="false">Layer</button></div><div class="pal-tools"><button class="dd grow" type="button"><span class="lbl">Line (1)</span><svg class="ic xs"><use href="#i-down"/></svg></button><button class="ib" type="button" aria-pressed="true" aria-label="Cộng dồn"><svg class="ic"><use href="#i-pickadd"/></svg></button></div>
+        <button class="pgh" type="button" aria-expanded="true"><svg class="ic xs"><use href="#i-down"/></svg>Hình học</button><div class="pr"><span class="pk">Điểm đầu X</span><span class="pv mono"><span>7855.00</span></span></div><div class="pr is-focus"><span class="pk">Độ dài</span><span class="pv mono"><span>3190.00</span></span></div><div class="pr ro"><span class="pk">Góc</span><span class="pv mono"><span>90°</span></span></div><div class="pr"><span class="pk">Layer</span><span class="pv"><span class="varies">*Khác nhau*</span></span></div><div class="pal-desc"><b>Độ dài</b><p>Chỉ đọc. Tính từ hình học; bấm để sao chép.</p></div></div>
+    </section>
+
+    <section class="sgs" id="dong-lenh"><h2>Dòng lệnh <span class="code-tag">UI-A06</span></h2>
+      <div class="card"><div class="cmd" style="border:1px solid var(--c-border);border-radius:var(--r-lg)"><div class="cmd-hist" style="height:auto"><p>Lệnh: <b>DIST</b></p><p><b>DIST</b> Chỉ định điểm đầu: <span class="mono">150.00,-150.00</span></p></div><div class="cmd-in"><svg class="ic xs"><use href="#i-right"/></svg><span class="cmd-name">DIST</span><span class="cmd-pr">Chỉ định điểm thứ hai hoặc <span class="chip">Nhiều điểm <span class="k">·</span> <u>M</u></span>:</span><input aria-label="Dòng lệnh mẫu"></div></div><p class="muted">Chip tùy chọn: nhãn tiếng Việt kèm chữ cái tắt tiếng Anh, gạch chân (“Bán kính · R”). Gõ chữ cái tiếng Anh luôn có tác dụng để script và LISP viết cho AutoCAD vẫn chạy.</p></div>
+    </section>
+
+    <section class="sgs" id="trang-thai"><h2>Thanh trạng thái <span class="code-tag">UI-A08</span></h2>
+      <div class="card"><div class="sb" style="border:1px solid var(--c-border);border-radius:var(--r-lg)"><span class="sb-coord">5000.00, 1600.00, 0.00</span><span class="sb-txt">MODEL</span><span class="sb-sep"></span><span class="sbt is-on"><svg class="ic"><use href="#i-osnap"/></svg></span><span class="sbt"><svg class="ic"><use href="#i-ortho"/></svg></span><span class="sbt is-on"><svg class="ic"><use href="#i-polar"/></svg></span><span class="sbt"><svg class="ic"><use href="#i-lw"/></svg></span><span class="sb-grow"></span><span class="sb-chip warn"><svg class="ic"><use href="#i-warn"/></svg>Font: 3 thay thế</span><span class="sbt has-dot"><svg class="ic"><use href="#i-bell"/></svg></span><span class="ed" data-ed="pro">Pro</span></div><p class="muted">Toggle bật: biểu tượng màu <code>--c-on</code> trên nền <code>--c-on-bg</code>; tắt: <code>--c-off</code>. Tooltip gồm tên, phím tắt và biến hệ thống.</p></div>
+    </section>
+
+    <section class="sgs" id="vung-ve"><h2>Vùng vẽ: bắt điểm, grip, chọn, con trỏ <span class="code-tag">07.1 §9</span></h2>
+      <p>Mỗi chế độ bắt điểm một hình riêng, giữ ngữ nghĩa quen thuộc. Grip nguội, rê, nóng khác nhau cả màu lẫn cỡ. Khung Window viền liền, Crossing viền đứt.</p>
+      <div class="stage-cv" id="snaps"></div>
+      <div class="stage-cv" id="grips"></div>
+    </section>
+
+    <section class="sgs" id="dot2"><h2>Trình theo bước, tác vụ nền, so sánh <span class="code-tag">Đợt 2</span></h2>
+      <p>Thêm cho Viewer Pro. Trình theo bước dùng khi việc có thứ tự nhưng phải quay lại được (In hàng loạt theo khung tên). Tác vụ dài chạy ở nền: bảng hiện tiến trình từng dòng, thanh trạng thái hiện tổng và nút hủy.</p>
+      <div class="card" style="padding:0;overflow:hidden"><ol class="wz-steps" style="border-radius:var(--r-xl) var(--r-xl) 0 0"><li><button type="button" class="wz-s done"><span class="wz-n"><svg class="ic s12"><use href="#i-check"/></svg></span>Nhận diện khung</button></li><li><button type="button" class="wz-s cur" aria-current="step"><span class="wz-n">2</span>Danh sách khung</button></li><li><button type="button" class="wz-s"><span class="wz-n">3</span>Thiết lập in</button></li><li><button type="button" class="wz-s" disabled><span class="wz-n">4</span>Chạy</button></li></ol>
+        <div class="stack" style="padding:12px 16px 16px"><p class="muted" style="margin:0">Bước đã qua có dấu ✓ và bấm để quay lại; bước chưa đủ điều kiện bị vô hiệu. Đang chạy thì khóa các bước trước.</p>
+          <div class="tblwrap"><table class="tbl"><colgroup><col><col style="width:200px"></colgroup><thead><tr><th>Tệp</th><th>Trạng thái</th></tr></thead><tbody>
+            <tr><td>Banve-01.dwg</td><td><span class="tag ok"><svg class="ic s12"><use href="#i-check"/></svg>126 đối tượng</span></td></tr>
+            <tr><td>MB-Truong-THCS-An-Phu.dwg</td><td><span class="cellprog"><span class="prog"><i style="width:46%"></i></span><span class="mono">46%</span></span></td></tr>
+            <tr><td>Thong-ke-thep-mong.dxf</td><td><span class="tag warn"><svg class="ic s12"><use href="#i-warn"/></svg>54 · 3 bỏ qua</span></td></tr>
+            <tr><td>Hien-trang-khu-dat.dwg</td><td><span class="tag danger"><svg class="ic s12"><use href="#i-error"/></svg>Lỗi cấu trúc tệp</span></td></tr>
+            <tr><td>Ketcau-T2.dwg</td><td><span class="faint">Bỏ qua: đã là Unicode</span></td></tr></tbody></table></div>
+          <div class="row"><span class="sb-task" style="background:var(--c-chrome);border-radius:var(--r)"><span class="spin"></span>Chuyển font 3/7<span class="prog"><i style="width:48%"></i></span></span><span class="faint">Thanh trạng thái: còn thấy khi đã đóng hộp thoại.</span></div></div></div>
+      <div class="cols">
+        <div class="card"><b>So sánh bản vẽ</b><div class="row"><span class="ktag del">− Xóa</span><span class="ktag add">+ Thêm</span><span class="ktag mod">~ Sửa</span></div><p class="muted">Màu nhóm thay đổi luôn đi kèm ký hiệu − + ~, kể cả trên vùng vẽ (nhãn số cạnh mỗi đám mây). Đang so sánh thì ẩn markup để không lẫn màu.</p></div>
+        <div class="card wide2"><b>Chế độ đếm trên vùng vẽ</b><div class="cbar" style="position:static;transform:none;justify-self:start;box-shadow:none"><svg class="ic"><use href="#i-count"/></svg><b>CUA-DI-1C</b><span class="muted">11 block</span><span class="sep"></span><button class="ib sm" type="button" aria-label="Block trước"><svg class="ic"><use href="#i-left"/></svg></button><span class="mono">3 / 11</span><button class="ib sm" type="button" aria-label="Block kế"><svg class="ic"><use href="#i-right"/></svg></button><span class="sep"></span><button class="btn sm ghost" type="button">Thoát</button></div><p class="muted">Thanh nổi giữa trên vùng vẽ, dưới banner. Block đang xem có khung đứt nét màu nhấn.</p></div>
+        <div class="card"><b>Điều khiển chỉ có trong prototype</b><label class="proto-sel" style="justify-self:start"><span>Mô phỏng</span><select aria-label="Mô phỏng"><option>Hết lượt kích hoạt</option></select></label><p class="muted">Viền đứt, chữ “Mô phỏng”: chọn kết quả máy chủ trả về để xem từng trạng thái. Không có trong sản phẩm.</p></div>
+      </div>
+    </section>
+
+    <section class="sgs" id="van-phong"><h2>Văn phong</h2>
+      <div class="cols"><div class="do"><b>Nên</b>“Không lưu được: ổ đĩa đầy. Giải phóng ít nhất 120 MB rồi thử lại.”</div><div class="dont"><b>Tránh</b>“Lỗi 0x80070070. Thao tác không thành công.”</div><div class="do"><b>Nên</b>Nút “Xóa 3 layout”, kèm số lượng.</div><div class="dont"><b>Tránh</b>Nút “OK” cho hành động phá hủy.</div><div class="do"><b>Nên</b>Giữ thuật ngữ quen: Layer, Block, Layout, Viewport; tooltip có tên lệnh tiếng Anh.</div><div class="dont"><b>Tránh</b>Dịch gượng “Lớp”, “Khối”, “Bố trí” cho Layer, Block, Layout.</div></div>
+      <p>Câu ngắn, xưng hô trung tính, không đổ lỗi cho người dùng, luôn chỉ ra cách khắc phục. Số trên giao diện chung dùng dấu chấm phân nghìn (1.250); số trong bản vẽ dùng dấu chấm thập phân (1250.00); ngày dạng dd/mm/yyyy.</p>
+    </section>
+
+    <section class="sgs" id="kiem-tra"><h2>Danh sách kiểm khi thiết kế một màn hình <span class="code-tag">07.3 Phụ lục C</span></h2>
+      <ol class="checklist"><li>Đủ trạng thái: mặc định, rê chuột, nhấn, vô hiệu, bị khóa theo phiên bản, đang tải, rỗng, lỗi.</li><li>Đúng ở chủ đề Tối và Sáng; tỉ lệ màn hình 100%, 150%, 200%; màn hình 1366×768.</li><li>Chuỗi tiếng Việt dài không bị cắt; có bản English.</li><li>Dùng được hoàn toàn bằng bàn phím: thứ tự focus, phím tắt, Enter/Esc.</li><li>Tooltip có tên lệnh tiếng Anh; F1 mở trợ giúp đúng trang.</li><li>Ô nhập số theo UI-C09.</li><li>Hành động phá hủy có xác nhận, nêu rõ số lượng, hoàn tác được.</li><li>Thao tác trên 2 giây có tiến trình và nút hủy; không chặn vùng vẽ nếu không cần.</li><li>Không dùng màu làm tín hiệu duy nhất; chữ đạt 4,5:1.</li><li>Biểu tượng tự thiết kế (SVG, 16 và 32 px), không giống của Autodesk.</li></ol>
+    </section>
+  </main>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script src="js/core.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/canvas.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = TC.$, $$ = TC.$$, esc = TC.esc;
+  var GROUPS = [
+    ['Bề mặt', [['--c-chrome','Thanh tiêu đề, tab, thanh trạng thái'],['--c-base','Nền ribbon, palette, hộp thoại'],['--c-sunken','Nền lõm: đầu nhóm, danh sách'],['--c-raised','Ô nhập, nút, thẻ'],['--c-active','Chip, nền nhấn'],['--c-hover','Lớp phủ khi rê chuột'],['--c-border','Đường chia vùng'],['--c-border-ctl','Viền điều khiển, đạt 3:1']]],
+    ['Chữ', [['--c-text','Chữ chính','t'],['--c-text-2','Nhãn, chữ phụ','t'],['--c-text-3','Chú thích, đầu cột','t'],['--c-text-dis','Vô hiệu (không cần đạt 4,5:1)','t']]],
+    ['Nhấn và trạng thái', [['--c-accent','Hành động chính, tab đang mở','t'],['--c-accent-hi','Nút chính khi rê'],['--c-accent-t','Chữ trên nền nhấn'],['--c-accent-soft','Hàng đang chọn, ghi chú'],['--c-focus','Viền tiêu điểm'],['--c-on','Toggle đang bật','t'],['--c-on-bg','Nền toggle đang bật'],['--c-off','Toggle tắt','t']]],
+    ['Ngữ nghĩa', [['--c-ok','Xong, hợp lệ','t'],['--c-warn','Cảnh báo','t'],['--c-danger','Lỗi, phá hủy','t'],['--c-info','Thông tin','t'],['--c-ok-soft','Nền xong'],['--c-warn-soft','Nền cảnh báo'],['--c-danger-soft','Nền lỗi'],['--c-info-soft','Nền thông tin']]],
+    ['Vùng vẽ và layout', [['--c-canvas','Nền Model (mặc định tối)'],['--c-cross','Chữ thập con trỏ'],['--c-rubber','Đường tạm theo con trỏ'],['--c-sel-w','selection.window: viền liền'],['--c-sel-wf','selection.window: nền'],['--c-sel-c','selection.crossing: viền đứt'],['--c-sel-cf','selection.crossing: nền'],['--c-hl-hover','highlight.hover'],['--c-hl-sel','highlight.selected'],['--c-hl-res','highlight.result (FIND, COMPARE)'],['--c-grip-cold','grip.cold'],['--c-grip-hover','grip.hover'],['--c-grip-hot','grip.hot'],['--c-snap','snap.marker'],['--c-track','tracking.vector'],['--c-dyn-bg','dyn.tooltip.bg'],['--c-dyn-t','dyn.tooltip.text'],['--c-layout-bg','Nền quanh tờ giấy'],['--c-paper','paper.bg'],['--c-paper-print','paper.printable'],['--c-cmp-a','compare.onlyA (kèm ký hiệu −)'],['--c-cmp-b','compare.onlyB (kèm ký hiệu +)'],['--c-cmp-common','compare.common']]],
+    ['Huy hiệu phiên bản', [['--c-ed-viewer','Viewer'],['--c-ed-vp','Viewer Pro'],['--c-ed-pro','Pro'],['--c-ed-trial','Dùng thử'],['--c-ed-edu','Giáo dục'],['--c-ed-ent','Doanh nghiệp']]]
+  ];
+  function lum(c){ var m = c.match(/^#?([0-9a-f]{6})/i); if (!m) return null; var n = parseInt(m[1], 16), r = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function(v){ v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * r[0] + .7152 * r[1] + .0722 * r[2]; }
+  function cr(a, b){ var x = lum(a), y = lum(b); if (x == null || y == null) return ''; var hi = Math.max(x, y), lo = Math.min(x, y); return ((hi + .05) / (lo + .05)).toFixed(1).replace('.', ',') + ':1'; }
+  function render(){
+    var base = TC.cssv('--c-base');
+    $('#sw').innerHTML = GROUPS.map(function(g){ return '<h3>' + g[0] + '</h3><div class="cols" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">' + g[1].map(function(t){ var v = TC.cssv(t[0]); return '<div class="tok"><i style="background:var(' + t[0] + ')"></i><code>' + t[0] + '</code><span>' + esc(t[1]) + '</span><span class="v">' + esc(v.toUpperCase()) + (t[2] ? ' · ' + cr(v, base) + ' trên nền' : '') + '</span></div>'; }).join('') + '</div>'; }).join('');
+    var sizes = [['--fs-3xl','32px','Tiêu đề trang web'],['--fs-2xl','24px','Số lớn, tiêu đề màn hình'],['--fs-xl','18px','Tiêu đề hộp thoại lớn'],['--fs-l','15px','Đoạn nhấn'],['--fs-m','13px','Đầu mục'],['--fs','12px','Chữ giao diện mặc định'],['--fs-s','11.5px','Nhãn, palette, dòng lệnh phụ'],['--fs-xs','10.5px','Nhãn panel, chú thích'],['--fs-2xs','10px','Huy hiệu nhỏ']];
+    $('#ty').innerHTML = sizes.map(function(s){ return '<span class="k">' + s[0] + ' · ' + s[1] + '</span><span style="font-size:var(' + s[0] + ')">Bản vẽ kỹ thuật ÂĂÊÔƠƯĐ 0123 <span class="faint" style="font-size:12px">' + s[2] + '</span></span>'; }).join('') + '<span class="k">--f-mono</span><span class="mono" style="font-size:13px">12345.67, 8901.23 · LINE · Ø16 · ±0.000</span><span class="k">đậm</span><span><span style="font-weight:400">400 thường</span> · <span style="font-weight:500">500 vừa</span> · <span style="font-weight:600">600 đậm</span></span>';
+    $('#spc').innerHTML = ['--sp-1','--sp-2','--sp-3','--sp-4','--sp-5','--sp-6','--sp-7','--sp-8','--sp-9'].map(function(k){ return '<span style="display:grid;justify-items:center;gap:4px;font:11px var(--f-mono);color:var(--c-text-3)"><i style="display:block;width:var(' + k + ');height:var(' + k + ');min-width:2px;min-height:2px;background:var(--c-accent)"></i>' + k + '<br>' + TC.cssv(k) + '</span>'; }).join('');
+    drawCanvas();
+  }
+  // biểu tượng
+  $('#icg').innerHTML = Object.keys(TC.ICONS).map(function(k){ return '<button type="button" data-icn="' + k + '" aria-label="' + k + '">' + TC.ic(k) + '<span>' + k + '</span></button>'; }).join('');
+  $('#icl').innerHTML = ['pan','zoom','line','circle','move','print','layers','fontdoc','measure','compare','pdf','lib'].map(function(k){ return '<figure>' + TC.ic(k, 'lg') + '<figcaption>' + k + '</figcaption></figure>'; }).join('');
+  $('#icg').addEventListener('click', function(e){ var b = e.target.closest('[data-icn]'); if (!b) return; try { navigator.clipboard.writeText(b.dataset.icn); } catch (x) {} TC.toast('Đã sao chép tên biểu tượng <b>' + esc(b.dataset.icn) + '</b>', { log:false }); });
+  // ô nhập số
+  $('#c09-box').innerHTML = [['c1','Bán kính','1250.00',{ min:0 }],['c2','Tỉ lệ (lỗi)','-5',{ min:0, label:'Tỉ lệ' }],['c3','Khác nhau','*Khác nhau*',{}],['c4','Chỉ đọc (RO)','3190.00',{ ro:true, pick:false }]].map(function(f){ return '<div class="field"><label for="' + f[0] + '">' + f[1] + '</label>' + TC.numField(Object.assign({ id:f[0], value:f[2], label:f[1], style:'width:190px' }, f[3])) + '</div>'; }).join('');
+  setTimeout(function(){ var b = $('#c2').closest('[data-num]'); b.dataset.label = 'Tỉ lệ'; TC.numCommit(b); }, 0);
+  TC.pickValue = function(box){ var inp = $('input', box); inp.value = '3900.00'; TC.numCommit(box); };
+  // marker bắt điểm, grip, khung chọn
+  function drawCanvas(){
+    var fake = Object.create(TC.View.prototype);
+    $('#snaps').innerHTML = ['end','mid','cen','gcen','node','quad','int','ext','ins','per','tan','nea','app','par'].map(function(k){ return '<figure><canvas width="44" height="44" data-snap="' + k + '"></canvas><figcaption>' + TC.SNAP_NAMES[k] + '</figcaption></figure>'; }).join('');
+    $$('[data-snap]').forEach(function(c){ var x = c.getContext('2d'); if (c.dataset.snap === 'ext'){ x.strokeStyle = TC.cssv('--c-track'); x.setLineDash([2, 3]); x.beginPath(); x.moveTo(4, 22); x.lineTo(40, 22); x.stroke(); x.setLineDash([]); x.strokeStyle = TC.cssv('--c-snap'); x.lineWidth = 2; x.beginPath(); x.moveTo(30, 18); x.lineTo(30, 26); x.moveTo(26, 22); x.lineTo(34, 22); x.stroke(); return; } fake.drawSnap(x, [22, 22], c.dataset.snap); });
+    var g = $('#grips'); g.innerHTML = '<figure><canvas width="220" height="70" id="gc"></canvas><figcaption>Grip vuông: nguội · rê · nóng</figcaption></figure><figure><canvas width="160" height="70" id="gk"></canvas><figcaption>Grip đa năng, tam giác, tròn</figcaption></figure><figure><canvas width="300" height="90" id="sel"></canvas><figcaption>Window (trái → phải) · Crossing (phải → trái)</figcaption></figure><figure><canvas width="200" height="90" id="hl"></canvas><figcaption>Rê chuột · đã chọn · kết quả tìm</figcaption></figure>';
+    var c = $('#gc').getContext('2d'); [['--c-grip-cold', 9, 1], ['--c-grip-hover', 11, 1.5], ['--c-grip-hot', 11, 2.5]].forEach(function(s, i){ var x = 40 + i * 70, y = 35; c.fillStyle = TC.cssv(s[0]); c.fillRect(x - s[1] / 2, y - s[1] / 2, s[1], s[1]); c.strokeStyle = i === 2 ? '#FFFFFF' : TC.cssv('--c-grip-border'); c.lineWidth = s[2]; c.strokeRect(x - s[1] / 2, y - s[1] / 2, s[1], s[1]); });
+    var k = $('#gk').getContext('2d'); k.fillStyle = TC.cssv('--c-grip-cold'); k.fillRect(20, 30, 16, 8); k.beginPath(); k.moveTo(70, 26); k.lineTo(84, 34); k.lineTo(70, 42); k.closePath(); k.fill(); k.beginPath(); k.arc(124, 34, 6, 0, 7); k.fill();
+    var s = $('#sel').getContext('2d'); s.fillStyle = TC.cssv('--c-sel-wf'); s.strokeStyle = TC.cssv('--c-sel-w'); s.fillRect(10, 15, 120, 60); s.strokeRect(10.5, 15.5, 120, 60); s.setLineDash([6, 4]); s.fillStyle = TC.cssv('--c-sel-cf'); s.strokeStyle = TC.cssv('--c-sel-c'); s.fillRect(165, 15, 120, 60); s.strokeRect(165.5, 15.5, 120, 60); s.setLineDash([]);
+    var h = $('#hl').getContext('2d'); [['--c-hl-hover', .22, 5], ['--c-hl-sel', .38, 5], ['--c-hl-res', .5, 5]].forEach(function(t, i){ var y = 22 + i * 24; h.globalAlpha = t[1]; h.strokeStyle = TC.cssv(t[0]); h.lineWidth = t[2]; h.beginPath(); h.moveTo(20, y); h.lineTo(180, y); h.stroke(); h.globalAlpha = 1; h.lineWidth = i === 0 ? 2.2 : 1.4; h.strokeStyle = i === 0 ? '#FFFFFF' : TC.cssv(t[0]); h.beginPath(); h.moveTo(20, y); h.lineTo(180, y); h.stroke(); });
+  }
+  // chủ đề, mật độ
+  function syncBtns(){ $$('[data-th]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.th === TC.S.theme)); }); $$('[data-dn]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.dn === TC.S.density)); }); $('#sg-lite').checked = !!TC.S.lite; }
+  document.addEventListener('click', function(e){ var t = e.target.closest('[data-th]'); if (t){ TC.S.theme = t.dataset.th; TC.save('theme', TC.S.theme); TC.applyTheme(); syncBtns(); render(); } var d = e.target.closest('[data-dn]'); if (d){ TC.S.density = d.dataset.dn; TC.save('density', TC.S.density); TC.applyTheme(); syncBtns(); render(); } });
+  $('#sg-lite').addEventListener('change', function(){ TC.S.lite = this.checked; TC.save('lite', TC.S.lite); TC.applyTheme(); render(); });
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  TC.applyTheme(); syncBtns(); render();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+})();
+</script>
+</body>
+</html>

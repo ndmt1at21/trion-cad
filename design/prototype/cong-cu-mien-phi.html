@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Công cụ miễn phí TrionCAD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/page.css">
+<link rel="stylesheet" href="css/web.css">
+<style>
+/* Trang duyệt Đợt 0: mỗi màn hình N01–N03 = sân khấu tương tác (trái) + ghi chú hành vi (phải) + dòng lệnh mô phỏng + mã DCL.
+   Ba thế giới hình ảnh: khung trang (token TrionCAD), hộp thoại DCL (điều khiển Windows do chương trình chủ vẽ), trang tải về (web TrionCAD). */
+
+/* sân khấu: nền trung tính thay cho cửa sổ của chương trình chủ */
+.stage{ position:relative; display:grid; place-items:center; padding:28px 16px; border-radius:var(--r-xl); background:#3B3E43; overflow-x:auto; min-height:200px }
+.stage-cap{ position:absolute; left:10px; top:8px; font-size:11px; color:#C3C7CD }
+/* dòng lệnh của chương trình chủ: chỉ là văn bản, không mô phỏng giao diện hãng nào */
+.host-cmd{ border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-sunken); font:12px/1.6 var(--f-mono); color:var(--c-text-2); padding:8px 12px; max-height:180px; overflow:auto; white-space:pre-wrap }
+.host-cmd .cap{ display:block; font-family:var(--f-ui); font-size:11px; color:var(--c-text-3); margin-bottom:4px }
+.host-cmd b{ color:var(--c-text); font-weight:500 }
+.host-cmd .new{ color:var(--c-text) }
+details.src{ border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-sunken) }
+details.src summary{ cursor:pointer; padding:8px 12px; font-size:13px; color:var(--c-text) }
+details.src pre{ margin:0; padding:10px 12px 14px; font:12px/1.55 var(--f-mono); color:var(--c-text-2); overflow:auto; max-height:420px; border-top:1px solid var(--c-border) }
+
+/* ============ Hộp thoại DCL: điều khiển Windows 10/11 (chương trình chủ vẽ) ============ */
+.w10{ font:12px/1.4 "Segoe UI", Tahoma, system-ui, sans-serif; color:#000; color-scheme:light }
+.w10 *{ box-sizing:border-box }
+.w10 .dlg{ background:#F0F0F0; border:1px solid #8C8C8C; box-shadow:0 10px 30px rgba(0,0,0,.45); width:max-content; max-width:100%; text-align:left }
+.w10 .dlg-t{ display:flex; align-items:center; height:30px; background:#FFFFFF; padding-left:10px; gap:8px; user-select:none }
+.w10 .dlg-t span{ flex:1; white-space:nowrap }
+.w10 .dlg-x{ width:44px; height:30px; border:0; background:none; font:inherit; font-size:16px; cursor:pointer }
+.w10 .dlg-x:hover{ background:#C42B1C; color:#FFF }
+.w10 .dlg-b{ padding:10px 12px 12px; display:grid; gap:8px }
+.w10 fieldset{ margin:0; border:1px solid #D5D5D5; padding:4px 9px 8px; min-width:0 }
+.w10 legend{ padding:0 3px; color:#000 }
+.w10 .row{ display:flex; gap:12px; align-items:center; flex-wrap:nowrap }
+.w10 .row.wrap{ flex-wrap:wrap }
+.w10 .col{ display:grid; gap:4px; align-content:start }
+.w10 label.opt{ display:inline-flex; gap:5px; align-items:center; white-space:nowrap }
+.w10 input[type="radio"], .w10 input[type="checkbox"]{ accent-color:#0067C0; margin:0; width:13px; height:13px }
+.w10 .btn{ font:inherit; min-width:75px; height:24px; padding:0 11px; background:#FDFDFD; color:#000; border:1px solid #D0D0D0; border-bottom-color:#B9B9B9; border-radius:4px; cursor:pointer; white-space:nowrap }
+.w10 .btn:hover{ background:#F6F6F6 } .w10 .btn:active{ background:#EDEDED }
+.w10 .btn.def{ background:#0067C0; color:#FFF; border-color:#0067C0 } .w10 .btn.def:hover{ background:#1975C5 }
+.w10 .btn:disabled{ color:#9D9D9D; background:#F5F5F5; border-color:#E0E0E0; cursor:default }
+.w10 .btn:focus-visible, .w10 input:focus-visible, .w10 select:focus-visible, .w10 .lst:focus-visible{ outline:2px solid #000; outline-offset:1px }
+.w10 .btn u, .w10 label u{ text-underline-offset:2px }
+.w10 .btnrow{ display:flex; gap:7px; align-items:center }
+.w10 .btnrow .push{ flex:1 }
+.w10 input[type="text"], .w10 select{ font:inherit; height:24px; padding:0 6px; background:#FFF; color:#000; border:1px solid #8D8D8D; border-radius:3px }
+.w10 select{ padding-right:2px }
+.w10 .num{ text-align:right; min-width:64px; font-variant-numeric:tabular-nums }
+.w10 .muted{ color:#5C5C5C }
+.w10 .err{ min-height:17px; color:#B00020 }
+.w10 .lst{ background:#FFF; border:1px solid #8D8D8D; overflow:auto; outline:none }
+.w10 .lst .lab{ display:block }
+.w10 .lst [role="option"]{ display:grid; padding:1px 5px; white-space:nowrap; cursor:default; min-height:19px }
+.w10 .lst [role="option"][aria-selected="true"]{ background:#0067C0; color:#FFF }
+.w10 .lst:not(:focus) [role="option"][aria-selected="true"]{ background:#D9D9D9; color:#000 }
+.w10 .lst .indent{ padding-left:18px }
+.w10 .lst .empty{ padding:6px; color:#6D6D6D; font-style:italic }
+.w10 .cols4{ grid-template-columns:150px 50px 72px 1fr }
+.w10 .bar{ display:flex; height:16px; border:1px solid #9A9A9A; background:#F0F0F0 }
+.w10 .bar i{ display:block; height:100% }
+.w10 .legend{ display:flex; gap:12px; flex-wrap:wrap }
+.w10 .legend span{ display:inline-flex; gap:5px; align-items:center }
+.w10 .legend i{ width:14px; height:9px; display:inline-block; border:1px solid rgba(0,0,0,.35) }
+.w10 .imgtile{ background:#000; border:1px solid #8D8D8D; display:block }
+.w10 .promo{ color:#3A3A3A; border-top:1px solid #D5D5D5; padding-top:7px }
+.w10 .hidden-dlg{ display:none }
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-logo" viewBox="0 0 16 16"><path d="M8 3 14.2 13.5H1.8z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3" r="2" fill="currentColor"/></symbol>
+  <symbol id="i-down" viewBox="0 0 16 16"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 16 16"><path d="M8 2v8.5M4.5 7 8 10.5 11.5 7M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</defs></svg>
+
+<main class="pg">
+  <header class="pg-head">
+    <p class="eyebrow">TrionCAD · Đợt 0 / 5 · Công cụ miễn phí (CC) · phát hành tháng 2–3</p>
+    <h1>Công cụ miễn phí chạy trong AutoCAD, ZWCAD, BricsCAD</h1>
+    <p class="lead">Ba thành phần UI-N01 đến UI-N03 theo đặc tả 07.3 §7. Đây là sản phẩm đầu tiên người dùng thấy, ra mắt trước Viewer hơn một năm. Hộp thoại bấm thử được; dòng lệnh bên dưới ghi lại những gì LISP in ra.</p>
+    <div class="rules">
+      <span><b>Ràng buộc:</b> chạy dưới dạng LISP trong ứng dụng CAD khác, nên giao diện chỉ gồm hộp thoại DCL (chương trình chủ vẽ bằng điều khiển Windows, không đổi màu hay font được) và dòng lệnh. Không palette, không ribbon, không biểu tượng hay giao diện của Autodesk.</span>
+      <span><b>Tên lệnh</b> giống TrionCAD (07.3 §0): <code>FIXFONT</code>, <code>TCLIB</code>; thêm <code>TCINSTALL</code> và <code>TCUNINSTALL</code> cho cài đặt (đề xuất mới).</span>
+    </div>
+    <div class="toc">
+      <a href="#n01">UI-N01 · Bác sĩ Font</a><a href="#n02">UI-N02 · Thư viện TCVN</a><a href="#n03">UI-N03 · Cài đặt và đăng ký</a>
+    </div>
+  </header>
+
+  <!-- ===================== UI-N01 ===================== -->
+  <section class="scr" id="n01" aria-labelledby="h-n01">
+    <div class="scr-h"><span class="code-tag">UI-N01</span><h2 id="h-n01">Bác sĩ Font bản LISP</h2><span class="rel">Lệnh <code>FIXFONT</code> · CC</span></div>
+    <div class="scr-grid">
+      <div style="display:grid; gap:10px; min-width:0">
+        <div class="states" role="group" aria-label="Trạng thái hộp thoại quét">Trạng thái:
+          <button type="button" data-st="idle" aria-pressed="true">Chưa quét</button>
+          <button type="button" data-st="found" aria-pressed="false">Có lỗi font</button>
+          <button type="button" data-st="clean" aria-pressed="false">Bản vẽ sạch</button>
+          <button type="button" data-st="empty" aria-pressed="false">Vùng chọn không có chữ</button>
+        </div>
+        <div class="stage w10" id="stage-n01">
+          <span class="stage-cap">Nổi trên cửa sổ chương trình chủ</span>
+          <!-- hộp thoại quét -->
+          <div class="dlg" id="dlg-scan" role="dialog" aria-labelledby="t-scan">
+            <div class="dlg-t"><span id="t-scan">Bác sĩ Font · TrionCAD (miễn phí)</span><button class="dlg-x" type="button" aria-label="Đóng" data-act="close-scan">×</button></div>
+            <div class="dlg-b" style="min-width:540px">
+              <fieldset><legend>Phạm vi quét</legend>
+                <div class="row">
+                  <label class="opt"><input type="radio" name="scope" value="all" checked><span>Cả <u>b</u>ản vẽ</span></label>
+                  <label class="opt"><input type="radio" name="scope" value="sel"><span><u>V</u>ùng chọn</span></label>
+                  <button class="btn" type="button" id="b-pick" disabled>Chọn đối tượng &lt;</button>
+                  <span class="muted" id="picked"></span>
+                </div>
+              </fieldset>
+              <fieldset><legend>Kết quả</legend>
+                <div class="col">
+                  <div class="row" style="gap:6px"><span style="width:170px">Font không có trên máy:</span><span class="num" id="v-missing">—</span></div>
+                  <div class="row" style="gap:6px"><span style="width:170px">Kiểu chữ trong bản vẽ:</span><span class="num" id="v-styles">—</span></div>
+                  <div class="bar" id="bar" aria-hidden="true"></div>
+                  <div class="legend" id="legend"><span class="muted">Chưa quét. Bấm Quét để kiểm tra bản vẽ.</span></div>
+                  <span id="lst-lab">Font và bảng mã</span>
+                  <div class="lst" id="lst-fonts" role="listbox" tabindex="0" aria-labelledby="lst-lab" style="height:142px"></div>
+                </div>
+              </fieldset>
+              <div class="promo">TrionCAD Viewer tự sửa lỗi này khi mở bản vẽ, không cần chuyển đổi.</div>
+              <div class="btnrow">
+                <button class="btn" type="button" data-act="signup">Đăng ký nhận bản dùng thử…</button>
+                <span class="push"></span>
+                <button class="btn def" type="button" id="b-scan" data-act="scan"><u>Q</u>uét</button>
+                <button class="btn" type="button" id="b-convert" data-act="to-convert" disabled><u>C</u>huyển sang Unicode…</button>
+                <button class="btn" type="button" data-act="close-scan">Đóng</button>
+                <button class="btn" type="button" data-act="help">Trợ giúp</button>
+              </div>
+              <div class="err" id="err-scan" role="status"></div>
+            </div>
+          </div>
+          <!-- hộp thoại chuyển -->
+          <div class="dlg hidden-dlg" id="dlg-conv" role="dialog" aria-labelledby="t-conv">
+            <div class="dlg-t"><span id="t-conv">Chuyển sang Unicode · Bác sĩ Font</span><button class="dlg-x" type="button" aria-label="Đóng" data-act="cancel-conv">×</button></div>
+            <div class="dlg-b" style="min-width:540px">
+              <fieldset><legend>Bảng mã nguồn</legend>
+                <div class="row">
+                  <label class="opt"><input type="radio" name="src" value="auto" checked><span>Tự <u>n</u>hận diện</span></label>
+                  <label class="opt"><input type="radio" name="src" value="tcvn3"><span>Ép <u>T</u>CVN3</span></label>
+                  <label class="opt"><input type="radio" name="src" value="vni"><span>Ép <u>V</u>NI</span></label>
+                </div>
+              </fieldset>
+              <fieldset><legend>Font Unicode đích</legend>
+                <div class="col">
+                  <select id="sel-font" aria-label="Font Unicode đích" style="width:300px">
+                    <option>Theo font gốc (gợi ý tự động)</option><option>Times New Roman</option><option>Arial</option><option>Tahoma</option><option>Segoe UI</option>
+                  </select>
+                  <span class="muted" id="font-hint">Gợi ý: .VnTime → Times New Roman, .VnArial → Arial, VNI-Times → Times New Roman, VNI-Helve → Arial.</span>
+                </div>
+              </fieldset>
+              <fieldset><legend>Tùy chọn</legend>
+                <div class="col">
+                  <label class="opt"><input type="checkbox" id="ck-style" checked><span>Cập nhật <u>k</u>iểu chữ sang font Unicode</span></label>
+                  <label class="opt"><input type="checkbox" id="ck-nested" checked><span>Gồm <u>b</u>lock lồng và attribute</span></label>
+                </div>
+              </fieldset>
+              <div id="conv-sum">Sẽ chuyển 296 đối tượng: 250 TCVN3, 46 VNI. Gõ U để hoàn tác.</div>
+              <div class="btnrow">
+                <button class="btn" type="button" data-act="back">&lt; <u>Q</u>uay lại</button>
+                <span class="push"></span>
+                <button class="btn def" type="button" data-act="convert">C<u>h</u>uyển</button>
+                <button class="btn" type="button" data-act="cancel-conv">Hủy</button>
+              </div>
+              <div class="err" id="err-conv" role="status"></div>
+            </div>
+          </div>
+          <div id="closed-n01" class="hidden-dlg" style="color:#E6E8EB; font:13px var(--f-ui); text-align:center">Hộp thoại đã đóng. <button class="btn" type="button" data-act="reopen" style="margin-left:6px">Gõ lại FIXFONT</button></div>
+        </div>
+        <div class="host-cmd" id="cmd-n01" aria-live="polite"><span class="cap">Dòng lệnh của chương trình chủ (LISP in ra)</span></div>
+      </div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li><b>Quét</b> đếm chữ theo bảng mã: text, mtext, attribute, chữ trong kích thước, multileader, bảng, kể cả block lồng.</li>
+          <li><b>Vùng chọn</b> bật nút “Chọn đối tượng &lt;”: hộp thoại đóng tạm, người dùng chọn trên bản vẽ, hộp thoại mở lại và ghi “Đã chọn N”.</li>
+          <li>Thanh tỉ lệ là tile <code>image</code> vẽ bằng <code>fill_image</code>; chú giải cạnh mỗi màu là chữ, không dựa vào màu.</li>
+          <li><b>Chuyển sang Unicode…</b> chỉ bật khi có chữ TCVN3 hoặc VNI.</li>
+          <li>Cả lần chuyển nằm trong một nhóm <code>UNDO BEgin/End</code>, gõ <kbd>U</kbd> là hoàn tác toàn bộ.</li>
+          <li>Kết quả in ra dòng lệnh, vì DCL không có thông báo nổi.</li>
+        </ul>
+        <h3>Trạng thái</h3>
+        <ul>
+          <li><b>Chưa quét:</b> số liệu “—”, danh sách rỗng có câu hướng dẫn.</li>
+          <li><b>Bản vẽ sạch:</b> “Bản vẽ dùng Unicode và đủ font.” (cùng câu với UI-J02).</li>
+          <li><b>Vùng chọn không có chữ:</b> báo ở <code>errtile</code>, không đóng hộp thoại.</li>
+        </ul>
+        <h3>Dẫn về TrionCAD</h3>
+        <ul><li>Dòng chân hộp thoại và nút “Đăng ký nhận bản dùng thử…” mở trang UI-N03 bằng trình duyệt mặc định.</li></ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== UI-N02 ===================== -->
+  <section class="scr" id="n02" aria-labelledby="h-n02">
+    <div class="scr-h"><span class="code-tag">UI-N02</span><h2 id="h-n02">Thư viện TCVN bản LISP</h2><span class="rel">Lệnh <code>TCLIB</code> · CC</span></div>
+    <div class="scr-grid">
+      <div style="display:grid; gap:10px; min-width:0">
+        <div class="stage w10" id="stage-n02">
+          <span class="stage-cap">Nổi trên cửa sổ chương trình chủ</span>
+          <div class="dlg" id="dlg-lib" role="dialog" aria-labelledby="t-lib">
+            <div class="dlg-t"><span id="t-lib">Thư viện TCVN · TrionCAD (miễn phí)</span><button class="dlg-x" type="button" aria-label="Đóng" data-act="lib-close">×</button></div>
+            <div class="dlg-b" style="min-width:760px">
+              <div class="row">
+                <label for="lib-q"><u>T</u>ìm:</label>
+                <input type="text" id="lib-q" style="width:260px" placeholder="" autocomplete="off">
+                <span class="muted" id="lib-count"></span>
+              </div>
+              <div class="row" style="align-items:flex-start">
+                <div class="col"><span id="cat-lab"><u>D</u>anh mục</span><div class="lst" id="lst-cat" role="listbox" tabindex="0" aria-labelledby="cat-lab" style="width:178px; height:260px"></div></div>
+                <div class="col"><span id="itm-lab"><u>K</u>ý hiệu</span><div class="lst" id="lst-items" role="listbox" tabindex="0" aria-labelledby="itm-lab" style="width:250px; height:260px"></div></div>
+                <div class="col" style="width:280px">
+                  <span>Xem trước</span>
+                  <svg class="imgtile" id="lib-prev" width="280" height="196" viewBox="0 0 280 196" role="img" aria-label="Xem trước ký hiệu"></svg>
+                  <b id="lib-name" style="font-weight:600"></b>
+                  <span id="lib-kind" class="muted"></span>
+                  <span id="lib-std" class="muted"></span>
+                </div>
+              </div>
+              <div class="row">
+                <label for="lib-scale"><span>Tỉ <u>l</u>ệ bản vẽ:</span></label>
+                <select id="lib-scale" style="width:96px"></select>
+                <span class="muted" id="lib-scale-hint"></span>
+              </div>
+              <div class="promo">TrionCAD có Thư viện TCVN đầy đủ hơn: kéo-thả, yêu thích, thư viện chung của công ty.</div>
+              <div class="btnrow">
+                <button class="btn" type="button" data-act="signup">Đăng ký nhận bản dùng thử…</button>
+                <span class="push"></span>
+                <button class="btn def" type="button" data-act="lib-insert" id="b-insert"><u>C</u>hèn</button>
+                <button class="btn" type="button" data-act="lib-close">Đóng</button>
+                <button class="btn" type="button" data-act="help">Trợ giúp</button>
+              </div>
+              <div class="err" id="err-lib" role="status"></div>
+            </div>
+          </div>
+          <div id="closed-n02" class="hidden-dlg" style="color:#E6E8EB; font:13px var(--f-ui); text-align:center">Hộp thoại đã đóng. <button class="btn" type="button" data-act="lib-reopen" style="margin-left:6px">Gõ lại TCLIB</button></div>
+        </div>
+        <div class="host-cmd" id="cmd-n02" aria-live="polite"><span class="cap">Dòng lệnh của chương trình chủ (LISP in ra)</span></div>
+      </div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li><b>Tìm không phân biệt dấu:</b> gõ “cua di” ra “Cửa đi…”. Kết quả lọc ngay khi gõ, xóa ô tìm thì quay lại danh mục đang chọn.</li>
+          <li>Bấm một danh mục cha (Kiến trúc) thì liệt kê mọi ký hiệu bên trong; danh mục con thụt vào.</li>
+          <li><b>Nhấp đúp</b> một ký hiệu hoặc bấm <b>Chèn</b>: hộp thoại đóng, dòng lệnh hỏi điểm chèn.</li>
+          <li><b>Hai loại tỉ lệ:</b> vật thể thật (cửa, thiết bị, cột) chèn 1:1 theo mm; ký hiệu chú thích (cao độ, trục, hướng Bắc, mặt cắt, khung tên) chèn theo tỉ lệ bản vẽ để in đúng cỡ.</li>
+          <li>Tỉ lệ bản vẽ mặc định đọc từ <code>DIMSCALE</code>; danh sách theo UI-D11.</li>
+          <li>Bản vẽ không dùng mm (<code>INSUNITS</code> ≠ 4): LISP quy đổi và ghi rõ trên dòng lệnh.</li>
+          <li>Block chèn vào có tên tiền tố <code>TC-</code> và nằm trên layer theo bộ môn (ví dụ <code>KT-CUA</code>); layer chưa có thì tạo.</li>
+        </ul>
+        <h3>Đi kèm gói</h3>
+        <ul><li>Mẫu bản vẽ, CTB, bộ layer, hatch và linetype TCVN dạng tệp, cài bằng <code>TCINSTALL</code> (UI-N03).</li></ul>
+        <h3>Cần xác minh</h3>
+        <ul><li>Số hiệu tiêu chuẩn của từng ký hiệu (trừ khung tên TCVN 5571) phải do người làm nội dung đối chiếu.</li></ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== UI-N03 ===================== -->
+  <section class="scr" id="n03" aria-labelledby="h-n03">
+    <div class="scr-h"><span class="code-tag">UI-N03</span><h2 id="h-n03">Cài đặt và đăng ký</h2><span class="rel">Trang tải về (web) · gói ZIP · lệnh <code>TCINSTALL</code> · CC</span></div>
+    <div class="states" role="group" aria-label="Thiết bị xem">Xem trang trên:
+      <span class="dev"><button type="button" data-dev="desktop" aria-pressed="true">Máy tính</button><button type="button" data-dev="phone" aria-pressed="false">Điện thoại</button></span>
+      <span>· nhiều người tải từ link gửi qua Zalo nên trang phải dùng tốt trên điện thoại.</span>
+    </div>
+    <div class="browser" id="browser" data-dev="desktop">
+      <div class="browser-bar"><span class="addr">[tên-miền]/cong-cu-mien-phi</span></div>
+      <div class="web">
+        <div class="web-in">
+          <nav class="web-nav" aria-label="Trang TrionCAD">
+            <a class="brand" href="#n03"><svg aria-hidden="true"><use href="#i-logo"/></svg>TrionCAD</a>
+            <span class="links"><a href="#n03" aria-current="page">Công cụ miễn phí</a><a href="#n03">TrionCAD Viewer · sắp ra mắt</a></span>
+          </nav>
+          <div class="hero">
+            <div>
+              <h3>Sửa lỗi font tiếng Việt và chèn ký hiệu TCVN ngay trong AutoCAD</h3>
+              <p class="sub">Hai công cụ LISP miễn phí cho AutoCAD, AutoCAD LT, ZWCAD và BricsCAD. Không cài phần mềm mới, không đổi cách bạn đang làm việc.</p>
+              <div class="compat" aria-label="Chạy trên"><span>AutoCAD 2024+</span><span>AutoCAD LT 2024+</span><span>ZWCAD</span><span>BricsCAD</span></div>
+            </div>
+            <form class="reg" id="reg" novalidate aria-labelledby="reg-h">
+              <h4 id="reg-h">Nhận gói tải về</h4>
+              <p>Nhập Zalo hoặc email để nhận link. Bạn cũng vào danh sách chờ TrionCAD Viewer (miễn phí) và hủy được bất cứ lúc nào.</p>
+              <div class="seg" role="tablist" aria-label="Cách nhận link">
+                <button type="button" role="tab" id="tab-zalo" aria-selected="true" aria-controls="f-contact">Zalo</button>
+                <button type="button" role="tab" id="tab-mail" aria-selected="false" aria-controls="f-contact">Email</button>
+              </div>
+              <div class="fld">
+                <label for="f-contact" id="f-contact-lab">Số điện thoại dùng Zalo</label>
+                <input id="f-contact" name="contact" inputmode="tel" autocomplete="tel" placeholder="0912 345 678" aria-describedby="f-contact-msg">
+                <span class="msg" id="f-contact-msg" aria-live="polite"></span>
+              </div>
+              <div class="fld">
+                <label for="f-field">Bạn làm lĩnh vực nào? <span class="help">(không bắt buộc)</span></label>
+                <select id="f-field"><option value="">Chọn…</option><option>Kiến trúc</option><option>Kết cấu</option><option>Điện, cấp thoát nước (M&amp;E)</option><option>Giao thông, hạ tầng</option><option>Cơ khí</option><option>Sinh viên, giảng viên</option><option>Khác</option></select>
+              </div>
+              <button class="cta" type="submit">Nhận link tải</button>
+              <span class="fine">Chúng tôi chỉ dùng thông tin này để gửi link và tin về TrionCAD Viewer, không chia sẻ cho bên thứ ba.</span>
+            </form>
+            <div class="reg ok-done" id="reg-ok" hidden>
+              <div class="ok-box" role="status"><span><b>Đã gửi link tải</b> tới <span id="ok-to"></span>. Bạn cũng có thể tải ngay ở đây.</span></div>
+              <button class="cta" type="button" id="b-dl"><svg width="16" height="16" aria-hidden="true"><use href="#i-dl"/></svg>Tải TrionCAD-Tools-1.0.zip</button>
+              <div class="sum"><span>4,2 MB · bản 1.0</span><span>SHA-256 [mã kiểm tra]</span></div>
+              <span class="fine" id="dl-note"></span>
+              <button class="cta sec" type="button" id="b-again">Đăng ký bằng số khác</button>
+            </div>
+          </div>
+
+          <div class="tools">
+            <div class="tool">
+              <h5>Bác sĩ Font <code>FIXFONT</code></h5>
+              <p>Tìm font thiếu và chữ mã cũ TCVN3, VNI trong bản vẽ, rồi chuyển hết sang Unicode trong một lần. Gõ U để hoàn tác.</p>
+              <ul><li>Quét cả bản vẽ hoặc vùng chọn, kể cả block lồng và attribute</li><li>Gợi ý font Unicode tương đương cho từng font gốc</li></ul>
+            </div>
+            <div class="tool">
+              <h5>Thư viện TCVN <code>TCLIB</code></h5>
+              <p>Ký hiệu kiến trúc, kết cấu, điện, cấp thoát nước, chèn đúng tỉ lệ bản vẽ. Tìm bằng tiếng Việt có dấu hay không dấu.</p>
+              <ul><li>Kèm mẫu bản vẽ A0–A4, CTB, bộ layer, hatch và linetype theo TCVN</li></ul>
+            </div>
+          </div>
+
+          <h4 class="sec-h">Cài trong 3 bước</h4>
+          <ol class="steps">
+            <li><span><b>Giải nén</b> vào một thư mục cố định, ví dụ <code>C:\TrionCAD-Tools</code>. Đừng để trong thư mục Downloads, vì công cụ sẽ nạp từ đây mỗi lần mở chương trình.</span></li>
+            <li><span><b>Kéo tệp <code>tcinstall.lsp</code> vào vùng vẽ</b> (hoặc nạp bằng lệnh <code>APPLOAD</code>). Nếu chương trình hỏi về tệp chưa ký số, chọn nạp một lần.</span></li>
+            <li><span><b>Gõ <code>TCINSTALL</code></b> rồi Enter. Lệnh này thêm thư mục vào đường dẫn hỗ trợ, danh sách thư mục tin cậy và Startup Suite. Xong thì gõ <code>FIXFONT</code> hoặc <code>TCLIB</code> để dùng.</span></li>
+          </ol>
+
+          <h4 class="sec-h">Chạy trên</h4>
+          <div class="tbl-wrap"><table class="cmpt">
+            <thead><tr><th scope="col">Chương trình</th><th scope="col">Phiên bản</th><th scope="col">Ghi chú</th></tr></thead>
+            <tbody>
+              <tr><td>AutoCAD</td><td>2024 trở lên</td><td>Đã có AutoLISP và DCL</td></tr>
+              <tr><td>AutoCAD LT</td><td>2024 trở lên</td><td>LT có AutoLISP từ bản 2024</td></tr>
+              <tr><td>ZWCAD</td><td>[phiên bản thấp nhất]</td><td>Đang kiểm tra</td></tr>
+              <tr><td>BricsCAD</td><td>[phiên bản thấp nhất]</td><td>Đang kiểm tra</td></tr>
+            </tbody>
+          </table></div>
+
+          <h4 class="sec-h">Câu hỏi thường gặp</h4>
+          <div class="faq">
+            <details><summary>Có mất phí không?</summary><p>Không. Hai công cụ miễn phí, dùng cho cả mục đích thương mại.</p></details>
+            <details><summary>Bác sĩ Font có sửa tệp DWG của tôi không?</summary><p>Có, khi bạn bấm Chuyển. Mọi thay đổi gom thành một bước, gõ U là quay lại như cũ. Nên lưu bản sao trước khi chuyển bản vẽ quan trọng.</p></details>
+            <details><summary>Chương trình hỏi “tệp chưa ký số” mỗi lần mở?</summary><p>Gõ lại <code>TCINSTALL</code>: lệnh thêm thư mục công cụ vào danh sách thư mục tin cậy để không bị hỏi nữa.</p></details>
+            <details><summary>Gỡ thế nào?</summary><p>Gõ <code>TCUNINSTALL</code>, rồi xóa thư mục <code>C:\TrionCAD-Tools</code>.</p></details>
+          </div>
+
+          <div class="web-foot">
+            <span>© [năm] [tên công ty]. TrionCAD là tên làm việc.</span>
+            <span>AutoCAD® là nhãn hiệu của Autodesk, Inc. ZWCAD® và BricsCAD® là nhãn hiệu của chủ sở hữu tương ứng. TrionCAD không liên kết với các hãng này.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scr-grid">
+      <div style="display:grid; gap:10px; min-width:0">
+        <h3 style="margin:8px 0 0; font-size:15px; font-weight:600">Gói tải về và lệnh cài đặt</h3>
+        <pre class="zip">TrionCAD-Tools-1.0.zip
+├─ HUONG-DAN.pdf          hướng dẫn 2 trang, có ảnh
+├─ tcinstall.lsp          lệnh TCINSTALL, TCUNINSTALL
+├─ fixfont.lsp · fixfont.dcl
+├─ tclib.lsp · tclib.dcl
+├─ tclib\                 block .dwg và slide .sld của thư viện
+├─ templates\             TCVN-A0…A4 ngang/dọc .dwt
+├─ plot\                  TCVN.ctb
+└─ support\               TCVN.lin · TCVN.pat · layer-TCVN.dwt</pre>
+        <div class="host-cmd" id="cmd-n03" aria-live="polite"><span class="cap">Dòng lệnh khi cài đặt</span></div>
+        <div class="states"><button type="button" data-act="install">Chạy thử TCINSTALL</button><button type="button" data-act="uninstall">Chạy thử TCUNINSTALL</button></div>
+      </div>
+      <aside class="notes">
+        <h3>Trang tải về</h3>
+        <ul>
+          <li>Đặc tả chỉ yêu cầu trang này cùng trang thanh toán và cổng quản trị; trang marketing nằm ngoài phạm vi (07.3 §8).</li>
+          <li><b>Zalo hoặc email</b> trước khi tải; số điện thoại nhận 0xxxxxxxxx hoặc +84, email kiểm tra dạng cơ bản. Lỗi hiện ngay dưới ô.</li>
+          <li>Sau khi đăng ký: nút tải trực tiếp, dung lượng, mã kiểm tra SHA-256.</li>
+          <li>Trên điện thoại, cột đăng ký xuống dưới phần giới thiệu, nút tải rộng hết hàng.</li>
+        </ul>
+        <h3>TCINSTALL</h3>
+        <ul>
+          <li>Hỏi xác nhận thư mục, mặc định là thư mục chứa <code>tcinstall.lsp</code>.</li>
+          <li>Thêm vào <code>Support File Search Path</code>, <code>TRUSTEDPATHS</code>, Startup Suite; chép <code>TCVN.ctb</code> vào thư mục plot style.</li>
+          <li>Chạy lại không tạo mục trùng; <code>TCUNINSTALL</code> gỡ đúng những mục đã thêm.</li>
+        </ul>
+        <h3>Chỗ còn để trống</h3>
+        <ul><li>Tên miền, tên công ty, mã SHA-256, phiên bản ZWCAD và BricsCAD thấp nhất.</li></ul>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  function $(s, r){ return (r || document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function log(id, lines, cls){
+    var box = document.getElementById(id);
+    $$('.new', box).forEach(function(n){ n.classList.remove('new'); });
+    [].concat(lines).forEach(function(t){ var d = document.createElement('div'); d.className = cls || 'new'; d.innerHTML = t; box.appendChild(d); });
+    box.scrollTop = box.scrollHeight;
+  }
+  function nfmt(n){ return n.toLocaleString('vi-VN'); }
+
+
+
+  /* ============ UI-N01 Bác sĩ Font ============ */
+  var FONTS = [
+    { f:'vntime.shx',  k:'SHX', enc:'TCVN3', n:180, miss:true },
+    { f:'.VnTimeH',    k:'TTF', enc:'TCVN3', n:70,  miss:true },
+    { f:'VNI-Times',   k:'TTF', enc:'VNI',   n:46,  miss:true },
+    { f:'Arial',       k:'TTF', enc:'Unicode', n:1128 },
+    { f:'romans.shx',  k:'SHX', enc:'Không rõ', n:12 }
+  ];
+  var ENC = [ ['Unicode','#007FFF'], ['TCVN3','#FF7F00'], ['VNI','#FFBF00'], ['Không rõ','#808080'] ];
+  var n01 = { st:'idle', picked:0 };
+  function totals(list){ var t = {}; ENC.forEach(function(e){ t[e[0]] = 0; }); list.forEach(function(r){ t[r.enc] += r.n; }); return t; }
+  function renderScan(){
+    var st = n01.st, rows = st === 'found' ? FONTS : st === 'clean' ? [{f:'Arial',k:'TTF',enc:'Unicode',n:1436}] : [];
+    $('#v-missing').textContent = st === 'found' ? '3' : st === 'clean' ? '0' : '—';
+    $('#v-styles').textContent = st === 'found' ? '12' : st === 'clean' ? '4' : '—';
+    var t = totals(rows), sum = rows.reduce(function(a, r){ return a + r.n; }, 0);
+    $('#bar').innerHTML = sum ? ENC.map(function(e){ return t[e[0]] ? '<i style="width:' + (t[e[0]] / sum * 100) + '%; background:' + e[1] + '"></i>' : ''; }).join('') : '';
+    $('#legend').innerHTML = st === 'found' ? ENC.map(function(e){ return '<span><i style="background:' + e[1] + '"></i>' + e[0] + ' ' + nfmt(t[e[0]]) + '</span>'; }).join('')
+      : st === 'clean' ? '<span>Bản vẽ dùng Unicode và đủ font.</span>'
+      : '<span class="muted">' + (st === 'empty' ? 'Không có kết quả.' : 'Chưa quét. Bấm Quét để kiểm tra bản vẽ.') + '</span>';
+    var lst = $('#lst-fonts');
+    lst.innerHTML = rows.length ? rows.map(function(r, i){
+      return '<div role="option" id="ff-' + i + '" aria-selected="' + (i === 0) + '" class="cols4" style="display:grid"><span>' + esc(r.f) + (r.miss ? ' (thiếu)' : '') + '</span><span>' + r.k + '</span><span>' + r.enc + '</span><span>' + nfmt(r.n) + '</span></div>';
+    }).join('') : '<div class="empty">' + (st === 'empty' ? 'Vùng chọn không có đối tượng chữ.' : 'Danh sách hiện sau khi quét.') + '</div>';
+    if (rows.length) lst.setAttribute('aria-activedescendant', 'ff-0'); else lst.removeAttribute('aria-activedescendant');
+    $('#b-convert').disabled = st !== 'found';
+    $('#err-scan').textContent = st === 'empty' ? 'Không có đối tượng chữ trong vùng chọn. Chọn lại hoặc quét cả bản vẽ.' : '';
+    $$('.states [data-st]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.st === st)); });
+  }
+  function setScope(v){
+    $('#b-pick').disabled = v !== 'sel';
+    if (v !== 'sel') $('#picked').textContent = '';
+  }
+  $$('input[name="scope"]').forEach(function(r){ r.addEventListener('change', function(){ setScope(r.value); }); });
+  $$('.states [data-st]').forEach(function(b){ b.addEventListener('click', function(){
+    n01.st = b.dataset.st;
+    if (n01.st === 'empty'){ $('input[name="scope"][value="sel"]').checked = true; setScope('sel'); $('#picked').textContent = 'Đã chọn 4'; }
+    showDlg('scan'); renderScan();
+  }); });
+  function showDlg(which){
+    $('#dlg-scan').classList.toggle('hidden-dlg', which !== 'scan');
+    $('#dlg-conv').classList.toggle('hidden-dlg', which !== 'conv');
+    $('#closed-n01').classList.toggle('hidden-dlg', which !== 'none');
+  }
+  function listKeys(lst){
+    lst.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      var opts = $$('[role="option"]', lst); if (!opts.length) return;
+      var i = opts.findIndex(function(o){ return o.getAttribute('aria-selected') === 'true'; });
+      i = Math.max(0, Math.min(opts.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)));
+      opts[i].click(); opts[i].scrollIntoView({ block:'nearest' }); e.preventDefault();
+    });
+  }
+  $('#lst-fonts').addEventListener('click', function(e){
+    var o = e.target.closest('[role="option"]'); if (!o) return;
+    $$('[role="option"]', this).forEach(function(x){ x.setAttribute('aria-selected', String(x === o)); });
+    this.setAttribute('aria-activedescendant', o.id);
+  });
+  listKeys($('#lst-fonts'));
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var a = b.dataset.act;
+    if (a === 'scan'){
+      var sel = $('input[name="scope"]:checked').value === 'sel';
+      if (sel && !n01.picked){ $('#err-scan').textContent = 'Chưa chọn đối tượng. Bấm “Chọn đối tượng <” trước.'; return; }
+      $('#err-scan').textContent = 'Đang quét…';
+      setTimeout(function(){
+        n01.st = 'found'; renderScan();
+        log('cmd-n01', 'Đang quét ' + (sel ? nfmt(n01.picked) + ' đối tượng đã chọn' : 'cả bản vẽ') + '… xong. Tìm thấy 1.436 đối tượng chữ, 3 font không có trên máy.');
+      }, 450);
+    } else if (a === 'to-convert'){ showDlg('conv'); $('#err-conv').textContent = ''; }
+    else if (a === 'back'){ showDlg('scan'); }
+    else if (a === 'cancel-conv'){ showDlg('none'); log('cmd-n01', '*Hủy*'); }
+    else if (a === 'convert'){
+      showDlg('none');
+      var upd = $('#ck-style').checked, nest = $('#ck-nested').checked;
+      log('cmd-n01', ['Bác sĩ Font: đã chuyển <b>' + (nest ? '296' : '241') + '</b> đối tượng sang Unicode (' + (nest ? '250 TCVN3, 46 VNI' : '205 TCVN3, 36 VNI') + ')' + (upd ? '; cập nhật 3 kiểu chữ.' : '.'),
+        'Bỏ qua 12 đối tượng chưa rõ bảng mã. Gõ U để hoàn tác cả lần chuyển.']);
+      n01.st = 'clean'; renderScan();
+    } else if (a === 'close-scan'){ showDlg('none'); }
+    else if (a === 'reopen'){ showDlg('scan'); log('cmd-n01', 'Lệnh: <b>FIXFONT</b>'); }
+    else if (a === 'signup'){ log(b.closest('#stage-n02') ? 'cmd-n02' : 'cmd-n01', 'Mở trình duyệt: [tên-miền]/cong-cu-mien-phi'); document.getElementById('n03').scrollIntoView({ behavior:'smooth' }); }
+    else if (a === 'help'){ log(b.closest('#stage-n02') ? 'cmd-n02' : 'cmd-n01', 'Mở trình duyệt: [tên-miền]/cong-cu-mien-phi/huong-dan'); }
+    else if (a === 'lib-insert'){ libInsert(); }
+    else if (a === 'lib-close'){ $('#dlg-lib').classList.add('hidden-dlg'); $('#closed-n02').classList.remove('hidden-dlg'); }
+    else if (a === 'lib-reopen'){ $('#dlg-lib').classList.remove('hidden-dlg'); $('#closed-n02').classList.add('hidden-dlg'); log('cmd-n02', 'Lệnh: <b>TCLIB</b>'); }
+    else if (a === 'install'){ install(); }
+    else if (a === 'uninstall'){ uninstall(); }
+  });
+  $('#b-pick').addEventListener('click', function(){
+    showDlg('none');
+    log('cmd-n01', 'Chọn đối tượng: <i>(người dùng quét chọn trên bản vẽ)</i> 125 đối tượng được chọn.');
+    setTimeout(function(){ n01.picked = 125; $('#picked').textContent = 'Đã chọn 125'; $('#err-scan').textContent = ''; showDlg('scan'); }, 700);
+  });
+  $('#sel-font').addEventListener('change', function(){
+    $('#font-hint').textContent = this.selectedIndex === 0 ? 'Gợi ý: .VnTime → Times New Roman, .VnArial → Arial, VNI-Times → Times New Roman, VNI-Helve → Arial.' : 'Mọi chữ TCVN3 và VNI dùng font ' + this.value + '.';
+  });
+  $$('input[name="src"]').forEach(function(r){ r.addEventListener('change', function(){
+    $('#conv-sum').textContent = r.value === 'auto' ? 'Sẽ chuyển 296 đối tượng: 250 TCVN3, 46 VNI. Gõ U để hoàn tác.'
+      : 'Sẽ chuyển 308 đối tượng, coi tất cả là ' + (r.value === 'tcvn3' ? 'TCVN3' : 'VNI') + ' (kể cả 12 đối tượng chưa rõ). Gõ U để hoàn tác.';
+  }); });
+  log('cmd-n01', ['Lệnh: <b>FIXFONT</b>', 'Bác sĩ Font 1.0 · TrionCAD Tools (miễn phí)'], '');
+  renderScan();
+
+  /* ============ UI-N02 Thư viện TCVN ============ */
+  var LIB = [
+    ['Kiến trúc','Cửa đi', 'real', [['Cửa đi 1 cánh 700','door1',700],['Cửa đi 1 cánh 800','door1',800],['Cửa đi 1 cánh 900','door1',900],['Cửa đi 2 cánh 1200','door2',1200],['Cửa đi 2 cánh 1400','door2',1400],['Cửa trượt 1 cánh 900','slide',900],['Cửa trượt 2 cánh 1600','slide',1600]]],
+    ['Kiến trúc','Cửa sổ', 'real', [['Cửa sổ 1 cánh 600','win',600],['Cửa sổ 2 cánh 1200','win',1200],['Cửa sổ 3 cánh 1800','win',1800],['Vách kính cố định 2400','win',2400]]],
+    ['Kiến trúc','Thiết bị vệ sinh', 'real', [['Bồn cầu','toilet'],['Chậu rửa (lavabo)','lav'],['Bồn tắm 1700','tub'],['Khu tắm đứng 900','shower'],['Phễu thu sàn','drain']]],
+    ['Kiến trúc','Cầu thang', 'real', [['Thang thẳng một vế','stair'],['Thang hai vế chữ U','stairU']]],
+    ['Kết cấu','Cột, cọc, thép', 'real', [['Cột BTCT 220×220','col'],['Cọc vuông 250×250','pile'],['Cọc khoan nhồi D800','pileD'],['Thép hình I200','ibeam']]],
+    ['Kết cấu','Ký hiệu thép', 'anno', [['Ký hiệu thanh thép 2Ø16','rebar']]],
+    ['Điện','Chiếu sáng, ổ cắm', 'anno', [['Đèn ốp trần','lamp'],['Đèn tuýp 1,2 m','tube'],['Ổ cắm đôi','socket'],['Công tắc đơn','switch'],['Tủ điện tầng','panel']]],
+    ['Cấp thoát nước','Van, thiết bị', 'anno', [['Van khóa','valve'],['Van một chiều','check'],['Đồng hồ nước','meter'],['Máy bơm','pump']]],
+    ['Chung','Ký hiệu chú thích', 'anno', [['Cao độ mặt bằng','level'],['Bóng trục','axis'],['Mũi tên hướng Bắc','north'],['Ký hiệu mặt cắt','section'],['Ký hiệu chi tiết','detail'],['Khung tên A3 ngang (TCVN 5571)','title']]]
+  ];
+  var ITEMS = []; LIB.forEach(function(g){ g[3].forEach(function(it){ ITEMS.push({ cat:g[0], sub:g[1], kind:g[2], name:it[0], shape:it[1], w:it[2] }); }); });
+  var CATS = []; LIB.forEach(function(g){ if (!CATS.some(function(c){ return c.top && c.name === g[0]; })) CATS.push({ name:g[0], top:true }); CATS.push({ name:g[1], parent:g[0] }); });
+  var SCALES = ['1:1','1:2','1:5','1:10','1:20','1:25','1:50','1:75','1:100','1:125','1:200','1:250','1:500','1:1000'];
+  var lib = { cat:1, item:2, q:'' };
+  function fold(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase(); }
+  function visible(){
+    if (lib.q) { var q = fold(lib.q); return ITEMS.filter(function(it){ return fold(it.name + ' ' + it.sub + ' ' + it.cat).indexOf(q) >= 0; }); }
+    var c = CATS[lib.cat]; return ITEMS.filter(function(it){ return c.top ? it.cat === c.name : it.sub === c.name && it.cat === c.parent; });
+  }
+  function renderLib(){
+    var cl = $('#lst-cat');
+    cl.innerHTML = CATS.map(function(c, i){ return '<div role="option" id="lc-' + i + '" aria-selected="' + (!lib.q && i === lib.cat) + '" class="' + (c.top ? '' : 'indent') + '">' + esc(c.name) + '</div>'; }).join('');
+    cl.setAttribute('aria-activedescendant', 'lc-' + lib.cat);
+    var its = visible(); if (lib.item >= its.length) lib.item = 0;
+    var il = $('#lst-items');
+    il.innerHTML = its.length ? its.map(function(it, i){ return '<div role="option" id="li-' + i + '" aria-selected="' + (i === lib.item) + '">' + esc(it.name) + '</div>'; }).join('') : '<div class="empty">Không có ký hiệu khớp “' + esc(lib.q) + '”. Thử bỏ bớt chữ.</div>';
+    if (its.length) il.setAttribute('aria-activedescendant', 'li-' + lib.item); else il.removeAttribute('aria-activedescendant');
+    $('#lib-count').textContent = lib.q ? its.length + ' kết quả' : ITEMS.length + ' ký hiệu (mẫu)';
+    var it = its[lib.item];
+    $('#b-insert').disabled = !it;
+    $('#lib-prev').innerHTML = it ? preview(it) : '';
+    $('#lib-name').textContent = it ? it.name : '';
+    $('#lib-kind').textContent = it ? (it.kind === 'real' ? 'Kích thước thật, chèn 1:1 (mm)' : 'Ký hiệu chú thích, chèn ×' + scaleN() + ' để in đúng cỡ') : '';
+    $('#lib-std').textContent = it ? 'Tiêu chuẩn: ' + (it.shape === 'title' ? 'TCVN 5571' : '[cần xác minh]') + ' · ' + it.cat + ' › ' + it.sub : '';
+    $('#lib-scale-hint').textContent = it && it.kind === 'real' ? 'Vật thể thật không đổi theo tỉ lệ; ký hiệu chú thích chèn ×' + scaleN() + '.' : 'Ký hiệu chèn ×' + scaleN() + ', in ra đúng cỡ trên giấy.';
+  }
+  function scaleN(){ return Number($('#lib-scale').value.split(':')[1]); }
+  $('#lib-scale').innerHTML = SCALES.map(function(s){ return '<option' + (s === '1:100' ? ' selected' : '') + '>' + s + '</option>'; }).join('');
+  $('#lib-scale').addEventListener('change', renderLib);
+  $('#lst-cat').addEventListener('click', function(e){ var o = e.target.closest('[role="option"]'); if (!o) return; lib.cat = Number(o.id.slice(3)); lib.item = 0; lib.q = ''; $('#lib-q').value = ''; renderLib(); });
+  $('#lst-items').addEventListener('click', function(e){ var o = e.target.closest('[role="option"]'); if (!o) return; lib.item = Number(o.id.slice(3)); renderLib(); $('#lst-items').focus(); });
+  $('#lst-items').addEventListener('dblclick', function(e){ if (e.target.closest('[role="option"]')) libInsert(); });
+  listKeys($('#lst-cat')); listKeys($('#lst-items'));
+  $('#lib-q').addEventListener('input', function(){ lib.q = this.value.trim(); lib.item = 0; renderLib(); });
+  $('#lib-q').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); libInsert(); } });
+  function libInsert(){
+    var it = visible()[lib.item]; if (!it) return;
+    $('#dlg-lib').classList.add('hidden-dlg'); $('#closed-n02').classList.remove('hidden-dlg');
+    var blk = 'TC-' + fold(it.sub).replace(/[^a-z0-9]+/g, '-').toUpperCase().replace(/^-|-$/g, '') + '-' + fold(it.name).replace(/[^a-z0-9]+/g, '').toUpperCase().slice(0, 14);
+    var layer = { 'Kiến trúc':'KT-', 'Kết cấu':'KC-', 'Điện':'DN-', 'Cấp thoát nước':'CTN-', 'Chung':'KH-' }[it.cat] + ({ 'Cửa đi':'CUA', 'Cửa sổ':'CUA', 'Thiết bị vệ sinh':'TBVS', 'Cầu thang':'THANG' }[it.sub] || 'KYHIEU');
+    log('cmd-n02', ['Chỉ định điểm chèn: <i>(bấm trên bản vẽ)</i>',
+      'Đã chèn “' + esc(it.name) + '” · block ' + blk + ' · ' + (it.kind === 'real' ? 'tỉ lệ 1:1' : 'tỉ lệ ×' + scaleN() + ' (bản vẽ ' + $('#lib-scale').value + ')') + ' · layer ' + layer + '.']);
+  }
+  // Ảnh xem trước: nét trắng/màu trên nền đen, giống slide trong tile image
+  function preview(it){
+    var W = 280, H = 196, cx = W/2, cy = H/2, s = '', L = function(x1,y1,x2,y2,c){ s += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(c||'#FFF')+'" stroke-width="1.4"/>'; };
+    var R = function(x,y,w,h,c,f){ s += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(f||'none')+'" stroke="'+(c||'#FFF')+'" stroke-width="1.4"/>'; };
+    var C = function(x,y,r,c,f){ s += '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+(f||'none')+'" stroke="'+(c||'#FFF')+'" stroke-width="1.4"/>'; };
+    var P = function(d,c,f){ s += '<path d="'+d+'" fill="'+(f||'none')+'" stroke="'+(c||'#FFF')+'" stroke-width="1.4"/>'; };
+    var T = function(x,y,t,sz,c){ s += '<text x="'+x+'" y="'+y+'" fill="'+(c||'#FFF')+'" font-size="'+(sz||14)+'" font-family="Arial" text-anchor="middle">'+t+'</text>'; };
+    var Y = '#FFFF00', CY = '#00FFFF', G = '#00FF00';
+    switch (it.shape){
+      case 'door1': case 'door2': case 'slide': {
+        var w = Math.min(200, (it.w || 900) / 9), x0 = cx - w/2, wy = 140;
+        R(20, wy - 8, x0 - 20, 16); R(x0 + w, wy - 8, W - 20 - x0 - w, 16);
+        s += '<path d="M20 '+(wy-8)+'l'+(x0-20)+' 16" stroke="#808080"/>';
+        if (it.shape === 'door1'){ L(x0, wy - 8, x0, wy - 8 - w, Y); P('M'+(x0+w)+' '+(wy-8)+' A'+w+' '+w+' 0 0 0 '+x0+' '+(wy-8-w), Y); }
+        else if (it.shape === 'door2'){ var h2 = w/2; L(x0, wy-8, x0, wy-8-h2, Y); L(x0+w, wy-8, x0+w, wy-8-h2, Y); P('M'+(x0+h2)+' '+(wy-8)+' A'+h2+' '+h2+' 0 0 0 '+x0+' '+(wy-8-h2), Y); P('M'+(x0+h2)+' '+(wy-8)+' A'+h2+' '+h2+' 0 0 1 '+(x0+w)+' '+(wy-8-h2), Y); }
+        else { R(x0, wy - 6, w*0.55, 5, Y); R(x0 + w*0.45, wy + 1, w*0.55, 5, Y); }
+        T(cx, 40, (it.w || 900), 13, G); L(x0, 48, x0 + w, 48, G); L(x0, 44, x0, 52, G); L(x0+w, 44, x0+w, 52, G);
+        break; }
+      case 'win': { var ww = Math.min(220, (it.w || 1200) / 10), xa = cx - ww/2;
+        R(20, 92, xa - 20, 16); R(xa + ww, 92, W - 20 - xa - ww, 16);
+        L(xa, 92, xa + ww, 92, CY); L(xa, 108, xa + ww, 108, CY); L(xa, 98, xa + ww, 98, CY); L(xa, 102, xa + ww, 102, CY); L(xa, 92, xa, 108); L(xa+ww, 92, xa+ww, 108);
+        T(cx, 60, it.w || 1200, 13, G); break; }
+      case 'toilet': R(cx - 40, 40, 80, 26, '#00BFFF'); s += '<ellipse cx="'+cx+'" cy="'+112+'" rx="34" ry="48" fill="none" stroke="#00BFFF" stroke-width="1.4"/>'; break;
+      case 'lav': R(cx - 60, 50, 120, 90, '#00BFFF'); s += '<ellipse cx="'+cx+'" cy="'+100+'" rx="42" ry="30" fill="none" stroke="#00BFFF" stroke-width="1.4"/>'; C(cx, 72, 4, '#00BFFF'); break;
+      case 'tub': s += '<rect x="40" y="58" width="200" height="84" rx="10" fill="none" stroke="#00BFFF" stroke-width="1.4"/><rect x="52" y="68" width="176" height="64" rx="28" fill="none" stroke="#00BFFF" stroke-width="1.4"/>'; C(214, 100, 5, '#00BFFF'); break;
+      case 'shower': R(cx-60, 38, 120, 120, '#00BFFF'); L(cx-60, 38, cx+60, 158, '#00BFFF'); L(cx+60, 38, cx-60, 158, '#00BFFF'); C(cx, 98, 7, '#00BFFF'); break;
+      case 'drain': C(cx, cy, 40, '#00BFFF'); for (var k = -24; k <= 24; k += 12){ L(cx + k, cy - Math.sqrt(1600 - k*k) + 4, cx + k, cy + Math.sqrt(1600 - k*k) - 4, '#00BFFF'); } break;
+      case 'stair': case 'stairU': for (var t = 0; t < 10; t++) L(50 + t*18, 60, 50 + t*18, 140); L(50, 60, 212, 60); L(50, 140, 212, 140); L(60, 100, 200, 100); P('M192 94 L204 100 L192 106', '#FFF', '#FFF'); T(70, 90, 'LÊN', 11); if (it.shape === 'stairU') { L(212, 60, 240, 60); L(212, 140, 240, 140); L(240, 60, 240, 140); } break;
+      case 'col': R(cx-30, cy-30, 60, 60, '#FFF', '#808080'); break;
+      case 'pile': R(cx-32, cy-32, 64, 64); L(cx-32, cy-32, cx+32, cy+32); L(cx+32, cy-32, cx-32, cy+32); break;
+      case 'pileD': C(cx, cy, 48); L(cx-60, cy, cx+60, cy, '#FF0000'); L(cx, cy-60, cx, cy+60, '#FF0000'); break;
+      case 'ibeam': P('M'+(cx-50)+' 40h100v14h-43v84h43v14h-100v-14h43v-84h-43z'); break;
+      case 'rebar': L(40, 120, 240, 120, Y); C(60, 120, 4, Y, Y); C(220, 120, 4, Y, Y); L(140, 120, 170, 70, '#FFF'); L(170, 70, 236, 70); T(203, 64, '2Ø16', 15); break;
+      case 'lamp': C(cx, cy, 36, '#FF7F00'); L(cx-25, cy-25, cx+25, cy+25, '#FF7F00'); L(cx+25, cy-25, cx-25, cy+25, '#FF7F00'); break;
+      case 'tube': R(40, cy - 12, 200, 24, '#FF7F00'); L(40, cy, 240, cy, '#FF7F00'); L(40, cy-12, 30, cy-24, '#FF7F00'); L(240, cy+12, 250, cy+24, '#FF7F00'); break;
+      case 'socket': P('M'+(cx-36)+' '+(cy+10)+' A36 36 0 0 1 '+(cx+36)+' '+(cy+10)+'Z', '#FF7F00'); L(cx-14, cy-30, cx-14, cy-48, '#FF7F00'); L(cx+14, cy-30, cx+14, cy-48, '#FF7F00'); break;
+      case 'switch': C(cx, cy + 20, 14, '#FF7F00', '#FF7F00'); L(cx + 10, cy + 10, cx + 50, cy - 30, '#FF7F00'); L(cx + 50, cy - 30, cx + 62, cy - 18, '#FF7F00'); break;
+      case 'panel': R(cx-60, cy-30, 120, 60, '#FF7F00'); P('M'+(cx-60)+' '+(cy+30)+' L'+(cx+60)+' '+(cy-30)+' L'+(cx+60)+' '+(cy+30)+'Z', '#FF7F00', '#FF7F00'); break;
+      case 'valve': case 'check': P('M'+(cx-50)+' '+(cy-26)+' L'+(cx+50)+' '+(cy+26)+' L'+(cx+50)+' '+(cy-26)+' L'+(cx-50)+' '+(cy+26)+'Z', CY, it.shape === 'check' ? 'none' : 'none'); if (it.shape === 'check') P('M'+cx+' '+cy+' L'+(cx+50)+' '+(cy-26)+' L'+(cx+50)+' '+(cy+26)+'Z', CY, CY); L(20, cy, cx-50, cy, CY); L(cx+50, cy, 260, cy, CY); break;
+      case 'meter': C(cx, cy, 34, CY); T(cx, cy + 7, 'M', 20, CY); L(20, cy, cx-34, cy, CY); L(cx+34, cy, 260, cy, CY); break;
+      case 'pump': C(cx, cy, 36, CY); P('M'+(cx-20)+' '+(cy+28)+' L'+(cx+30)+' '+cy+' L'+(cx-20)+' '+(cy-28), CY); break;
+      case 'level': P('M'+(cx-60)+' 120 L'+(cx-46)+' 98 L'+(cx-74)+' 98Z', Y); L(cx-74, 98, cx+70, 98, Y); T(cx+4, 90, '±0.000', 18, Y); break;
+      case 'axis': C(cx, 64, 30, '#FF0000'); T(cx, 72, 'A', 22); s += '<line x1="'+cx+'" y1="94" x2="'+cx+'" y2="186" stroke="#FF0000" stroke-width="1.4" stroke-dasharray="14 4 3 4"/>'; break;
+      case 'north': C(cx, 108, 46, Y); P('M'+cx+' 52 L'+(cx-18)+' 150 L'+cx+' 132Z', Y); P('M'+cx+' 52 L'+(cx+18)+' 150 L'+cx+' 132Z', Y, Y); T(cx, 44, 'B', 18, Y); break;
+      case 'section': L(30, cy, 250, cy, '#FFF'); s += '<line x1="30" y1="'+cy+'" x2="250" y2="'+cy+'" stroke="#FFF" stroke-width="1" stroke-dasharray="14 4 3 4"/>'; R(24, cy-26, 8, 26, '#FFF', '#FFF'); R(248, cy-26, 8, 26, '#FFF', '#FFF'); T(40, cy - 34, '1', 18); T(240, cy - 34, '1', 18); break;
+      case 'detail': C(cx, cy, 44); L(cx-44, cy, cx+44, cy); T(cx, cy - 10, 'A', 20); T(cx, cy + 26, 'KT 05', 13); break;
+      case 'title': R(20, 30, 240, 136); R(140, 116, 120, 50); L(140, 132, 260, 132); L(140, 149, 260, 149); L(200, 116, 200, 166); T(80, 104, 'A3 · 420×297', 12, '#808080'); break;
+      default: R(cx-50, cy-30, 100, 60);
+    }
+    return s;
+  }
+  renderLib();
+  log('cmd-n02', 'Lệnh: <b>TCLIB</b>', '');
+
+  /* ============ UI-N03 trang tải về, cài đặt ============ */
+  var reg = { mode:'zalo' };
+  $$('[data-dev]').forEach(function(b){ if (b.tagName !== 'BUTTON') return; b.addEventListener('click', function(){
+    $('#browser').dataset.dev = b.dataset.dev;
+    $$('button[data-dev]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+  }); });
+  function setMode(m){
+    reg.mode = m;
+    $('#tab-zalo').setAttribute('aria-selected', String(m === 'zalo'));
+    $('#tab-mail').setAttribute('aria-selected', String(m === 'mail'));
+    var f = $('#f-contact');
+    $('#f-contact-lab').textContent = m === 'zalo' ? 'Số điện thoại dùng Zalo' : 'Email';
+    f.placeholder = m === 'zalo' ? '0912 345 678' : 'ten@congty.vn';
+    f.inputMode = m === 'zalo' ? 'tel' : 'email'; f.autocomplete = m === 'zalo' ? 'tel' : 'email'; f.type = m === 'zalo' ? 'text' : 'email';
+    f.value = ''; f.removeAttribute('aria-invalid'); $('#f-contact-msg').textContent = '';
+  }
+  $('#tab-zalo').addEventListener('click', function(){ setMode('zalo'); });
+  $('#tab-mail').addEventListener('click', function(){ setMode('mail'); });
+  function check(v){
+    if (!v) return reg.mode === 'zalo' ? 'Nhập số điện thoại dùng Zalo.' : 'Nhập email.';
+    if (reg.mode === 'zalo'){ var d = v.replace(/[\s.\-]/g, ''); if (!/^(0|\+84)(3|5|7|8|9)\d{8}$/.test(d)) return 'Số chưa đúng. Ví dụ: 0912 345 678 hoặc +84 912 345 678.'; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'Email chưa đúng. Ví dụ: ten@congty.vn.';
+    return '';
+  }
+  $('#f-contact').addEventListener('blur', function(){ if (this.value) { var m = check(this.value.trim()); this.setAttribute('aria-invalid', String(!!m)); $('#f-contact-msg').textContent = m; } });
+  $('#f-contact').addEventListener('input', function(){ if (this.getAttribute('aria-invalid') === 'true' && !check(this.value.trim())) { this.removeAttribute('aria-invalid'); $('#f-contact-msg').textContent = ''; } });
+  $('#reg').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = $('#f-contact'), v = f.value.trim(), m = check(v);
+    f.setAttribute('aria-invalid', String(!!m)); $('#f-contact-msg').textContent = m;
+    if (m) { f.focus(); return; }
+    $('#ok-to').textContent = (reg.mode === 'zalo' ? 'Zalo ' : 'email ') + v;
+    $('#reg').hidden = true; $('#reg-ok').hidden = false; $('#b-dl').focus();
+  });
+  $('#b-again').addEventListener('click', function(){ $('#reg-ok').hidden = true; $('#reg').hidden = false; setMode(reg.mode); $('#f-contact').focus(); $('#dl-note').textContent = ''; });
+  $('#b-dl').addEventListener('click', function(){ $('#dl-note').textContent = 'Prototype: bản thật tải tệp ZIP ở bước này.'; });
+
+  function install(){
+    log('cmd-n03', ['Lệnh: <b>TCINSTALL</b>', 'TrionCAD Tools 1.0 · cài đặt',
+      'Thư mục cài đặt &lt;C:\\TrionCAD-Tools&gt;: <i>Enter</i>',
+      '  Thêm vào đường dẫn hỗ trợ ............ xong',
+      '  Thêm vào thư mục tin cậy (TRUSTEDPATHS) ... xong',
+      '  Thêm fixfont.lsp, tclib.lsp vào Startup Suite ... xong',
+      '  Chép TCVN.ctb vào thư mục plot style ... xong',
+      'Cài đặt xong. Lệnh mới: <b>FIXFONT</b> (Bác sĩ Font), <b>TCLIB</b> (Thư viện TCVN). Gỡ: TCUNINSTALL.']);
+  }
+  function uninstall(){
+    log('cmd-n03', ['Lệnh: <b>TCUNINSTALL</b>', 'Gỡ TrionCAD Tools khỏi chương trình này? [Có/Không] &lt;Có&gt;: <i>Enter</i>',
+      '  Gỡ khỏi đường dẫn hỗ trợ, thư mục tin cậy, Startup Suite ... xong',
+      'Đã gỡ. Có thể xóa thư mục C:\\TrionCAD-Tools. TCVN.ctb được giữ lại vì có thể đang dùng trong bản vẽ.']);
+  }
+  log('cmd-n03', 'Kéo tcinstall.lsp vào vùng vẽ → <b>tcinstall.lsp</b> đã nạp. Gõ TCINSTALL để cài.', '');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+/* TrionCAD · khung trang duyệt thiết kế (Đợt 0, trang web UI-L16): tiêu đề, mục lục, khối màn hình, ghi chú. */
+[hidden]{ display:none !important }
+html,body{ background:var(--c-base); color:var(--c-text) }
+body{ margin:0; font:14px/var(--lh-text) var(--f-ui); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:32px 72px; -webkit-font-smoothing:antialiased }
+.pg{ max-width:1240px; margin:0 auto; display:grid; gap:56px }
+a{ color:var(--c-accent) }
+code, kbd{ font-family:var(--f-mono); font-size:.92em }
+.pg-head{ display:grid; gap:12px }
+.eyebrow{ margin:0; font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--c-text-3) }
+h1{ margin:0; font-size:clamp(26px, 3.6vw, 34px); line-height:1.15; font-weight:600; letter-spacing:-.01em; text-wrap:balance }
+.lead{ margin:0; max-width:76ch; color:var(--c-text-2) }
+.rules{ margin:4px 0 0; padding:12px 14px; display:grid; gap:4px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-sunken); font-size:13px; color:var(--c-text-2); max-width:900px }
+.rules b{ color:var(--c-text) }
+.toc{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px }
+.toc a{ text-decoration:none; color:var(--c-text); padding:5px 10px; border:1px solid var(--c-border); border-radius:var(--r-xl); font-size:13px; background:var(--c-raised) }
+.toc a:hover{ border-color:var(--c-border-ctl) }
+.toc a:focus-visible, .tgl:focus-within, .dev button:focus-visible{ outline:2px solid var(--c-focus); outline-offset:2px }
+.tgl{ display:inline-flex; gap:8px; align-items:center; font-size:13px; color:var(--c-text-2); padding:5px 10px; border:1px solid var(--c-border); border-radius:var(--r-xl) }
+.tgl input{ accent-color:var(--c-accent); margin:0 }
+
+.scr{ display:grid; gap:14px; scroll-margin-top:16px }
+.scr-h{ display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px }
+.scr-h h2{ margin:0; font-size:22px; font-weight:600; line-height:1.25 }
+.code-tag{ font-family:var(--f-mono); font-size:12px; font-weight:500; padding:2px 7px; border-radius:var(--r); background:var(--c-active); color:var(--c-text) }
+.rel{ font-size:12px; color:var(--c-text-3) }
+.scr-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(260px, 340px); gap:16px; align-items:start }
+@media (max-width:980px){ .scr-grid{ grid-template-columns:minmax(0,1fr) } }
+.notes{ display:grid; gap:10px; font-size:13px; color:var(--c-text-2) }
+.notes h3{ margin:0; font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--c-text-3) }
+.notes ul{ margin:0; padding-left:18px; display:grid; gap:4px }
+.notes b{ color:var(--c-text); font-weight:600 }
+.states{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:var(--c-text-3) }
+.states button{ font:inherit; font-size:12px; color:var(--c-text); background:var(--c-raised); border:1px solid var(--c-border); border-radius:var(--r); padding:3px 9px; cursor:pointer }
+.states button[aria-pressed="true"]{ border-color:var(--c-accent); background:var(--c-accent-soft) }
+.states button:focus-visible{ outline:2px solid var(--c-focus); outline-offset:1px }

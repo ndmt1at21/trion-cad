@@ -1,0 +1,68 @@
+/* TrionCAD · trang web (tải về UI-N03, thanh toán và tài khoản UI-L16). Dùng chung token với ứng dụng (07.3 §6 UI-L16). */
+.browser{ border:1px solid var(--c-border); border-radius:var(--r-xl); overflow:hidden; background:var(--c-raised); margin-inline:auto; width:100%; transition:max-width var(--t) }
+.browser[data-dev="phone"]{ max-width:390px }
+.browser-bar{ display:flex; gap:8px; align-items:center; height:32px; padding:0 10px; background:var(--c-chrome); border-bottom:1px solid var(--c-border); font-size:12px; color:var(--c-text-3) }
+.browser-bar .addr{ flex:1; height:22px; display:flex; align-items:center; padding:0 10px; border-radius:var(--r-xl); background:var(--c-base); color:var(--c-text-2); font-family:var(--f-mono); font-size:11px; overflow:hidden; white-space:nowrap }
+.dev{ display:inline-flex; border:1px solid var(--c-border); border-radius:var(--r-xl); overflow:hidden }
+.dev button{ font:inherit; font-size:12px; border:0; background:var(--c-raised); color:var(--c-text-2); padding:4px 10px; cursor:pointer }
+.dev button[aria-pressed="true"]{ background:var(--c-active); color:var(--c-text); font-weight:600 }
+.web{ container-type:inline-size; background:var(--c-base); color:var(--c-text); font:15px/1.6 var(--f-ui) }
+.web-in{ max-width:1080px; margin:0 auto; padding:0 28px 40px }
+.web-nav{ display:flex; align-items:center; gap:16px; height:56px; border-bottom:1px solid var(--c-border); margin:0 -28px 0; padding:0 28px }
+.brand{ display:inline-flex; gap:8px; align-items:center; font-weight:600; font-size:15px; color:var(--c-text); text-decoration:none }
+.brand svg{ width:20px; height:20px; color:var(--c-accent) }
+.web-nav .links{ display:flex; gap:18px; margin-left:auto; font-size:13px }
+.web-nav .links a{ color:var(--c-text-2); text-decoration:none } .web-nav .links a[aria-current]{ color:var(--c-text); font-weight:600 }
+.hero{ display:grid; grid-template-columns:minmax(0,1.15fr) minmax(300px, .85fr); gap:36px; padding:40px 0 28px; align-items:start }
+.hero h3{ margin:0; font-size:36px; line-height:1.15; font-weight:600; letter-spacing:-.015em; text-wrap:balance }
+.hero .sub{ margin:14px 0 0; color:var(--c-text-2); max-width:56ch }
+.compat{ display:flex; flex-wrap:wrap; gap:6px; margin-top:18px }
+.compat span{ font-size:12px; padding:3px 9px; border-radius:var(--r-xl); border:1px solid var(--c-border); color:var(--c-text-2); background:var(--c-raised) }
+.reg{ border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised); padding:18px; display:grid; gap:12px }
+.reg h4{ margin:0; font-size:16px; font-weight:600 }
+.reg p{ margin:0; font-size:13px; color:var(--c-text-2) }
+.seg{ display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); overflow:hidden }
+.seg button{ font:inherit; font-size:13px; height:32px; border:0; background:var(--c-raised); color:var(--c-text-2); cursor:pointer }
+.seg button[aria-selected="true"]{ background:var(--c-accent); color:var(--c-accent-t); font-weight:600 }
+.seg button:focus-visible{ outline:2px solid var(--c-focus); outline-offset:-2px }
+.fld{ display:grid; gap:5px; font-size:13px }
+.fld label{ color:var(--c-text-2) }
+.fld input, .fld select{ font:inherit; font-size:14px; height:36px; padding:0 10px; background:var(--c-base); color:var(--c-text); border:1px solid var(--c-border-ctl); border-radius:var(--r-xl) }
+.fld input:focus-visible, .fld select:focus-visible{ outline:2px solid var(--c-focus); outline-offset:0; border-color:var(--c-focus) }
+.fld input[aria-invalid="true"]{ border-color:var(--c-danger); box-shadow:0 0 0 1px var(--c-danger) }
+.fld .msg{ color:var(--c-danger); font-size:12px; min-height:0 }
+.fld .help{ color:var(--c-text-3); font-size:12px }
+.cta{ font:inherit; font-size:14px; font-weight:600; height:40px; border:0; border-radius:var(--r-xl); background:var(--c-accent); color:var(--c-accent-t); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 18px }
+.cta:hover{ background:var(--c-accent-hi) } .cta:focus-visible{ outline:2px solid var(--c-text); outline-offset:2px }
+.cta.sec{ background:var(--c-raised); color:var(--c-text); border:1px solid var(--c-border-ctl) }
+.fine{ font-size:12px; color:var(--c-text-3) }
+.ok-box{ display:grid; gap:10px; padding:12px; border-radius:var(--r-xl); background:var(--c-ok-soft); border:1px solid var(--c-ok) }
+.ok-box b{ color:var(--c-text) }
+.sum{ display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--c-text-3); font-family:var(--f-mono); flex-wrap:wrap }
+.tools{ display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:8px 0 24px }
+.tool{ border:1px solid var(--c-border); border-radius:var(--r-xl); padding:16px; display:grid; gap:8px; background:var(--c-raised) }
+.tool h5{ margin:0; font-size:15px; font-weight:600; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap }
+.tool h5 code{ font-size:12px; color:var(--c-text-2); font-weight:500 }
+.tool p{ margin:0; font-size:14px; color:var(--c-text-2) }
+.tool ul{ margin:0; padding-left:18px; font-size:13px; color:var(--c-text-2); display:grid; gap:3px }
+.sec-h{ margin:24px 0 10px; font-size:20px; font-weight:600 }
+.steps{ margin:0; padding:0; list-style:none; display:grid; gap:10px; counter-reset:st }
+.steps li{ display:grid; grid-template-columns:28px minmax(0,1fr); gap:12px; counter-increment:st; font-size:14px; color:var(--c-text-2) }
+.steps li::before{ content:counter(st); width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--c-active); color:var(--c-text); font-weight:600; font-size:13px }
+.steps b{ color:var(--c-text) }
+.cmpt{ width:100%; border-collapse:collapse; font-size:13px }
+.cmpt th, .cmpt td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--c-border) }
+.cmpt th{ color:var(--c-text-3); font-weight:600; font-size:12px }
+.tbl-wrap{ overflow-x:auto }
+.faq details{ border-bottom:1px solid var(--c-border); padding:10px 0 }
+.faq summary{ cursor:pointer; font-weight:500; font-size:14px }
+.faq p{ margin:6px 0 0; font-size:14px; color:var(--c-text-2) }
+.web-foot{ margin-top:28px; padding-top:16px; border-top:1px solid var(--c-border); font-size:12px; color:var(--c-text-3); display:grid; gap:4px }
+.zip{ font:12px/1.6 var(--f-mono); color:var(--c-text-2); background:var(--c-sunken); border:1px solid var(--c-border); border-radius:var(--r-xl); padding:10px 12px; margin:0; overflow-x:auto }
+@container (max-width: 760px){
+  .web-in{ padding:0 18px 32px } .web-nav{ margin:0 -18px; padding:0 18px }
+  .web-nav .links a:not([aria-current]){ display:none }
+  .hero{ grid-template-columns:minmax(0,1fr); gap:22px; padding:26px 0 18px }
+  .hero h3{ font-size:27px }
+  .tools{ grid-template-columns:minmax(0,1fr) }
+}

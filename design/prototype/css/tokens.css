@@ -1,0 +1,106 @@
+/* TrionCAD · token thiết kế, hướng A "Than chì".
+   Một nguồn cho prototype, styleguide và các trang web gắn với ứng dụng.
+   Tối là chủ đề mặc định của sản phẩm (07.1 §13.2). Trang hiển thị theo chủ đề của người xem;
+   data-theme="light|dark" trên <html> ép một chủ đề. Nền vùng vẽ không đổi theo chủ đề giao diện. */
+
+:root{
+  /* --- chữ --- */
+  --f-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --f-cad: "Arial Narrow", Arial, "Helvetica Neue", sans-serif;   /* chữ trên vùng vẽ, mô phỏng font TTF của bản vẽ */
+  --fs-2xs: 10px; --fs-xs: 10.5px; --fs-s: 11.5px; --fs: 12px; --fs-m: 13px; --fs-l: 15px; --fs-xl: 18px; --fs-2xl: 24px; --fs-3xl: 32px;
+  --fw-m: 500; --fw-b: 600;
+  --lh: 1.35; --lh-text: 1.55;
+
+  /* --- khoảng cách: bậc 2 px ở mức nhỏ, 4 px ở mức lớn --- */
+  --sp-1: 2px; --sp-2: 4px; --sp-3: 6px; --sp-4: 8px; --sp-5: 12px; --sp-6: 16px; --sp-7: 24px; --sp-8: 32px; --sp-9: 48px;
+
+  /* --- kích thước khung (mật độ gọn, mặc định) --- */
+  --h-title: 32px; --h-tab: 26px; --h-btn: 21px; --h-lbl: 16px; --h-ftab: 28px; --h-row: 22px; --h-ltab: 24px;
+  --h-cmdl: 17px; --h-cmdin: 26px; --h-status: 26px; --h-ctl: 24px; --h-ctl-l: 28px;
+  --pal-w: 272px; --strip: 22px; --lg-w: 52px; --ic: 16px; --ic-lg: 32px;
+
+  /* --- hình khối, chuyển động --- */
+  --r: 2px; --r-lg: 3px; --r-xl: 4px;
+  --sw: 1.25; --cap: square; --join: miter;          /* nét biểu tượng ở cỡ 16 px */
+  --t-fast: 80ms; --t: 120ms;                        /* ≤ 150 ms (07.1 §1.3) */
+  --fade-xref: .5; --fade-locked: .45;
+
+  /* --- màu · Tối --- */
+  --c-chrome: #121417; --c-base: #1A1D21; --c-sunken: #15171A; --c-raised: #23272C; --c-active: #2D3239;
+  --c-hover: rgba(255,255,255,.055); --c-press: rgba(255,255,255,.09);
+  --c-border: #2C3036; --c-border-ctl: #646B75;
+  --c-text: #E3E6EA; --c-text-2: #A9B0B9; --c-text-3: #8A919B; --c-text-dis: #6A717B;
+  --c-accent: #3CC8C0; --c-accent-hi: #5BD6CF; --c-accent-t: #04201E; --c-accent-soft: rgba(60,200,192,.15); --c-focus: #3CC8C0;
+  --c-on: #3CC8C0; --c-on-bg: rgba(60,200,192,.14); --c-off: #8A919B;
+  --c-warn: #E9B44C; --c-warn-soft: rgba(233,180,76,.13); --c-danger: #F06A61; --c-danger-soft: rgba(240,106,97,.13);
+  --c-ok: #55C68F; --c-ok-soft: rgba(85,198,143,.13); --c-info: #6BA6FF; --c-info-soft: rgba(107,166,255,.13);
+  --c-banner: #1F2A2C; --c-scrim: rgba(6,8,10,.55);
+  --c-icon-fill: none;
+  --sh-pop: 0 4px 14px rgba(0,0,0,.45); --sh-dlg: 0 16px 40px rgba(0,0,0,.55);
+  /* vùng vẽ và layout (07.1 §13.2) */
+  --c-canvas: #0F1113; --c-canvas-grid: #1E2226; --c-canvas-grid-major: #2A2F35; --c-canvas-axis: #3A4048;
+  --c-layout-bg: #2A2E33; --c-paper: #FFFFFF; --c-paper-print: #8C949E; --c-paper-shadow: rgba(0,0,0,.55);
+  --c-cross: #E8EAED; --c-rubber: #FFFFFF;
+  --c-sel-w: #4C8DFF; --c-sel-wf: rgba(76,141,255,.16); --c-sel-c: #45C27E; --c-sel-cf: rgba(69,194,126,.16);
+  --c-hl-hover: #FFFFFF; --c-hl-sel: #78B2FF; --c-hl-res: #FFB547;
+  --c-grip-cold: #4C8DFF; --c-grip-hover: #FFA94D; --c-grip-hot: #FF5B57; --c-grip-border: #0F1113;
+  --c-snap: #F5D33B; --c-track: #5DE0A6;
+  --c-dyn-bg: #262A30; --c-dyn-t: #EEF0F2; --c-dyn-b: #5B626C;
+  --c-snap-tip-bg: #FFF6C9; --c-snap-tip-t: #2A2300; --c-snap-tip-b: #CDB64B;
+  --c-cmp-a: #FF9A3C; --c-cmp-b: #4CA8FF; --c-cmp-common: #6C737D;
+  /* huy hiệu phiên bản */
+  --c-ed-viewer: #3B4048; --c-ed-viewer-t: #E3E6EA; --c-ed-vp: #9B8CFF; --c-ed-vp-t: #140F2E;
+  --c-ed-pro: #3CC8C0; --c-ed-pro-t: #04201E; --c-ed-ent: #E3E6EA; --c-ed-ent-t: #121417;
+  --c-ed-edu: #6BA6FF; --c-ed-edu-t: #071A33; --c-ed-trial: #E9B44C; --c-ed-trial-t: #2A1C00;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --c-chrome: #E4E7EB; --c-base: #F2F4F6; --c-sunken: #EAEDF0; --c-raised: #FFFFFF; --c-active: #D9DEE4;
+    --c-hover: rgba(0,0,0,.045); --c-press: rgba(0,0,0,.08);
+    --c-border: #D0D5DB; --c-border-ctl: #858D97;
+    --c-text: #15181C; --c-text-2: #4A525C; --c-text-3: #5C646E; --c-text-dis: #8E959E;
+    --c-accent: #06706A; --c-accent-hi: #0A8079; --c-accent-t: #FFFFFF; --c-accent-soft: rgba(6,112,106,.11); --c-focus: #06706A;
+    --c-on: #06706A; --c-on-bg: rgba(6,112,106,.12); --c-off: #5C646E;
+    --c-warn: #8A5600; --c-warn-soft: rgba(196,128,0,.13); --c-danger: #B3322A; --c-danger-soft: rgba(179,50,42,.10);
+    --c-ok: #1B7F4E; --c-ok-soft: rgba(27,127,78,.11); --c-info: #2A66C9; --c-info-soft: rgba(42,102,201,.10);
+    --c-banner: #E2F1EF; --c-scrim: rgba(20,24,28,.35);
+    --sh-pop: 0 4px 14px rgba(20,30,40,.18); --sh-dlg: 0 16px 40px rgba(20,30,40,.25);
+    --c-layout-bg: #C9CED4; --c-paper-shadow: rgba(30,40,50,.35);
+    --c-dyn-bg: #FFFFFF; --c-dyn-t: #15181C; --c-dyn-b: #858D97;
+    --c-grip-cold: #2F6FE0; --c-grip-hover: #F08A24; --c-grip-hot: #E0403C;
+    --c-ed-viewer: #D9DEE4; --c-ed-viewer-t: #15181C; --c-ed-vp: #5B46D6; --c-ed-vp-t: #FFFFFF;
+    --c-ed-pro: #06706A; --c-ed-pro-t: #FFFFFF; --c-ed-ent: #15181C; --c-ed-ent-t: #FFFFFF;
+    --c-ed-edu: #2A66C9; --c-ed-edu-t: #FFFFFF; --c-ed-trial: #8A5600; --c-ed-trial-t: #FFFFFF;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --c-chrome: #E4E7EB; --c-base: #F2F4F6; --c-sunken: #EAEDF0; --c-raised: #FFFFFF; --c-active: #D9DEE4;
+  --c-hover: rgba(0,0,0,.045); --c-press: rgba(0,0,0,.08);
+  --c-border: #D0D5DB; --c-border-ctl: #858D97;
+  --c-text: #15181C; --c-text-2: #4A525C; --c-text-3: #5C646E; --c-text-dis: #8E959E;
+  --c-accent: #06706A; --c-accent-hi: #0A8079; --c-accent-t: #FFFFFF; --c-accent-soft: rgba(6,112,106,.11); --c-focus: #06706A;
+  --c-on: #06706A; --c-on-bg: rgba(6,112,106,.12); --c-off: #5C646E;
+  --c-warn: #8A5600; --c-warn-soft: rgba(196,128,0,.13); --c-danger: #B3322A; --c-danger-soft: rgba(179,50,42,.10);
+  --c-ok: #1B7F4E; --c-ok-soft: rgba(27,127,78,.11); --c-info: #2A66C9; --c-info-soft: rgba(42,102,201,.10);
+  --c-banner: #E2F1EF; --c-scrim: rgba(20,24,28,.35);
+  --sh-pop: 0 4px 14px rgba(20,30,40,.18); --sh-dlg: 0 16px 40px rgba(20,30,40,.25);
+  --c-layout-bg: #C9CED4; --c-paper-shadow: rgba(30,40,50,.35);
+  --c-dyn-bg: #FFFFFF; --c-dyn-t: #15181C; --c-dyn-b: #858D97;
+  --c-grip-cold: #2F6FE0; --c-grip-hover: #F08A24; --c-grip-hot: #E0403C;
+  --c-ed-viewer: #D9DEE4; --c-ed-viewer-t: #15181C; --c-ed-vp: #5B46D6; --c-ed-vp-t: #FFFFFF;
+  --c-ed-pro: #06706A; --c-ed-pro-t: #FFFFFF; --c-ed-ent: #15181C; --c-ed-ent-t: #FFFFFF;
+  --c-ed-edu: #2A66C9; --c-ed-edu-t: #FFFFFF; --c-ed-trial: #8A5600; --c-ed-trial-t: #FFFFFF;
+  color-scheme: light;
+}
+
+/* mật độ thoáng (07.1 §13.1): palette, ribbon, dòng lệnh cao hơn */
+:root[data-density="comfortable"]{
+  --h-row: 26px; --h-btn: 23px; --h-lbl: 17px; --h-ctl: 26px; --h-cmdl: 19px; --h-cmdin: 28px; --h-status: 28px; --h-ftab: 30px; --h-ltab: 26px;
+}
+/* Giao diện nhẹ (nguyên tắc 9): tắt bóng đổ, làm mờ, chuyển động */
+:root[data-lite]{ --sh-pop: 0 0 0 1px var(--c-border-ctl); --sh-dlg: 0 0 0 1px var(--c-border-ctl); --t-fast: 0ms; --t: 0ms; }
+@media (prefers-reduced-motion: reduce){ :root{ --t-fast: 0ms; --t: 0ms; } }

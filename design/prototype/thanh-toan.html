@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thanh toán TrionCAD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/page.css">
+<link rel="stylesheet" href="css/web.css">
+<style>
+/* UI-L16 · trang mua và trang tài khoản trên web. Thành phần web dùng chung ở css/web.css; phần dưới là riêng của hai trang này. */
+.web .h3{ margin:0; font-size:28px; line-height:1.2; font-weight:600; letter-spacing:-.01em }
+.web .sub2{ margin:6px 0 0; color:var(--c-text-2); font-size:14px }
+.buy{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:28px; padding:26px 0 8px; align-items:start }
+.blk{ display:grid; gap:12px; padding:18px 0; border-top:1px solid var(--c-border) }
+.blk:first-child{ border-top:0; padding-top:0 }
+.blk-h{ display:flex; align-items:baseline; gap:10px; margin:0; font-size:16px; font-weight:600 }
+.blk-h .n{ width:22px; height:22px; border-radius:50%; display:inline-grid; place-items:center; background:var(--c-active); font:600 12px var(--f-mono); flex:none; transform:translateY(-1px) }
+.plans{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px }
+.plan{ position:relative; display:grid; gap:6px; align-content:start; padding:14px; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); background:var(--c-raised); cursor:pointer; text-align:left; font:inherit; color:inherit }
+.plan:hover{ border-color:var(--c-text-3) }
+.plan[aria-checked="true"]{ border-color:var(--c-accent); box-shadow:0 0 0 1px var(--c-accent); background:color-mix(in srgb, var(--c-accent) 7%, var(--c-raised)) }
+.plan:focus-visible, .pay:focus-visible, .opt button:focus-visible, .st-btn:focus-visible, .acc-nav button:focus-visible{ outline:2px solid var(--c-focus); outline-offset:2px }
+.plan b{ font-size:15px } .plan .pr{ font-size:20px; font-weight:600; font-family:var(--f-mono); letter-spacing:-.02em }
+.plan .pr small{ font:500 12px var(--f-ui); color:var(--c-text-2); letter-spacing:0 }
+.plan ul{ margin:4px 0 0; padding-left:16px; font-size:12.5px; color:var(--c-text-2); display:grid; gap:2px }
+.plan .tagw{ position:absolute; top:-9px; right:10px; font-size:11px; font-weight:600; padding:1px 8px; border-radius:var(--r-xl); background:var(--c-accent); color:var(--c-accent-t) }
+.opt{ display:inline-flex; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); overflow:hidden; justify-self:start; flex-wrap:wrap }
+.opt button{ font:inherit; font-size:13px; height:32px; padding:0 14px; border:0; background:var(--c-raised); color:var(--c-text-2); cursor:pointer; border-right:1px solid var(--c-border) }
+.opt button:last-child{ border-right:0 }
+.opt button[aria-pressed="true"]{ background:var(--c-accent); color:var(--c-accent-t); font-weight:600 }
+.opt button:disabled{ color:var(--c-text-dis); cursor:default }
+.hint{ margin:0; font-size:12.5px; color:var(--c-text-3) }
+.stepper{ display:inline-flex; align-items:center; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); overflow:hidden; justify-self:start }
+.stepper button{ font:inherit; font-size:18px; width:36px; height:34px; border:0; background:var(--c-raised); color:var(--c-text); cursor:pointer }
+.stepper input{ width:56px; height:34px; border:0; border-inline:1px solid var(--c-border); background:var(--c-base); color:var(--c-text); text-align:center; font:600 15px var(--f-mono) }
+.grid2w{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px }
+.fld.full{ grid-column:1 / -1 }
+.grid2w .fld{ align-content:start }
+.rowi{ display:flex; gap:8px; min-width:0 } .rowi > input{ flex:1; min-width:0; width:0 } .fld{ min-width:0 }
+.fld .ok{ color:var(--c-ok); font-size:12px }
+.pays{ display:grid; gap:8px }
+.pay{ display:grid; grid-template-columns:20px 92px minmax(0,1fr); gap:10px; align-items:center; padding:11px 12px; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); background:var(--c-raised); cursor:pointer; text-align:left; font:inherit; color:inherit }
+.pay[aria-checked="true"]{ border-color:var(--c-accent); box-shadow:0 0 0 1px var(--c-accent) }
+.pay .dot{ width:16px; height:16px; border-radius:50%; border:1.5px solid var(--c-border-ctl); display:grid; place-items:center }
+.pay[aria-checked="true"] .dot{ border-color:var(--c-accent) } .pay[aria-checked="true"] .dot::after{ content:""; width:8px; height:8px; border-radius:50%; background:var(--c-accent) }
+.pay .nm{ font-weight:600; font-size:14px } .pay .ds{ font-size:12.5px; color:var(--c-text-2) }
+.chk2{ display:flex; gap:9px; align-items:flex-start; font-size:13px; color:var(--c-text-2) } .chk2 input{ accent-color:var(--c-accent); margin:2px 0 0; width:15px; height:15px; flex:none } .chk2 b{ color:var(--c-text) }
+.sumc{ position:sticky; top:12px; display:grid; gap:12px; padding:18px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised) }
+.sumc h4{ margin:0; font-size:15px; font-weight:600 }
+.line{ display:flex; justify-content:space-between; gap:12px; font-size:13.5px; color:var(--c-text-2) } .line b{ color:var(--c-text); font-weight:500; font-family:var(--f-mono); white-space:nowrap }
+.line.tot{ padding-top:10px; border-top:1px solid var(--c-border); font-size:15px; color:var(--c-text); font-weight:600 } .line.tot b{ font-size:20px; font-weight:600 }
+.line .disc{ color:var(--c-ok) }
+.msg{ font-size:12.5px } .msg.err{ color:var(--c-danger) } .msg.ok{ color:var(--c-ok) }
+.promise{ display:grid; gap:6px; padding:12px; border-radius:var(--r-xl); background:var(--c-sunken); font-size:12.5px; color:var(--c-text-2) }
+.promise b{ color:var(--c-text) }
+.res{ display:grid; gap:16px; justify-items:start; padding:32px 0 16px; max-width:640px }
+.res .big{ width:48px; height:48px; border-radius:50%; display:grid; place-items:center }
+.res .big svg{ width:26px; height:26px }
+.res.ok .big{ background:var(--c-ok-soft); color:var(--c-ok) } .res.fail .big{ background:var(--c-danger-soft); color:var(--c-danger) } .res.wait .big{ background:var(--c-warn-soft); color:var(--c-warn) }
+.keybox{ display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px dashed var(--c-border-ctl); border-radius:var(--r-xl); font:600 17px var(--f-mono); letter-spacing:.06em } .keybox .lnk{ font:500 13px var(--f-ui); letter-spacing:0 }
+.bankq{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:18px; align-items:center; padding:14px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised) }
+.kv{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:6px 14px; font-size:13.5px } .kv span{ color:var(--c-text-2) } .kv b{ font-family:var(--f-mono); font-weight:500 }
+.qr{ display:block; border-radius:var(--r-xl) }
+.btns{ display:flex; flex-wrap:wrap; gap:8px }
+.web a{ color:var(--c-accent) } .web a.cta{ color:var(--c-accent-t); text-decoration:none } .web a.cta.sec{ color:var(--c-text) }
+/* trang tài khoản */
+.acc{ display:grid; grid-template-columns:200px minmax(0,1fr); gap:28px; padding:26px 0 8px; align-items:start }
+.acc-nav{ display:grid; gap:2px; position:sticky; top:12px }
+.acc-nav button{ font:inherit; font-size:14px; text-align:left; padding:8px 10px; border:0; border-radius:var(--r-lg); background:none; color:var(--c-text-2); cursor:pointer }
+.acc-nav button[aria-current="page"]{ background:var(--c-accent-soft); color:var(--c-text); font-weight:600; box-shadow:inset 3px 0 0 var(--c-accent) }
+.card{ display:grid; gap:12px; padding:18px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised) }
+.card h4{ margin:0; font-size:15px; font-weight:600; display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+.pill{ font-size:11.5px; font-weight:600; padding:1px 8px; border-radius:var(--r-xl); background:var(--c-active); color:var(--c-text-2) }
+.pill.ok{ background:var(--c-ok-soft); color:var(--c-ok) } .pill.warn{ background:var(--c-warn-soft); color:var(--c-warn) } .pill.vp{ background:var(--c-ed-vp); color:var(--c-ed-vp-t) }
+.facts{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px }
+.facts div{ display:grid; gap:2px } .facts span{ font-size:12px; color:var(--c-text-3) } .facts b{ font-size:15px; font-weight:600 }
+.sw2{ position:relative; width:36px; height:20px; border-radius:10px; background:var(--c-active); border:0; cursor:pointer; flex:none }
+.sw2::after{ content:""; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:var(--c-text-2); transition:left var(--t) }
+.sw2[aria-checked="true"]{ background:var(--c-accent) } .sw2[aria-checked="true"]::after{ left:19px; background:var(--c-accent-t) }
+.sw2:focus-visible{ outline:2px solid var(--c-focus); outline-offset:2px }
+.srow{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap }
+.wtbl{ width:100%; border-collapse:collapse; font-size:13.5px }
+.wtbl th, .wtbl td{ text-align:left; padding:9px 10px; border-bottom:1px solid var(--c-border); vertical-align:middle }
+.wtbl th{ color:var(--c-text-3); font-weight:600; font-size:12px } .wtbl td.num, .wtbl th.num{ text-align:right; font-family:var(--f-mono) }
+.wtbl .mail{ font-family:var(--f-mono); font-size:12.5px }
+.lnk{ font:inherit; font-size:13px; background:none; border:0; color:var(--c-accent); cursor:pointer; padding:0 }
+.lnk.danger{ color:var(--c-danger) }
+.alert{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:var(--r-xl); font-size:13.5px }
+.alert.warn{ background:var(--c-warn-soft) } .alert.err{ background:var(--c-danger-soft) } .alert svg{ width:18px; height:18px; flex:none; margin-top:1px } .alert.warn svg{ color:var(--c-warn) } .alert.err svg{ color:var(--c-danger) }
+.st-btn{ font:inherit; font-size:12px; color:var(--c-text); background:var(--c-raised); border:1px solid var(--c-border); border-radius:var(--r); padding:3px 9px; cursor:pointer }
+.st-btn[aria-pressed="true"]{ border-color:var(--c-accent); background:var(--c-accent-soft) }
+.ico{ width:16px; height:16px; flex:none }
+/* trang duyệt: khung trình duyệt rộng như trang thật, ghi chú xuống dưới */
+.scr-grid.wide{ grid-template-columns:minmax(0,1fr) } .scr-grid.wide .notes{ display:block; columns:2 320px; column-gap:32px } .scr-grid.wide .notes > *{ break-inside:avoid } .scr-grid.wide .notes h3{ margin:0 0 8px } .scr-grid.wide .notes ul{ margin-bottom:14px }
+@container (max-width: 760px){
+  .buy, .acc{ grid-template-columns:minmax(0,1fr); gap:18px; padding-top:18px }
+  .plans{ grid-template-columns:minmax(0,1fr) }
+  .grid2w{ grid-template-columns:minmax(0,1fr) }
+  .pay{ grid-template-columns:20px minmax(0,1fr) } .pay .ds{ grid-column:2 }
+  .sumc{ position:static }
+  .acc-nav{ position:static; display:flex; overflow-x:auto; gap:4px } .acc-nav button{ white-space:nowrap } .acc-nav button[aria-current="page"]{ box-shadow:inset 0 -2px 0 var(--c-accent) }
+  .facts{ grid-template-columns:repeat(2, minmax(0,1fr)) }
+  .bankq{ grid-template-columns:minmax(0,1fr); justify-items:center }
+  .opt.bill{ display:grid; justify-self:stretch } .opt.bill button{ border-right:0; border-bottom:1px solid var(--c-border); text-align:left } .opt.bill button:last-child{ border-bottom:0 }
+  .wtbl .hide-s{ display:none }
+  .web .h3{ font-size:23px }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-logo" viewBox="0 0 16 16"><path d="M8 3 14.2 13.5H1.8z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3" r="2" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 16 16"><path d="M8 2.2 14.5 13.5h-13z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 6.5v3.2M8 11.2v.6" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 16 16"><path d="M5.5 5.5h8v8h-8z M10.5 5.5v-3h-8v8h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+</defs></svg>
+
+<main class="pg">
+  <header class="pg-head">
+    <p class="eyebrow">TrionCAD · Đợt 2 / 5 · Viewer Pro (VP) · phát hành tháng 18</p>
+    <h1>Thanh toán và hóa đơn trên web</h1>
+    <p class="lead">UI-L16 theo đặc tả 07.3 §6. Có hai trang. Trang mua: chọn gói, số ghế, thuê bao hay vĩnh viễn, thông tin xuất hóa đơn điện tử, mã giảm giá hoặc mã đại lý, thanh toán. Trang tài khoản: hóa đơn, gia hạn tự động, quản lý ghế. Cả hai dùng chung token và kiểu chữ với ứng dụng. Nút <b>Mua</b>, <b>Gia hạn</b> trong ứng dụng mở trang tương ứng.</p>
+    <div class="rules">
+      <span><b>Bán tự phục vụ</b> (04 §7): thanh toán xong là có key và tự kích hoạt khi đăng nhập ứng dụng bằng cùng email; chuyển khoản thì kích hoạt khi tiền về.</span>
+      <span><b>Cam kết giấy phép công bằng</b> (04 §6.3) ghi ngay trên trang: hết thuê bao không khóa dữ liệu, giảm ghế không bị phạt, vĩnh viễn nghĩa là vĩnh viễn.</span>
+      <span><b>Tên miền, ngân hàng, mã số thuế</b> trong trang là dữ liệu mẫu.</span>
+    </div>
+    <div class="toc"><a href="#mua">Mua và thanh toán</a><a href="#tai-khoan">Trang tài khoản</a><a href="index.html">← Mở prototype ứng dụng</a></div>
+  </header>
+
+  <!-- ===================== Mua ===================== -->
+  <section class="scr" id="mua" aria-labelledby="h-mua">
+    <div class="scr-h"><span class="code-tag">UI-L16</span><h2 id="h-mua">Mua: gói, ghế, hóa đơn, thanh toán</h2><span class="rel">Web · mở từ nút Mua (UI-L04), Gia hạn (UI-L03), trang Bảng giá · VP</span></div>
+    <div class="states" role="group" aria-label="Trạng thái trang mua">Trạng thái:
+      <button class="st-btn" type="button" data-bst="form" aria-pressed="true">Điền đơn</button><button class="st-btn" type="button" data-bst="bank" aria-pressed="false">Chờ chuyển khoản</button><button class="st-btn" type="button" data-bst="ok" aria-pressed="false">Thành công</button><button class="st-btn" type="button" data-bst="fail" aria-pressed="false">Không thành công</button>
+      <span class="dev" style="margin-left:8px"><button type="button" data-dev="desktop" data-for="br-buy" aria-pressed="true">Máy tính</button><button type="button" data-dev="phone" data-for="br-buy" aria-pressed="false">Điện thoại</button></span>
+    </div>
+    <div class="scr-grid wide">
+      <div class="browser" id="br-buy" data-dev="desktop"><div class="browser-bar"><span class="addr" id="buy-addr">[tên-miền]/mua</span></div><div class="web"><div class="web-in" id="buy"></div></div></div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li>Mở từ ứng dụng thì <b>chọn sẵn gói</b> theo tính năng đang khóa (Viewer Pro hoặc Pro). Số ghế mặc định 1.</li>
+          <li>Đổi gói, kiểu thanh toán, số ghế, mã: <b>tổng tiền cập nhật ngay</b> ở cột phải (dưới cùng trên điện thoại).</li>
+          <li><b>Mã số thuế</b> 10 hoặc 13 số (dạng 0101234567-001). Bấm Tra cứu để điền tên và địa chỉ công ty; vẫn sửa tay được.</li>
+          <li>Mã bắt đầu bằng <code>DL-</code> là <b>mã đại lý</b>: ghi nhận đại lý hỗ trợ, không đổi giá. Mã khác là mã giảm giá.</li>
+          <li><b>Chuyển khoản</b>: hiện VietQR, số tài khoản, nội dung chuyển khoản là mã đơn; đơn giữ 24 giờ; kích hoạt tự động khi tiền về.</li>
+          <li>Thanh toán thất bại: nói rõ <b>chưa bị trừ tiền</b>, giữ nguyên đơn để thử lại hoặc đổi phương thức.</li>
+          <li>Thử nhập: MST <code>0312345678</code>, mã <code>TRION10</code> hoặc <code>DL-HN-012</code>.</li>
+        </ul>
+        <h3>Cần xác minh</h3>
+        <ul><li>Thuế GTGT với sản phẩm phần mềm: đang ghi “không chịu thuế” theo 04 §6.1, cần tư vấn thuế xác nhận theo Luật thuế GTGT 2024.</li><li>Giá là giả thuyết của 04 §6.1, kiểm định bằng khảo sát trước khi bán.</li></ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== Tài khoản ===================== -->
+  <section class="scr" id="tai-khoan" aria-labelledby="h-acc">
+    <div class="scr-h"><span class="code-tag">UI-L16</span><h2 id="h-acc">Trang tài khoản: gia hạn, ghế, hóa đơn</h2><span class="rel">Web · mở từ menu tài khoản trong ứng dụng, email nhắc gia hạn · VP</span></div>
+    <div class="states" role="group" aria-label="Trạng thái thuê bao">Thuê bao:
+      <button class="st-btn" type="button" data-ast="ok" aria-pressed="true">Đang hoạt động</button><button class="st-btn" type="button" data-ast="soon" aria-pressed="false">Còn 7 ngày</button><button class="st-btn" type="button" data-ast="exp" aria-pressed="false">Đã hết hạn</button>
+      <span class="dev" style="margin-left:8px"><button type="button" data-dev="desktop" data-for="br-acc" aria-pressed="true">Máy tính</button><button type="button" data-dev="phone" data-for="br-acc" aria-pressed="false">Điện thoại</button></span>
+    </div>
+    <div class="scr-grid wide">
+      <div class="browser" id="br-acc" data-dev="desktop"><div class="browser-bar"><span class="addr">[tên-miền]/tai-khoan</span></div><div class="web"><div class="web-in" id="acc"></div></div></div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li><b>Gia hạn tự động</b> bật hay tắt bằng một công tắc; tắt thì vẫn dùng đến hết hạn. Nhắc qua email trước 30, 7 và 1 ngày.</li>
+          <li>Hết hạn: ứng dụng chuyển về Viewer, <b>bản vẽ vẫn mở và in được</b>; trang nói rõ điều này cạnh nút Gia hạn.</li>
+          <li><b>Ghế</b>: mời theo email; người được gán đăng nhập ứng dụng là dùng được. Thu hồi ghế thì máy của người đó về Viewer ở lần kết nối tới. Mỗi ghế dùng trên 2 máy.</li>
+          <li><b>Giảm ghế</b> khi gia hạn không bị phạt; tiền ghế dư tính vào kỳ sau.</li>
+          <li><b>Hóa đơn điện tử</b> tải được dạng PDF và XML; sửa thông tin xuất hóa đơn cho các đơn sau.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s, r){ return (r || document).querySelector(s); }, $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); };
+  var vnd = function(n){ return Math.round(n).toLocaleString('vi-VN') + ' đ'; };
+  var ic = function(n, c){ return '<svg class="ico' + (c ? ' ' + c : '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>'; };
+  var nav = function(cur){ return '<nav class="web-nav" aria-label="Trang TrionCAD"><a class="brand" href="#mua"><svg aria-hidden="true"><use href="#i-logo"/></svg>TrionCAD</a><span class="links"><a href="#mua">Sản phẩm</a><a href="#mua"' + (cur === 'buy' ? ' aria-current="page"' : '') + '>Bảng giá</a><a href="#mua">Tải về</a><a href="#mua">Hỗ trợ</a><a href="#tai-khoan"' + (cur === 'acc' ? ' aria-current="page"' : '') + '>Tài khoản</a></span></nav>'; };
+  function qr(seed, size){
+    var n = 25, s = seed >>> 0, d = '', rnd = function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++){
+      var f = (x < 7 && y < 7) || (x >= n - 7 && y < 7) || (x < 7 && y >= n - 7), on;
+      if (f){ var fx = x < 7 ? x : x - (n - 7), fy = y < 7 ? y : y - (n - 7); on = fx === 0 || fx === 6 || fy === 0 || fy === 6 || (fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4); } else on = rnd() > .52;
+      if (on) d += 'M' + x + ' ' + y + 'h1v1h-1z';
+    }
+    return '<svg class="qr" viewBox="-2 -2 29 29" width="' + size + '" height="' + size + '" role="img" aria-label="Mã VietQR chuyển khoản"><rect x="-2" y="-2" width="29" height="29" fill="#FFFFFF"/><path d="' + d + '" fill="#101214"/></svg>';
+  }
+
+  /* ================= trang mua ================= */
+  var PLANS = {
+    vp:{ name:'TrionCAD Viewer Pro', short:'Viewer Pro', year:690000, perp:1990000, feat:['In hàng loạt theo khung tên','So sánh bản vẽ, đếm block','Chuyển font hàng loạt','Markup, ghi chú'] },
+    pro:{ name:'TrionCAD Pro', short:'Pro', year:2990000, month:349000, perp:7990000, feat:['Mọi tính năng của Viewer Pro','Vẽ, sửa, lưu DWG và DXF','LISP, script','Bác sĩ Font sửa trực tiếp'], note:'Vĩnh viễn kèm 12 tháng cập nhật; gia hạn cập nhật 1.990.000 đ/năm, không bắt buộc.', best:true },
+    ent:{ name:'TrionCAD Doanh nghiệp', short:'Doanh nghiệp', year:3990000, perp:10990000, feat:['Giấy phép floating cho cả công ty','Cổng quản trị, gán ghế theo email','Cài đặt hàng loạt (MSI)'], unit:'/ghế' }
+  };
+  var BILL = { year:'Thuê bao năm', month:'Thuê bao tháng', perp:'Vĩnh viễn' };
+  var PAY = [['vnpay','VNPay','QR ngân hàng, thẻ ATM nội địa, Internet Banking'],['momo','Ví MoMo','Quét mã QR bằng ứng dụng MoMo'],['zalopay','ZaloPay','Thanh toán ngay trong Zalo'],['bank','Chuyển khoản','VietQR; kích hoạt khi tiền về, thường vài phút'],['card','Thẻ quốc tế','Visa, Mastercard, JCB']];
+  var B = { st:'form', plan:'vp', bill:'year', seats:1, who:'co', mst:'', mstMsg:'', company:'', addr:'', mail:'', pay:'vnpay', code:'', applied:null, codeMsg:'', auto:true, agree:true, errs:{} };
+  var h = (location.hash || '').slice(1); if (h === 'pro' || h === 'vp') B.plan = h;
+  function price(){ var p = PLANS[B.plan]; if (!p[B.bill]) B.bill = 'year'; var base = p[B.bill] * B.seats, disc = B.applied && B.applied.pct ? base * B.applied.pct / 100 : 0; return { base:base, disc:disc, total:base - disc }; }
+  function renderBuy(){
+    var host = $('#buy'), p = PLANS[B.plan], pr = price();
+    $('#buy-addr').textContent = '[tên-miền]/mua?goi=' + ({ vp:'viewer-pro', pro:'pro', ent:'doanh-nghiep' }[B.plan]);
+    if (B.st !== 'form'){ host.innerHTML = nav('buy') + result(p, pr); return; }
+    var bills = ['year'].concat(p.month ? ['month'] : []).concat(['perp']);
+    host.innerHTML = nav('buy') + '<div class="buy"><div>' +
+      '<div class="blk"><div><p class="h3">Mua TrionCAD</p><p class="sub2">Thanh toán xong nhận key qua email. Đăng nhập ứng dụng bằng cùng email là tự kích hoạt.</p></div></div>' +
+      '<div class="blk"><h3 class="blk-h"><span class="n">1</span>Chọn gói</h3><div class="plans" role="radiogroup" aria-label="Gói">' + Object.keys(PLANS).map(function(k){ var q = PLANS[k]; return '<button class="plan" type="button" role="radio" data-plan="' + k + '" aria-checked="' + (B.plan === k) + '">' + (q.best ? '<span class="tagw">Đầy đủ nhất</span>' : '') + '<b>' + q.short + '</b><span class="pr">' + vnd(q.year).replace(' đ', '') + ' <small>đ/năm' + (q.unit || '') + '</small></span><ul>' + q.feat.map(function(f){ return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></button>'; }).join('') + '</div>' +
+        '<div class="opt bill" role="group" aria-label="Kiểu thanh toán">' + ['year','month','perp'].map(function(b){ var ok = bills.indexOf(b) >= 0; return '<button type="button" data-bill="' + b + '" aria-pressed="' + (B.bill === b) + '"' + (ok ? '' : ' disabled title="Gói này không có ' + BILL[b].toLowerCase() + '"') + '>' + BILL[b] + (ok && p[b] ? ' · ' + vnd(p[b]).replace(' đ', '') + ' đ' + (b === 'month' ? '/tháng' : b === 'year' ? '/năm' : '') : '') + '</button>'; }).join('') + '</div>' +
+        (B.bill === 'perp' && p.note ? '<p class="hint">' + p.note + '</p>' : B.bill === 'perp' ? '<p class="hint">Dùng mãi phiên bản đã mua; tự kích hoạt lại khi đổi máy (2 lần mỗi năm); kích hoạt offline được.</p>' : '<p class="hint">Hết thuê bao không khóa dữ liệu: ứng dụng chuyển về Viewer, bản vẽ vẫn mở, xem và in được.</p>') + '</div>' +
+      '<div class="blk"><h3 class="blk-h"><span class="n">2</span>Số ghế</h3><div class="stepper"><button type="button" data-seat="-1" aria-label="Bớt một ghế">−</button><input id="b-seats" inputmode="numeric" value="' + B.seats + '" aria-label="Số ghế"><button type="button" data-seat="1" aria-label="Thêm một ghế">+</button></div><p class="hint">' + (B.plan === 'ent' ? 'Ghế floating: số người dùng cùng lúc. Máy chủ giấy phép cài trong mạng công ty.' : 'Mỗi ghế cho một người, dùng trên 2 máy. Gán ghế cho đồng nghiệp ở trang Tài khoản; giảm ghế khi gia hạn không bị phạt.') + '</p></div>' +
+      '<div class="blk"><h3 class="blk-h"><span class="n">3</span>Thông tin xuất hóa đơn điện tử</h3><div class="opt" role="group" aria-label="Người mua"><button type="button" data-who="co" aria-pressed="' + (B.who === 'co') + '">Công ty</button><button type="button" data-who="me" aria-pressed="' + (B.who === 'me') + '">Cá nhân</button></div>' +
+        (B.who === 'co' ? '<div class="grid2w"><div class="fld"><label for="b-mst">Mã số thuế</label><div class="rowi"><input id="b-mst" inputmode="numeric" value="' + esc(B.mst) + '" placeholder="0101234567" aria-invalid="' + !!B.errs.mst + '" aria-describedby="b-mst-m"><button class="cta sec" type="button" data-act="lookup" style="height:36px">Tra cứu</button></div><span class="' + (B.errs.mst ? 'msg' : B.mstMsg ? 'ok' : 'help') + '" id="b-mst-m">' + esc(B.errs.mst || B.mstMsg || '10 hoặc 13 số, ví dụ 0101234567-001.') + '</span></div>' +
+          '<div class="fld"><label for="b-mail">Email nhận hóa đơn</label><input id="b-mail" type="email" autocomplete="email" value="' + esc(B.mail) + '" placeholder="ketoan@congty.vn" aria-invalid="' + !!B.errs.mail + '"><span class="msg">' + esc(B.errs.mail || '') + '</span></div>' +
+          '<div class="fld full"><label for="b-co">Tên công ty</label><input id="b-co" value="' + esc(B.company) + '" aria-invalid="' + !!B.errs.company + '"><span class="msg">' + esc(B.errs.company || '') + '</span></div>' +
+          '<div class="fld full"><label for="b-addr">Địa chỉ</label><input id="b-addr" value="' + esc(B.addr) + '" aria-invalid="' + !!B.errs.addr + '"><span class="msg">' + esc(B.errs.addr || '') + '</span></div></div>'
+        : '<div class="grid2w"><div class="fld"><label for="b-name">Họ tên</label><input id="b-name" autocomplete="name" value="' + esc(B.company) + '" aria-invalid="' + !!B.errs.company + '"><span class="msg">' + esc(B.errs.company || '') + '</span></div><div class="fld"><label for="b-mail">Email nhận hóa đơn</label><input id="b-mail" type="email" autocomplete="email" value="' + esc(B.mail) + '" placeholder="ten@gmail.com" aria-invalid="' + !!B.errs.mail + '"><span class="msg">' + esc(B.errs.mail || '') + '</span></div></div>') + '</div>' +
+      '<div class="blk"><h3 class="blk-h"><span class="n">4</span>Phương thức thanh toán</h3><div class="pays" role="radiogroup" aria-label="Phương thức thanh toán">' + PAY.map(function(m){ return '<button class="pay" type="button" role="radio" data-pay="' + m[0] + '" aria-checked="' + (B.pay === m[0]) + '"><span class="dot"></span><span class="nm">' + m[1] + '</span><span class="ds">' + m[2] + '</span></button>'; }).join('') + '</div>' +
+        (B.bill !== 'perp' ? '<label class="chk2"><input type="checkbox" id="b-auto"' + (B.auto ? ' checked' : '') + (B.pay === 'bank' ? ' disabled' : '') + '><span><b>Tự động gia hạn</b>' + (B.pay === 'bank' ? ' (không dùng được với chuyển khoản: sẽ nhắc gia hạn qua email trước 30, 7, 1 ngày)' : ': trừ tiền vào ngày gia hạn, nhắc trước 7 ngày; tắt bất cứ lúc nào ở trang Tài khoản.') + '</span></label>' : '') +
+        '<label class="chk2"><input type="checkbox" id="b-agree"' + (B.agree ? ' checked' : '') + '><span>Tôi đồng ý <a href="#mua">Điều khoản sử dụng</a> và <a href="#mua">Chính sách quyền riêng tư</a>.</span></label>' + (B.errs.agree ? '<span class="msg err">' + esc(B.errs.agree) + '</span>' : '') + '</div>' +
+      '</div>' + summary(p, pr) + '</div>' + foot();
+  }
+  function summary(p, pr){
+    return '<aside class="sumc" aria-label="Đơn hàng"><h4>Đơn hàng</h4><div class="line"><span>' + esc(p.name) + '<br><span style="font-size:12px">' + BILL[B.bill] + ' · ' + B.seats + ' ghế × ' + vnd(p[B.bill]) + '</span></span><b>' + vnd(pr.base) + '</b></div>' +
+      '<div class="fld"><label for="b-code">Mã giảm giá hoặc mã đại lý</label><div class="rowi"><input id="b-code" value="' + esc(B.code) + '" placeholder="Nếu có" autocapitalize="characters"><button class="cta sec" type="button" data-act="code" style="height:36px">Áp dụng</button></div>' + (B.codeMsg ? '<span class="msg ' + (B.applied ? 'ok' : 'err') + '">' + esc(B.codeMsg) + '</span>' : '') + '</div>' +
+      (pr.disc ? '<div class="line"><span>Giảm ' + B.applied.pct + '% (' + esc(B.applied.code) + ')</span><b class="disc">−' + vnd(pr.disc) + '</b></div>' : '') +
+      '<div class="line"><span>Thuế GTGT</span><b>Không chịu thuế</b></div>' +
+      '<div class="line tot"><span>Tổng thanh toán</span><b>' + vnd(pr.total) + '</b></div>' +
+      '<button class="cta" type="button" data-act="pay">Thanh toán ' + vnd(pr.total) + '</button>' +
+      '<div class="promise"><span><b>Hết thuê bao không khóa dữ liệu.</b> Ứng dụng về Viewer, bản vẽ vẫn mở và in được.</span><span>Hóa đơn điện tử gửi tới email nhận hóa đơn trong 24 giờ.</span><span>Cần hỗ trợ: Zalo OA TrionCAD, 8:00–21:00.</span></div></aside>';
+  }
+  function foot(){ return '<footer class="web-foot"><span>TrionCAD · dữ liệu khách hàng lưu tại Việt Nam · giá đã gồm mọi khoản phí</span><span class="fine">Trang mẫu cho thiết kế, chưa nhận thanh toán thật.</span></footer>'; }
+  function result(p, pr){
+    var mail = B.mail || 'ketoan@congty.vn', id = 'TC-2610-0042';
+    if (B.st === 'ok') return '<div class="res ok"><span class="big">' + ic('check') + '</span><div><p class="h3">Thanh toán thành công</p><p class="sub2">Mã đơn <b class="mono" style="font-family:var(--f-mono)">' + id + '</b> · ' + esc(p.name) + ' · ' + B.seats + ' ghế · ' + vnd(pr.total) + '</p></div>' +
+      '<div class="fld" style="width:100%"><label>Key của bạn (đã gửi tới ' + esc(mail) + ')</label><div class="keybox"><span>' + (B.plan === 'pro' ? 'TCPR' : B.plan === 'ent' ? 'TCEN' : 'TCVP') + '-7K2Q-M9XD-4HFA</span><button class="lnk" type="button" data-act="copykey" style="margin-left:auto;display:inline-flex;gap:5px;align-items:center">' + ic('copy') + 'Sao chép</button></div></div>' +
+      '<ol class="steps" style="width:100%"><li><span>Mở TrionCAD, vào <b>Tài khoản › Kích hoạt</b> và đăng nhập bằng <b>' + esc(mail) + '</b>, hoặc dán key.</span></li><li><span>Cần thêm người dùng? Gán ghế ở <a href="#tai-khoan">trang Tài khoản</a>.</span></li><li><span>Hóa đơn điện tử đang được xuất, gửi tới ' + esc(mail) + ' trong 24 giờ.</span></li></ol>' +
+      '<div class="btns"><a class="cta" href="index.html">Mở TrionCAD</a><button class="cta sec" type="button" data-act="back">Mua thêm</button></div></div>' + foot();
+    if (B.st === 'bank') return '<div class="res wait"><span class="big">' + ic('clock') + '</span><div><p class="h3">Chờ chuyển khoản</p><p class="sub2">Đơn <b>' + id + '</b> được giữ 24 giờ. Tiền về là kích hoạt tự động, thường trong vài phút.</p></div>' +
+      '<div class="bankq">' + qr(424242, 168) + '<div class="kv"><span>Ngân hàng</span><b>[Ngân hàng mẫu]</b><span>Số tài khoản</span><b>0123 456 789</b><span>Chủ tài khoản</span><b>CONG TY [TRIONCAD]</b><span>Số tiền</span><b>' + vnd(pr.total) + '</b><span>Nội dung</span><b>TC26100042</b></div></div>' +
+      '<p class="hint">Ghi đúng nội dung chuyển khoản để hệ thống tự nhận. Chuyển sai nội dung: gửi ảnh giao dịch qua Zalo OA để được kích hoạt thủ công.</p><div class="btns"><button class="cta sec" type="button" data-act="back">Đổi phương thức thanh toán</button></div></div>' + foot();
+    return '<div class="res fail"><span class="big">' + ic('x') + '</span><div><p class="h3">Thanh toán chưa thành công</p><p class="sub2">Giao dịch bị hủy ở cổng ' + esc((PAY.filter(function(m){ return m[0] === B.pay; })[0] || PAY[0])[1]) + '. <b>Tài khoản của bạn chưa bị trừ tiền.</b> Đơn và thông tin hóa đơn vẫn được giữ.</p></div>' +
+      '<div class="btns"><button class="cta" type="button" data-act="retry">Thử lại</button><button class="cta sec" type="button" data-act="back">Chọn phương thức khác</button></div><p class="hint">Vẫn lỗi? Nhắn Zalo OA TrionCAD kèm mã đơn ' + id + '.</p></div>' + foot();
+  }
+  function validate(){
+    var e = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(B.mail.trim())) e.mail = 'Email chưa đúng. Ví dụ: ketoan@congty.vn';
+    if (B.who === 'co'){ if (!/^\d{10}(-\d{3})?$/.test(B.mst.trim())) e.mst = 'Mã số thuế cần 10 hoặc 13 số, ví dụ 0101234567-001.'; if (!B.company.trim()) e.company = 'Nhập tên công ty, hoặc bấm Tra cứu theo mã số thuế.'; if (!B.addr.trim()) e.addr = 'Nhập địa chỉ ghi trên hóa đơn.'; }
+    else if (!B.company.trim()) e.company = 'Nhập họ tên người mua.';
+    if (!B.agree) e.agree = 'Cần đồng ý điều khoản để tiếp tục.';
+    return e;
+  }
+  function readInputs(){ var g = function(id){ var x = document.getElementById(id); return x ? x.value : null; }; if (g('b-mst') != null) B.mst = g('b-mst'); if (g('b-mail') != null) B.mail = g('b-mail'); if (g('b-co') != null) B.company = g('b-co'); if (g('b-name') != null) B.company = g('b-name'); if (g('b-addr') != null) B.addr = g('b-addr'); if (g('b-code') != null) B.code = g('b-code'); }
+  $('#buy').addEventListener('click', function(e){
+    var t;
+    if ((t = e.target.closest('[data-plan]'))){ readInputs(); B.plan = t.dataset.plan; renderBuy(); return; }
+    if ((t = e.target.closest('[data-bill]')) && !t.disabled){ readInputs(); B.bill = t.dataset.bill; renderBuy(); return; }
+    if ((t = e.target.closest('[data-seat]'))){ readInputs(); B.seats = Math.max(1, Math.min(500, B.seats + Number(t.dataset.seat))); renderBuy(); return; }
+    if ((t = e.target.closest('[data-who]'))){ readInputs(); B.who = t.dataset.who; B.errs = {}; B.company = ''; renderBuy(); return; }
+    if ((t = e.target.closest('[data-pay]'))){ readInputs(); B.pay = t.dataset.pay; renderBuy(); return; }
+    if (!(t = e.target.closest('[data-act]'))) return;
+    var a = t.dataset.act; readInputs();
+    if (a === 'lookup'){ if (!/^\d{10}(-\d{3})?$/.test(B.mst.trim())){ B.errs.mst = 'Mã số thuế cần 10 hoặc 13 số, ví dụ 0101234567-001.'; B.mstMsg = ''; } else { delete B.errs.mst; delete B.errs.company; delete B.errs.addr; B.company = 'CÔNG TY TNHH THIẾT KẾ XÂY DỰNG AN PHÚ'; B.addr = 'Số 12, đường số 7, phường An Phú, TP. Thủ Đức, TP. Hồ Chí Minh'; B.mstMsg = 'Đã điền theo mã số thuế. Kiểm tra lại trước khi thanh toán.'; } renderBuy(); }
+    else if (a === 'code'){ var c = B.code.trim().toUpperCase(); B.code = c; if (!c){ B.applied = null; B.codeMsg = ''; } else if (c === 'TRION10'){ B.applied = { code:c, pct:10 }; B.codeMsg = 'Đã áp dụng: giảm 10% cho đơn đầu tiên.'; } else if (/^DL-[A-Z]{2}-\d{3}$/.test(c)){ B.applied = { code:c, pct:0 }; B.codeMsg = 'Mã đại lý ' + c + ': đại lý Minh Phát (Hà Nội) hỗ trợ cài đặt cho đơn này. Giá không đổi.'; } else { B.applied = null; B.codeMsg = 'Mã không đúng hoặc đã hết hạn.'; } renderBuy(); }
+    else if (a === 'pay'){ B.errs = validate(); if (Object.keys(B.errs).length){ renderBuy(); var f = $('#buy [aria-invalid="true"]'); if (f) f.focus(); return; } setBuy(B.pay === 'bank' ? 'bank' : 'ok'); }
+    else if (a === 'back' || a === 'retry'){ setBuy(a === 'retry' ? 'ok' : 'form'); }
+    else if (a === 'copykey'){ try { navigator.clipboard.writeText(t.parentNode.firstChild.textContent); } catch (x) {} t.lastChild.textContent = 'Đã sao chép'; }
+  });
+  $('#buy').addEventListener('change', function(e){ if (e.target.id === 'b-auto') B.auto = e.target.checked; if (e.target.id === 'b-agree'){ B.agree = e.target.checked; if (B.agree) delete B.errs.agree; } if (e.target.id === 'b-seats'){ B.seats = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1)); readInputs(); renderBuy(); } });
+  function setBuy(st){ B.st = st; $$('[data-bst]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.bst === st)); }); if (st !== 'form' && !B.mail) B.mail = 'ketoan@congty.vn'; renderBuy(); }
+  $$('[data-bst]').forEach(function(b){ b.addEventListener('click', function(){ readInputs(); setBuy(b.dataset.bst); }); });
+
+  /* ================= trang tài khoản ================= */
+  var AC = { tab:'over', st:'ok', auto:true, invite:'', seats:[
+      { mail:'an.nguyen@congty.vn', name:'Nguyễn Minh An', st:'Đang dùng', dev:['LAPTOP-AN-KT', 'PC-VANPHONG-02'] },
+      { mail:'chi.le@congty.vn', name:'Lê Thu Chi', st:'Đang dùng', dev:['LAPTOP-CHI'] },
+      { mail:'bao.tran@congty.vn', name:'', st:'Đã mời', dev:[] } ],
+    inv:[['1C26TTC-00042', '19/10/2026', 'Viewer Pro · 3 ghế · năm 2026–2027', 2070000, 'Đã xuất'], ['1C25TTC-00317', '19/10/2025', 'Viewer Pro · 2 ghế · năm 2025–2026', 1380000, 'Đã xuất'], ['1C25TTC-00351', '02/12/2025', 'Thêm 1 ghế Viewer Pro (tính theo ngày còn lại)', 610000, 'Đã xuất']] };
+  if (h === 'tai-khoan' || h === 'gia-han') AC.st = h === 'gia-han' ? 'soon' : 'ok';
+  function renderAcc(){
+    var host = $('#acc'), T = [['over','Tổng quan'],['seats','Ghế và thiết bị'],['inv','Hóa đơn'],['pay','Thanh toán']];
+    var alert = AC.st === 'soon' ? '<div class="alert warn" role="status">' + ic('warn') + '<span><b>Thuê bao còn 7 ngày</b> (hết hạn 26/10/2026). ' + (AC.auto ? 'Sẽ tự gia hạn bằng VNPay · thẻ nội địa •••• 4821.' : 'Gia hạn tự động đang tắt.') + ' Hết hạn thì ứng dụng về Viewer, bản vẽ vẫn mở và in được.</span></div>'
+      : AC.st === 'exp' ? '<div class="alert err" role="alert">' + ic('warn') + '<span><b>Thuê bao đã hết hạn ngày 12/10/2026.</b> Ứng dụng của 3 người đang chạy ở chế độ Viewer; dữ liệu an toàn, bản vẽ vẫn mở và in được. Gia hạn là dùng lại ngay, không cần kích hoạt lại.</span></div>' : '';
+    var body = '';
+    if (AC.tab === 'over') body = alert + '<div class="card"><h4>TrionCAD Viewer Pro <span class="pill vp">Viewer Pro</span><span class="pill ' + (AC.st === 'exp' ? 'warn' : 'ok') + '">' + (AC.st === 'exp' ? 'Đã hết hạn' : 'Đang hoạt động') + '</span></h4>' +
+        '<div class="facts"><div><span>Kiểu</span><b>Thuê bao năm</b></div><div><span>Số ghế</span><b>3 (2 đang dùng)</b></div><div><span>' + (AC.st === 'exp' ? 'Hết hạn' : 'Gia hạn tiếp') + '</span><b>' + (AC.st === 'exp' ? '12/10/2026' : AC.st === 'soon' ? '26/10/2026' : '19/10/2027') + '</b></div><div><span>Kỳ tới</span><b>' + vnd(2070000) + '</b></div></div>' +
+        '<div class="srow"><span style="display:flex;gap:10px;align-items:center"><button class="sw2" type="button" role="switch" data-act="auto" aria-checked="' + AC.auto + '" aria-label="Tự động gia hạn"></button><span><b>Tự động gia hạn</b><br><span class="hint">' + (AC.auto ? 'VNPay · thẻ nội địa •••• 4821 · nhắc trước 7 ngày' : 'Đang tắt: nhắc qua email trước 30, 7, 1 ngày') + '</span></span></span><span class="btns">' + (AC.st !== 'ok' ? '<button class="cta" type="button" data-act="renew">Gia hạn ngay · ' + vnd(2070000) + '</button>' : '') + '<button class="cta sec" type="button" data-tab="seats">Thêm, bớt ghế</button><a class="cta sec" href="#mua" data-act="upgrade">Nâng cấp lên Pro</a></span></div></div>' +
+        '<div class="card"><h4>Cần biết</h4><ul style="margin:0;padding-left:18px;font-size:13.5px;color:var(--c-text-2);display:grid;gap:4px"><li>Hết thuê bao không khóa dữ liệu: ứng dụng về Viewer, bản vẽ vẫn mở và in được.</li><li>Giảm ghế khi gia hạn không bị phạt; tiền ghế dư tính vào kỳ sau.</li><li>Hóa đơn điện tử của mỗi kỳ có ở mục Hóa đơn.</li></ul></div>';
+    else if (AC.tab === 'seats') body = '<div class="card"><h4>Ghế <span class="pill">' + AC.seats.length + ' ghế</span></h4><div class="tbl-wrap"><table class="wtbl"><thead><tr><th>Người dùng</th><th>Trạng thái</th><th class="hide-s">Thiết bị</th><th></th></tr></thead><tbody>' +
+        AC.seats.map(function(s, i){ return '<tr><td>' + (s.name ? '<b style="font-weight:500">' + esc(s.name) + '</b><br>' : '') + '<span class="mail">' + esc(s.mail || '—') + '</span></td><td><span class="pill ' + (s.st === 'Đang dùng' ? 'ok' : s.st === 'Đã mời' ? 'warn' : '') + '">' + s.st + '</span></td><td class="hide-s">' + (s.dev.length ? s.dev.length + '/2 · ' + esc(s.dev.join(', ')) : '—') + '</td><td style="text-align:right">' + (s.mail ? '<button class="lnk danger" type="button" data-revoke="' + i + '">Thu hồi</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+        '<div class="fld"><label for="ac-inv">Mời người dùng vào ghế trống</label><div class="rowi"><input id="ac-inv" type="email" placeholder="ten@congty.vn" value="' + esc(AC.invite) + '"><button class="cta sec" type="button" data-act="invite" style="height:36px">Gửi lời mời</button></div><span class="msg" id="ac-inv-m"></span></div>' +
+        '<div class="srow"><span class="hint">Cần thêm ghế? Ghế mới tính tiền theo số ngày còn lại của kỳ.</span><a class="cta sec" href="#mua">Thêm ghế</a></div></div>' +
+        '<div class="card"><h4>Thiết bị đã kích hoạt</h4><div class="tbl-wrap"><table class="wtbl"><thead><tr><th>Tên máy</th><th>Người dùng</th><th class="hide-s">Kết nối cuối</th><th></th></tr></thead><tbody>' +
+        AC.seats.reduce(function(a, s){ return a.concat(s.dev.map(function(d, j){ return [d, s.name, j ? '02/10/2026' : 'Hôm nay']; })); }, []).map(function(r){ return '<tr><td style="font-family:var(--f-mono);font-size:12.5px">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td class="hide-s">' + r[2] + '</td><td style="text-align:right"><button class="lnk" type="button" data-deact="' + esc(r[0]) + '">Hủy kích hoạt</button></td></tr>'; }).join('') + '</tbody></table></div></div>';
+    else if (AC.tab === 'inv') body = '<div class="card"><h4>Hóa đơn điện tử</h4><div class="tbl-wrap"><table class="wtbl"><thead><tr><th>Số hóa đơn</th><th class="hide-s">Ngày</th><th>Nội dung</th><th class="num">Số tiền</th><th>Tải về</th></tr></thead><tbody>' +
+        AC.inv.map(function(r){ return '<tr><td style="font-family:var(--f-mono);font-size:12.5px">' + r[0] + '</td><td class="hide-s">' + r[1] + '</td><td>' + esc(r[2]) + '</td><td class="num">' + vnd(r[3]) + '</td><td><button class="lnk" type="button" data-dl="pdf">PDF</button> · <button class="lnk" type="button" data-dl="xml">XML</button></td></tr>'; }).join('') + '</tbody></table></div><p class="hint" id="ac-dl">Hóa đơn có mã của cơ quan thuế, gửi kèm email khi xuất.</p></div>' +
+        '<div class="card"><h4>Thông tin xuất hóa đơn</h4><div class="kv"><span>Đơn vị</span><b style="font-family:var(--f-ui)">CÔNG TY TNHH THIẾT KẾ XÂY DỰNG AN PHÚ</b><span>Mã số thuế</span><b>0312345678</b><span>Email nhận</span><b>ketoan@congty.vn</b></div><div class="btns"><button class="cta sec" type="button" data-act="editinv">Sửa cho các đơn sau</button></div></div>';
+    else body = '<div class="card"><h4>Phương thức thanh toán</h4><div class="srow"><span><b>VNPay · thẻ nội địa •••• 4821</b><br><span class="hint">Dùng cho gia hạn tự động · thêm ngày 19/10/2025</span></span><span class="btns"><button class="cta sec" type="button" data-act="changepay">Đổi</button></span></div><p class="hint">TrionCAD không lưu số thẻ; cổng thanh toán giữ mã thay thế để trừ tiền khi gia hạn.</p></div>';
+    host.innerHTML = nav('acc') + '<div class="acc"><nav class="acc-nav" aria-label="Tài khoản">' + T.map(function(t){ return '<button type="button" data-tab="' + t[0] + '"' + (AC.tab === t[0] ? ' aria-current="page"' : '') + '>' + t[1] + '</button>'; }).join('') + '<span class="hint" style="padding:10px">an.nguyen@congty.vn</span></nav><div style="display:grid;gap:14px;min-width:0"><div><p class="h3">' + T.filter(function(t){ return t[0] === AC.tab; })[0][1] + '</p></div>' + body + '</div></div>' + foot();
+  }
+  $('#acc').addEventListener('click', function(e){
+    var t;
+    if ((t = e.target.closest('[data-tab]'))){ AC.tab = t.dataset.tab; renderAcc(); return; }
+    if ((t = e.target.closest('[data-revoke]'))){ var s = AC.seats[Number(t.dataset.revoke)]; if (t.dataset.sure){ s.mail = ''; s.name = ''; s.st = 'Trống'; s.dev = []; renderAcc(); } else { t.dataset.sure = '1'; t.textContent = 'Bấm lần nữa để thu hồi'; } return; }
+    if ((t = e.target.closest('[data-deact]'))){ t.outerHTML = '<span class="hint">Đã hủy · máy về Viewer khi kết nối</span>'; return; }
+    if ((t = e.target.closest('[data-dl]'))){ $('#ac-dl').textContent = 'Prototype: bản thật tải tệp ' + t.dataset.dl.toUpperCase() + ' của hóa đơn ở bước này.'; return; }
+    if (!(t = e.target.closest('[data-act]'))) return;
+    var a = t.dataset.act;
+    if (a === 'auto'){ AC.auto = !AC.auto; renderAcc(); }
+    else if (a === 'renew'){ AC.st = 'ok'; setAcc('ok'); }
+    else if (a === 'invite'){ var v = $('#ac-inv').value.trim(), m = $('#ac-inv-m'); if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){ m.className = 'msg err'; m.textContent = 'Email chưa đúng.'; return; } var free = AC.seats.filter(function(s){ return !s.mail; })[0]; if (!free){ m.className = 'msg err'; m.textContent = 'Hết ghế trống. Thu hồi một ghế hoặc mua thêm ghế.'; return; } free.mail = v; free.st = 'Đã mời'; renderAcc(); }
+    else if (a === 'upgrade'){ B.plan = 'pro'; B.st = 'form'; renderBuy(); }
+    else if (a === 'editinv' || a === 'changepay') t.textContent = 'Prototype: mở biểu mẫu sửa';
+  });
+  function setAcc(st){ AC.st = st; $$('[data-ast]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.ast === st)); }); renderAcc(); }
+  $$('[data-ast]').forEach(function(b){ b.addEventListener('click', function(){ setAcc(b.dataset.ast); }); });
+  $$('button[data-dev]').forEach(function(b){ b.addEventListener('click', function(){ document.getElementById(b.dataset.for).dataset.dev = b.dataset.dev; $$('button[data-for="' + b.dataset.for + '"]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); }); });
+
+  renderBuy(); setAcc(AC.st);
+  if (h === 'tai-khoan' || h === 'gia-han') setTimeout(function(){ document.getElementById('tai-khoan').scrollIntoView(); }, 0);
+})();
+</script>
+</body>
+</html>

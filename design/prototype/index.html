@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TrionCAD Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app"></div>
+<noscript><p style="padding:24px">Prototype TrionCAD cần bật JavaScript.</p></noscript>
+<script src="js/core.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/cad.js"></script>
+<script src="js/cmd.js"></script>
+<script src="js/palettes.js"></script>
+<script src="js/ribbons.js"></script>
+<script src="js/shell.js"></script>
+<script src="js/screens1.js"></script>
+<script src="js/screens2.js"></script>
+<script src="js/screens3.js"></script>
+<script src="js/screens4.js"></script>
+<script src="js/catalog.js"></script>
+<script>
+  TC.applyTheme();
+  TC.app.mount(document.getElementById('app'));
+  // màn hình hẹp hơn 1366 px: dựng ở 1366×768 rồi thu nhỏ cho vừa (đặc tả hỗ trợ từ 1366×768)
+  if (innerWidth < 1240) TC.setFrame(1366);
+  addEventListener('resize', function(){ if (TC.frame) TC.setFrame(TC.frame); });
+  // mở thẳng một màn hình bằng #UI-xxx (ví dụ index.html#UI-H02)
+  var h = location.hash.slice(1).toUpperCase();
+  var hit = h && TC.CATALOG.filter(function(i){ return i.code.replace('-', '') === h.replace('-', ''); })[0];
+  if (hit) setTimeout(function(){ TC.openScreen(hit.code); }, 300);
+  if (!TC.S.onboarded && !hit) setTimeout(TC.screens.onboarding, 500);
+</script>
+</body>
+</html>

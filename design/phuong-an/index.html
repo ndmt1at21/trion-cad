@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hướng giao diện TrionCAD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Onest:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Bố cục trang: một cột; mỗi hướng = mô tả → ảnh dựng cửa sổ chính 1920×1080 thu theo bề rộng → bộ thành phần mẫu.
+   Trang ngoài theo chủ đề của người xem; ảnh dựng có chủ đề riêng (mặc định Tối, như sản phẩm). */
+:root{
+  --pg-bg:#F1F2F4; --pg-surface:#FFFFFF; --pg-ink:#15171B; --pg-ink-2:#4B515B; --pg-line:#D5D9DF; --pg-accent:#2F4BC4; --pg-chip:#E6E9EE;
+  --pg-font:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --pg-bg:#0E0F12; --pg-surface:#16181C; --pg-ink:#E8EAED; --pg-ink-2:#A3A9B2; --pg-line:#2A2E35; --pg-accent:#9DB0FF; --pg-chip:#20242A; color-scheme: dark }
+}
+:root[data-theme="dark"]{ --pg-bg:#0E0F12; --pg-surface:#16181C; --pg-ink:#E8EAED; --pg-ink-2:#A3A9B2; --pg-line:#2A2E35; --pg-accent:#9DB0FF; --pg-chip:#20242A; color-scheme: dark }
+
+html,body{ background:var(--pg-bg); color:var(--pg-ink) }
+body{ margin:0; font:15px/1.6 var(--pg-font); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:40px 72px }
+.pg{ max-width:1320px; margin:0 auto; display:grid; gap:64px }
+.pg-head{ display:grid; gap:14px; max-width:860px }
+.pg-head .eyebrow{ margin:0; font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--pg-ink-2) }
+h1{ margin:0; font-size:clamp(28px, 4vw, 40px); line-height:1.15; font-weight:700; text-wrap:balance; letter-spacing:-.01em }
+.lead{ margin:0; color:var(--pg-ink-2); max-width:68ch }
+.controls{ display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; margin-top:6px }
+.seg{ display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--pg-ink-2) }
+.seg-btns{ display:inline-flex; border:1px solid var(--pg-line); border-radius:8px; padding:2px; background:var(--pg-surface) }
+.seg-btns button{ font:inherit; font-size:13px; border:0; background:none; color:var(--pg-ink-2); padding:5px 11px; border-radius:6px; cursor:pointer }
+.seg-btns button[aria-pressed="true"]{ background:var(--pg-chip); color:var(--pg-ink); font-weight:600 }
+.seg-btns button:focus-visible, .full-btn:focus-visible{ outline:2px solid var(--pg-accent); outline-offset:2px }
+.same{ margin:0; font-size:13px; color:var(--pg-ink-2) }
+
+.dir-sec{ display:grid; gap:18px }
+.dir-top{ display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:12px 40px; align-items:start }
+.dir-top h2{ margin:0; font-size:26px; line-height:1.2; font-weight:700; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap }
+.dir-top h2 .letter{ font-size:13px; font-weight:700; letter-spacing:.06em; padding:2px 8px; border-radius:6px; background:var(--pg-chip); color:var(--pg-ink-2) }
+.dir-top p{ margin:6px 0 0; color:var(--pg-ink-2) }
+.facts{ display:grid; grid-template-columns:auto 1fr; gap:4px 14px; margin:0; font-size:13px }
+.facts dt{ color:var(--pg-ink-2) } .facts dd{ margin:0; font-variant-numeric:tabular-nums }
+.facts .metric{ font-weight:700 }
+.frame-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:12px; color:var(--pg-ink-2) }
+.full-btn{ font:inherit; font-size:12px; border:1px solid var(--pg-line); background:var(--pg-surface); color:var(--pg-ink); border-radius:6px; padding:4px 10px; cursor:pointer }
+.frame{ position:relative; width:100%; overflow:hidden; border-radius:10px; border:1px solid var(--pg-line); background:#000 }
+.frame > .app{ position:absolute; top:0; left:0; transform-origin:0 0 }
+.frame.is-full{ overflow:auto } .frame.is-full > .app{ position:relative; transform:none !important }
+.kit-wrap{ border-radius:10px; overflow:hidden; border:1px solid var(--pg-line) }
+.decide{ display:grid; gap:12px; max-width:860px; padding:24px; border:1px solid var(--pg-line); border-radius:12px; background:var(--pg-surface) }
+.decide h2{ margin:0; font-size:22px }
+.decide ol{ margin:0; padding-left:20px; display:grid; gap:8px }
+.decide p{ margin:0; color:var(--pg-ink-2) }
+@media (max-width:860px){ .dir-top{ grid-template-columns:minmax(0,1fr) } }
+
+/* ===================== Cửa sổ TrionCAD (dùng chung 3 hướng) ===================== */
+/* --- A · Than chì: xám than trung tính, nhấn xanh ngọc, gọn nhất, nét vuông --- */
+.dir-a{ --f-ui:"IBM Plex Sans", system-ui, sans-serif; --f-mono:"IBM Plex Mono", ui-monospace, monospace;
+  --fs:12px; --fs-s:11.5px; --fs-xs:10.5px; --lh:1.35;
+  --h-title:32px; --h-tab:26px; --h-btn:21px; --h-lbl:16px; --h-ftab:28px; --h-row:22px; --h-ltab:24px; --h-cmdl:17px; --h-cmdin:26px; --h-status:26px;
+  --pal-w:272px; --strip:22px; --lg-w:52px; --lg-ic:28px; --r:2px; --r-lg:3px; --sw:1.25; --cap:square; --join:miter; }
+.dir-a[data-mode="dark"]{
+  --c-chrome:#121417; --c-base:#1A1D21; --c-sunken:#15171A; --c-raised:#23272C; --c-active:#2D3239; --c-hover:rgba(255,255,255,.055);
+  --c-border:#2C3036; --c-border-ctl:#646B75; --c-text:#E3E6EA; --c-text-2:#A9B0B9; --c-text-3:#8A919B;
+  --c-accent:#3CC8C0; --c-accent-t:#04201E; --c-accent-soft:rgba(60,200,192,.15); --c-icon-fill:none;
+  --c-on:#3CC8C0; --c-on-bg:rgba(60,200,192,.14); --c-warn:#E9B44C; --c-warn-soft:rgba(233,180,76,.13); --c-danger:#F06A61; --c-ok:#55C68F;
+  --c-banner:#1F2a2c; --c-canvas:#0F1113; --c-dyn-bg:#262A30; --c-dyn-t:#EEF0F2; --c-dyn-b:#5B626C;
+  --c-snap:#F5D33B; --c-track:#5DE0A6; --c-cross:#E8EAED; --c-rubber:#FFFFFF;
+  --c-sel-w:#4C8DFF; --c-sel-wf:rgba(76,141,255,.16); --c-sel-c:#45C27E; --c-sel-cf:rgba(69,194,126,.16);
+  --c-grip-cold:#4C8DFF; --c-grip-hover:#FFA94D; --c-grip-hot:#FF5B57; --c-hl-sel:#78B2FF; --c-hl-res:#FFB547;
+  --c-ed-pro:#3CC8C0; --c-ed-pro-t:#04201E; --c-ed-vp:#9B8CFF; --c-ed-vp-t:#140F2E; --c-ed-trial:#E9B44C; --c-ed-trial-t:#2A1C00; color-scheme:dark }
+.dir-a[data-mode="light"]{
+  --c-chrome:#E4E7EB; --c-base:#F2F4F6; --c-sunken:#EAEDF0; --c-raised:#FFFFFF; --c-active:#D9DEE4; --c-hover:rgba(0,0,0,.045);
+  --c-border:#D0D5DB; --c-border-ctl:#858D97; --c-text:#15181C; --c-text-2:#4A525C; --c-text-3:#5C646E;
+  --c-accent:#06706A; --c-accent-t:#FFFFFF; --c-accent-soft:rgba(6,112,106,.11); --c-icon-fill:none;
+  --c-on:#06706A; --c-on-bg:rgba(6,112,106,.12); --c-warn:#8A5600; --c-warn-soft:rgba(196,128,0,.13); --c-danger:#B3322A; --c-ok:#1B7F4E;
+  --c-banner:#E2F1EF; --c-canvas:#0F1113; --c-dyn-bg:#FFFFFF; --c-dyn-t:#15181C; --c-dyn-b:#858D97;
+  --c-snap:#F5D33B; --c-track:#5DE0A6; --c-cross:#E8EAED; --c-rubber:#FFFFFF;
+  --c-sel-w:#4C8DFF; --c-sel-wf:rgba(76,141,255,.16); --c-sel-c:#45C27E; --c-sel-cf:rgba(69,194,126,.16);
+  --c-grip-cold:#2F6FE0; --c-grip-hover:#F08A24; --c-grip-hot:#E0403C; --c-hl-sel:#78B2FF; --c-hl-res:#FFB547;
+  --c-ed-pro:#06706A; --c-ed-pro-t:#FFFFFF; --c-ed-vp:#5B46D6; --c-ed-vp-t:#FFFFFF; --c-ed-trial:#8A5600; --c-ed-trial-t:#FFFFFF; color-scheme:light }
+
+/* --- B · Tím Huế: than ấm, nhấn tím Huế, Be Vietnam Pro, mật độ tiêu chuẩn --- */
+.dir-b{ --f-ui:"Be Vietnam Pro", system-ui, sans-serif; --f-mono:"JetBrains Mono", ui-monospace, monospace;
+  --fs:12.5px; --fs-s:11.5px; --fs-xs:10px; --lh:1.4;
+  --h-title:34px; --h-tab:28px; --h-btn:22px; --h-lbl:18px; --h-ftab:30px; --h-row:24px; --h-ltab:26px; --h-cmdl:18px; --h-cmdin:28px; --h-status:28px;
+  --pal-w:296px; --strip:24px; --lg-w:56px; --lg-ic:30px; --r:4px; --r-lg:6px; --sw:1.5; --cap:round; --join:round; }
+.dir-b[data-mode="dark"]{
+  --c-chrome:#151213; --c-base:#1D191A; --c-sunken:#181415; --c-raised:#282325; --c-active:#352D31; --c-hover:rgba(255,236,244,.05);
+  --c-border:#30292B; --c-border-ctl:#72676B; --c-text:#EFE8E6; --c-text-2:#BAAFAD; --c-text-3:#978B89;
+  --c-accent:#B08AE6; --c-accent-t:#1A0F2B; --c-accent-soft:rgba(176,138,230,.16); --c-icon-fill:rgba(176,138,230,.22); --c-brand-dot:#D9A640;
+  --c-on:#C7A9F0; --c-on-bg:rgba(176,138,230,.14); --c-warn:#E8AE4A; --c-warn-soft:rgba(232,174,74,.13); --c-danger:#EE6B5E; --c-ok:#5DC490;
+  --c-banner:#261F2C; --c-canvas:#131213; --c-dyn-bg:#2A2427; --c-dyn-t:#F3EEEC; --c-dyn-b:#6E6367;
+  --c-snap:#F2C14E; --c-track:#6FD3A6; --c-cross:#EDE7E5; --c-rubber:#FFFFFF;
+  --c-sel-w:#5B95F0; --c-sel-wf:rgba(91,149,240,.16); --c-sel-c:#4FBE83; --c-sel-cf:rgba(79,190,131,.16);
+  --c-grip-cold:#5B95F0; --c-grip-hover:#F2A65A; --c-grip-hot:#E9584C; --c-hl-sel:#8DB6F5; --c-hl-res:#F2B35A;
+  --c-ed-pro:#B08AE6; --c-ed-pro-t:#1A0F2B; --c-ed-vp:#D9A640; --c-ed-vp-t:#2A1C04; --c-ed-trial:#E8AE4A; --c-ed-trial-t:#2A1C00; color-scheme:dark }
+.dir-b[data-mode="light"]{
+  --c-chrome:#E9E3E0; --c-base:#F6F2EF; --c-sunken:#EEE8E4; --c-raised:#FFFFFF; --c-active:#E2D8D4; --c-hover:rgba(60,20,40,.045);
+  --c-border:#DDD3CE; --c-border-ctl:#958A86; --c-text:#231B1D; --c-text-2:#594D50; --c-text-3:#6C5F63;
+  --c-accent:#6E3FB0; --c-accent-t:#FFFFFF; --c-accent-soft:rgba(110,63,176,.10); --c-icon-fill:rgba(110,63,176,.14); --c-brand-dot:#B07F1C;
+  --c-on:#6E3FB0; --c-on-bg:rgba(110,63,176,.11); --c-warn:#8C5500; --c-warn-soft:rgba(190,120,0,.13); --c-danger:#B9372C; --c-ok:#1E7A4C;
+  --c-banner:#EFE6F7; --c-canvas:#131213; --c-dyn-bg:#FFFFFF; --c-dyn-t:#231B1D; --c-dyn-b:#958A86;
+  --c-snap:#F2C14E; --c-track:#6FD3A6; --c-cross:#EDE7E5; --c-rubber:#FFFFFF;
+  --c-sel-w:#5B95F0; --c-sel-wf:rgba(91,149,240,.16); --c-sel-c:#4FBE83; --c-sel-cf:rgba(79,190,131,.16);
+  --c-grip-cold:#3A72D6; --c-grip-hover:#E08A2E; --c-grip-hot:#D2453A; --c-hl-sel:#8DB6F5; --c-hl-res:#F2B35A;
+  --c-ed-pro:#6E3FB0; --c-ed-pro-t:#FFFFFF; --c-ed-vp:#8C5F0E; --c-ed-vp-t:#FFFFFF; --c-ed-trial:#8C5500; --c-ed-trial-t:#FFFFFF; color-scheme:light }
+
+/* --- C · Lam đêm: vùng vẽ trước hết, palette và dòng lệnh nổi, nhấn trắng đơn sắc, bo tròn --- */
+.dir-c{ --f-ui:"Onest", system-ui, sans-serif; --f-mono:"Geist Mono", ui-monospace, monospace;
+  --fs:13px; --fs-s:12px; --fs-xs:11px; --lh:1.4;
+  --h-title:40px; --h-tab:32px; --h-btn:23px; --h-lbl:18px; --h-ftab:40px; --h-row:26px; --h-ltab:28px; --h-cmdl:19px; --h-cmdin:30px; --h-status:30px;
+  --pal-w:288px; --strip:0px; --lg-w:58px; --lg-ic:30px; --r:6px; --r-lg:10px; --sw:1.6; --cap:round; --join:round; }
+.dir-c[data-mode="dark"]{
+  --c-chrome:#0B111C; --c-base:#111927; --c-sunken:#0D1420; --c-raised:#192334; --c-active:#22314A; --c-hover:rgba(200,220,255,.065);
+  --c-border:#1F2A3C; --c-border-ctl:#5B6B84; --c-text:#E6ECF5; --c-text-2:#9DABC1; --c-text-3:#7F8DA4;
+  --c-accent:#F2F6FC; --c-accent-t:#0B111C; --c-accent-soft:rgba(242,246,252,.11); --c-icon-fill:none;
+  --c-on:#F2F6FC; --c-on-bg:rgba(242,246,252,.12); --c-warn:#F0B44C; --c-warn-soft:rgba(240,180,76,.13); --c-danger:#F2677A; --c-ok:#4FC79A;
+  --c-banner:rgba(25,35,52,.92); --c-canvas:#0A1019; --c-glass:rgba(17,25,39,.86); --c-shadow:0 8px 28px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.04) inset;
+  --c-dyn-bg:#1B2639; --c-dyn-t:#EEF3FA; --c-dyn-b:#5B6B84;
+  --c-snap:#FFD666; --c-track:#6FE3D2; --c-cross:#E6ECF5; --c-rubber:#FFFFFF;
+  --c-sel-w:#5C9BFF; --c-sel-wf:rgba(92,155,255,.16); --c-sel-c:#4FC79A; --c-sel-cf:rgba(79,199,154,.16);
+  --c-grip-cold:#5C9BFF; --c-grip-hover:#FFB45C; --c-grip-hot:#FF5C7A; --c-hl-sel:#8EBBFF; --c-hl-res:#FFC46B;
+  --c-ed-pro:#F2F6FC; --c-ed-pro-t:#0B111C; --c-ed-vp:#8FB8FF; --c-ed-vp-t:#0B111C; --c-ed-trial:#F0B44C; --c-ed-trial-t:#241800; color-scheme:dark }
+.dir-c[data-mode="light"]{
+  --c-chrome:#E5EAF2; --c-base:#F4F6FA; --c-sunken:#EBEFF5; --c-raised:#FFFFFF; --c-active:#DCE3EE; --c-hover:rgba(10,30,70,.05);
+  --c-border:#D3DBE7; --c-border-ctl:#7E8BA0; --c-text:#0E1626; --c-text-2:#44516A; --c-text-3:#58657D;
+  --c-accent:#121C2E; --c-accent-t:#FFFFFF; --c-accent-soft:rgba(18,28,46,.08); --c-icon-fill:none;
+  --c-on:#121C2E; --c-on-bg:rgba(18,28,46,.09); --c-warn:#8C5800; --c-warn-soft:rgba(200,130,0,.13); --c-danger:#C23347; --c-ok:#1A7D58;
+  --c-banner:rgba(255,255,255,.94); --c-canvas:#0A1019; --c-glass:rgba(250,251,253,.9); --c-shadow:0 8px 28px rgba(10,20,40,.18), 0 0 0 1px rgba(10,20,40,.06);
+  --c-dyn-bg:#FFFFFF; --c-dyn-t:#0E1626; --c-dyn-b:#7E8BA0;
+  --c-snap:#FFD666; --c-track:#6FE3D2; --c-cross:#E6ECF5; --c-rubber:#FFFFFF;
+  --c-sel-w:#5C9BFF; --c-sel-wf:rgba(92,155,255,.16); --c-sel-c:#4FC79A; --c-sel-cf:rgba(79,199,154,.16);
+  --c-grip-cold:#2F6FE0; --c-grip-hover:#EE8E1F; --c-grip-hot:#E23B5C; --c-hl-sel:#8EBBFF; --c-hl-res:#FFC46B;
+  --c-ed-pro:#121C2E; --c-ed-pro-t:#FFFFFF; --c-ed-vp:#2F62C8; --c-ed-vp-t:#FFFFFF; --c-ed-trial:#8C5800; --c-ed-trial-t:#FFFFFF; color-scheme:light }
+
+/* ---- khung ---- */
+.app{ position:relative; width:var(--W); height:var(--H); display:grid; grid-template-rows:var(--h-title) auto auto minmax(0,1fr) auto auto auto;
+  background:var(--c-base); color:var(--c-text); font:var(--fs)/var(--lh) var(--f-ui); overflow:hidden; -webkit-font-smoothing:antialiased; text-align:left }
+.app[data-size="1920"]{ --W:1920px; --H:1080px } .app[data-size="1366"]{ --W:1366px; --H:768px }
+:where(.app, .kit) *{ box-sizing:border-box }
+:where(.app, .kit) button{ font:inherit; color:inherit; background:none; border:0; padding:0; margin:0; cursor:default; text-align:inherit }
+:where(.app, .kit) p{ margin:0 }
+.mono{ font-family:var(--f-mono); font-variant-numeric:tabular-nums }
+.ic{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:var(--sw); stroke-linecap:var(--cap); stroke-linejoin:var(--join); flex:none; overflow:visible }
+.ic .dot{ fill:currentColor; stroke:none } .ic .f{ fill:var(--c-icon-fill) } .ic .dash{ stroke-dasharray:1.6 1.7 } .ic .dots{ stroke-dasharray:0 2.6; stroke-linecap:round; stroke-width:calc(var(--sw) * 1.4) }
+.ic.lg{ width:var(--lg-ic); height:var(--lg-ic); stroke-width:calc(var(--sw) * .62) }
+.ic.xs{ width:9px; height:9px; stroke-width:calc(var(--sw) * 1.5) }
+.ib{ display:inline-flex; align-items:center; justify-content:center; gap:1px; height:24px; min-width:24px; padding:0 4px; border-radius:var(--r); color:var(--c-text-2) }
+.ib:hover{ background:var(--c-hover); color:var(--c-text) }
+.ib.is-on{ background:var(--c-on-bg); color:var(--c-on) }
+.sep{ width:1px; height:16px; background:var(--c-border); margin:0 4px; flex:none }
+
+/* thanh tiêu đề */
+.tb{ display:flex; align-items:center; gap:6px; height:var(--h-title); background:var(--c-chrome); padding-left:4px; border-bottom:1px solid var(--c-border); min-width:0 }
+.tb-app{ display:flex; align-items:center; gap:6px; height:calc(100% - 6px); padding:0 8px 0 6px; border-radius:var(--r) }
+.tb-app:hover{ background:var(--c-hover) }
+.tb-app .logo{ width:18px; height:18px; color:var(--c-accent) }
+.dir-b .tb-app .logo .dot{ fill:var(--c-brand-dot) }
+.tb-brand{ font-weight:600 }
+.qat{ display:flex; align-items:center; gap:1px }
+.tb-doc{ flex:1; display:flex; justify-content:center; align-items:center; gap:6px; color:var(--c-text-2); white-space:nowrap; min-width:0 }
+.tb-file{ color:var(--c-text) } .tb-dirty{ color:var(--c-accent) }
+.ed{ display:inline-flex; align-items:center; height:17px; font-size:var(--fs-xs); font-weight:600; padding:0 6px; border-radius:var(--r); letter-spacing:.02em; background:var(--c-ed-pro); color:var(--c-ed-pro-t); line-height:1 }
+.ed.vp{ background:var(--c-ed-vp); color:var(--c-ed-vp-t) } .ed.trial{ background:var(--c-ed-trial); color:var(--c-ed-trial-t) }
+.tb-search{ display:flex; align-items:center; gap:7px; width:300px; height:24px; padding:0 8px; background:var(--c-raised); border:1px solid var(--c-border); border-radius:var(--r); color:var(--c-text-3); font-size:var(--fs-s); white-space:nowrap; overflow:hidden }
+.win{ display:flex; height:100%; margin-left:4px } .win button{ width:44px; height:100%; display:grid; place-items:center; color:var(--c-text-2) }
+.win button:hover{ background:var(--c-hover) }
+
+/* ribbon */
+.rb{ background:var(--c-base); border-bottom:1px solid var(--c-border); min-width:0 }
+.rb-tabs{ display:flex; align-items:stretch; height:var(--h-tab); padding:0 6px; gap:1px; background:var(--c-chrome) }
+.rb-tab{ display:flex; align-items:center; padding:0 12px; color:var(--c-text-2); position:relative; white-space:nowrap }
+.rb-tab:hover{ color:var(--c-text) }
+.rb-tab.is-on{ color:var(--c-text); background:var(--c-base); font-weight:500 }
+.rb-tab .lockb{ margin-left:5px }
+.rb-tabs-r{ margin-left:auto; display:flex; align-items:center }
+.rb-body{ display:flex; align-items:stretch; height:calc(var(--h-btn) * 3 + 8px + var(--h-lbl)); padding:0 2px; overflow:hidden }
+.rb-p{ display:flex; flex-direction:column; flex:none; padding:4px 4px 0; border-right:1px solid var(--c-border) }
+.rb-c{ flex:1; display:flex; gap:2px; align-items:stretch }
+.rb-l{ height:var(--h-lbl); display:flex; align-items:center; justify-content:center; gap:3px; color:var(--c-text-3); font-size:var(--fs-xs); white-space:nowrap }
+.rb-l .ic.xs{ opacity:.8 }
+.rb-lg{ display:flex; flex-direction:column; align-items:center; gap:3px; min-width:var(--lg-w); max-width:64px; padding:3px 4px 0; border-radius:var(--r); text-align:center; line-height:1.18 }
+.rb-lg span{ font-size:var(--fs-s); display:flex; align-items:flex-start; justify-content:center; gap:2px }
+.rb-lg:hover, .rb-s:hover{ background:var(--c-hover) }
+.rb-col{ display:flex; flex-direction:column; justify-content:flex-start; gap:1px; padding-top:1px }
+.rb-s{ display:flex; align-items:center; gap:5px; height:var(--h-btn); padding:0 6px 0 4px; border-radius:var(--r); white-space:nowrap }
+.rb-s .ic.xs, .rb-lg .ic.xs{ color:var(--c-text-3) }
+.rb-s.icon-only{ padding:0 4px }
+.rb-row{ display:flex; gap:1px; height:var(--h-btn) } .rb-row .rb-s{ padding:0 4px }
+.rb-dd{ display:flex; align-items:center; gap:6px; height:var(--h-btn); padding:0 6px; border:1px solid var(--c-border-ctl); background:var(--c-raised); border-radius:var(--r); white-space:nowrap; font-size:var(--fs-s) }
+.rb-dd .grow{ flex:1 }
+.rb-dd .sw{ width:10px; height:10px; border-radius:2px; background:#FFFFFF; box-shadow:0 0 0 1px var(--c-border-ctl) }
+.lt-sample{ width:30px; border-top:1.5px solid currentColor }
+.lw-sample{ width:30px; border-top:3px solid currentColor }
+.rb-coll{ display:none }
+.rb-p.is-collapsed .rb-c, .rb-p.is-collapsed .rb-l{ display:none }
+.rb-p.is-compact .rb-s .t{ display:none } .rb-p.is-compact .rb-s{ padding:0 4px }
+.rb-p.is-collapsed .rb-coll{ display:flex; flex-direction:column; align-items:center; gap:4px; width:auto; min-width:var(--lg-w); padding:6px 6px 0; height:100%; border-radius:var(--r) }
+.rb-p.is-collapsed .rb-coll span{ font-size:var(--fs-s); display:flex; align-items:center; gap:3px }
+
+/* tab tệp */
+.ft{ display:flex; align-items:flex-end; height:var(--h-ftab); background:var(--c-chrome); padding:0 6px; gap:2px; border-bottom:1px solid var(--c-border) }
+.ft-tab{ display:flex; align-items:center; gap:7px; height:calc(var(--h-ftab) - 4px); padding:0 10px; color:var(--c-text-2); border-radius:var(--r-lg) var(--r-lg) 0 0; white-space:nowrap }
+.ft-tab.is-on{ background:var(--c-base); color:var(--c-text) }
+.ft-tab .ic.xs{ color:var(--c-text-3) }
+.ft-dot{ width:6px; height:6px; border-radius:50%; background:var(--c-accent) }
+.ft-add{ height:calc(var(--h-ftab) - 6px); width:24px; display:grid; place-items:center; color:var(--c-text-3) }
+
+/* vùng làm việc */
+.ws{ display:grid; grid-template-columns:var(--strip) minmax(0,1fr) var(--pal-w) 0px; min-height:0; position:relative }
+.app[data-size="1366"] .ws{ grid-template-columns:var(--strip) minmax(0,1fr) 0px var(--strip) }
+.dock{ background:var(--c-chrome); display:flex; flex-direction:column; align-items:center; padding-top:8px; gap:6px; overflow:hidden }
+.dock-l{ grid-column:1; border-right:1px solid var(--c-border) } .dock-r{ grid-column:4; border-left:1px solid var(--c-border) }
+.ws > .cv{ grid-column:2 } .ws > .pal{ grid-column:3 }
+.vtab{ writing-mode:vertical-rl; transform:rotate(180deg); padding:10px 0; font-size:var(--fs-xs); color:var(--c-text-2); border-radius:var(--r); white-space:nowrap }
+.vtab:hover{ background:var(--c-hover) }
+.cv{ position:relative; overflow:hidden; background:var(--c-canvas); min-width:0 }
+.cv svg.dw{ position:absolute; inset:0; width:100%; height:100% }
+.dw text{ font-family:"Arial Narrow", Arial, "Helvetica Neue", sans-serif }
+.dw .bg{ fill:var(--c-canvas) }
+.cv-banner{ position:absolute; top:0; left:0; right:0; display:flex; align-items:center; gap:10px; min-height:38px; padding:4px 6px 4px 12px; background:var(--c-banner); border-bottom:1px solid var(--c-border); color:var(--c-text); font-size:var(--fs-s); z-index:2 }
+.cv-banner > .ic{ color:var(--c-accent) }
+.cv-banner p{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.cv-banner .acts{ display:flex; gap:6px; align-items:center }
+.cv-vpc{ position:absolute; left:8px; top:46px; display:flex; gap:2px; font-size:var(--fs-xs); color:var(--c-text-2); z-index:2 }
+.cv-vpc button{ padding:1px 6px; border-radius:var(--r); background:rgba(0,0,0,.25); color:#C9CED6 }
+.cv-ucs{ position:absolute; left:14px; bottom:12px; width:64px; height:64px; color:#C9CED6; z-index:1 }
+.dyn{ position:absolute; z-index:3; display:flex; align-items:center; gap:4px; height:20px; padding:0 6px; font-size:var(--fs-s); background:var(--c-dyn-bg); color:var(--c-dyn-t); border:1px solid var(--c-dyn-b); border-radius:var(--r); white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.35) }
+.dyn.is-focus{ border-color:var(--c-accent); box-shadow:0 0 0 1px var(--c-accent), 0 2px 6px rgba(0,0,0,.35) }
+.dyn .caret{ height:12px }
+.dyn.prompt{ color:var(--c-dyn-t) } .dyn.prompt .ic.xs{ color:var(--c-text-3) }
+.snap-tip{ position:absolute; z-index:3; padding:1px 6px; font-size:var(--fs-xs); background:#FFF6C9; color:#2A2300; border:1px solid #CDB64B; border-radius:var(--r); white-space:nowrap }
+.dir-b .snap-tip{ background:#FFF1CC; border-color:#D2AE55 } .dir-c .snap-tip{ background:#FFF4CF; border-color:#D9BB5C }
+
+/* palette */
+.pal{ display:flex; flex-direction:column; background:var(--c-base); border-left:1px solid var(--c-border); min-height:0; min-width:0; overflow:hidden }
+.app[data-size="1366"] .pal{ display:none }
+.dock-r{ display:none } .app[data-size="1366"] .dock-r{ display:flex }
+.pal-hd{ height:28px; display:flex; align-items:center; gap:2px; padding:0 4px 0 10px; font-weight:600; border-bottom:1px solid var(--c-border); background:var(--c-chrome); flex:none }
+.pal-hd .grow{ flex:1 }
+.pal-hd .ib{ height:22px; min-width:22px }
+.pal-tools{ display:flex; gap:3px; padding:6px; border-bottom:1px solid var(--c-border); flex:none }
+.dd{ display:flex; align-items:center; justify-content:space-between; gap:6px; height:24px; padding:0 6px 0 8px; background:var(--c-raised); border:1px solid var(--c-border-ctl); border-radius:var(--r); flex:1; min-width:0; white-space:nowrap }
+.dd .ic.xs{ color:var(--c-text-2) }
+.pal-body{ flex:1; overflow:hidden; min-height:0 }
+.pgh{ display:flex; align-items:center; gap:5px; height:var(--h-row); padding:0 6px; font-weight:600; background:var(--c-sunken); border-bottom:1px solid var(--c-border); font-size:var(--fs-s) }
+.pgh .ic.xs{ color:var(--c-text-2) }
+.pr{ display:grid; grid-template-columns:46% 54%; height:var(--h-row); border-bottom:1px solid var(--c-border); font-size:var(--fs-s) }
+.pk{ padding:0 8px 0 20px; color:var(--c-text-2); display:flex; align-items:center; overflow:hidden; white-space:nowrap; border-right:1px solid var(--c-border) }
+.pv{ padding:0 8px; display:flex; align-items:center; gap:6px; overflow:hidden; white-space:nowrap; min-width:0 }
+.pv .sw{ width:12px; height:12px; border-radius:2px; box-shadow:0 0 0 1px var(--c-border-ctl); flex:none }
+.pr.is-focus{ background:var(--c-accent-soft) } .pr.is-focus .pk{ color:var(--c-text) }
+.pr.is-focus .pv{ background:var(--c-raised); box-shadow:inset 0 0 0 1px var(--c-accent); justify-content:space-between }
+.pr.ro .pv{ color:var(--c-text-3) }
+.pal-desc{ border-top:1px solid var(--c-border); padding:8px 10px 10px; font-size:var(--fs-s); color:var(--c-text-2); display:grid; gap:3px; flex:none }
+.pal-desc b{ color:var(--c-text) } .pal-desc code{ font-family:var(--f-mono); font-size:var(--fs-xs); color:var(--c-text) }
+
+/* tab layout, dòng lệnh, thanh trạng thái */
+.lt{ display:flex; align-items:stretch; height:var(--h-ltab); background:var(--c-chrome); padding:0 6px; gap:1px; border-top:1px solid var(--c-border) }
+.lt-tab{ display:flex; align-items:center; padding:0 12px; color:var(--c-text-2); white-space:nowrap; font-size:var(--fs-s) }
+.lt-tab.is-on{ background:var(--c-base); color:var(--c-text); font-weight:500 }
+.lt-add{ width:24px; display:grid; place-items:center; color:var(--c-text-3) }
+.cmd{ background:var(--c-base); border-top:1px solid var(--c-border); min-width:0 }
+.cmd-hist{ padding:4px 12px 0; color:var(--c-text-2) }
+.cmd-hist p{ height:var(--h-cmdl); display:flex; align-items:center; gap:5px; white-space:nowrap }
+.cmd-hist b{ color:var(--c-text); font-weight:600 }
+.app[data-size="1366"] .cmd-hist p:not(:last-child){ display:none }
+.cmd-in{ display:flex; align-items:center; gap:6px; height:var(--h-cmdin); margin:3px 6px 6px; padding:0 4px 0 8px; background:var(--c-raised); border:1px solid var(--c-border-ctl); border-radius:var(--r); white-space:nowrap }
+.cmd-in > .ic{ color:var(--c-accent) }
+.cmd-name{ font-weight:600 }
+.cmd-pr{ color:var(--c-text) }
+.chip{ display:inline-flex; align-items:center; gap:3px; height:calc(var(--h-cmdin) - 8px); padding:0 8px; border-radius:var(--r); background:var(--c-active); color:var(--c-text); font-size:var(--fs-s) }
+.chip u{ text-decoration-thickness:1px; text-underline-offset:2px; font-family:var(--f-mono); font-size:var(--fs-xs) }
+.chip .k{ color:var(--c-text-2) }
+.caret{ display:inline-block; width:1px; height:14px; background:var(--c-text) }
+.cmd-r{ margin-left:auto; display:flex; gap:1px }
+.sb{ display:flex; align-items:center; gap:2px; height:var(--h-status); padding:0 4px; background:var(--c-chrome); border-top:1px solid var(--c-border); color:var(--c-text-2); font-size:var(--fs-s); white-space:nowrap; min-width:0 }
+.sb-coord{ font-family:var(--f-mono); font-size:var(--fs-xs); min-width:186px; padding:0 8px; color:var(--c-text) }
+.sb-txt{ display:flex; align-items:center; gap:4px; height:20px; padding:0 7px; border-radius:var(--r); font-size:var(--fs-xs); font-weight:600; letter-spacing:.03em }
+.sb-txt:hover, .sbt:hover{ background:var(--c-hover) }
+.sbt{ width:25px; height:21px; display:grid; place-items:center; border-radius:var(--r); color:var(--c-text-3); position:relative }
+.sbt.is-on{ color:var(--c-on); background:var(--c-on-bg) }
+.sbt .ic{ width:15px; height:15px }
+.sbt.has-dot::after{ content:""; position:absolute; top:3px; right:4px; width:6px; height:6px; border-radius:50%; background:var(--c-danger); box-shadow:0 0 0 1.5px var(--c-chrome) }
+.sb-grow{ flex:1 }
+.sb-sep{ width:1px; height:14px; background:var(--c-border); margin:0 4px }
+.sb-chip{ display:flex; gap:5px; align-items:center; padding:0 8px; height:21px; border-radius:var(--r) }
+.sb-chip.warn{ color:var(--c-warn); background:var(--c-warn-soft) }
+.app[data-size="1366"] .hide-1366{ display:none }
+
+/* ---- A: chi tiết riêng ---- */
+.dir-a .rb-tab.is-on{ background:none }
+.dir-a .rb-tab.is-on::after{ content:""; position:absolute; left:10px; right:10px; bottom:0; height:2px; background:var(--c-accent) }
+.dir-a .ft-tab.is-on{ box-shadow:inset 0 2px 0 var(--c-accent) }
+.dir-a .lt-tab.is-on{ box-shadow:inset 0 -2px 0 var(--c-accent) }
+
+/* ---- B: chi tiết riêng ---- */
+.dir-b .rb-tab.is-on{ border-radius:var(--r-lg) var(--r-lg) 0 0; box-shadow:inset 0 2px 0 var(--c-accent) }
+.dir-b .rb-l{ text-transform:uppercase; letter-spacing:.09em; font-size:9.5px; font-weight:600; background:var(--c-sunken); margin:0 -4px; border-top:1px solid var(--c-border) }
+.dir-b .rb-p{ box-shadow:1px 0 0 rgba(255,255,255,.035) }
+.dir-b .pgh{ text-transform:uppercase; letter-spacing:.07em; font-size:10px }
+.dir-b .ft-tab.is-on{ box-shadow:inset 0 2px 0 var(--c-accent) }
+.dir-b .lt-tab.is-on{ box-shadow:inset 0 -2px 0 var(--c-accent) }
+.dir-b .sbt.is-on{ background:none; box-shadow:inset 0 -2px 0 var(--c-accent) }
+.dir-b .cmd-in{ border-radius:var(--r-lg) }
+
+/* ---- C: vùng vẽ trước hết ---- */
+.dir-c.app{ grid-template-rows:var(--h-title) auto minmax(0,1fr) auto }
+.dir-c .tb-doc{ display:none }
+.dir-c .tb{ gap:4px }
+.dir-c .ft{ position:absolute; top:0; left:330px; right:540px; height:var(--h-title); background:none; border:0; padding:0; align-items:center; gap:4px; z-index:5; overflow:hidden }
+.dir-c .ft-tab{ height:28px; border-radius:var(--r); padding:0 10px }
+.dir-c .ft-tab.is-on{ background:var(--c-raised); box-shadow:0 0 0 1px var(--c-border) }
+.dir-c .tb-search{ margin-left:auto; border-radius:999px; height:28px }
+.dir-c .rb-tabs{ padding:0 8px; gap:3px; background:var(--c-base); align-items:center }
+.dir-c .rb-tab{ height:24px; border-radius:999px; padding:0 13px }
+.dir-c .rb-tab.is-on{ background:var(--c-accent); color:var(--c-accent-t) }
+.dir-c .rb-body{ padding:0 6px; gap:6px }
+.dir-c .rb-p{ border-right:0; position:relative }
+.dir-c .rb-p + .rb-p::before{ content:""; position:absolute; left:-3px; top:10px; bottom:24px; width:1px; background:var(--c-border) }
+.dir-c .ws{ display:block }
+.dir-c .cv{ position:absolute; inset:0 }
+.dir-c .dock{ display:none !important }
+.dir-c .pal{ position:absolute; top:10px; right:10px; bottom:10px; width:var(--pal-w); border:1px solid var(--c-border); border-radius:var(--r-lg); box-shadow:var(--c-shadow); z-index:4 }
+.dir-c .pal-hd{ background:var(--c-base); border-radius:var(--r-lg) var(--r-lg) 0 0 }
+.dir-c.app[data-size="1366"] .pal{ display:flex; width:44px; overflow:hidden }
+.dir-c.app[data-size="1366"] .pal > :not(.pal-mini){ display:none }
+.pal-mini{ display:none }
+.dir-c.app[data-size="1366"] .pal-mini{ display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:8px }
+.dir-c .cv-banner{ top:10px; left:10px; right:calc(var(--pal-w) + 20px); border:1px solid var(--c-border); border-radius:var(--r-lg); box-shadow:var(--c-shadow); backdrop-filter:blur(10px) }
+.dir-c.app[data-size="1366"] .cv-banner{ right:64px }
+.dir-c .cv-vpc{ top:58px; left:12px }
+.dir-c .lt{ position:absolute; left:10px; bottom:calc(var(--h-status) + 10px); height:30px; background:var(--c-glass); border:1px solid var(--c-border); border-radius:999px; padding:3px; gap:2px; box-shadow:var(--c-shadow); backdrop-filter:blur(10px); z-index:4 }
+.dir-c .lt-tab{ border-radius:999px; padding:0 11px }
+.dir-c .lt-tab.is-on{ background:var(--c-accent-soft); color:var(--c-text) }
+.dir-c .cmd{ position:absolute; bottom:calc(var(--h-status) + 10px); left:calc((100% - var(--pal-w) - 20px) / 2); transform:translateX(-50%); width:min(760px, 52%); border:1px solid var(--c-border); border-radius:var(--r-lg); background:var(--c-glass); backdrop-filter:blur(12px); box-shadow:var(--c-shadow); z-index:4 }
+.dir-c.app[data-size="1366"] .cmd{ left:50%; width:560px }
+.dir-c .cmd-in{ border-radius:var(--r); margin:3px 6px 6px }
+.dir-c .cv-ucs{ bottom:64px }
+.dir-c .sbt.is-on{ border-radius:999px }
+.dir-c .sb-chip{ border-radius:999px }
+
+/* ===================== Bộ thành phần mẫu ===================== */
+.kit{ background:var(--c-base); color:var(--c-text); font:var(--fs)/var(--lh) var(--f-ui); padding:20px 22px 22px; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:20px 32px; -webkit-font-smoothing:antialiased }
+.kit h3{ margin:0 0 8px; font-size:var(--fs-xs); font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--c-text-3) }
+.kit-col{ display:grid; gap:18px; align-content:start; min-width:0 }
+.row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.btn{ display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 12px; border-radius:var(--r); border:1px solid var(--c-border-ctl); background:var(--c-raised); color:var(--c-text); font-size:var(--fs-s); font-weight:500; white-space:nowrap }
+.btn.sm{ height:24px; padding:0 9px }
+.btn.primary{ background:var(--c-accent); color:var(--c-accent-t); border-color:transparent; font-weight:600 }
+.btn.ghost{ background:none; border-color:transparent; color:var(--c-text-2) }
+.btn[disabled]{ opacity:.45 }
+.btn.locked{ color:var(--c-text-2) } .btn.locked .ic{ width:13px; height:13px }
+.fld{ display:grid; gap:4px; font-size:var(--fs-s); color:var(--c-text-2) }
+.fld .lab{ color:var(--c-text-2) }
+.num{ display:flex; align-items:center; height:26px; width:184px; background:var(--c-raised); border:1px solid var(--c-border-ctl); border-radius:var(--r); overflow:hidden }
+.num input{ all:unset; flex:1; min-width:0; padding:0 8px; font-family:var(--f-mono); font-size:var(--fs-s); color:var(--c-text) }
+.num .pick, .num .spin{ display:grid; place-items:center; width:24px; height:100%; border-left:1px solid var(--c-border); color:var(--c-text-2) }
+.num .spin{ grid-template-rows:1fr 1fr; width:18px } .num .spin .ic{ width:8px; height:8px }
+.num.err{ border-color:var(--c-danger); box-shadow:0 0 0 1px var(--c-danger) }
+.msg-err{ color:var(--c-danger); font-size:var(--fs-xs); display:flex; gap:4px; align-items:center }
+.chk{ display:flex; gap:7px; align-items:center; font-size:var(--fs-s) }
+.chk i{ width:14px; height:14px; border-radius:calc(var(--r) - 1px); border:1px solid var(--c-border-ctl); background:var(--c-raised); display:grid; place-items:center }
+.chk i.on{ background:var(--c-accent); border-color:var(--c-accent); color:var(--c-accent-t) }
+.chk i .ic{ width:10px; height:10px; stroke-width:2.2 }
+.tip{ display:grid; gap:2px; padding:7px 10px; background:var(--c-dyn-bg); color:var(--c-dyn-t); border:1px solid var(--c-dyn-b); border-radius:var(--r); font-size:var(--fs-s); box-shadow:0 4px 14px rgba(0,0,0,.3); max-width:260px }
+.tip .cmdn{ font-family:var(--f-mono); font-size:var(--fs-xs); color:var(--c-text-2) }
+.toast{ display:flex; gap:10px; align-items:center; padding:9px 10px 9px 12px; background:var(--c-raised); border:1px solid var(--c-border); border-radius:var(--r-lg); box-shadow:0 6px 20px rgba(0,0,0,.28); font-size:var(--fs-s) }
+.toast .ic{ color:var(--c-ok) }
+.type-big{ font-size:22px; line-height:1.3; font-weight:500; letter-spacing:-.005em }
+.type-row{ display:flex; flex-wrap:wrap; gap:4px 18px; color:var(--c-text-2); font-size:var(--fs-s) }
+.type-row span b{ color:var(--c-text); font-weight:600 }
+.sws{ display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:8px }
+.swc{ display:grid; gap:4px; font-size:var(--fs-xs); color:var(--c-text-2) }
+.swc i{ height:28px; border-radius:var(--r); box-shadow:inset 0 0 0 1px rgba(128,128,128,.28) }
+.swc code{ font-family:var(--f-mono); color:var(--c-text-3) }
+.canvas-strip{ display:flex; gap:14px; align-items:center; padding:10px 12px; background:var(--c-canvas); border-radius:var(--r); flex-wrap:wrap; color:#C9CED6; font-size:var(--fs-xs) }
+.canvas-strip span{ display:flex; gap:6px; align-items:center }
+.g{ width:9px; height:9px; display:inline-block }
+@media (max-width:860px){ .kit{ grid-template-columns:minmax(0,1fr) } }
+@media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 16 16"><path d="M8 3 14.2 13.5H1.8z"/><circle class="dot" cx="8" cy="3" r="2"/></symbol>
+    <symbol id="i-new" viewBox="0 0 16 16"><path d="M3.5 1.5h6l3 3v10h-9z"/><path d="M9.5 1.5v3h3"/><path d="M8 7.5v4.5M5.75 9.75h4.5"/></symbol>
+    <symbol id="i-open" viewBox="0 0 16 16"><path d="M1.5 13V3h4l1.5 1.5h5.5v2"/><path d="M1.5 13l2.2-6.5h11L12.5 13z" class="f"/></symbol>
+    <symbol id="i-save" viewBox="0 0 16 16"><path d="M2.5 2.5h9l2 2v9h-11z"/><path d="M5 2.5v3.5h5.5V2.5"/><path d="M5 13.5v-4h6v4" class="f"/></symbol>
+    <symbol id="i-saveas" viewBox="0 0 16 16"><path d="M8 13.5H2.5v-11h8l2 2v3"/><path d="M5 2.5v3h4.5v-3"/><path d="M8.5 14.5l.6-2.4 4.4-4.4 1.8 1.8-4.4 4.4z" class="f"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 16 16"><path d="M5.5 3.5 2.5 6.5l3 3"/><path d="M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 16 16"><path d="M10.5 3.5l3 3-3 3"/><path d="M13.5 6.5H6a3.5 3.5 0 0 0 0 7h3"/></symbol>
+    <symbol id="i-print" viewBox="0 0 16 16"><path d="M4.5 6V1.5h7V6"/><path d="M4.5 11.5h-3V6h13v5.5h-3"/><path d="M4.5 9.5h7v5h-7z" class="f"/></symbol>
+    <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5l4 4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14.5c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.6.3-.8.7-.8 1.3v.3"/><circle class="dot" cx="8" cy="11.7" r=".85"/></symbol>
+    <symbol id="i-min" viewBox="0 0 16 16"><path d="M3.5 8.5h9"/></symbol>
+    <symbol id="i-max" viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 16 16"><path d="M3.8 3.8l8.4 8.4M12.2 3.8l-8.4 8.4"/></symbol>
+    <symbol id="i-x" viewBox="0 0 16 16"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></symbol>
+    <symbol id="i-down" viewBox="0 0 16 16"><path d="M3.5 6 8 10.5 12.5 6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 16 16"><path d="M3.5 10 8 5.5l4.5 4.5"/></symbol>
+    <symbol id="i-right" viewBox="0 0 16 16"><path d="M6 3.5 10.5 8 6 12.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+    <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 16 16"><circle class="dot" cx="3.5" cy="8" r="1.15"/><circle class="dot" cx="8" cy="8" r="1.15"/><circle class="dot" cx="12.5" cy="8" r="1.15"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 16 16"><path d="M10 1.8 14.2 6"/><path d="M11.6 3.4 8.6 6.4 5.2 6 3.6 7.6l4.8 4.8L10 10.8l-.4-3.4 3-3"/><path d="M6 10 2 14"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 16 16"><path d="M3.5 7.5h9v7h-9z" class="f"/><path d="M5.5 7.5V5.2a2.5 2.5 0 0 1 5 0v2.3"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 16 16"><path d="M8 2 14.8 13.8H1.2z"/><path d="M8 6.2v3.8"/><circle class="dot" cx="8" cy="11.9" r=".85"/></symbol>
+    <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.3v4"/><circle class="dot" cx="8" cy="4.9" r=".85"/></symbol>
+    <symbol id="i-fontdoc" viewBox="0 0 16 16"><path d="M1.5 13.5 5.2 3h1.6l3.7 10.5M3 9.5h5.5"/><path d="M12.5 5.5v6M9.5 8.5h6"/></symbol>
+    <!-- vẽ -->
+    <symbol id="i-line" viewBox="0 0 16 16"><path d="M4 12 12 4"/><rect class="dot" x="1.8" y="11.2" width="3" height="3"/><rect class="dot" x="11.2" y="1.8" width="3" height="3"/></symbol>
+    <symbol id="i-pline" viewBox="0 0 16 16"><path d="M2.5 12.5 6 5l4 6 3.5-7.5"/><rect class="dot" x="4.9" y="3.9" width="2.2" height="2.2"/><rect class="dot" x="8.9" y="9.9" width="2.2" height="2.2"/></symbol>
+    <symbol id="i-circle" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.8" class="f"/><path d="M8 6.6v2.8M6.6 8h2.8"/></symbol>
+    <symbol id="i-arc" viewBox="0 0 16 16"><path d="M2.5 12A6 6 0 0 1 13.5 12"/><rect class="dot" x="1" y="11" width="3" height="3"/><rect class="dot" x="12" y="11" width="3" height="3"/><circle class="dot" cx="8" cy="5.4" r="1"/></symbol>
+    <symbol id="i-rect" viewBox="0 0 16 16"><path d="M2.5 4h11v8h-11z" class="f"/></symbol>
+    <symbol id="i-hatch" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11z"/><path d="M2.5 7 7 2.5M2.5 11.5l9-9M6 13.5l7.5-7.5M10.5 13.5l3-3"/></symbol>
+    <symbol id="i-ellipse" viewBox="0 0 16 16"><ellipse cx="8" cy="8" rx="6.2" ry="3.9" class="f"/><path d="M8 7v2M7 8h2"/></symbol>
+    <symbol id="i-spline" viewBox="0 0 16 16"><path d="M1.8 12.5C4 2.5 7.5 3 8 8s4.4 5.5 6.2-4.5"/></symbol>
+    <symbol id="i-xline" viewBox="0 0 16 16"><path d="M.8 11.2 15.2 4.8"/><circle class="dot" cx="8" cy="8" r="1.4"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 16 16"><path d="M4 12.5a2 2 0 0 1-1-3.7 2.2 2.2 0 0 1 3.2-2.6 2.4 2.4 0 0 1 4.2-.4 2.2 2.2 0 0 1 3 2.4A2 2 0 0 1 12.5 12.5z" class="f"/></symbol>
+    <!-- sửa -->
+    <symbol id="i-move" viewBox="0 0 16 16"><path d="M8 1.5v13M1.5 8h13"/><path d="M6 3.5 8 1.5l2 2M6 12.5l2 2 2-2M3.5 6 1.5 8l2 2M12.5 6l2 2-2 2"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 16 16"><path d="M13.2 8.6A5.2 5.2 0 1 1 11.7 4.3"/><path d="M12.2 1.8v3h-3"/><circle class="dot" cx="8" cy="8" r="1.3"/></symbol>
+    <symbol id="i-trim" viewBox="0 0 16 16"><path d="M10.5 1.5v13"/><path d="M1.5 8h9"/><path d="M10.5 8h4" class="dash"/><path d="M12 5.5l2.5 5M14.5 5.5l-2.5 5" style="stroke-width:1"/></symbol>
+    <symbol id="i-extend" viewBox="0 0 16 16"><path d="M13.5 1.5v13"/><path d="M1.5 8h6"/><path d="M7.5 8H13" class="dash"/><path d="M10.5 6 12.5 8l-2 2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 16 16"><path d="M2.5 2.5h8v8h-8z"/><path d="M5.5 5.5h8v8h-8z" class="f"/></symbol>
+    <symbol id="i-mirror" viewBox="0 0 16 16"><path d="M8 1.5v13" class="dash"/><path d="M6 4 2 12h4z"/><path d="M10 4l4 8h-4z" class="f"/></symbol>
+    <symbol id="i-fillet" viewBox="0 0 16 16"><path d="M3 14V8.5A5.5 5.5 0 0 1 8.5 3H14"/><path d="M3 6.2V3h3.2" class="dash"/></symbol>
+    <symbol id="i-stretch" viewBox="0 0 16 16"><path d="M2.5 13.5v-8h5"/><path d="M2.5 13.5h6"/><path d="M7.5 5.5h6v8h-5" class="dash"/><path d="M9.5 1.8h4.2V6"/><path d="M13.7 1.8 10 5.5"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 16 16"><path d="M2.5 8.5h5v5h-5z" class="f"/><path d="M2.5 8.5v-6h11v11h-6" class="dash"/><path d="M7.5 8.5 13 3M9.6 3H13v3.4"/></symbol>
+    <symbol id="i-array" viewBox="0 0 16 16"><path d="M2 2h3v3H2zM6.5 2h3v3h-3zM11 2h3v3h-3zM2 6.5h3v3H2zM6.5 6.5h3v3h-3zM11 6.5h3v3h-3zM2 11h3v3H2zM6.5 11h3v3h-3zM11 11h3v3h-3z"/></symbol>
+    <symbol id="i-erase" viewBox="0 0 16 16"><path d="M6.5 13.5h7.5"/><path d="M2.6 9.4 9.4 2.6l4 4-6.9 6.9H5.6z" class="f"/><path d="M5.6 6.4l4 4"/></symbol>
+    <symbol id="i-explode" viewBox="0 0 16 16"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/><path d="M6.6 6.6 5.2 5.2M9.4 6.6l1.4-1.4M9.4 9.4l1.4 1.4M6.6 9.4l-1.4 1.4"/></symbol>
+    <symbol id="i-offset" viewBox="0 0 16 16"><path d="M2.5 13.5V7a4.5 4.5 0 0 1 4.5-4.5h6.5"/><path d="M6 13.5V8.2A2.2 2.2 0 0 1 8.2 6h5.3" class="dash"/></symbol>
+    <!-- chú thích -->
+    <symbol id="i-mtext" viewBox="0 0 16 16"><path d="M2 12.5 5.5 3.5h1L10 12.5M3.3 9.3h4.9"/><path d="M11.5 6.5h3M11.5 9.5h3M11.5 12.5h3"/></symbol>
+    <symbol id="i-dim" viewBox="0 0 16 16"><path d="M2.5 3v10.5M13.5 3v10.5"/><path d="M2.5 10.5h11"/><path d="M1.3 11.7l2.4-2.4M12.3 11.7l2.4-2.4"/><path d="M5.5 7.5h5"/></symbol>
+    <symbol id="i-leader" viewBox="0 0 16 16"><path d="M3 13 8.5 7.5h6"/><path d="M2 14l.9-3.3 2.4 2.4z" class="dot"/><path d="M9 4.5h5.5M9 2h4"/></symbol>
+    <symbol id="i-table" viewBox="0 0 16 16"><path d="M2 3h12v10H2z"/><path d="M2 6.5h12M2 10h12M6.5 3v10M10.5 3v10"/></symbol>
+    <!-- layer -->
+    <symbol id="i-layers" viewBox="0 0 16 16"><path d="M8 2 14.5 5.5 8 9 1.5 5.5z" class="f"/><path d="M1.5 8.3 8 11.8l6.5-3.5"/><path d="M1.5 11 8 14.5l6.5-3.5"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 16 16"><path d="M5.8 11.6h4.4M6.3 14h3.4"/><path d="M5.8 11.6c0-1.5-2.4-2.6-2.4-5.2a4.6 4.6 0 0 1 9.2 0c0 2.6-2.4 3.7-2.4 5.2" class="f"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8" class="f"/><path d="M8 1.2v1.8M8 13v1.8M1.2 8H3M13 8h1.8M3.2 3.2l1.3 1.3M11.5 11.5l1.3 1.3M3.2 12.8l1.3-1.3M11.5 4.5l1.3-1.3"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 16 16"><path d="M8 1.5v13M2.4 4.8l11.2 6.4M2.4 11.2l11.2-6.4"/><path d="M6.5 2.6 8 4l1.5-1.4M6.5 13.4 8 12l1.5 1.4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 16 16"><path d="M3.5 7.5h9v7h-9z" class="f"/><path d="M5.5 7.5V5.2a2.5 2.5 0 0 1 4.9-.7"/></symbol>
+    <symbol id="i-isolate" viewBox="0 0 16 16"><path d="M8 2 14.5 5.5 8 9 1.5 5.5z" class="f"/><path d="M1.5 9.6 8 13.1l6.5-3.5" class="dash"/></symbol>
+    <symbol id="i-unisolate" viewBox="0 0 16 16"><path d="M8 2 14.5 5.5 8 9 1.5 5.5z"/><path d="M1.5 9.6 8 13.1l6.5-3.5"/></symbol>
+    <symbol id="i-laycur" viewBox="0 0 16 16"><path d="M8 3.5 14.5 7 8 10.5 1.5 7z"/><path d="M8 13v2" /><path d="M5.5 1.5l2.5 2 2.5-2"/></symbol>
+    <symbol id="i-laymatch" viewBox="0 0 16 16"><path d="M5.5 6 10.5 8.5 5.5 11 .5 8.5z"/><path d="M11 3h4.5M13.2 1v4" /><path d="M10.5 12.5h5"/></symbol>
+    <!-- block, thuộc tính, tiện ích -->
+    <symbol id="i-insert" viewBox="0 0 16 16"><path d="M8 1.5 14 5v6l-6 3.5L2 11V5z" class="f"/><path d="M2 5l6 3.5L14 5M8 8.5v6"/></symbol>
+    <symbol id="i-bcreate" viewBox="0 0 16 16"><path d="M2.5 2.5h8v8h-8z" class="f"/><path d="M12.5 9.5v5M10 12h5"/></symbol>
+    <symbol id="i-bedit" viewBox="0 0 16 16"><path d="M2.5 2.5h8v8h-8z"/><path d="M8.5 14.5l.6-2.4 4.5-4.5 1.8 1.8-4.5 4.5z" class="f"/></symbol>
+    <symbol id="i-attedit" viewBox="0 0 16 16"><path d="M2.5 2.5h6l5.5 5.5-6 6-5.5-5.5z" class="f"/><circle cx="5.5" cy="5.5" r="1"/></symbol>
+    <symbol id="i-match" viewBox="0 0 16 16"><path d="M3 14c1.9 0 3.2-1.1 3.2-2.6a1.6 1.6 0 0 0-3.2 0c0 1-.5 1.9-1 2.3" class="f"/><path d="M5.5 9.6 13 2l1.1 1.1-7.6 7.6"/></symbol>
+    <symbol id="i-measure" viewBox="0 0 16 16"><path d="M1.5 10.5 10.5 1.5l4 4-9 9z" class="f"/><path d="M4.4 7.6l1.6 1.6M6.5 5.5 8.6 7.6M8.6 3.4l1.6 1.6"/></symbol>
+    <symbol id="i-qselect" viewBox="0 0 16 16"><path d="M2 2.5h12L9.5 8v5.5l-3-1.6V8z" class="f"/></symbol>
+    <symbol id="i-selall" viewBox="0 0 16 16"><path class="dash" d="M2.5 2.5h11v11h-11z"/><path d="M6.5 6.5l6 2.3-2.6 1.1-1.1 2.6z" class="dot"/></symbol>
+    <symbol id="i-idpoint" viewBox="0 0 16 16"><path d="M8 1.5v4.2M8 10.3v4.2M1.5 8h4.2M10.3 8h4.2"/><circle cx="8" cy="8" r="1.6"/></symbol>
+    <symbol id="i-group" viewBox="0 0 16 16"><path d="M2 2h4v4H2zM10 10h4v4h-4z" class="f"/><path d="M1 1h14v14H1z" class="dash"/></symbol>
+    <symbol id="i-ungroup" viewBox="0 0 16 16"><path d="M2 2h4v4H2zM10 10h4v4h-4z"/><path d="M8 3h5v5M3 8v5h5" class="dash"/></symbol>
+    <symbol id="i-paste" viewBox="0 0 16 16"><path d="M5.5 2.5h-3v12h11v-12h-3"/><path d="M5.5 1.5h5v2.6h-5z" class="f"/><path d="M5 8h6M5 11h4"/></symbol>
+    <symbol id="i-cut" viewBox="0 0 16 16"><circle cx="4.5" cy="12" r="2"/><circle cx="11.5" cy="12" r="2"/><path d="M6 10.6 12 2.5M10 10.6 4 2.5"/></symbol>
+    <symbol id="i-copyclip" viewBox="0 0 16 16"><path d="M5.5 5h8v9.5h-8z" class="f"/><path d="M3 11V2.5h8"/></symbol>
+    <symbol id="i-copybase" viewBox="0 0 16 16"><path d="M5.5 5h8v9.5h-8z"/><path d="M3 11V2.5h8"/><rect class="dot" x="4" y="13" width="3" height="3"/></symbol>
+    <symbol id="i-pickadd" viewBox="0 0 16 16"><path d="M2.5 2.5l4 10.5 1.6-4.3 4.3-1.6z" class="f"/><path d="M12.5 10v5M10 12.5h5"/></symbol>
+    <symbol id="i-select" viewBox="0 0 16 16"><path d="M3.5 2.5l3.5 11 2-4.6 4.5-2z" class="f"/></symbol>
+    <!-- thanh trạng thái -->
+    <symbol id="i-grid" viewBox="0 0 16 16"><circle class="dot" cx="3" cy="3" r="1"/><circle class="dot" cx="8" cy="3" r="1"/><circle class="dot" cx="13" cy="3" r="1"/><circle class="dot" cx="3" cy="8" r="1"/><circle class="dot" cx="8" cy="8" r="1"/><circle class="dot" cx="13" cy="8" r="1"/><circle class="dot" cx="3" cy="13" r="1"/><circle class="dot" cx="8" cy="13" r="1"/><circle class="dot" cx="13" cy="13" r="1"/></symbol>
+    <symbol id="i-snap" viewBox="0 0 16 16"><circle class="dot" cx="3" cy="3" r="1"/><circle class="dot" cx="13" cy="3" r="1"/><circle class="dot" cx="3" cy="13" r="1"/><circle class="dot" cx="13" cy="13" r="1"/><path d="M8 4.5v7M4.5 8h7"/></symbol>
+    <symbol id="i-ortho" viewBox="0 0 16 16"><path d="M3.5 2v10.5H14"/><path d="M3.5 9h3.5v3.5"/></symbol>
+    <symbol id="i-polar" viewBox="0 0 16 16"><path d="M2 13.5h12"/><path d="M2 13.5 11.5 3"/><path d="M8 13.5A6 6 0 0 0 6 9"/></symbol>
+    <symbol id="i-osnap" viewBox="0 0 16 16"><path d="M5 5h6v6H5z"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/></symbol>
+    <symbol id="i-otrack" viewBox="0 0 16 16"><path d="M8 1.5v13M1.5 8h13" class="dots"/><path d="M6.5 8h3M8 6.5v3"/></symbol>
+    <symbol id="i-dyn" viewBox="0 0 16 16"><path d="M1.5 3.5h9.5v5.5H1.5z" class="f"/><path d="M4 6.25h3"/><path d="M10 9.2l4.6 1.8-2.1.8-.8 2.1z" class="dot"/></symbol>
+    <symbol id="i-lw" viewBox="0 0 16 16"><path d="M2 3.5h12" style="stroke-width:1"/><path d="M2 7.5h12" style="stroke-width:2"/><path d="M2 12h12" style="stroke-width:3"/></symbol>
+    <symbol id="i-transp" viewBox="0 0 16 16"><path d="M2 2h8v8H2z"/><path d="M6 6h8v8H6z" class="f"/></symbol>
+    <symbol id="i-iso" viewBox="0 0 16 16"><path d="M1.5 5.5l13 7.5M1.5 10.5l13-7.5M8 1.5v13"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 16 16"><path d="M2 5h8v8H2z"/><path d="M6 2h8v8" class="dash"/><path d="M12.5 12.5l1.8 1.8"/></symbol>
+    <symbol id="i-anno" viewBox="0 0 16 16"><path d="M2.5 13.5 7 2.5h1.4l4.6 11"/><path d="M4.4 9.5h6.3"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.2v2.2M8 12.6v2.2M1.2 8h2.2M12.6 8h2.2M3.2 3.2l1.6 1.6M11.2 11.2l1.6 1.6M3.2 12.8l1.6-1.6M11.2 4.8l1.6-1.6"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 16 16"><path d="M3.8 11.5V7.2a4.2 4.2 0 0 1 8.4 0v4.3l1.5 1.5H2.3z" class="f"/><path d="M6.5 14.8h3"/></symbol>
+    <symbol id="i-tasks" viewBox="0 0 16 16"><path d="M14 8a6 6 0 1 1-6-6"/><path d="M8 4.5V8l2.4 1.6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></symbol>
+    <symbol id="i-ws" viewBox="0 0 16 16"><path d="M1.5 2.5h13v11h-13z"/><path d="M1.5 5.5h13M10.5 5.5v8"/></symbol>
+    <symbol id="i-blocks" viewBox="0 0 16 16"><path d="M2 2h5v5H2zM9 9h5v5H9z" class="f"/><path d="M9 2h5v5H9zM2 9h5v5H2z"/></symbol>
+  </defs>
+</svg>
+
+<main class="pg">
+  <header class="pg-head">
+    <p class="eyebrow">TrionCAD · Thiết kế giao diện · Bước chọn hướng</p>
+    <h1>Hướng giao diện TrionCAD</h1>
+    <p class="lead">Ba phương án cho cửa sổ chính (UI-A01) khi đang vẽ một đoạn thẳng trên mặt bằng tầng 1, có banner Bác sĩ Font. Bố cục và nội dung lấy từ đặc tả 07.1; ba hướng khác nhau ở màu, chữ, mật độ, hình khối và biểu tượng. Bạn chọn một hướng (hoặc ghép, ví dụ màu của A với bố cục của C) để làm chi tiết toàn bộ 172 màn hình.</p>
+    <div class="controls">
+      <div class="seg"><span id="lbl-mode">Chủ đề trong ảnh dựng</span>
+        <div class="seg-btns" role="group" aria-labelledby="lbl-mode">
+          <button type="button" id="mode-dark" data-mode="dark" aria-pressed="true">Tối (mặc định)</button>
+          <button type="button" id="mode-light" data-mode="light" aria-pressed="false">Sáng</button>
+        </div>
+      </div>
+      <div class="seg"><span id="lbl-size">Màn hình</span>
+        <div class="seg-btns" role="group" aria-labelledby="lbl-size">
+          <button type="button" id="size-1920" data-size="1920" aria-pressed="true">1920×1080</button>
+          <button type="button" id="size-1366" data-size="1366" aria-pressed="false">1366×768</button>
+        </div>
+      </div>
+    </div>
+    <p class="same">Giống nhau ở cả ba: thứ tự vùng theo UI-A01, nội dung ribbon tab Trang chủ (§7.2), lệnh LINE với bắt điểm Điểm cuối và nhập động, palette Thuộc tính khi không chọn gì, màu đối tượng theo bảng ACI. Biểu tượng là bộ tự vẽ trên lưới 16 px. Ở 1366×768, panel ribbon ít dùng tự thu thành nút và palette tự ẩn (§3.2).</p>
+  </header>
+
+  <section class="dir-sec" data-dir="a" aria-labelledby="h-a">
+    <div class="dir-top">
+      <div>
+        <h2 id="h-a"><span class="letter">A</span>Than chì</h2>
+        <p>Như một dụng cụ đo chính xác: xám than trung tính, một màu nhấn xanh ngọc cho trạng thái đang bật, đường kẻ mảnh 1 px, góc gần vuông. Gọn nhất trong ba hướng nên hợp laptop 1366×768. Người dùng AutoCAD thấy quen về mật độ nhưng không lẫn về màu. Ít cá tính thương hiệu nhất.</p>
+      </div>
+      <dl class="facts">
+        <dt>Chữ</dt><dd>IBM Plex Sans 12 px · số liệu IBM Plex Mono</dd>
+        <dt>Mật độ</dt><dd>dòng palette 22 px · ribbon 87 px · bo góc 2 px</dd>
+        <dt>Biểu tượng</dt><dd>nét 1,25 px, đầu vuông</dd>
+        <dt>Vùng vẽ</dt><dd class="metric" data-metric>—</dd>
+        <dt>Ribbon</dt><dd data-rb>—</dd>
+      </dl>
+    </div>
+    <div class="frame-bar"><span>Ảnh dựng ở kích thước thật, thu nhỏ theo bề rộng trang</span><button type="button" class="full-btn" data-full>Xem 100%</button></div>
+    <div class="frame" data-frame aria-hidden="true" inert></div>
+    <div class="kit-wrap" data-kit aria-hidden="true" inert></div>
+  </section>
+
+  <section class="dir-sec" data-dir="b" aria-labelledby="h-b">
+    <div class="dir-top">
+      <div>
+        <h2 id="h-b"><span class="letter">B</span>Tím Huế</h2>
+        <p>Bản sắc Việt: nền than ấm, màu nhấn tím Huế, chữ Be Vietnam Pro do nhóm tác giả Việt thiết kế nên dấu tiếng Việt cân và thoáng. Nhãn panel in hoa giãn chữ, biểu tượng hai lớp có mảng tô nhạt. Nhận diện thương hiệu mạnh nhất, hợp câu chuyện “lõi do người Việt làm chủ”. Mật độ tiêu chuẩn nên vùng vẽ nhỏ hơn A một chút.</p>
+      </div>
+      <dl class="facts">
+        <dt>Chữ</dt><dd>Be Vietnam Pro 12,5 px · số liệu JetBrains Mono</dd>
+        <dt>Mật độ</dt><dd>dòng palette 24 px · ribbon 92 px · bo góc 4 px</dd>
+        <dt>Biểu tượng</dt><dd>nét 1,5 px, đầu tròn, mảng tô tím 22%</dd>
+        <dt>Vùng vẽ</dt><dd class="metric" data-metric>—</dd>
+        <dt>Ribbon</dt><dd data-rb>—</dd>
+      </dl>
+    </div>
+    <div class="frame-bar"><span>Ảnh dựng ở kích thước thật, thu nhỏ theo bề rộng trang</span><button type="button" class="full-btn" data-full>Xem 100%</button></div>
+    <div class="frame" data-frame aria-hidden="true" inert></div>
+    <div class="kit-wrap" data-kit aria-hidden="true" inert></div>
+  </section>
+
+  <section class="dir-sec" data-dir="c" aria-labelledby="h-c">
+    <div class="dir-top">
+      <div>
+        <h2 id="h-c"><span class="letter">C</span>Lam đêm</h2>
+        <p>Vùng vẽ trước hết: palette, dòng lệnh và tab layout nổi trên vùng vẽ (đặc tả cho phép cả hai), tab tệp nằm trên thanh tiêu đề. Nền lam đêm, màu nhấn trắng đơn sắc, bo góc 6–10 px, chữ Onest. Vùng vẽ lớn nhất và trông hiện đại nhất, nhưng xa thói quen AutoCAD nhất, nên cần thử với người dùng thật trước khi chốt.</p>
+      </div>
+      <dl class="facts">
+        <dt>Chữ</dt><dd>Onest 13 px · số liệu Geist Mono</dd>
+        <dt>Mật độ</dt><dd>dòng palette 26 px · ribbon 95 px · bo góc 6–10 px</dd>
+        <dt>Biểu tượng</dt><dd>nét 1,6 px, đầu tròn</dd>
+        <dt>Vùng vẽ</dt><dd class="metric" data-metric>—</dd>
+        <dt>Ribbon</dt><dd data-rb>—</dd>
+      </dl>
+    </div>
+    <div class="frame-bar"><span>Ảnh dựng ở kích thước thật, thu nhỏ theo bề rộng trang</span><button type="button" class="full-btn" data-full>Xem 100%</button></div>
+    <div class="frame" data-frame aria-hidden="true" inert></div>
+    <div class="kit-wrap" data-kit aria-hidden="true" inert></div>
+  </section>
+
+  <section class="decide" aria-labelledby="h-decide">
+    <h2 id="h-decide">Cần bạn quyết định</h2>
+    <ol>
+      <li><b>Hướng nào?</b> A, B hoặc C. Có thể ghép: phần nhìn (màu, chữ, biểu tượng) của một hướng với bố cục của hướng khác.</li>
+      <li><b>Mâu thuẫn trong đặc tả 07.1.</b> §1 mục 6 yêu cầu vùng vẽ chiếm ≥ 75% màn hình ở 1920×1080; §3.2 yêu cầu ở ≥ 1920 px thì ribbon đầy đủ và palette Thuộc tính mở sẵn. Khi palette dock cố định, A và B chỉ đạt khoảng 60%. Muốn đạt 75% thì palette phải tự ẩn, hoặc nổi trên vùng vẽ như C.</li>
+    </ol>
+    <p>Số “Vùng vẽ” ở mỗi hướng được đo trực tiếp trên ảnh dựng: phần màn hình mà bản vẽ hiện ra được, tính cả chỗ bị banner hay palette nổi che.</p>
+  </section>
+</main>
+
+<template id="tpl-app">
+<div class="app">
+  <header class="tb">
+    <button class="tb-app"><svg class="ic logo"><use href="#i-logo"/></svg><span class="tb-brand">TrionCAD</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+    <div class="qat">
+      <button class="ib"><svg class="ic"><use href="#i-new"/></svg></button>
+      <button class="ib"><svg class="ic"><use href="#i-open"/></svg></button>
+      <button class="ib"><svg class="ic"><use href="#i-save"/></svg></button>
+      <button class="ib"><svg class="ic"><use href="#i-saveas"/></svg></button>
+      <span class="sep"></span>
+      <button class="ib"><svg class="ic"><use href="#i-undo"/></svg><svg class="ic xs"><use href="#i-down"/></svg></button>
+      <button class="ib"><svg class="ic"><use href="#i-redo"/></svg></button>
+      <span class="sep"></span>
+      <button class="ib"><svg class="ic"><use href="#i-print"/></svg><svg class="ic xs"><use href="#i-down"/></svg></button>
+      <button class="ib"><svg class="ic xs"><use href="#i-down"/></svg></button>
+    </div>
+    <div class="tb-doc"><span class="tb-file">Banve-01.dwg<span class="tb-dirty">*</span></span><span>—</span><span>TrionCAD</span><span class="ed">Pro</span></div>
+    <div class="tb-search"><svg class="ic"><use href="#i-search"/></svg><span>Tìm lệnh: “đường tròn”, CIRCLE, C…</span></div>
+    <button class="ib"><svg class="ic"><use href="#i-user"/></svg></button>
+    <button class="ib"><svg class="ic"><use href="#i-help"/></svg></button>
+    <div class="win"><button><svg class="ic"><use href="#i-min"/></svg></button><button><svg class="ic"><use href="#i-max"/></svg></button><button><svg class="ic"><use href="#i-close"/></svg></button></div>
+  </header>
+
+  <nav class="rb">
+    <div class="rb-tabs">
+      <button class="rb-tab is-on">Trang chủ</button><button class="rb-tab">Chèn</button><button class="rb-tab">Chú thích</button><button class="rb-tab">Hiển thị</button><button class="rb-tab">Quản lý</button><button class="rb-tab">Xuất</button><button class="rb-tab">Công cụ VN</button><button class="rb-tab">Mở rộng</button>
+      <span class="rb-tabs-r"><button class="ib"><svg class="ic xs"><use href="#i-up"/></svg></button></span>
+    </div>
+    <div class="rb-body">
+      <div class="rb-p" data-prio="1">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-line"/></svg><span>Vẽ<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-line"/></svg><span>Đoạn thẳng</span></button>
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-pline"/></svg><span>Polyline</span></button>
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-circle"/></svg><span>Đường tròn<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-arc"/></svg><span>Cung<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-rect"/></svg><span class="t">Chữ nhật</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-hatch"/></svg><span class="t">Hatch</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-ellipse"/></svg><span class="t">Ellipse</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+          </div>
+          <div class="rb-col">
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-spline"/></svg><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-xline"/></svg></button>
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-cloud"/></svg><svg class="ic xs"><use href="#i-down"/></svg></button>
+          </div>
+        </div>
+        <div class="rb-l">Vẽ<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="1">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-move"/></svg><span>Sửa<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-move"/></svg><span class="t">Di chuyển</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-copy"/></svg><span class="t">Sao chép</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-stretch"/></svg><span class="t">Kéo giãn</span></button>
+          </div>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-rotate"/></svg><span class="t">Xoay</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-mirror"/></svg><span class="t">Đối xứng</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-scale"/></svg><span class="t">Tỉ lệ</span></button>
+          </div>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-trim"/></svg><span class="t">Cắt</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-fillet"/></svg><span class="t">Bo góc</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-array"/></svg><span class="t">Mảng</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+          </div>
+          <div class="rb-col">
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-erase"/></svg></button>
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-explode"/></svg></button>
+            <button class="rb-s icon-only"><svg class="ic"><use href="#i-offset"/></svg></button>
+          </div>
+        </div>
+        <div class="rb-l">Sửa<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="2">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-mtext"/></svg><span>Chú thích<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-mtext"/></svg><span>Văn bản<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-dim"/></svg><span>Kích thước<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-leader"/></svg><span class="t">Đường dẫn</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-table"/></svg><span class="t">Bảng</span></button>
+          </div>
+        </div>
+        <div class="rb-l">Chú thích<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="1">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-layers"/></svg><span>Layer<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-layers"/></svg><span>Thuộc tính layer</span></button>
+          <div class="rb-col" style="gap:3px">
+            <div class="rb-dd" style="width:212px"><svg class="ic"><use href="#i-bulb"/></svg><svg class="ic"><use href="#i-sun"/></svg><svg class="ic"><use href="#i-unlock"/></svg><span class="sw"></span><span class="grow">KT-TUONG</span><svg class="ic xs"><use href="#i-down"/></svg></div>
+            <div class="rb-row">
+              <button class="rb-s"><svg class="ic"><use href="#i-isolate"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-unisolate"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-bulb"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-snow"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-lock"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-laycur"/></svg></button><button class="rb-s"><svg class="ic"><use href="#i-laymatch"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="rb-l">Layer<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="3">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-insert"/></svg><span>Block<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-insert"/></svg><span>Chèn<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-bcreate"/></svg><span class="t">Tạo</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-bedit"/></svg><span class="t">Sửa</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-attedit"/></svg><span class="t">Attribute</span><svg class="ic xs"><use href="#i-down"/></svg></button>
+          </div>
+        </div>
+        <div class="rb-l">Block<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="2">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-match"/></svg><span>Thuộc tính<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-match"/></svg><span>Khớp thuộc tính</span></button>
+          <div class="rb-col" style="gap:3px">
+            <div class="rb-dd" style="width:132px"><span class="sw"></span><span class="grow">ByLayer</span><svg class="ic xs"><use href="#i-down"/></svg></div>
+            <div class="rb-dd" style="width:132px"><span class="lt-sample"></span><span class="grow">ByLayer</span><svg class="ic xs"><use href="#i-down"/></svg></div>
+            <div class="rb-dd" style="width:132px"><span class="lw-sample"></span><span class="grow">ByLayer</span><svg class="ic xs"><use href="#i-down"/></svg></div>
+          </div>
+        </div>
+        <div class="rb-l">Thuộc tính<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="4">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-group"/></svg><span>Nhóm<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-group"/></svg><span>Nhóm</span></button>
+          <div class="rb-col"><button class="rb-s icon-only"><svg class="ic"><use href="#i-ungroup"/></svg></button><button class="rb-s icon-only"><svg class="ic"><use href="#i-bedit"/></svg></button><button class="rb-s icon-only"><svg class="ic"><use href="#i-select"/></svg></button></div>
+        </div>
+        <div class="rb-l">Nhóm</div>
+      </div>
+
+      <div class="rb-p" data-prio="3">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-measure"/></svg><span>Tiện ích<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-measure"/></svg><span>Đo<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <div class="rb-col">
+            <button class="rb-s"><svg class="ic"><use href="#i-qselect"/></svg><span class="t">Chọn nhanh</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-selall"/></svg><span class="t">Chọn tất cả</span></button>
+            <button class="rb-s"><svg class="ic"><use href="#i-idpoint"/></svg><span class="t">Tọa độ điểm</span></button>
+          </div>
+        </div>
+        <div class="rb-l">Tiện ích<svg class="ic xs"><use href="#i-down"/></svg></div>
+      </div>
+
+      <div class="rb-p" data-prio="4">
+        <button class="rb-coll"><svg class="ic lg"><use href="#i-paste"/></svg><span>Clipboard<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+        <div class="rb-c">
+          <button class="rb-lg"><svg class="ic lg"><use href="#i-paste"/></svg><span>Dán<svg class="ic xs"><use href="#i-down"/></svg></span></button>
+          <div class="rb-col"><button class="rb-s icon-only"><svg class="ic"><use href="#i-cut"/></svg></button><button class="rb-s icon-only"><svg class="ic"><use href="#i-copyclip"/></svg></button><button class="rb-s icon-only"><svg class="ic"><use href="#i-copybase"/></svg></button></div>
+        </div>
+        <div class="rb-l">Clipboard</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="ft">
+    <button class="ft-tab"><svg class="ic"><use href="#i-logo"/></svg>Start</button>
+    <button class="ft-tab is-on">Banve-01.dwg<i class="ft-dot"></i><svg class="ic xs"><use href="#i-x"/></svg></button>
+    <button class="ft-tab">Ketcau-T2.dwg</button>
+    <button class="ft-add"><svg class="ic"><use href="#i-plus"/></svg></button>
+  </div>
+
+  <div class="ws">
+    <div class="dock dock-l"><button class="vtab">Blocks</button><button class="vtab">Thư viện TCVN</button></div>
+    <div class="cv">
+      <svg class="dw" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="cv-banner">
+        <svg class="ic"><use href="#i-fontdoc"/></svg>
+        <p><b>Bác sĩ Font:</b> bản vẽ dùng 3 font không có trên máy và 250 đối tượng chữ mã TCVN3. TrionCAD đã tự hiển thị đúng.</p>
+        <span class="acts"><button class="btn sm">Xem chi tiết</button><button class="btn sm primary">Chuyển sang Unicode</button><button class="btn sm ghost hide-1366">Không nhắc lại với tệp này</button></span>
+        <button class="ib"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="cv-vpc"><button>[–]</button><button>[Trên]</button><button>[2D Wireframe]</button></div>
+      <svg class="cv-ucs" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 54V12M10 54h42"/><path d="M6 18l4-7 4 7M46 50l7 4-7 4"/><path d="M10 54h7v-7h-7z"/><text x="56" y="47" fill="currentColor" stroke="none" font-size="11" font-family="Arial">X</text><text x="16" y="13" fill="currentColor" stroke="none" font-size="11" font-family="Arial">Y</text></svg>
+    </div>
+    <aside class="pal">
+      <div class="pal-mini"><button class="ib"><svg class="ic"><use href="#i-ws"/></svg></button><button class="ib"><svg class="ic"><use href="#i-layers"/></svg></button><button class="ib"><svg class="ic"><use href="#i-blocks"/></svg></button></div>
+      <div class="pal-hd"><span class="grow">Thuộc tính</span><button class="ib"><svg class="ic"><use href="#i-pin"/></svg></button><button class="ib"><svg class="ic"><use href="#i-more"/></svg></button><button class="ib"><svg class="ic"><use href="#i-x"/></svg></button></div>
+      <div class="pal-tools"><div class="dd"><span>Không chọn</span><svg class="ic xs"><use href="#i-down"/></svg></div><button class="ib is-on"><svg class="ic"><use href="#i-pickadd"/></svg></button><button class="ib"><svg class="ic"><use href="#i-select"/></svg></button><button class="ib"><svg class="ic"><use href="#i-qselect"/></svg></button></div>
+      <div class="pal-body">
+        <div class="pgh"><svg class="ic xs"><use href="#i-down"/></svg>Chung</div>
+        <div class="pr"><span class="pk">Màu</span><span class="pv"><i class="sw" style="background:#FFFFFF"></i>ByLayer</span></div>
+        <div class="pr is-focus"><span class="pk">Layer</span><span class="pv"><span>KT-TUONG</span><svg class="ic xs"><use href="#i-down"/></svg></span></div>
+        <div class="pr"><span class="pk">Linetype</span><span class="pv"><span class="lt-sample"></span>ByLayer</span></div>
+        <div class="pr"><span class="pk">Tỉ lệ linetype</span><span class="pv mono">1.0000</span></div>
+        <div class="pr"><span class="pk">Độ dày nét</span><span class="pv"><span class="lw-sample" style="width:22px"></span>ByLayer</span></div>
+        <div class="pr"><span class="pk">Độ trong suốt</span><span class="pv">ByLayer</span></div>
+        <div class="pr"><span class="pk">Độ dày đùn</span><span class="pv mono">0.00</span></div>
+        <div class="pgh"><svg class="ic xs"><use href="#i-down"/></svg>View</div>
+        <div class="pr ro"><span class="pk">Tâm X</span><span class="pv mono">8400.00</span></div>
+        <div class="pr ro"><span class="pk">Tâm Y</span><span class="pv mono">2300.00</span></div>
+        <div class="pr ro"><span class="pk">Cao</span><span class="pv mono">16000.00</span></div>
+        <div class="pr ro"><span class="pk">Rộng</span><span class="pv mono">38450.00</span></div>
+        <div class="pgh"><svg class="ic xs"><use href="#i-down"/></svg>Khác</div>
+        <div class="pr"><span class="pk">Tỉ lệ chú thích</span><span class="pv">1:100</span></div>
+        <div class="pr"><span class="pk">Biểu tượng UCS</span><span class="pv">Có</span></div>
+        <div class="pr"><span class="pk">UCS tại gốc</span><span class="pv">Không</span></div>
+        <div class="pr"><span class="pk">Tên UCS</span><span class="pv">Thế giới</span></div>
+        <div class="pr"><span class="pk">Kiểu hiển thị</span><span class="pv">2D Wireframe</span></div>
+      </div>
+      <div class="pal-desc"><b>Layer</b><p>Layer hiện hành, dùng cho đối tượng vẽ mới.</p><code>CLAYER</code></div>
+    </aside>
+    <div class="dock dock-r"><button class="vtab">Thuộc tính</button><button class="vtab">Layer</button></div>
+  </div>
+
+  <div class="lt"><button class="lt-tab is-on">Model</button><button class="lt-tab">A1-Mat bang</button><button class="lt-tab">A1-Mat cat</button><button class="lt-add"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+
+  <section class="cmd">
+    <div class="cmd-hist">
+      <p>Lệnh: <b>LINE</b></p>
+      <p>Chỉ định điểm đầu: <span class="mono">3300,1300</span></p>
+      <p>Đã bật bắt điểm: Điểm cuối, Trung điểm, Tâm, Giao điểm</p>
+    </div>
+    <div class="cmd-in"><svg class="ic xs"><use href="#i-right"/></svg><span class="cmd-name">LINE</span><span class="cmd-pr">Chỉ định điểm tiếp theo hoặc</span><span class="chip">Hoàn tác <span class="k">·</span> <u>U</u></span><span>:</span><span class="caret"></span>
+      <span class="cmd-r"><button class="ib"><svg class="ic xs"><use href="#i-up"/></svg></button></span></div>
+  </section>
+
+  <footer class="sb">
+    <span class="sb-coord">5000.00, 1600.00, 0.00</span>
+    <button class="sb-txt">MODEL</button>
+    <span class="sb-sep"></span>
+    <button class="sbt"><svg class="ic"><use href="#i-grid"/></svg></button>
+    <button class="sbt"><svg class="ic"><use href="#i-snap"/></svg></button>
+    <button class="sbt is-on"><svg class="ic"><use href="#i-dyn"/></svg></button>
+    <button class="sbt"><svg class="ic"><use href="#i-ortho"/></svg></button>
+    <button class="sbt is-on"><svg class="ic"><use href="#i-polar"/></svg></button>
+    <button class="sbt hide-1366"><svg class="ic"><use href="#i-iso"/></svg></button>
+    <button class="sbt is-on"><svg class="ic"><use href="#i-otrack"/></svg></button>
+    <button class="sbt is-on"><svg class="ic"><use href="#i-osnap"/></svg></button>
+    <button class="sbt"><svg class="ic"><use href="#i-lw"/></svg></button>
+    <button class="sbt hide-1366"><svg class="ic"><use href="#i-transp"/></svg></button>
+    <button class="sbt hide-1366"><svg class="ic"><use href="#i-cycle"/></svg></button>
+    <span class="sb-sep"></span>
+    <button class="sb-txt"><svg class="ic"><use href="#i-anno"/></svg>1:100<svg class="ic xs"><use href="#i-down"/></svg></button>
+    <span class="sb-grow"></span>
+    <button class="sb-chip warn"><svg class="ic"><use href="#i-warn"/></svg>Font: 3 thay thế</button>
+    <button class="sbt"><svg class="ic"><use href="#i-tasks"/></svg></button>
+    <button class="sbt has-dot"><svg class="ic"><use href="#i-bell"/></svg></button>
+    <span class="ed" style="margin:0 4px">Pro</span>
+    <button class="sbt"><svg class="ic"><use href="#i-gear"/></svg></button>
+    <button class="sbt"><svg class="ic"><use href="#i-menu"/></svg></button>
+  </footer>
+</div>
+</template>
+
+<template id="tpl-kit">
+<div class="kit">
+  <div class="kit-col">
+    <div>
+      <h3>Nút</h3>
+      <div class="row">
+        <button class="btn primary">In</button>
+        <button class="btn">Xem trước…</button>
+        <button class="btn ghost">Hủy</button>
+        <button class="btn" disabled>Áp dụng</button>
+        <button class="btn locked"><svg class="ic"><use href="#i-lock"/></svg>In hàng loạt<span class="ed vp">Viewer Pro</span></button>
+      </div>
+    </div>
+    <div>
+      <h3>Ô nhập số (UI-C09), danh sách, ô chọn</h3>
+      <div class="row" style="align-items:flex-start; gap:16px">
+        <div class="fld"><span class="lab">Bán kính</span><span class="num"><input value="1250.00" aria-label="Bán kính" tabindex="-1" readonly><span class="pick"><svg class="ic"><use href="#i-idpoint"/></svg></span><span class="spin"><svg class="ic"><use href="#i-up"/></svg><svg class="ic"><use href="#i-down"/></svg></span></span></div>
+        <div class="fld"><span class="lab">Tỉ lệ</span><span class="num err"><input value="-5" aria-label="Tỉ lệ" tabindex="-1" readonly><span class="pick"><svg class="ic"><use href="#i-idpoint"/></svg></span></span><span class="msg-err"><svg class="ic xs"><use href="#i-warn"/></svg>Tỉ lệ phải lớn hơn 0</span></div>
+        <div class="fld"><span class="lab">Layer</span><span class="dd" style="width:170px"><span style="display:flex;gap:6px;align-items:center"><i class="sw" style="width:10px;height:10px;border-radius:2px;background:#FFFF00;display:inline-block"></i>KT-CUA</span><svg class="ic xs"><use href="#i-down"/></svg></span></div>
+      </div>
+      <div class="row" style="margin-top:10px; gap:16px">
+        <span class="chk"><i class="on"><svg class="ic"><use href="#i-check"/></svg></i>Bắt điểm vào xref</span>
+        <span class="chk"><i></i>Gồm block lồng</span>
+        <span class="chip" style="height:22px">Bán kính · <u>R</u></span><span class="chip" style="height:22px">Đường kính · <u>D</u></span>
+      </div>
+    </div>
+    <div>
+      <h3>Tooltip, toast</h3>
+      <div class="row" style="align-items:flex-start; gap:14px">
+        <div class="tip"><b>Đường tròn</b><span class="cmdn">CIRCLE · C</span><span style="color:var(--c-text-2)">Rê thêm để xem mô tả · F1 trợ giúp</span></div>
+        <div class="toast"><svg class="ic"><use href="#i-check"/></svg><span>Đã xuất 24 tờ PDF</span><button class="btn sm">Mở thư mục</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="kit-col">
+    <div>
+      <h3>Chữ</h3>
+      <p class="type-big">Bản vẽ kỹ thuật ÂĂÊÔƠƯĐ 0123</p>
+      <div class="type-row"><span><b>Nhãn</b> Độ trong suốt</span><span><b>Phụ</b> Chỉ định điểm tiếp theo</span><span class="mono"><b>Số</b> 12345.67, 8901.23</span></div>
+    </div>
+    <div>
+      <h3>Bề mặt và màu nhấn</h3>
+      <div class="sws" data-sw="ui"></div>
+    </div>
+    <div>
+      <h3>Trên vùng vẽ</h3>
+      <div class="canvas-strip">
+        <span><i class="g" style="border:1.5px solid var(--c-sel-w); background:var(--c-sel-wf); width:22px;height:14px"></i>Window</span>
+        <span><i class="g" style="border:1.5px dashed var(--c-sel-c); background:var(--c-sel-cf); width:22px;height:14px"></i>Crossing</span>
+        <span><i class="g" style="background:var(--c-grip-cold)"></i>Grip nguội</span>
+        <span><i class="g" style="background:var(--c-grip-hover); width:11px;height:11px"></i>Rê</span>
+        <span><i class="g" style="background:var(--c-grip-hot); width:11px;height:11px; outline:1.5px solid #fff"></i>Nóng</span>
+        <span><i class="g" style="border:2px solid var(--c-snap); width:12px;height:12px"></i>Bắt điểm</span>
+        <span><i class="g" style="border-top:2px dotted var(--c-track); width:26px;height:0"></i>Theo dõi</span>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<script>
+(function(){
+  'use strict';
+  var state = { mode:'dark', size:'1920' };
+  try { var s = JSON.parse(localStorage.getItem('tc-dir-view') || '{}'); if (s.mode) state.mode = s.mode; if (s.size) state.size = s.size; } catch(e) {}
+
+  /* ---------- Bản vẽ mẫu: mặt bằng tầng 1, đơn vị mm, trục Y hướng lên ---------- */
+  var ACI = {1:'#FF0000',2:'#FFFF00',3:'#00FF00',4:'#00FFFF',6:'#FF00FF',7:'#FFFFFF',8:'#808080',9:'#C0C0C0',30:'#FF7F00',140:'#00BFFF',252:'#696969'};
+  function buildScene(){
+    var E = [];
+    function rp(x0,y0,x1,y1){ return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]]; }
+    function L(x1,y1,x2,y2,c,lt){ E.push({t:'L',p:[x1,y1,x2,y2],c:c,lt:lt}); }
+    function R(x0,y0,x1,y1,c){ E.push({t:'P',pts:rp(x0,y0,x1,y1),closed:1,c:c}); }
+    function P(pts,c,closed){ E.push({t:'P',pts:pts,closed:closed,c:c}); }
+    function C(x,y,r,c){ E.push({t:'C',x:x,y:y,r:r,c:c}); }
+    function A(x,y,r,a0,a1,c){ E.push({t:'A',x:x,y:y,r:r,a0:a0,a1:a1,c:c}); }
+    function El(x,y,rx,ry,c){ E.push({t:'E',x:x,y:y,rx:rx,ry:ry,c:c}); }
+    function T(x,y,h,s,c,al,rot,b){ E.push({t:'T',x:x,y:y,h:h,s:s,c:c,al:al||'middle',rot:rot||0,b:b}); }
+    function F(pts,fill,c){ E.push({t:'F',pts:pts,fill:fill,c:c}); }
+
+    var h = 110, i = 55;
+    var AX = [0,3900,7800,11700], AY = [0,4800,9000];
+    var rooms = [
+      {r:[110,110,7745,4745], n:'PHÒNG KHÁCH + ĂN', s:'35.39', at:[3950,4150], h:260},
+      {r:[7855,110,11590,4745], n:'BẾP', s:'17.31', at:[9300,2650]},
+      {r:[110,4855,3845,8890], n:'P. NGỦ 1', s:'15.07', at:[1900,6350]},
+      {r:[3955,4855,7745,6845]},
+      {r:[3955,6955,5645,8890], n:'WC', s:'3.27', at:[4800,8150], small:1},
+      {r:[5755,6955,7745,8890], n:'KHO', s:'3.85', at:[6900,8150], small:1},
+      {r:[7855,4855,11590,8890], n:'P. NGỦ 2', s:'15.07', at:[9700,6350]}
+    ];
+    // tường: tô hatch toàn khối rồi che lòng phòng
+    F(rp(-h,-h,11700+h,9000+h),'hatch');
+    rooms.forEach(function(o){ F(rp(o.r[0],o.r[1],o.r[2],o.r[3]),'bg'); });
+    F(rp(4300,4745-30,7400,4855+30),'bg');
+    // trục định vị (CENTER)
+    AX.forEach(function(x){ L(x,-2600,x,9800,1,'center'); });
+    AY.forEach(function(y){ L(-2600,y,12500,y,1,'center'); });
+    // mép tường
+    R(-h,-h,11700+h,9000+h,7);
+    rooms.forEach(function(o){ R(o.r[0],o.r[1],o.r[2],o.r[3],7); });
+    // lỗ mở: che, vẽ má cửa
+    function openH(a,b,wy,t){ F(rp(a,wy-t/2-30,b,wy+t/2+30),'bg'); L(a,wy-t/2,a,wy+t/2,7); L(b,wy-t/2,b,wy+t/2,7); }
+    function openV(a,b,wx,t){ F(rp(wx-t/2-30,a,wx+t/2+30,b),'bg'); L(wx-t/2,a,wx+t/2,a,7); L(wx-t/2,b,wx+t/2,b,7); }
+    openH(4300,7400,4800,110);
+    // cửa đi (KT-CUA, màu 2): cánh mở 90° và cung quét
+    function doorH(a,b,wy,t,hingeAtA,side){
+      openH(a,b,wy,t); var w=b-a, hx=hingeAtA?a:b, fy=wy+side*t/2;
+      L(hx,fy,hx,fy+side*w,2);
+      var closed = hingeAtA?0:180, open = side>0?90:270;
+      A(hx,fy,w,Math.min(closed,open===270&&closed===0?-90:open),Math.max(closed,open===270&&closed===0?-90:open),2);
+    }
+    function doorV(a,b,wx,t,hingeAtA,side){
+      openV(a,b,wx,t); var w=b-a, hy=hingeAtA?a:b, fx=wx+side*t/2;
+      L(fx,hy,fx+side*w,hy,2);
+      var closed = hingeAtA?90:270, open = side>0?0:180;
+      var a0=closed, a1=open; if (hingeAtA && side>0){a0=0;a1=90;} else if(hingeAtA && side<0){a0=90;a1=180;} else if(!hingeAtA && side>0){a0=-90;a1=0;} else {a0=180;a1=270;}
+      A(fx,hy,w,a0,a1,2);
+    }
+    doorH(2750,3650,0,220,true,1);
+    doorV(3300,4100,7800,110,false,1);
+    doorH(2700,3500,4800,110,false,1);
+    doorH(8200,9000,4800,110,true,1);
+    doorH(4300,5000,6900,110,false,1);
+    doorH(6100,6800,6900,110,true,1);
+    // cửa sổ (KT-CUASO, màu 4)
+    function winH(a,b,wy,t){ openH(a,b,wy,t); L(a,wy-t/2,b,wy-t/2,4); L(a,wy+t/2,b,wy+t/2,4); L(a,wy-22,b,wy-22,4); L(a,wy+22,b,wy+22,4); }
+    function winV(a,b,wx,t){ openV(a,b,wx,t); L(wx-t/2,a,wx-t/2,b,4); L(wx+t/2,a,wx+t/2,b,4); L(wx-22,a,wx-22,b,4); L(wx+22,a,wx+22,b,4); }
+    winH(4800,6600,0,220); winH(9200,10600,0,220); winH(4500,5200,9000,220);
+    winV(1400,3200,0,220); winV(6000,7800,0,220); winV(6200,7800,11700,220); winV(1200,2200,11700,220);
+    // cột 300×300
+    [[0,0],[3900,0],[7800,0],[11700,0],[0,4800],[3900,4800],[7800,4800],[11700,4800],[0,9000],[3900,9000],[7800,9000],[11700,9000]].forEach(function(p){
+      F(rp(p[0]-150,p[1]-150,p[0]+150,p[1]+150),'solid',8); R(p[0]-150,p[1]-150,p[0]+150,p[1]+150,7);
+    });
+    // nội thất (màu 8)
+    P([[400,200],[2600,200],[2600,1000],[1200,1000],[1200,2400],[400,2400]],8,1);
+    P([[600,2400],[600,400],[2600,400]],8,0);
+    R(1600,1400,2500,2100,8);
+    R(600,4300,2400,4700,8); L(900,4600,2100,4600,8);
+    R(5000,1600,6800,2600,8);
+    [5175,5675,6175].forEach(function(x){ R(x,1050,x+450,1500,8); L(x,1120,x+450,1120,8); R(x,2700,x+450,3150,8); L(x,3080,x+450,3080,8); });
+    R(8400,110,11590,710,8); R(10990,710,11590,4200,8);
+    R(9500,200,10300,620,8); R(9560,250,9880,580,8); R(9920,250,10240,580,8);
+    R(10990,2250,11590,3150,8); C(11140,2480,110,8); C(11440,2480,110,8); C(11140,2920,110,8); C(11440,2920,110,8);
+    R(8900,4045,9600,4745,8); L(8900,4045,9600,4745,8);
+    R(1100,6890,2700,8890,8); R(1250,8450,1850,8800,8); R(1950,8450,2550,8800,8); L(1100,7900,2700,7900,8);
+    R(600,8390,1050,8840,8); R(2750,8390,3200,8840,8);
+    R(3245,5900,3845,7700,8); L(3545,5900,3545,7700,8);
+    R(8800,6890,10600,8890,8); R(8950,8450,9650,8800,8); R(9750,8450,10450,8800,8); L(8800,7900,10600,7900,8);
+    R(8300,8390,8750,8840,8); R(10650,8390,11100,8840,8);
+    R(10990,5200,11590,6400,8); R(10520,5560,10900,5940,8);
+    R(4050,8640,4550,8890,140); El(4300,8360,200,270,140);
+    R(5050,8440,5645,8890,140); El(5347,8650,190,140,140); C(4350,7300,60,140);
+    R(5800,8490,7700,8890,8); L(5800,8690,7700,8690,8);
+    // cầu thang
+    for (var k=0;k<=12;k++){ var tx=4300+k*260; L(tx,5150,tx,6550,9); }
+    L(4300,5150,7420,5150,9); L(4300,6550,7420,6550,9);
+    L(4400,5850,7250,5850,9); P([[7250,5760],[7420,5850],[7250,5940]],9,1);
+    P([[5600,5150],[5900,5650],[5750,5700],[6050,6550]],9,0);
+    T(4520,6050,170,'LÊN',9,'start');
+    // kích thước (KT-DIM, màu 3)
+    function dimH(x1,x2,y,from,txt){ L(x1,from,x1,y-160,3); L(x2,from,x2,y-160,3); L(x1-200,y,x2+200,y,3); E.push({t:'TK',x:x1,y:y,c:3}); E.push({t:'TK',x:x2,y:y,c:3}); T((x1+x2)/2,y+210,220,txt,3); }
+    function dimV(y1,y2,x,from,txt){ L(from,y1,x-160,y1,3); L(from,y2,x-160,y2,3); L(x,y1-200,x,y2+200,3); E.push({t:'TK',x:x,y:y1,c:3}); E.push({t:'TK',x:x,y:y2,c:3}); T(x-90,(y1+y2)/2,220,txt,3,'middle',90); }
+    dimH(0,3900,-1200,-500,'3900'); dimH(3900,7800,-1200,-500,'3900'); dimH(7800,11700,-1200,-500,'3900');
+    dimH(0,11700,-1900,-1360,'11700');
+    dimV(0,4800,-1200,-500,'4800'); dimV(4800,9000,-1200,-500,'4200');
+    dimV(0,9000,-1900,-1360,'9000');
+    // bóng trục
+    ['1','2','3','4'].forEach(function(n,k){ C(AX[k],-3000,400,1); T(AX[k],-3000,340,n,7,'middle',0); });
+    ['A','B','C'].forEach(function(n,k){ C(-3000,AY[k],400,1); T(-3000,AY[k],340,n,7,'middle',0); });
+    // tên phòng
+    rooms.forEach(function(o){ if(!o.n) return; T(o.at[0],o.at[1],o.h||(o.small?220:300),o.n,7); T(o.at[0],o.at[1]-(o.small?320:400),o.small?170:200,'S = '+o.s+' m²',9); });
+    // cao độ ±0.000
+    P([[1700,2800],[1560,3000],[1840,3000]],2,1); L(1560,3000,2700,3000,2); T(2130,3170,180,'±0.000',2,'middle');
+    // tên bản vẽ
+    T(5850,-4400,480,'MẶT BẰNG TẦNG 1',7,'middle',0,1); L(5850-2700,-4760,5850+2700,-4760,7); L(5850-2700,-4820,5850+2700,-4820,7);
+    T(5850,-5100,280,'TL 1:100',7);
+    // ghi chú
+    T(13600,8550,300,'GHI CHÚ:',7,'start',0,1);
+    ['1. Tường bao xây gạch dày 220, tường ngăn dày 110.','2. Cao độ ±0.000 lấy theo mặt sàn hoàn thiện tầng 1.','3. Kích thước ghi bằng mm, cao độ ghi bằng m.','4. Cửa đi, cửa sổ xem bảng thống kê bản vẽ KT-12.']
+      .forEach(function(s,k){ T(13600,8000-k*480,220,s,7,'start'); });
+    // mũi tên hướng Bắc
+    C(17600,1500,900,2); P([[17600,2500],[17250,700],[17600,1050]],2,1); F([[17600,2500],[17950,700],[17600,1050]],'solid',2); P([[17600,2500],[17950,700],[17600,1050]],2,1);
+    T(17600,2750,360,'B',2,'middle',0,1);
+    return E;
+  }
+  var SCENE = buildScene();
+  var VIEW = { x0:-4200, y0:-5700, x1:21000, y1:10300 };
+  var P1 = [3300,1300], P2 = [5000,1600];
+
+  function f1(n){ return Math.round(n*10)/10; }
+  function drawSVG(app, uid){
+    var cv = app.querySelector('.cv'), svg = cv.querySelector('svg.dw');
+    var W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+    var banner = cv.querySelector('.cv-banner');
+    var top = (banner ? banner.offsetTop + banner.offsetHeight : 0) + 34;
+    var pal = app.classList.contains('dir-c') && app.dataset.size === '1920' ? 300 : 0;
+    var bottom = app.classList.contains('dir-c') ? 120 : 20;
+    var aw = W - pal - 40, ah = H - top - bottom;
+    var s = Math.min(aw/(VIEW.x1-VIEW.x0), ah/(VIEW.y1-VIEW.y0));
+    var ox = 20 + (aw - (VIEW.x1-VIEW.x0)*s)/2 - VIEW.x0*s;
+    var oy = top + (ah - (VIEW.y1-VIEW.y0)*s)/2 + VIEW.y1*s;
+    function X(x){ return f1(ox + x*s); } function Y(y){ return f1(oy - y*s); }
+    var o = [];
+    o.push('<defs><pattern id="hp'+uid+'" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#808080" stroke-width="1"/></pattern></defs>');
+    SCENE.forEach(function(e){
+      var c = ACI[e.c] || '#FFFFFF';
+      if (e.t === 'F'){
+        var d = e.pts.map(function(p,k){ return (k?'L':'M')+X(p[0])+' '+Y(p[1]); }).join('')+'Z';
+        if (e.fill === 'hatch') o.push('<path d="'+d+'" fill="url(#hp'+uid+')"/>');
+        else if (e.fill === 'bg') o.push('<path class="bg" d="'+d+'"/>');
+        else o.push('<path d="'+d+'" fill="'+c+'" fill-opacity=".85"/>');
+      } else if (e.t === 'L'){
+        o.push('<line x1="'+X(e.p[0])+'" y1="'+Y(e.p[1])+'" x2="'+X(e.p[2])+'" y2="'+Y(e.p[3])+'" stroke="'+c+'" stroke-width="1"'+(e.lt==='center'?' stroke-dasharray="16 4 3 4"':'')+'/>');
+      } else if (e.t === 'P'){
+        o.push('<'+(e.closed?'polygon':'polyline')+' points="'+e.pts.map(function(p){ return X(p[0])+','+Y(p[1]); }).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="1"/>');
+      } else if (e.t === 'C'){
+        o.push('<circle cx="'+X(e.x)+'" cy="'+Y(e.y)+'" r="'+f1(e.r*s)+'" fill="none" stroke="'+c+'" stroke-width="1"/>');
+      } else if (e.t === 'E'){
+        o.push('<ellipse cx="'+X(e.x)+'" cy="'+Y(e.y)+'" rx="'+f1(e.rx*s)+'" ry="'+f1(e.ry*s)+'" fill="none" stroke="'+c+'" stroke-width="1"/>');
+      } else if (e.t === 'A'){
+        var pts = []; for (var k=0;k<=24;k++){ var a=(e.a0+(e.a1-e.a0)*k/24)*Math.PI/180; pts.push(X(e.x+e.r*Math.cos(a))+','+Y(e.y+e.r*Math.sin(a))); }
+        o.push('<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+c+'" stroke-width="1"/>');
+      } else if (e.t === 'TK'){
+        var x = X(e.x), y = Y(e.y); o.push('<line x1="'+(x-3.5)+'" y1="'+(y+3.5)+'" x2="'+(x+3.5)+'" y2="'+(y-3.5)+'" stroke="'+c+'" stroke-width="1.6"/>');
+      } else if (e.t === 'T'){
+        var fs = Math.max(4, e.h*s*1.25);
+        var tx = X(e.x), ty = Y(e.y) + (e.rot ? 0 : fs*0.35);
+        var tr = e.rot ? ' transform="rotate(-'+e.rot+' '+tx+' '+ty+')"' : '';
+        o.push('<text x="'+tx+'" y="'+ty+'" fill="'+c+'" font-size="'+f1(fs)+'" text-anchor="'+e.al+'"'+(e.b?' font-weight="700"':'')+(e.rot?' dominant-baseline="auto"':'')+tr+'>'+e.s+'</text>');
+      }
+    });
+    // ---- lớp tương tác: LINE đang chờ điểm thứ hai, bắt Điểm cuối ở góc bàn ăn ----
+    var ax = X(P1[0]), ay = Y(P1[1]), bx = X(P2[0]), by = Y(P2[1]);
+    var dx = bx-ax, dy = by-ay, len = Math.hypot(dx,dy), ux = dx/len, uy = dy/len, nx = uy, ny = -ux; // pháp tuyến hướng lên trên
+    var off = 26;
+    o.push('<g style="stroke:var(--c-dyn-b)" stroke-width="1" fill="none"><line x1="'+ax+'" y1="'+ay+'" x2="'+f1(ax+nx*(off+5))+'" y2="'+f1(ay+ny*(off+5))+'"/><line x1="'+bx+'" y1="'+by+'" x2="'+f1(bx+nx*(off+5))+'" y2="'+f1(by+ny*(off+5))+'"/><line x1="'+f1(ax+nx*off)+'" y1="'+f1(ay+ny*off)+'" x2="'+f1(bx+nx*off)+'" y2="'+f1(by+ny*off)+'"/></g>');
+    o.push('<line x1="'+ax+'" y1="'+ay+'" x2="'+f1(ax+70)+'" y2="'+ay+'" style="stroke:var(--c-dyn-b)" stroke-dasharray="2 3"/>');
+    var ang = Math.atan2(-(by-ay), bx-ax); var r = 46, steps = 12, arc=[]; for (var k=0;k<=steps;k++){ var a2 = ang*k/steps; arc.push(f1(ax + r*Math.cos(a2))+','+f1(ay - r*Math.sin(a2))); }
+    o.push('<polyline points="'+arc.join(' ')+'" fill="none" style="stroke:var(--c-dyn-b)"/>');
+    o.push('<line x1="'+ax+'" y1="'+ay+'" x2="'+bx+'" y2="'+by+'" style="stroke:var(--c-rubber)" stroke-width="1.2"/>');
+    o.push('<line x1="'+(bx-64)+'" y1="'+by+'" x2="'+(bx+64)+'" y2="'+by+'" style="stroke:var(--c-cross)" stroke-width="1"/><line x1="'+bx+'" y1="'+(by-64)+'" x2="'+bx+'" y2="'+(by+64)+'" style="stroke:var(--c-cross)" stroke-width="1"/>');
+    o.push('<rect x="'+(bx-6)+'" y="'+(by-6)+'" width="12" height="12" fill="none" style="stroke:var(--c-snap)" stroke-width="2"/>');
+    svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    svg.innerHTML = o.join('');
+    // ô nhập động, tooltip bắt điểm (HTML trên vùng vẽ)
+    cv.querySelectorAll('.dyn,.snap-tip').forEach(function(n){ n.remove(); });
+    var lenMM = Math.hypot(P2[0]-P1[0], P2[1]-P1[1]).toFixed(2);
+    var angDeg = Math.round(Math.abs(Math.atan2(P2[1]-P1[1], P2[0]-P1[0])*180/Math.PI));
+    function put(cls, html, x, y){ var d = document.createElement('div'); d.className = cls; d.innerHTML = html; cv.appendChild(d); d.style.left = (x - d.offsetWidth/2)+'px'; d.style.top = (y - d.offsetHeight/2)+'px'; return d; }
+    put('dyn is-focus mono', lenMM+'<span class="caret"></span>', ax + dx/2 + nx*off, ay + dy/2 + ny*off);
+    var mid = ang/2; put('dyn mono', angDeg+'°', ax + (r+30)*Math.cos(mid), ay - (r+30)*Math.sin(mid) + 4);
+    var pr = put('dyn prompt', 'Chỉ định điểm tiếp theo hoặc<svg class="ic xs"><use href="#i-down"/></svg>', 0, 0);
+    pr.style.left = (bx + 18)+'px'; pr.style.top = (by + 16)+'px';
+    var st = document.createElement('div'); st.className = 'snap-tip'; st.textContent = 'Điểm cuối'; cv.appendChild(st);
+    st.style.left = (bx + 12)+'px'; st.style.top = (by - 30)+'px';
+  }
+
+  /* ---------- ribbon co theo bề rộng (§3.2): thu panel ưu tiên thấp thành nút ---------- */
+  function fitRibbon(app){
+    var body = app.querySelector('.rb-body'), panels = Array.prototype.slice.call(body.querySelectorAll('.rb-p'));
+    function over(){ return body.scrollWidth > body.clientWidth + 1; }
+    panels.forEach(function(p){ p.classList.remove('is-collapsed', 'is-compact'); });
+    // 1) thu panel ít dùng thành nút, ưu tiên thấp và bên phải trước; 2) ẩn nhãn nút nhỏ của panel chính; 3) thu nốt
+    var order = panels.slice().sort(function(a,b){ return (b.dataset.prio - a.dataset.prio) || (panels.indexOf(b) - panels.indexOf(a)); });
+    order.forEach(function(p){ if (over() && p.dataset.prio > 1) p.classList.add('is-collapsed'); });
+    panels.slice().reverse().forEach(function(p){ if (over() && !p.classList.contains('is-collapsed')) p.classList.add('is-compact'); });
+    panels.slice().reverse().forEach(function(p){ if (over()) p.classList.add('is-collapsed'); });
+  }
+
+  function canvasShare(app){
+    var cv = app.querySelector('.cv'), total = app.offsetWidth * app.offsetHeight;
+    var w = cv.offsetWidth, h = cv.offsetHeight;
+    return Math.round(w*h/total*100);
+  }
+
+  /* ---------- dựng trang ---------- */
+  var tplApp = document.getElementById('tpl-app'), tplKit = document.getElementById('tpl-kit');
+  var SW = [['--c-chrome','Thanh'],['--c-base','Nền'],['--c-sunken','Lõm'],['--c-raised','Nổi'],['--c-border-ctl','Viền ô'],['--c-text','Chữ'],['--c-text-2','Chữ phụ'],['--c-accent','Nhấn'],['--c-warn','Cảnh báo'],['--c-danger','Lỗi'],['--c-ok','Xong'],['--c-canvas','Vùng vẽ']];
+  var secs = Array.prototype.slice.call(document.querySelectorAll('.dir-sec'));
+  secs.forEach(function(sec, n){
+    var dir = sec.dataset.dir;
+    var app = tplApp.content.firstElementChild.cloneNode(true);
+    app.classList.add('dir-'+dir);
+    sec.querySelector('[data-frame]').appendChild(app);
+    var kit = tplKit.content.firstElementChild.cloneNode(true);
+    kit.classList.add('dir-'+dir);
+    sec.querySelector('[data-kit]').appendChild(kit);
+    var swBox = kit.querySelector('[data-sw="ui"]');
+    swBox.innerHTML = SW.map(function(s){ return '<span class="swc"><i style="background:var('+s[0]+')"></i>'+s[1]+'<code data-var="'+s[0]+'"></code></span>'; }).join('');
+    sec._app = app; sec._kit = kit; sec._uid = n;
+    sec.querySelector('[data-full]').addEventListener('click', function(ev){
+      var fr = sec.querySelector('[data-frame]'), on = fr.classList.toggle('is-full');
+      ev.currentTarget.textContent = on ? 'Thu theo trang' : 'Xem 100%';
+      layoutOne(sec);
+    });
+  });
+
+  function layoutOne(sec){
+    var app = sec._app, fr = sec.querySelector('[data-frame]');
+    var W = state.size === '1920' ? 1920 : 1366, H = state.size === '1920' ? 1080 : 768;
+    if (fr.classList.contains('is-full')){ fr.style.height = Math.min(H, window.innerHeight * 0.9) + 'px'; }
+    else { var sc = fr.clientWidth / W; app.style.transform = 'scale('+sc+')'; fr.style.height = Math.round(H*sc)+'px'; }
+  }
+  function applyAll(){
+    secs.forEach(function(sec){
+      var app = sec._app;
+      app.dataset.mode = state.mode; app.dataset.size = state.size; sec._kit.dataset.mode = state.mode;
+      layoutOne(sec);
+      fitRibbon(app);
+      drawSVG(app, sec._uid);
+      var m = sec.querySelector('[data-metric]');
+      m.textContent = canvasShare(app) + '% màn hình ' + (state.size === '1920' ? '1920×1080' : '1366×768');
+      var nc = app.querySelectorAll('.rb-p.is-collapsed').length, nk = app.querySelectorAll('.rb-p.is-compact').length;
+      sec.querySelector('[data-rb]').textContent = (nc || nk) ? ('thu ' + nc + '/9 panel thành nút' + (nk ? ', ẩn nhãn nút nhỏ ở ' + nk + ' panel' : '')) : 'đủ 9 panel tab Trang chủ';
+      var cs = getComputedStyle(sec._kit);
+      sec._kit.querySelectorAll('code[data-var]').forEach(function(c){ c.textContent = cs.getPropertyValue(c.dataset.var).trim().toUpperCase(); });
+    });
+    document.querySelectorAll('[data-mode]').forEach(function(b){ if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)); });
+    document.querySelectorAll('button[data-size]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.size === state.size)); });
+    try { localStorage.setItem('tc-dir-view', JSON.stringify(state)); } catch(e) {}
+  }
+  document.querySelectorAll('button[data-mode]').forEach(function(b){ b.addEventListener('click', function(){ state.mode = b.dataset.mode; applyAll(); }); });
+  document.querySelectorAll('button[data-size]').forEach(function(b){ b.addEventListener('click', function(){ state.size = b.dataset.size; applyAll(); }); });
+  var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ secs.forEach(layoutOne); }, 80); });
+  applyAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(applyAll);
+})();
+</script>
+</body>
+</html>
