@@ -423,7 +423,7 @@
     var d = D(), job = null;
     if (!TX_SETS[TX.set]) TX.set = 'Standard';
     return new Promise(function(res){
-      var dlg = TC.dialog({ id:'tx', title:'Đóng gói gửi đi', cmd:'ETRANSMIT', code:'UI-B11', w:960, h:620, flush:true, body:'<div class="tx" id="tx-b"></div>', foot:'<span></span>', onClose:function(){ if (job) job.stop = true; res(); } });
+      var dlg = TC.dialog({ id:'tx', title:'Đóng gói gửi đi', cmd:'ETRANSMIT', code:'UI-B11', w:960, h:620, flush:true, body:'<div class="tx" id="tx-b"></div>', foot:'<span></span>', onClose:function(){ if (job) TC.toast('Đóng gói vẫn chạy ở nền. Theo dõi ở thanh trạng thái.', { type:'info', log:false }); res(); } });
       var F = [];
       function row(f, tree){
         var dis = f.fixed || f.miss || f.skip, st = f.miss ? '<span class="tag warn">' + ic('warn', 's12') + esc(f.st) + '</span>' : f.st ? '<span class="faint">' + esc(f.st) + '</span>' : '<span class="tag ok">' + ic('check', 's12') + 'Đưa vào gói</span>';
@@ -446,21 +446,22 @@
             (S.desc ? '<span class="faint" style="font-size:var(--fs-xs)">' + esc(S.desc) + '</span>' : '') + '</div>' +
             '<div class="grp"><label class="gh" for="tx-note">Ghi chú gửi kèm</label><textarea class="inp" id="tx-note" rows="5" style="height:auto;padding:5px 7px;resize:vertical" placeholder="Ví dụ: Bản vẽ kiến trúc phát hành lần 2, sửa theo góp ý ngày 15/10.">' + esc(TX.note) + '</textarea><span class="faint" style="font-size:var(--fs-xs)">Ghi vào báo cáo đóng gói, gửi kèm trong gói.</span></div></div></div>';
         var f = $('.dlg-f', dlg.el);
-        f.innerHTML = run ? '<span class="tx-prog"><span class="prog grow"><i style="width:' + job.p.toFixed(0) + '%"></i></span><span class="mono">' + Math.round(job.p) + '%</span><span class="faint">' + esc(job.label) + '</span></span><button class="btn danger" type="button" data-tx="stop">Hủy</button>'
+        f.innerHTML = run ? '<button class="btn ghost" type="button" data-x="close">Chạy ở nền</button><span class="tx-prog"><span class="prog grow"><i style="width:' + job.p.toFixed(0) + '%"></i></span><span class="mono">' + Math.round(job.p) + '%</span><span class="faint">' + esc(job.label) + '</span></span><button class="btn danger" type="button" data-tx="stop">Hủy</button>'
           : '<button class="btn" type="button" data-tx="report">' + ic('list') + 'Xem báo cáo</button><span class="grow"></span><button class="btn ghost" type="button" data-x="cancel">Hủy</button><button class="btn primary" type="button" data-tx="go"' + (inc.length ? '' : ' disabled') + '>' + ic('pkg') + 'Đóng gói ' + inc.length + ' tệp</button>';
       }
       function start(){
         var S = TX_SETS[TX.set], inc = F.filter(function(f){ return f.inc; }), steps = ['Thu thập tệp tham chiếu'].concat(S.uni ? ['Chuyển font sang Unicode: ' + d.name] : [], S.purge ? ['Dọn dẹp bản vẽ'] : [], S.bind ? [S.bindk + ' xref vào bản vẽ'] : [], S.noprn ? ['Đặt máy in của layout về “Không”'] : [], S.fmt !== 'Giữ nguyên' ? ['Lưu thành ' + S.fmt] : [], inc.map(function(x){ return 'Sao chép ' + x.name; }), [S.pkg === 'zip' ? 'Nén ZIP' : 'Ghi thư mục', 'Ghi báo cáo đóng gói']);
-        var k = 0, rep = txReport(d, F), name = txPkg(d), miss = F.filter(function(x){ return x.miss; }).length;
-        job = { p:0, label:steps[0], stop:false }; render();
-        A().setTask('<span class="sb-task"><span class="spin"></span>Đóng gói ' + esc(d.name) + '</span>');
+        var k = 0, name = txPkg(d), miss = F.filter(function(x){ return x.miss; }).length;
+        // tác vụ nền: tiến trình và nút hủy ở thanh trạng thái, đóng hộp thoại vẫn chạy tiếp
+        var tick = function(){ render(); A().setTask(job ? '<span class="sb-task"><span class="spin"></span>Đóng gói ' + esc(d.name) + ' ' + Math.round(job.p) + '%<span class="prog"><i style="width:' + job.p.toFixed(0) + '%"></i></span><button class="ib sm" type="button" id="tx-x" aria-label="Hủy đóng gói">' + ic('x') + '</button></span>' : ''); var x = $('#tx-x'); if (x) x.onclick = function(){ if (job) job.stop = true; }; };
+        job = { p:0, label:steps[0], stop:false }; tick();
         var t = setInterval(function(){
-          if (job.stop){ clearInterval(t); job = null; A().setTask(''); TC.toast('Đã hủy đóng gói. Chưa tạo tệp nào trong ' + esc(S.dir) + '.', { type:'warn', log:false }); render(); return; }
-          k++; job.p = Math.min(100, k / steps.length * 100); job.label = steps[Math.min(k, steps.length - 1)]; render();
+          if (job.stop){ clearInterval(t); job = null; tick(); TC.toast('Đã hủy đóng gói. Chưa tạo tệp nào trong ' + esc(S.dir) + '.', { type:'warn', log:false }); return; }
+          k++; job.p = Math.min(100, k / steps.length * 100); job.label = steps[Math.min(k, steps.length - 1)]; tick();
           if (k < steps.length) return;
-          clearInterval(t); job = null; A().setTask(''); dlg.close(true);
+          clearInterval(t); job = null; tick(); dlg.close(true);
           TC.toast('Đã đóng gói ' + inc.length + ' tệp vào <span class="mono">' + esc(name) + '</span>' + (miss ? '. Thiếu ' + miss + ' tệp không tìm thấy: xem báo cáo.' : '.'), { type:miss ? 'warn' : 'ok', act:{ label:'Mở thư mục', fn:function(){ TC.toast('Mở ' + esc(S.dir) + ' trong File Explorer.', { type:'info', log:false }); } }, kind:'task' });
-          ctx.out('ETRANSMIT: ' + inc.length + ' tệp → ' + esc(S.dir + '\\' + name) + '. Báo cáo: ' + esc(SC.att.base(d.name)) + ' - Bao-cao-dong-goi.txt' + (rep ? '' : ''));
+          ctx.out('ETRANSMIT: ' + inc.length + ' tệp → ' + esc(S.dir + '\\' + name) + '. Báo cáo: ' + esc(SC.att.base(d.name)) + ' - Bao-cao-dong-goi.txt');
         }, 230);
       }
       dlg.el.addEventListener('click', function(e){

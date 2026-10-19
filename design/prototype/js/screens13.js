@@ -239,9 +239,10 @@
 
   /* ================= Dấu tâm, đường tâm ================= */
   var CEXT = 350; // phần kéo dài qua đường tròn: CENTEREXE 3,5 × DIMSCALE 100
-  X.cmark = function(x){ var e = x.e, k = x.t ? x.t.k : 1, c = e.c, s = e.r * .1, gp = e.r * .05, R = e.r + Math.min(CEXT, e.r * .5), seg = function(a, b){ x.o({ k:'seg', a:x.P(a), b:x.P(b) }); };
+  // dấu chữ thập ở tâm (0,1 R) và bốn đường kéo dài qua đường tròn, cách chữ thập một khe 0,05 R
+  X.cmark = function(x){ var e = x.e, c = e.c, s = e.r * .1, gp = e.r * .05, R = e.r + Math.min(CEXT, e.r * .5), seg = function(a, b){ x.o({ k:'seg', a:x.P(a), b:x.P(b) }); };
     seg([c[0] - s, c[1]], [c[0] + s, c[1]]); seg([c[0], c[1] - s], [c[0], c[1] + s]);
-    [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(function(u){ seg(add2(c, u, s + gp), add2(c, u, R)); }); if (k !== 1) return; };
+    [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(function(u){ seg(add2(c, u, s + gp), add2(c, u, R)); }); };
   function cmark(e){ return ED.make({ t:'cmark', c:e.c.slice(), r:e.r }); }
   IMPL.CENTERMARK = function(ctx){
     ctx.badge('CM'); var n = 0;
@@ -408,7 +409,8 @@
     var count = function(){ var c = {}; C.ents.forEach(function(e){ var k = TC.TYPE_NAMES[e.t] || e.t; c[k] = (c[k] || 0) + 1; }); return Object.keys(c).map(function(k){ return TC.n(c[k]) + ' ' + esc(k); }).join(', '); };
     var label = function(){ return { obj:'Dán ' + TC.n(n) + ' đối tượng', blk:'Dán thành block', img:'Dán thành ảnh', txt:'Dán thành MText' }[cur]; };
     return new Promise(function(res){
-      var dlg = TC.dialog({ id:'pspec', title:'Dán đặc biệt', cmd:'PASTESPEC', w:560, onClose:function(r){ if (r !== true) res(); },
+      var top = TC.topDialog(); if (top && top.id === 'pspec') top.close(false); // chạy lại lệnh khi hộp thoại cũ còn mở
+      var dlg = TC.dialog({ id:'pspec', title:'Dán đặc biệt', cmd:'PASTESPEC', w:560, cls:'pspec', focus:has ? '#ps-l' : '[data-x="cancel"]', onClose:function(r){ if (r !== true) res(); },
         body:has ? '<div class="stack"><div class="frow" style="--lab-w:64px"><span class="lab">Nguồn</span><span><b>' + esc(C.from || 'TrionCAD') + '</b> · ' + count() + '</span></div>' +
             '<div class="psw"><div class="stack" style="gap:8px">' + H.rad('ps-m', 'paste', 'Dán', true) + '<label class="chk" aria-disabled="true" data-tip="Dán liên kết dùng cho nguồn OLE (Excel, Word). Clipboard đang chứa đối tượng TrionCAD."><input type="radio" name="ps-m" value="link" disabled> Dán liên kết</label></div>' +
             '<div class="stack" style="gap:4px"><span class="gh">Dạng</span><div class="tree psl" id="ps-l" role="listbox" aria-label="Dạng dán" tabindex="0">' + F.map(function(f){ return '<button class="tn" type="button" role="option" data-pf="' + f[0] + '" aria-selected="' + (f[0] === cur) + '">' + ic(f[3], 's12') + esc(f[1]) + '</button>'; }).join('') + '</div></div></div>' +
@@ -493,10 +495,11 @@
         if (k){ ctx.out('Tùy chọn “' + esc(k) + '” không có. Chọn Thêm đối tượng · A, Bớt đối tượng · R hoặc Đổi tên · REN.'); return menu(); }
       }); }).then(end, function(err){ end(); throw err; }); });
   };
-  // PICKSTYLE: nút ribbon bật/tắt ngay; gõ lệnh thì hỏi giá trị như AutoCAD (script chạy được)
+  // PICKSTYLE: bấm nút (ribbon, menu) thì bật/tắt ngay; gõ lệnh hoặc chạy script thì hỏi giá trị như AutoCAD
   IMPL.PICKSTYLE = function(ctx, pre){
-    var set = function(v){ TC.S.pickstyle = v; TC.save('pickstyle', v); ctx.out('PICKSTYLE = ' + v + ' · chọn theo nhóm: <b>' + (v & 1 ? 'bật' : 'tắt') + '</b>' + (v & 2 ? ', chọn hatch kèm đường biên liên kết' : '') + '.'); V().drawOver(); };
-    if (pre === undefined) return set(TC.S.pickstyle & 1 ? TC.S.pickstyle & 2 : TC.S.pickstyle | 1);
+    var ev = window.event;
+    var set = function(v){ TC.S.pickstyle = v; TC.save('pickstyle', v); ctx.out('PICKSTYLE = ' + v + ' · chọn theo nhóm: <b>' + (v & 1 ? 'bật' : 'tắt') + '</b>' + (v & 2 ? ', chọn hatch kèm đường biên liên kết' : '') + '.'); V().drawOver(); A().renderRibbon(); };
+    if (pre == null && ev && ev.type === 'click') return set(TC.S.pickstyle & 1 ? TC.S.pickstyle & 2 : TC.S.pickstyle | 1);
     if (pre != null && /^[0-3]$/.test(pre)) return set(Number(pre));
     return ctx.kw('Giá trị mới cho PICKSTYLE', [['Tắt', '0'], ['Chọn theo nhóm', '1'], ['Hatch liên kết', '2'], ['Cả hai', '3']], String(TC.S.pickstyle)).then(function(k){ if (/^[0-3]$/.test(k)) set(Number(k)); else ctx.out('PICKSTYLE nhận giá trị từ 0 đến 3.'); });
   };
@@ -684,9 +687,12 @@
 
   /* ================= Chữ: đổi tỉ lệ, đổi điểm canh, gộp thành MText ================= */
   var TXT = /^(text|mtext|attdef)$/;
-  // khung chữ một dòng: điểm trái trên đường chân chữ (lb), hướng u, pháp tuyến v; bề rộng ước lượng 0,62 × chiều cao mỗi ký tự như canvas
-  function tFrame(e){ var r = rad(e.rot || 0), u = [Math.cos(r), Math.sin(r)], v = [-u[1], u[0]], al = e.al || 'l', w = e.h * .62 * String(e.t === 'attdef' ? e.tag : e.s).length, lb = add2(e.p, u, al === 'c' || al === 'm' ? -w / 2 : al === 'r' ? -w : 0); if (al === 'm') lb = add2(lb, v, -e.h / 2); return { lb:lb, u:u, v:v, w:w, h:e.h }; }
-  function tAt(f, al){ var p = add2(f.lb, f.u, al === 'c' || al === 'm' ? f.w / 2 : al === 'r' ? f.w : 0); return al === 'm' ? add2(p, f.v, f.h / 2) : p; }
+  // đo chữ bằng đúng font của vùng vẽ: đo ở cỡ 100 px rồi quy ra đơn vị bản vẽ (cỡ font = 1,32 × chiều cao chữ, như canvas.js)
+  var MC = document.createElement('canvas').getContext('2d');
+  function tMet(e){ var s = String(e.t === 'attdef' ? e.tag : e.s), k = e.h * 1.32 / 100; MC.font = V().textFont({ style:e.style }, 100); MC.textBaseline = 'alphabetic'; var a = MC.measureText(s); MC.textBaseline = 'middle'; var b = MC.measureText(s); return { w:a.width * k, mid:(a.actualBoundingBoxAscent - b.actualBoundingBoxAscent) * k }; }
+  // khung chữ một dòng: điểm trái trên đường chân chữ (lb), hướng u, pháp tuyến v, bề rộng w, độ cao đường giữa so với chân chữ (mid)
+  function tFrame(e){ var r = rad(e.rot || 0), u = [Math.cos(r), Math.sin(r)], v = [-u[1], u[0]], al = e.al || 'l', m = tMet(e), lb = add2(e.p, u, al === 'c' || al === 'm' ? -m.w / 2 : al === 'r' ? -m.w : 0); if (al === 'm') lb = add2(lb, v, -m.mid); return { lb:lb, u:u, v:v, w:m.w, h:e.h, mid:m.mid }; }
+  function tAt(f, al){ var p = add2(f.lb, f.u, al === 'c' || al === 'm' ? f.w / 2 : al === 'r' ? f.w : 0); return al === 'm' ? add2(p, f.v, f.mid) : p; }
   // điểm neo theo mã canh (L, C, R, M, TL…BR) của chữ hoặc MText
   function anchor(e, k){
     if (e.t === 'mtext'){ var r = rad(e.rot || 0), u = [Math.cos(r), Math.sin(r)], v = [-u[1], u[0]], Hm = TC.mtextLines(e).length * e.h * (e.ls || 1.6667); k = { L:'BL', C:'BC', R:'BR', M:'MC' }[k] || k; var p = add2(e.p, u, /C$/.test(k) ? e.w / 2 : /R$/.test(k) ? e.w : 0); return add2(p, v, /^M/.test(k) ? -Hm / 2 : /^B/.test(k) ? -Hm : 0); }
@@ -695,7 +701,7 @@
   var JUST = [['Trái', 'L'], ['Giữa', 'C'], ['Phải', 'R'], ['Giữa tâm', 'M'], ['Trên trái', 'TL'], ['Trên giữa', 'TC'], ['Trên phải', 'TR']], JALL = /^(L|C|R|M|TL|TC|TR|ML|MC|MR|BL|BC|BR)$/;
   IMPL.SCALETEXT = function(ctx){
     ctx.badge('ST');
-    return selEdit(ctx, 'Chọn đối tượng chữ').then(function(ids){ var ts = ents(ids, TXT); if (!ts.length){ ctx.out('Không có chữ (Text, MText, attribute) trong vùng chọn.'); return; }
+    return selEdit(ctx, 'Chọn đối tượng chữ').then(function(ids){ var ts = ents(ids, TXT); if (!ids.length) return; if (!ts.length){ ctx.out('Không có chữ (Text, MText, attribute) trong vùng chọn.'); return; }
       return ask(ctx, 'Điểm gốc cho tỉ lệ', [['Hiện có', 'E']].concat(JUST.slice(0, 4)), 'Hiện có').then(function(k){ k = String(k).toUpperCase(); if (k !== 'E' && !JALL.test(k)){ ctx.out('Điểm gốc “' + esc(k) + '” không hợp lệ. Dùng E, L, C, R, M hoặc TL…BR.'); return; }
         var go = function(hOf, what){ return ED.run('SCALETEXT', function(){ ts.forEach(function(e){ var h = hOf(e); if (!(h > 0)) return; var f = h / e.h, a = k === 'E' ? null : anchor(e, k); ED.mod(e, function(x){ x.h = h; if (a){ x.p = add2(a, sub(x.p, a), f); if (x.t === 'mtext') x.w *= f; } }); }); TC.cad.clearSel(); ctx.out('Đã đổi chiều cao ' + TC.n(ts.length) + ' đối tượng chữ ' + what + '.'); }); };
         return ctx.val('Chiều cao mới hoặc', TC.d(ts[0].h), { opts:[['Khớp đối tượng', 'M'], ['Hệ số tỉ lệ', 'S']] }).then(function(v){ var o = String(v).trim().toUpperCase();
@@ -705,7 +711,7 @@
   };
   IMPL.JUSTIFYTEXT = function(ctx){
     ctx.badge('JT');
-    return selEdit(ctx, 'Chọn đối tượng chữ').then(function(ids){ var ts = ents(ids, TXT); if (!ts.length){ ctx.out('Không có chữ (Text, MText, attribute) trong vùng chọn.'); return; }
+    return selEdit(ctx, 'Chọn đối tượng chữ').then(function(ids){ var ts = ents(ids, TXT); if (!ids.length) return; if (!ts.length){ ctx.out('Không có chữ (Text, MText, attribute) trong vùng chọn.'); return; }
       return ask(ctx, 'Điểm canh mới', JUST, 'Trái').then(function(k){ k = String(k).toUpperCase(); var al = { L:'l', C:'c', R:'r', M:'m', MC:'m', TL:'l', ML:'l', BL:'l', TC:'c', BC:'c', TR:'r', MR:'r', BR:'r' }[k];
         if (!al){ ctx.out('Điểm canh “' + esc(k) + '” không hợp lệ. Dùng L, C, R, M hoặc TL…BR.'); return; }
         var name = (JUST.filter(function(j){ return j[1] === k; })[0] || [k])[0];
@@ -717,8 +723,10 @@
     ctx.badge('T2M'); var d = D();
     var go = function(ids){ var ts = ents(ED.editable(ids, ctx), /^(text|mtext)$/); if (!ts.length){ ctx.out('Không có chữ trong vùng chọn.'); return; } if (ts.length === 1 && ts[0].t === 'mtext'){ ctx.out('Đối tượng đã là MText. Chọn thêm chữ để gộp.'); return; }
       if (T2M.order === 'T') ts.sort(function(a, b){ var ya = a.t === 'mtext' ? a.p[1] : tFrame(a).lb[1], yb = b.t === 'mtext' ? b.p[1] : tFrame(b).lb[1]; return yb - ya || a.p[0] - b.p[0]; });
-      var f = ts[0], h = f.h, lbs = ts.map(function(e){ return e.t === 'mtext' ? [e.p[0], e.p[1] - e.h] : tFrame(e).lb; }), x0 = Math.min.apply(null, lbs.map(function(p){ return p[0]; })), top = Math.max.apply(null, lbs.map(function(p){ return p[1]; })) + h;
-      var w = Math.max.apply(null, ts.map(function(e){ return e.t === 'mtext' ? e.w : tFrame(e).w; })) + h, ls = ts.length > 1 ? TC.clamp(Math.abs(lbs[0][1] - lbs[lbs.length - 1][1]) / (ts.length - 1) / h, 1.2, 3) : 1.6667;
+      // chiều cao chung là chiều cao gặp nhiều nhất; khung đủ rộng để không tự ngắt dòng (canvas ngắt theo 0,62 × cao mỗi ký tự)
+      var f = ts[0], hs = {}; ts.forEach(function(e){ hs[e.h] = (hs[e.h] || 0) + 1; }); var h = Number(Object.keys(hs).sort(function(a, b){ return hs[b] - hs[a]; })[0]);
+      var lbs = ts.map(function(e){ return e.t === 'mtext' ? [e.p[0], e.p[1] - e.h] : tFrame(e).lb; }), x0 = Math.min.apply(null, lbs.map(function(p){ return p[0]; })), top = lbs[0][1] + h;
+      var w = (Math.max.apply(null, ts.map(function(e){ return Math.max.apply(null, String(e.s).split('\n').map(function(l){ return l.length; })); })) + 1) * h * .62, ls = ts.length > 1 ? TC.clamp(Math.abs(lbs[0][1] - lbs[lbs.length - 1][1]) / (ts.length - 1) / h, 1, 3) : 1.6667;
       return ED.run('TXT2MTXT', function(){ var m = Object.assign(ED.make({ t:'mtext', p:[x0, top], w:w, h:h, s:ts.map(function(e){ return e.s; }).join('\n'), ls:ls, style:f.style, al:'l', rot:0 }), { layer:f.layer }); if (f.color != null) m.color = f.color; m = ED.add(m, ED.listOf(d, f)); ts.forEach(function(e){ ED.del(e); }); d.sel = [m.id]; TC.cad.afterSel(); ctx.out('Đã gộp ' + ts.length + ' đối tượng chữ thành 1 MText (' + (T2M.order === 'T' ? 'từ trên xuống' : 'theo thứ tự chọn') + ').'); }); };
     if (d.sel.length) return go(d.sel.slice());
     ctx.out('Bấm hoặc kéo khung để chọn chữ, Enter để gộp.', 'faint');

@@ -40,6 +40,7 @@
   --sh-pop: 0 4px 14px rgba(0,0,0,.45); --sh-dlg: 0 16px 40px rgba(0,0,0,.55);
   /* vùng vẽ và layout (07.1 §13.2) */
   --c-canvas: #0F1113; --c-canvas-grid: #1E2226; --c-canvas-grid-major: #2A2F35; --c-canvas-axis: #3A4048;
+  --c-canvas-bedit: #2A2F35; --c-canvas-bedit-grid: #3A4048;
   --c-layout-bg: #2A2E33; --c-paper: #FFFFFF; --c-paper-print: #8C949E; --c-paper-shadow: rgba(0,0,0,.55);
   --c-cross: #E8EAED; --c-rubber: #FFFFFF;
   --c-sel-w: #4C8DFF; --c-sel-wf: rgba(76,141,255,.16); --c-sel-c: #45C27E; --c-sel-cf: rgba(69,194,126,.16);

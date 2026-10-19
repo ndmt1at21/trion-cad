@@ -224,15 +224,15 @@ TC.ICONS = {
   coldel:'<path d="M2.5 2v12M13.5 2v12"/><path d="M5.5 2h5v12h-5z" class="f"/><path d="M6.3 6.2l3.4 3.6M9.7 6.2l-3.4 3.6"/>',
   merge:'<path d="M1.5 3.5h13v9h-13z"/><path d="M3.3 8H7M5.6 6.6 7 8 5.6 9.4M12.7 8H9M10.4 6.6 9 8l1.4 1.4"/>',
   unmerge:'<path d="M1.5 3.5h13v9h-13zM8 3.5v9"/><path d="M6.2 8H3.4M4.8 6.6 3.4 8l1.4 1.4M9.8 8h2.8M11.2 6.6 12.6 8l-1.4 1.4"/>',
-  borders:'<path d="M2 2h12v12H2z" style="stroke-width:2"/><path d="M2 8h12M8 2v12" class="dots"/>',
+  borders:'<path d="M2 2h12v12H2z" style="stroke-width:2"/><path d="M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
   bdall:'<path d="M2 2h12v12H2zM2 8h12M8 2v12"/>',
-  bdout:'<path d="M2 2h12v12H2z"/><path d="M2 8h12M8 2v12" class="dots"/>',
-  bdin:'<path d="M2 2h12v12H2z" class="dots"/><path d="M2 8h12M8 2v12"/>',
-  bdnone:'<path d="M2 2h12v12H2zM2 8h12M8 2v12" class="dots"/>',
-  bdtop:'<path d="M2 2h12"/><path d="M2 14h12M2 2v12M14 2v12M2 8h12M8 2v12" class="dots"/>',
-  bdbot:'<path d="M2 14h12"/><path d="M2 2h12M2 2v12M14 2v12M2 8h12M8 2v12" class="dots"/>',
-  bdleft:'<path d="M2 2v12"/><path d="M2 2h12M2 14h12M14 2v12M2 8h12M8 2v12" class="dots"/>',
-  bdright:'<path d="M14 2v12"/><path d="M2 2h12M2 14h12M2 2v12M2 8h12M8 2v12" class="dots"/>',
+  bdout:'<path d="M2 2h12v12H2z"/><path d="M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
+  bdin:'<path d="M2 2h12v12H2z" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/><path d="M2 8h12M8 2v12"/>',
+  bdnone:'<path d="M2 2h12v12H2zM2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
+  bdtop:'<path d="M2 2h12"/><path d="M2 14h12M2 2v12M14 2v12M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
+  bdbot:'<path d="M2 14h12"/><path d="M2 2h12M2 2v12M14 2v12M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
+  bdleft:'<path d="M2 2v12"/><path d="M2 2h12M2 14h12M14 2v12M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
+  bdright:'<path d="M14 2v12"/><path d="M2 2h12M2 14h12M2 2v12M2 8h12M8 2v12" style="stroke-dasharray:0 2.4;stroke-linecap:round;stroke-width:1.5"/>',
   pct:'<circle cx="4.5" cy="4.5" r="2"/><circle cx="11.5" cy="11.5" r="2"/><path d="M12.5 2.5 3.5 13.5"/>',
   fx:'<path d="M7.5 3.2C6.4 2.5 4.8 2.7 4.5 4.6L3.2 13.5M2 7h4.4"/><path d="M8.6 7.5l4.6 6M13.2 7.5l-4.6 6"/>',
   // soạn MText (UI-F02, F03): xếp chồng, đoạn văn
@@ -273,7 +273,8 @@ TC.ICONS = {
 TC.ic = function(name, cls){ return '<svg class="ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
 (function(){
   var s = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>';
-  for (var k in TC.ICONS) s += '<symbol id="i-' + k + '" viewBox="0 0 16 16">' + TC.ICONS[k] + '</symbol>';
+  // CSS của trang không chạm tới nội dung <use>, nên nét đứt (.dash) và chấm (.dots) ghi thành thuộc tính
+  for (var k in TC.ICONS) s += '<symbol id="i-' + k + '" viewBox="0 0 16 16">' + TC.ICONS[k].replace(/class="dash"/g, 'stroke-dasharray="1.6 1.7"').replace(/class="dots"/g, 'stroke-dasharray="0 2.6" stroke-linecap="round" stroke-width="1.75"') + '</symbol>';
   s += '</defs></svg>';
   var d = document.createElement('div'); d.innerHTML = s;
   (document.body || document.documentElement).insertBefore(d.firstChild, (document.body || document.documentElement).firstChild);

@@ -106,7 +106,6 @@
     'TCMARKUP|TCMARKUP|VP|2|Ghi chú markup|ghi chu, markup, danh dau, dam may, con dau|markup|Ghi chú › Markup',
     'TCATTOUT|TCATTOUT|VP|2|Xuất attribute ra Excel|xuat attribute, excel, khung ten|stats|Công cụ › Bản vẽ',
     'SELECT|SELECT|V|1|Chọn đối tượng|chon doi tuong|select|Dòng lệnh',
-    'TCATTIN|TCATTIN|PRO|2|Nhập attribute từ Excel|nhap attribute, excel|stats|Công cụ › Bản vẽ',
     // Đợt 3 · bản biên tập (EA); đợt 4, 5 là lệnh của v1.0 và sau v1.0
     'GRADIENT|GD|PRO|4|Tô chuyển màu (gradient)|to chuyen mau, gradient|hatch|Trang chủ › Vẽ',
     'BOUNDARY|BO|PRO|3|Tạo đường biên kín|duong bien, boundary|pline|Trang chủ › Vẽ',
@@ -304,6 +303,7 @@
   cmd.def = function(n){ n = String(n).toUpperCase().replace(/^[_.'\-]+/, ''); return CMDS[n] || CMDS[ALIAS[n]] || null; };
   cmd.last = function(){ return recentCmds[0] || null; };
   cmd.recent = function(){ return recentCmds.slice(0, 8); };
+  cmd.textPrompt = function(){ return !!(prompt && prompt.allowSpace); }; // prompt nhận chữ: dấu phẩy là chữ, không phải số
 
   /* ---------- giao diện dòng lệnh ---------- */
   var CL = TC.cmdline = {}, hist = [], els = {}, prompt = null, acSel = 0, histIdx = -1, entered = [];
@@ -496,7 +496,7 @@
           TC.cad.getSel({ onPick:function(){ TC.cmdline.status('Đã chọn ' + TC.n(d.sel.length) + ' · Enter để kết thúc chọn'); } }).then(function(ids){ prompt = null; renderPrompt(); if (ids && ids.length) d.prevSel = ids.slice(); res(ids || []); });
         });
       },
-      kw:function(text, opts, def){ return ask(text, { opts:opts, def:def }).then(function(r){ var v = r.raw || def; var k = opts.filter(function(o){ return o[1].toUpperCase() === String(v).toUpperCase() || TC.fold(o[0]).indexOf(TC.fold(v)) === 0; })[0]; return k ? k[1] : v; }); },
+      kw:function(text, opts, def){ return ask(text, { opts:opts, def:def }).then(function(r){ var v = r.raw || def; if (!v) return v; var k = opts.filter(function(o){ return o[1].toUpperCase() === String(v).toUpperCase() || TC.fold(o[0]).indexOf(TC.fold(v)) === 0; })[0]; return k ? k[1] : v; }); },
       val:function(text, def, o){ return ask(text, Object.assign({ def:def }, o || {})).then(function(r){ return r.raw === '' ? def : r.raw; }); },
       badge:function(b){ TC.app.view.badge = b; }
     };

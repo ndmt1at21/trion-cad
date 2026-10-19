@@ -209,6 +209,7 @@
     if (pr && pr.src && pr.src !== e && (pr.src.layer !== '0' || pr.src.color != null)) { var bl = this.doc.layerMap[pr.src.layer]; if (pr.src.color == null && bl) c = bl.color; }
     if (c == null) c = (this.doc.layerMap[e.layer] || {}).color || 7;
     if (c === 7 || c === 255) return onPaper ? '#000000' : '#FFFFFF';
+    if (typeof c === 'string') return c;
     return ACI[c] || '#FFFFFF';
   };
   View.prototype.lw = function(e){ if (!TC.S.toggles.lw) return 1; var w = e.lw != null ? e.lw : (this.doc.layerMap[e.layer] || {}).lw || 0.25; return Math.max(1, Math.round(w * 4 * 10) / 10); };
@@ -223,7 +224,7 @@
     var lay = this.doc.layerMap[e.layer] || {}; var lt = e.lt || lay.lt;
     if (e.t === 'vpframe' && !style) return;
     var frameOff = this.doc.frame === 0;
-    e._p.forEach(function(pr){
+    e._p.forEach(function(pr){ if (pr.fbg && self.print) return; // nền xám của field không in
       if (pr.k === 'ins' || (pr.clipb && frameOff && !style)) return;
       ctx.strokeStyle = ctx.fillStyle = col || self.color(e, pr, onPaper);
       ctx.lineWidth = pr.w && !style ? Math.max(lw, pr.w * s) : lw;

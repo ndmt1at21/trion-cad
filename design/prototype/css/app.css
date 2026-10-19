@@ -707,14 +707,51 @@ select.inp{ appearance:none; padding-right:22px; background-image:linear-gradien
 /* ô bảng UI-F07: khung sửa nội dung ô trên vùng vẽ */
 .tbce{ position:absolute; z-index:7; margin:0; padding:2px 5px; resize:none; overflow:hidden; border:1px dashed var(--c-sel-w); border-radius:1px; outline:none; background:color-mix(in srgb, var(--c-canvas) 86%, transparent); color:var(--c-rubber); caret-color:var(--c-sel-w); line-height:1.3; box-shadow:0 0 0 1px var(--c-canvas) }
 .tbce.paper{ background:var(--c-paper); color:var(--c-canvas) }
+/* field UI-F08 */
+.fdw{ display:grid; grid-template-columns:230px minmax(0,1fr); gap:14px; min-height:440px }
+.fdlist{ height:338px; overflow:auto; border:1px solid var(--c-border); border-radius:var(--r); padding:2px; outline:none }
+.fdm{ grid-template-rows:minmax(0,1fr) auto; min-width:0 } .fdbot{ align-items:start }
+.fdopt{ max-height:190px; overflow:auto; border:1px solid var(--c-border); border-radius:var(--r); padding:2px; outline:none }
+.fdopt .tn > span:first-child{ overflow:hidden; text-overflow:ellipsis } .fdopt .tn .cnt{ font-family:var(--f-mono); max-width:55%; overflow:hidden; text-overflow:ellipsis }
+.fdpv{ display:grid; place-items:center; height:60px; padding:6px 10px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-canvas); color:var(--c-rubber); font:16px Arial, "Helvetica Neue", sans-serif; overflow:hidden; text-align:center }
+.fdpv .faint{ font:var(--fs-s) var(--f-ui); color:var(--c-paper-print) } .fdv{ padding:1px 3px } .fdv.bg{ background:var(--c-canvas-axis) }
+.fdx{ min-height:60px; padding:6px 8px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-sunken); color:var(--c-text-2); font-size:var(--fs-xs); word-break:break-all; user-select:all }
+/* dung sai hình học UI-F14 */
+.gtt{ border-collapse:collapse; width:100% } .gtt th{ font-size:var(--fs-xs); font-weight:var(--fw-m); color:var(--c-text-3); text-align:left; padding:0 4px 4px } .gtt td{ padding:3px 4px; vertical-align:middle }
+.gtc{ display:inline-flex; align-items:center; gap:2px }
+.gts{ display:grid; place-items:center; width:34px; height:30px; border:1px solid var(--c-border-ctl); border-radius:var(--r); background:var(--c-raised); color:var(--c-text) }
+.gtd, .gtm{ display:grid; place-items:center; width:24px; height:var(--h-ctl); border:1px solid var(--c-border-ctl); border-radius:var(--r); background:var(--c-raised); color:var(--c-text-3); font-size:13px }
+.gts:hover, .gtd:hover, .gtm:hover{ border-color:var(--c-text-2) } .gtd[aria-pressed="true"]{ background:var(--c-on-bg); color:var(--c-on); border-color:var(--c-on) }
+.gtm i, .gtmc{ display:inline-grid; place-items:center; width:16px; height:16px; border:1.25px solid currentColor; border-radius:50%; font:600 9.5px var(--f-ui); font-style:normal; color:var(--c-text) }
+.gtmc{ margin-right:6px; vertical-align:middle } .gtmc.off{ border-color:transparent; color:var(--c-text-3) }
+.gdts{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:.075; stroke-linecap:square; overflow:visible } .gdts .fl{ fill:currentColor; stroke:none }
+.gtmi{ display:inline-grid; place-items:center; width:18px; margin-right:6px; vertical-align:middle } .gtmi .gdts{ width:16px; height:16px }
+/* leader nhanh UI-F13 */
+.qlw{ display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start }
+.qlatt{ display:grid; grid-template-columns:minmax(0,1fr) 104px 104px; gap:6px 10px; align-items:center; font-size:var(--fs-s) } .qlatt input{ accent-color:var(--c-accent); margin:0 }
+/* xếp chồng UI-F02, đoạn văn UI-F03, cột UI-F04, nhập văn bản */
+.skw{ display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:14px; align-items:start }
+.skpv{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; min-height:96px; padding:8px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-canvas); color:var(--c-rubber); font:20px Arial, "Helvetica Neue", sans-serif }
+.skpv .skc{ font-size:12px; color:var(--c-paper-print); flex-basis:100%; text-align:center; margin-top:8px } .skpv .skc b{ font-weight:400; color:var(--c-rubber) }
+.skf{ display:inline-flex; flex-direction:column; align-items:center; line-height:1.05; margin:0 3px } .skf.h > span:first-child{ border-bottom:1.5px solid currentColor; padding:0 2px } .skf.t, .skf.dec{ align-items:flex-start } .skf.d{ display:inline }
+.mpar{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 180px; gap:14px; align-items:start }
+.mtabs{ height:92px; overflow:auto; border:1px solid var(--c-border); border-radius:var(--r); padding:2px; outline:none }
+.mppv{ min-height:230px; padding:8px 10px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-canvas); color:var(--c-rubber); font:11px Arial, "Helvetica Neue", sans-serif } .mppv p{ margin:0 }
+.mcol{ display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:14px; align-items:start }
+.mcpv{ display:flex; gap:10px; height:150px; padding:10px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-canvas); overflow:hidden }
+.mcc{ flex:1; display:flex; flex-direction:column; gap:7px; min-width:0 } .mcc i{ display:block; height:3px; background:var(--c-paper-print); border-radius:1px } .mcc i.s{ width:60% }
+.tipv{ margin:0; height:180px; overflow:auto; padding:8px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-sunken); color:var(--c-text); font:var(--fs-s)/1.5 var(--f-mono); white-space:pre-wrap }
+/* tỉ lệ chú thích của đối tượng UI-F11 */
+.osw{ display:grid; grid-template-columns:minmax(0,1fr) 112px; gap:12px }
+.osadd{ display:grid; gap:2px; max-height:240px; overflow:auto; padding:4px 6px; border:1px solid var(--c-border); border-radius:var(--r) } .osi{ height:22px; width:100% }
 /* ==== hết screens9.js ==== */
 
 /* ==== Đợt 4 · screens10.js · block, tham chiếu, Mở rộng ==== */
 /* Block Editor UI-G04: nền vùng vẽ khác màu, UCS vẽ tại gốc block, không chuyển layout khi đang sửa */
-:root[data-bedit]{ --c-canvas:var(--c-canvas-grid-major); --c-canvas-grid-major:var(--c-canvas-axis) }
+:root[data-bedit]{ --c-canvas:var(--c-canvas-bedit); --c-canvas-grid-major:var(--c-canvas-bedit-grid) }
 :root[data-bedit] .cv-ucs{ display:none }
 :root[data-bedit] .lt{ pointer-events:none; opacity:.45 }
-.rb [data-ctl^="be-p2"]{ opacity:.45 } .rb [data-ctl="be-close"]{ max-width:84px }
+.rb [data-ctl^="be-p2"]{ opacity:.45 } .rb [data-ctl="be-close"], .rb [data-ctl="pu-imp"]{ max-width:84px }
 .bed{ display:grid; grid-template-columns:minmax(0,1fr) 302px; gap:14px }
 .bel{ height:262px; padding:2px; display:grid; align-content:start; outline:none }
 .bei{ display:flex; align-items:center; gap:6px; height:24px; padding:0 8px; border-radius:var(--r); font-size:var(--fs-s); text-align:left; width:100% }
@@ -727,8 +764,8 @@ select.inp{ appearance:none; padding-right:22px; background-image:linear-gradien
 .bmw{ display:grid; grid-template-columns:minmax(0,1fr) 116px; gap:10px } .bmt{ height:250px; outline:none } .bmt:focus-visible{ box-shadow:0 0 0 1px var(--c-focus) }
 .bmt tr.dup td{ background:var(--c-warn-soft) } .bmt tr.dup.is-sel td{ background:var(--c-accent-soft) }
 /* Gắn PDF UI-G13, nhập PDF UI-G14 */
-.pam{ display:grid; grid-template-columns:minmax(0,1fr) 246px; gap:12px; align-items:start }
-.pdp{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:6px; min-height:132px; max-height:230px; overflow:auto; padding:2px }
+.pam{ display:grid; grid-template-columns:minmax(0,1fr) 262px; gap:12px; align-items:start }
+.pdp{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; align-content:start; min-height:132px; max-height:236px; overflow:auto; padding:2px }
 .pdpi{ position:relative; display:grid; gap:3px; padding:4px; border:1px solid var(--c-border); border-radius:var(--r); font-size:var(--fs-xs); text-align:left; color:var(--c-text-2) }
 .pdpi canvas{ width:100%; height:auto; border-radius:1px; display:block } .pdpi span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .pdpi b{ color:var(--c-text) }
 .pdpi:hover{ border-color:var(--c-border-ctl) } .pdpi[aria-pressed="true"]{ border-color:var(--c-accent); box-shadow:0 0 0 1px var(--c-accent); color:var(--c-text) }
@@ -738,6 +775,40 @@ select.inp{ appearance:none; padding-right:22px; background-image:linear-gradien
 .pishx{ display:grid; grid-template-columns:1fr 1fr; gap:4px 8px; padding-left:20px }
 .pps{ display:grid; gap:2px } .ppi{ display:flex; align-items:center; gap:8px; height:22px; color:var(--c-text-3); font-size:var(--fs-s) } .ppi.done{ color:var(--c-text-2) } .ppi.cur{ color:var(--c-text); font-weight:var(--fw-m) }
 .ppk{ width:16px; display:grid; place-items:center; color:var(--c-ok) } .ppk .spin{ width:12px; height:12px }
+/* Thay block UI-G16 */
+.brw{ display:grid; grid-template-columns:232px minmax(0,1fr) 202px; gap:12px; align-items:start; padding-top:10px }
+.brl{ height:212px; padding:2px; display:grid; align-content:start; outline:none }
+.bri{ display:grid; grid-template-columns:42px minmax(0,1fr); gap:8px; align-items:center; padding:2px 6px; border-radius:var(--r); text-align:left; font-size:var(--fs-s) }
+.bri canvas{ border-radius:1px; display:block } .bri .nm{ display:grid; min-width:0 } .bri i{ font-style:normal; color:var(--c-text-3); font-size:var(--fs-xs); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.bri:hover{ background:var(--c-hover) } .bri[aria-selected="true"]{ background:var(--c-accent-soft); box-shadow:inset 2px 0 0 var(--c-accent) }
+/* DesignCenter UI-G17: rộng hơn palette thường */
+.palhost:has(.dc){ width:360px }
+.dc{ display:flex; flex-direction:column; height:100%; min-height:0 } .dc .pal-tools{ gap:1px }
+.dct{ padding:0 4px; flex:none } .dctree{ max-height:32%; min-height:66px; overflow:auto; padding:4px; border-bottom:1px solid var(--c-border); flex:none }
+.dctree .tn{ gap:4px } .dctree .tx{ width:10px; display:inline-grid; place-items:center; flex:none } .dctree .tl{ overflow:hidden; text-overflow:ellipsis }
+.dcpath{ padding:4px 8px; font-size:var(--fs-xs); color:var(--c-text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-bottom:1px solid var(--c-border); flex:none }
+.dcc{ flex:1 1 140px; min-height:110px; overflow:auto; outline:none }
+.dcg{ display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:4px; padding:6px } .dcg.ls{ grid-template-columns:1fr; gap:0; padding:4px }
+.dci{ display:grid; justify-items:center; gap:3px; padding:5px 4px; border:1px solid transparent; border-radius:var(--r); font-size:var(--fs-xs); color:var(--c-text-2); text-align:center; min-width:0 }
+.dci .nm{ color:var(--c-text); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap } .dci canvas{ border-radius:1px; display:block } .dci .sw{ width:22px; height:22px; margin:6px 0 }
+.dci:hover{ border-color:var(--c-border-ctl) } .dci[aria-selected="true"]{ border-color:var(--c-accent); background:var(--c-accent-soft) }
+.dcg.ls .dci{ grid-template-columns:30px minmax(0,1fr) auto; justify-items:start; align-items:center; text-align:left; padding:2px 6px; height:26px } .dcg.ls .dci .sw{ width:12px; height:12px; margin:0 0 0 8px }
+.dcpv{ border-top:1px solid var(--c-border); padding:6px; flex:none } .dcpv canvas{ display:block; width:100%; height:auto; border-radius:var(--r) }
+.dcdesc{ min-height:0; padding:6px 10px } .dcs{ display:grid; gap:8px; padding:8px; border-bottom:1px solid var(--c-border) } .dcs .frow{ gap:5px 8px }
+/* Tool Palettes UI-G18: tab dọc bên phải */
+.tp{ display:flex; flex-direction:column; height:100%; min-height:0 } .tp.drop .tpl{ box-shadow:inset 0 0 0 2px var(--c-accent); background:var(--c-accent-soft) }
+.tpm{ flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) var(--strip) }
+.tpl{ overflow:auto; padding:4px; display:grid; align-content:start; gap:1px; outline:none }
+.tpi{ display:grid; grid-template-columns:42px minmax(0,1fr) auto; gap:8px; align-items:center; min-height:36px; padding:2px 6px; border-radius:var(--r); text-align:left; font-size:var(--fs-s) }
+.tpi:hover, .tpi[aria-selected="true"]{ background:var(--c-hover) } .tpi:active{ background:var(--c-press) } .tpi .nm{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.tpi canvas{ display:block; border-radius:1px } .tpic{ display:grid; place-items:center; width:40px; height:30px; border-radius:1px; background:var(--c-sunken); color:var(--c-text-2) }
+.tpt{ background:var(--c-chrome); border-left:1px solid var(--c-border); display:flex; flex-direction:column; gap:2px; padding-top:4px; overflow:hidden }
+.tpv{ writing-mode:vertical-rl; padding:10px 0; font-size:var(--fs-xs); color:var(--c-text-2); white-space:nowrap; display:flex; align-items:center; justify-content:center }
+.tpv:hover{ background:var(--c-hover); color:var(--c-text) } .tpv[aria-selected="true"]{ background:var(--c-base); color:var(--c-text); box-shadow:inset 2px 0 0 var(--c-accent) }
+.tpdrag{ position:fixed; z-index:950; pointer-events:none; display:flex; align-items:center; gap:6px; padding:3px 8px; border-radius:var(--r); border:1px dashed var(--c-border-ctl); background:var(--c-raised); color:var(--c-text-2); font-size:var(--fs-s) } .tpdrag.ok{ border-color:var(--c-accent); color:var(--c-text) }
+/* Sửa tại chỗ UI-G19 */
+.rfd{ display:grid; grid-template-columns:minmax(0,1fr) 252px; gap:12px; align-items:start } .rft{ height:168px; padding:3px; outline:none } .rft .tl{ overflow:hidden; text-overflow:ellipsis }
+.rfh{ font-size:var(--fs-s); padding-left:20px; margin-top:-6px }
 /* ==== hết screens10.js ==== */
 
 /* ==== Đợt 4 · screens11.js · công cụ VN, bộ bản vẽ ==== */
@@ -814,6 +885,7 @@ select.inp{ appearance:none; padding-right:22px; background-image:linear-gradien
 /* Dán đặc biệt: cách dán bên trái, danh sách dạng bên phải */
 .psw{ display:grid; grid-template-columns:130px minmax(0,1fr); gap:14px; align-items:start }
 .psl{ min-height:96px; padding:2px; border:1px solid var(--c-border); border-radius:var(--r) }
+.pspec .chk[aria-disabled="true"]{ color:var(--c-text-dis); cursor:default }
 @media (max-width:640px){ .psw{ grid-template-columns:minmax(0,1fr) } }
 /* ==== hết screens13.js ==== */
 

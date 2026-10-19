@@ -232,7 +232,7 @@
   // gõ "," thì nhắc một lần
   var commaHinted = false;
   document.addEventListener('input', function(e){
-    if (commaHinted || !e.target.closest || !e.target.closest('[data-num], .cmd-in')) return;
+    if (commaHinted || !e.target.closest || !e.target.closest('[data-num], .cmd-in') || (e.target.closest('.cmd-in') && TC.cmd && TC.cmd.textPrompt())) return;
     if (/\d,/.test(e.target.value) && !/^=/.test(e.target.value)) { commaHinted = true; TC.toast('Trong bản vẽ, dấu thập phân luôn là dấu chấm: gõ <b>12.5</b>, không gõ 12,5.', { type:'info', log:false }); }
   });
 

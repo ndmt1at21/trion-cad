@@ -32,7 +32,7 @@
     S(x + 70, y, x + 70, y + 52, .5); S(x, y + 40, x + 180, y + 40, .35); S(x + 22, y + 40, x + 22, y + 52); S(x + 20, y, x + 20, y + 40); S(x + 50, y, x + 50, y + 40);
     for (var i = 1; i < 6; i++) S(x, y + i * 20 / 3, x + 70, y + i * 20 / 3);
     [['DUYỆT', 'DUYET'], ['KIỂM TRA', 'KIEMTRA'], ['VẼ', 'VE'], ['THIẾT KẾ', 'THIETKE'], ['CHỦ TRÌ', 'CHUTRI'], ['CHỦ NHIỆM', 'CHUNHIEM']].forEach(function(r, k){ Tx(1.5, k * 20 / 3 + 2.3, r[0]); At(r[1], 21.5, k * 20 / 3 + 2.3, 1.8); });
-    Tx(24, 48.6, 'ĐƠN VỊ THIẾT KẾ'); At('DONVI', 24, 42.8, 2.2, '[TÊN CÔNG TY]');
+    Tx(24, 48.6, 'ĐƠN VỊ THIẾT KẾ'); At('DONVI', 24, 43, 1.8, '[TÊN CÔNG TY]');
     if (logo) a({ t:'image', p:[x + 1.5, y + 41.5], w:19, h:9, name:logo, frame:false });
     S(x + 70, y + 30, x + 180, y + 30); S(x + 70, y + 14, x + 180, y + 14); S(x + 140, y + 30, x + 140, y + 40); S(x + 95, y, x + 95, y + 14); S(x + 125, y, x + 125, y + 14); S(x + 160, y, x + 160, y + 14);
     Tx(72, 49, 'CÔNG TRÌNH'); At('CONGTRINH', 72, 42.6, 2.6); Tx(72, 37.6, 'HẠNG MỤC'); At('HANGMUC', 72, 32, 2.2); Tx(142, 37.6, 'GIAI ĐOẠN'); At('GIAIDOAN', 142, 32, 1.8);
@@ -115,8 +115,8 @@
       ED.run('Cập nhật khung tên', function(){ by[id].forEach(function(s){ var w = Object.assign(tbVals(s), extra || {}), set = {}; Object.keys(w).forEach(function(t){ if (!hasTag(d, s.e.name, t)) skip[t] = 1; else if (String(s.at0[t]) !== String(w[t])) set[t] = w[t]; }); if (Object.keys(set).length){ ED.mod(s.e, function(x){ x.attrs = Object.assign({}, x.attrs, set); }); k++; } }); });
       if (k){ n += k; docs.push(d.name); } }); });
     var nOff = Object.keys(off).reduce(function(a, f){ return a + off[f]; }, 0), sk = Object.keys(skip);
-    TC.toast((n ? 'Đã cập nhật <b>' + n + ' khung tên</b> trong ' + docs.map(esc).join(', ') + ' (Ctrl+Z ở từng bản vẽ để hoàn tác)' : 'Khung tên trong các bản vẽ đang mở đã khớp với bộ') + (nOff ? ' · ' + nOff + ' tờ ở ' + Object.keys(off).length + ' tệp chưa mở được ghi ở nền và lưu lại' : '') + (bad.length ? ' · bỏ qua ' + bad.length + ' tờ: không tìm thấy ' + esc(bad[0]) : '') + (sk.length ? '. Khung cũ không có ô ' + sk.join(', ') + ': cập nhật khung theo mẫu v1.0 trong Khung tên.' : '.'),
-      { type:bad.length ? 'warn' : 'ok', act:sk.length ? { label:'Mở Khung tên', fn:function(){ TC.cmd.run('TCTITLE'); } } : null });
+    TC.toast((n ? 'Đã cập nhật <b>' + n + ' khung tên</b> trong ' + docs.length + ' bản vẽ đang mở (Ctrl+Z ở từng bản vẽ)' : 'Khung tên trong các bản vẽ đang mở đã khớp') + (nOff ? ' và ' + nOff + ' tờ ở ' + Object.keys(off).length + ' tệp chưa mở' : '') + '.' + (bad.length ? ' Bỏ qua ' + bad.length + ' tờ: thiếu ' + esc(bad[0]) + '.' : '') + (sk.length ? ' Khung cũ chưa có ô ' + sk.map(function(t){ return tbLabel(t).toLowerCase(); }).join(', ') + '.' : ''),
+      { type:bad.length ? 'warn' : 'ok', act:sk.length ? { label:'Nâng khung lên v1.0', fn:function(){ TC.cmd.run('TCTITLE'); } } : null });
     V().draw(); refresh(); return n;
   }
   // tờ đã in bị sửa sau đó: xét đối tượng của bước hoàn tác mới nhất (khung trong Model, layout, vùng Model mà viewport của layout nhìn thấy)
@@ -253,12 +253,14 @@
         box.innerHTML = '<div class="hrow" style="flex-wrap:nowrap"><span class="tag">' + esc(cur.e.name) + '</span><span class="faint ell grow" style="font-size:var(--fs-s)">' + esc(cur.where) + (s ? ' · tờ ' + esc(s.no) + ' trong bộ ' + esc(SS.name) : inSet ? '' : ' · bản vẽ chưa thuộc bộ bản vẽ, chỉ tự điền thông tin dự án') + '</span><button class="btn sm" type="button" id="tc-fill">' + ic('refresh') + 'Tự điền <b id="tc-nd"></b> ô từ bộ bản vẽ</button></div>' +
           (miss.length ? '<div class="note warn">' + ic('warn') + '<div class="stack" style="gap:4px"><span>Khung <b>' + esc(cur.e.name) + '</b> thiếu ' + miss.length + ' ô so với mẫu TCVN 5571 v1.0: ' + miss.map(tbLabel).join(', ') + '.</span>' + H.chk('tc-up', 'Khi áp dụng, cập nhật định nghĩa khung theo mẫu v1.0 (giữ nội dung các ô cũ, thêm ô logo)', true) + '</div></div>' : '') +
           '<div class="tcf2"><div class="tcg">' + H.gh('Công trình và tờ').replace('class="gh"', 'class="gh" style="grid-column:1 / -1"') + TBF.filter(function(f){ return !PEOPLE[f[0]]; }).map(fld).join('') + '</div><div class="tcg">' + H.gh('Người thực hiện').replace('class="gh"', 'class="gh" style="grid-column:1 / -1"') + TBF.filter(function(f){ return PEOPLE[f[0]]; }).map(fld).join('') +
-            '<span class="lab">Logo</span><span class="stack" style="gap:4px"><span class="hrow" style="flex-wrap:nowrap"><canvas width="64" height="26" class="ssm-logo" id="tc-lg" aria-hidden="true"></canvas><span class="' + (logo ? 'mono ' : '') + 'faint ell" style="font-size:var(--fs-xs)">' + esc(logo || 'Chưa có logo') + '</span></span><span class="hrow"><button class="btn sm" type="button" id="tc-lgb">' + ic('image') + 'Chọn ảnh logo…</button>' + (logo ? '<button class="btn sm ghost" type="button" id="tc-lgx">Bỏ logo</button>' : '') + '</span></span></div></div>' +
+            '<span class="lab">Logo</span><span class="stack" style="gap:4px" id="tc-lgw"></span></div></div>' +
           '<span class="fmsg" id="tc-msg" aria-live="polite"></span>' +
           H.grp('Áp dụng cho', H.rad('tcs', 'one', 'Chỉ khung này', scope === 'one') + H.rad('tcs', 'doc', 'Các ô chung cho mọi khung <b>' + esc(cur.e.name) + '</b> trong bản vẽ (' + same() + ' khung)', scope === 'doc') + (inSet ? H.rad('tcs', 'set', 'Các ô chung cho cả bộ bản vẽ <b>' + esc(SS.name) + '</b> (' + sheets().length + ' tờ, UI-H07): ghi thông tin dự án, số hiệu, số tờ', scope === 'set') : '<label class="chk dis"><input type="radio" disabled> Cả bộ bản vẽ: thêm bản vẽ vào bộ ở Quản lý bộ bản vẽ (TCSHEETS)</label>'));
-        logoPaint($d('#tc-lg'), logo); $d('#tc-nd').textContent = nd; $d('#tc-fill').disabled = !nd;
+        logoRow(); $d('#tc-nd').textContent = nd; $d('#tc-fill').disabled = !nd;
         V().temp = cur.where === 'Model' ? [{ k:'poly', pts:rp(cur.e._bb[0], cur.e._bb[1], cur.e._bb[2], cur.e._bb[3]), closed:true, color:TC.cssv('--c-accent'), w:2 }] : []; V().drawOver();
       }
+      function fillAll(){ $$('[data-want]', dlg.el).forEach(function(i){ i.value = i.dataset.want; }); $$('.tcf2 .tag.warn', dlg.el).forEach(function(x){ x.classList.remove('warn'); }); var nd = $d('#tc-nd'); if (nd){ nd.textContent = 0; $d('#tc-fill').disabled = true; } }
+      function logoRow(){ var w = $d('#tc-lgw'); if (!w) return; w.innerHTML = '<span class="hrow" style="flex-wrap:nowrap"><canvas width="64" height="26" class="ssm-logo" id="tc-lg" aria-hidden="true"></canvas><span class="' + (logo ? 'mono ' : '') + 'faint ell" style="font-size:var(--fs-xs)">' + esc(logo || 'Chưa có logo') + '</span></span><span class="hrow"><button class="btn sm" type="button" id="tc-lgb">' + ic('image') + 'Chọn ảnh logo…</button>' + (logo ? '<button class="btn sm ghost" type="button" id="tc-lgx">Bỏ logo</button>' : '') + '</span>'; logoPaint($d('#tc-lg'), logo); }
       function mapPane(){ var s = cur && inSet ? sheetFor(d, cur.e) : null;
         $d('#tc-m').innerHTML = '<div class="stack"><p class="faint" style="font-size:var(--fs-s)">Mỗi attribute của khung tên lấy giá trị từ thông tin dự án hoặc thông tin tờ của bộ bản vẽ (UI-H07). Ánh xạ dùng chung cho Quản lý bộ bản vẽ và Tạo khung in (TCFRAME).</p><div class="tblwrap" style="max-height:420px"><table class="tbl"><colgroup><col style="width:110px"><col style="width:150px"><col style="width:230px"><col></colgroup><thead><tr><th>Attribute</th><th>Ô trong khung</th><th>Nguồn dữ liệu</th><th>Giá trị' + (cur ? ' · ' + esc(attrsOf(d, cur.e).KYHIEU || '') : '') + '</th></tr></thead><tbody>' +
           TBF.map(function(f){ var src = SS.map[f[0]] || '', v = src ? srcVal(src, s || {}) : (cur ? attrsOf(d, cur.e)[f[0]] : ''); return '<tr><td class="mono">' + f[0] + '</td><td>' + esc(f[1]) + (cur && !hasTag(d, cur.e.name, f[0]) ? ' <span class="tag info">mẫu v1.0</span>' : '') + '</td><td><select class="inp sm" data-tm="' + f[0] + '" aria-label="Nguồn cho ' + f[0] + '" style="width:100%">' + SRC.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === src ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select></td><td class="' + (src ? '' : 'faint') + '">' + esc(v == null || v === '' ? (src[0] === 's' && !s ? '(theo tờ khi thuộc bộ)' : '—') : v) + '</td></tr>'; }).join('') + '</tbody></table></div></div>'; }
@@ -283,22 +285,22 @@
           all.forEach(function(x){ if (x === cur || (scope !== 'one' && (scope === 'set' || x.e.name === name))){ ED.mod(x.e, function(z){ z.attrs = Object.assign({}, z.attrs, x === cur ? v : common); }); n++; } });
         });
         if (scope === 'set') updateAll({ THIETKE:v.THIETKE, VE:v.VE, DUYET:v.DUYET });
-        V().draw(); refresh(); TC.toast('Đã cập nhật ' + n + ' khung tên' + (up ? ', định nghĩa ' + esc(name) + ' theo mẫu v1.0' : '') + (logoCh && logo ? ', logo ' + esc(logo) : '') + '. Hoàn tác bằng Ctrl+Z.', { log:false });
+        V().draw(); refresh(); if (scope !== 'set') TC.toast('Đã cập nhật ' + n + ' khung tên' + (up ? ', định nghĩa ' + esc(name) + ' theo mẫu v1.0' : '') + (logoCh && logo ? ', logo ' + esc(logo) : '') + '. Hoàn tác bằng Ctrl+Z.', { log:false });
         all.forEach(function(x){ x.e = d.byId[x.e.id] || x.e; }); show();
       }
       dlg.el.addEventListener('click', function(e){
         var t = e.target.closest('[data-tc]'); if (t){ cur = all[Number(t.dataset.tc)]; list(); return; }
         var g = e.target.closest('[data-go]'); if (g){ $('[data-dt="' + g.dataset.go + '"]', dlg.el).click(); return; }
         var o = e.target.closest('[data-seg="tcor"] button'); if (o){ TI.por = o.dataset.v === 'Dọc'; insPv(); return; }
-        if (e.target.closest('#tc-fill')){ $$('[data-want]', dlg.el).forEach(function(i){ i.value = i.dataset.want; }); $$('.tcf2 .tag.warn', dlg.el).forEach(function(x){ x.classList.remove('warn'); }); $d('#tc-nd').textContent = 0; $d('#tc-fill').disabled = true; return; }
-        if (e.target.closest('#tc-lgb')) pickLogo(e.target.closest('#tc-lgb'), function(n){ logo = n; form(); });
-        if (e.target.closest('#tc-lgx')){ logo = ''; form(); }
+        if (e.target.closest('#tc-fill')){ fillAll(); return; }
+        if (e.target.closest('#tc-lgb')) pickLogo(e.target.closest('#tc-lgb'), function(n){ logo = n; logoRow(); });
+        if (e.target.closest('#tc-lgx')){ logo = ''; logoRow(); }
       });
       dlg.el.addEventListener('change', function(e){ var t = e.target;
-        if (t.name === 'tcs'){ scope = t.value; okLabel(); } else if (t.dataset.tm){ SS.map[t.dataset.tm] = t.value; mapPane(); refresh(); }
+        if (t.name === 'tcs'){ scope = t.value; if (scope === 'set') fillAll(); okLabel(); } else if (t.dataset.tm){ SS.map[t.dataset.tm] = t.value; mapPane(); refresh(); }
         else if (t.name === 'tcm'){ TI.tpl = t.value; insPv(); } else if (t.id === 'tc-p'){ TI.size = t.value; insPv(); } else if (t.id === 'tc-s'){ TI.sc = t.value; insPv(); } else if (t.id === 'tc-bm'){ TI.bm = t.value; insPv(); } else if (t.id === 'tc-fill2'){ TI.fill = t.checked; insPv(); } });
       dlg.el.addEventListener('input', function(e){ if (e.target.dataset.tf === 'KYHIEU'){ e.target.classList.remove('err'); $d('#tc-msg').textContent = ''; } });
-      dlg.el.addEventListener('dtab', function(e){ tab = e.detail; show(); });
+      dlg.el.addEventListener('dtab', function(e){ tab = e.detail; $$('.tct-b > [data-dp]', dlg.el).forEach(function(p){ p.hidden = p.dataset.dp !== tab; }); show(); });
       $d('#tc-save').addEventListener('click', function(){ SC.ask('Lưu thành mẫu công ty', 'Tên mẫu khung tên', 'An Phú · ' + TI.size, function(v){ return SS.tpls.some(function(t){ return t.name === v; }) ? 'Đã có mẫu “' + v + '”.' : null; }, 'UI-J05').then(function(nm){ if (!nm) return; SS.tpls.push({ name:nm, logo:logo || PJ.logo, at:TC.date() }); TC.toast('Đã lưu mẫu <b>' + esc(nm) + '</b> vào <span class="mono">\\\\SRV-01\\Chung\\Mau-khung-ten</span>, dùng chung cho cả công ty. Chọn ở tab Chèn khung tên hoặc Tạo khung in (TCFRAME).', { log:false }); if (tab === 'i') insPane(); }); });
       $d('#tc-ok').addEventListener('click', function(){
         if (tab !== 'i'){ if (cur) apply(); return; }
@@ -366,20 +368,22 @@
   function strOf(d, e, tag){ return e.t === 'insert' ? attrsOf(d, e)[tag] : e.s; }
   function setStr(e, tag, v){ ED.mod(e, function(x){ if (x.t === 'insert'){ x.attrs = Object.assign({}, x.attrs); x.attrs[tag] = v; } else x.s = v; }); }
   // nhãn xem trước gắn với điểm trên bản vẽ (đi theo pan/zoom)
-  function pins(list){ TC.cad.reset(); list.slice(0, 80).forEach(function(x){ var b = x[0]._bb; TC.cad.pin(esc(x[1]), [(b[0] + b[2]) / 2, b[3] + (b[3] - b[1]) * .25], 'area'); }); }
+  function pinPt(e){ if (e.t === 'text') return [leftOf(e) + estW(e) / 2, e.p[1] + e.h * (/m$/.test(e.al || '') ? 1.15 : 1.75)]; if (e.t === 'mtext') return [e.p[0] + e.w / 2, e.p[1] + e.h * .7]; var b = e._bb; return [(b[0] + b[2]) / 2, b[3] + (b[3] - b[1]) * .25]; }
+  function pins(list){ TC.cad.reset(); list.slice(0, 80).forEach(function(x){ TC.cad.pin(esc(x[1]), pinPt(x[0]), 'area'); }); }
   TC.on('sel', function(){ if (NDLG) NDLG.upd(); if (XDLG) XDLG.upd(); });
+  function besideCanvas(dlg){ var cr = $('#cv').getBoundingClientRect(); dlg.el.style.left = (cr.left + 12) + 'px'; dlg.el.style.top = Math.max(12, Math.min(cr.top + 8, innerHeight - dlg.el.offsetHeight - 12)) + 'px'; }
   IMPL.TCNUMBER = function(ctx, pre){
     if (pre === 'P') return numPoints(ctx);
     if (NDLG){ NDLG.dlg.el.focus(); NDLG.upd(); return; }
     var d = D(), tags = function(){ var o = {}; d.sel.concat(d.ents.filter(function(e){ return e.t === 'insert'; }).slice(0, 400).map(function(e){ return e.id; })).forEach(function(id){ var e = d.byId[id]; if (e && e.t === 'insert') ((d.blocks[e.name] || {}).ents || []).forEach(function(a){ if (a.t === 'attdef') o[a.tag] = (o[a.tag] || e.name); }); }); return o; };
     var tg = tags(); if (!NUM.tag) NUM.tag = Object.keys(tg)[0] || '';
-    var dlg = TC.dialog({ id:'tcnum', title:'Đánh số tự động', cmd:'TCNUMBER', code:'UI-J07', w:440, modal:false,
+    var dlg = TC.dialog({ id:'tcnum', title:'Đánh số tự động', cmd:'TCNUMBER', code:'UI-J07', w:440, h:Math.min(720, innerHeight - 24), modal:false,
       body:'<div class="stack tnw">' + H.grp('Đích', SC.seg('tnt', ['Text có sẵn', 'Attribute', 'Text mới'], { text:'Text có sẵn', attr:'Attribute', 'new':'Text mới' }[NUM.tgt]) + '<div id="tn-tag">' + H.row('Tag', '<select class="inp" id="tn-tg" style="width:250px">' + Object.keys(tg).map(function(k){ return '<option value="' + esc(k) + '"' + (k === NUM.tag ? ' selected' : '') + '>' + esc(k) + ' · ' + esc(tg[k]) + '</option>'; }).join('') + '</select>', 76) + '</div>') +
         H.grp('Định dạng', H.row('Mẫu có sẵn', '<select class="inp" id="tn-pre" style="width:200px"><option value="">(tự đặt)</option>' + NPRE.map(function(p){ return '<option' + (p[0] === NUM.preset ? ' selected' : '') + '>' + esc(p[0]) + '</option>'; }).join('') + '</select><button class="btn sm ghost" type="button" id="tn-save">Lưu mẫu…</button>', 76) + '<div class="frow" style="--lab-w:76px"><label class="lab" for="tn-p">Tiền tố</label><span class="hrow"><input class="inp" id="tn-p" style="width:96px" spellcheck="false"><label class="lab" for="tn-s">Hậu tố</label><input class="inp" id="tn-s" style="width:110px" spellcheck="false"></span></div>' +H.row('Kiểu', SC.seg('tnk', ['Số', 'Chữ cái'], NUM.kind === 'abc' ? 'Chữ cái' : 'Số'), 76) + H.row('Bắt đầu', H.num('tn-b', '1', { prec:0, unit:'none', w:72, label:'Số bắt đầu' }) + '<span class="lab">Bước</span>' + H.num('tn-st', '1', { prec:0, unit:'none', w:64, label:'Bước' }), 76) + H.row('Số chữ số', H.sel('tn-d', ['1', '01', '001', '0001'], '1', 96), 76)) +
         H.grp('Thứ tự', H.sel('tn-o', ['Theo thứ tự chọn', 'X tăng: trái → phải', 'Y giảm: trên → dưới', 'Theo hàng rồi cột'], 'Theo thứ tự chọn')) + H.grp('Xem trước <span class="faint" style="text-transform:none;letter-spacing:0;font-weight:400">· giá trị mới hiện trên vùng vẽ</span>', '<div id="tn-pv"></div>') + '</div>',
       foot:'<button class="btn ghost" type="button" id="tn-pt">' + ic('idpoint') + 'Chỉ điểm từng cái</button><span class="grow"></span><button class="btn ghost" type="button" data-x="close">Đóng</button><button class="btn primary" type="button" id="tn-ok"></button>',
       onClose:function(){ NDLG = null; TC.cad.reset(); } });
-    var cr = $('#cv').getBoundingClientRect(); dlg.el.style.left = (cr.left + 12) + 'px'; dlg.el.style.top = Math.max(12, cr.top + 8) + 'px';
+    besideCanvas(dlg);
     var $d = function(s){ return $(s, dlg.el); }, ORD = ['sel', 'x', 'y', 'rc'], DIG = ['1', '01', '001', '0001'];
     function sync(){ $d('#tn-p').value = NUM.pre; $d('#tn-s').value = NUM.suf; $d('#tn-b').value = String(NUM.start); $d('#tn-st').value = String(NUM.step); $d('#tn-d').value = DIG[NUM.dig - 1] || '1'; $d('#tn-o').selectedIndex = ORD.indexOf(NUM.order); $$('[data-seg="tnk"] button', dlg.el).forEach(function(b){ b.setAttribute('aria-pressed', String((b.dataset.v === 'Chữ cái') === (NUM.kind === 'abc'))); }); }
     function read(){ NUM.pre = $d('#tn-p').value; NUM.suf = $d('#tn-s').value; NUM.start = Math.round(num($d('#tn-b').value, NUM.start)); NUM.step = Math.round(num($d('#tn-st').value, NUM.step)) || 1; NUM.dig = DIG.indexOf($d('#tn-d').value) + 1; NUM.order = ORD[$d('#tn-o').selectedIndex]; NUM.tag = ($d('#tn-tg') || {}).value || NUM.tag; }
@@ -473,6 +477,7 @@
     pick.slice().reverse().forEach(function(m2){ var sign = m2[2], dec = (m2[3].split('.')[1] || '').length, x = (sign === '-' ? -1 : 1) * Number(m2[3]), y = op === '*' ? x * v : x + v, t = Math.abs(y).toFixed(dec), sg = sign ? (Math.abs(y) < 1e-9 ? '±' : y > 0 ? '+' : '-') : y < 0 ? '-' : '', at = m2.index + m2[1].length; out = out.slice(0, at) + sg + t + out.slice(at + m2[2].length + m2[3].length); });
     return out;
   }
+  SC.vnCase = vnCase; SC.numOp = numOp; SC.incStr = incStr; // dùng lại cho TCASE, TCOUNT (Mở rộng) và các lệnh khác
   function estW(e){ return e.t === 'mtext' ? e.w : e.h * .62 * String(e.s).length; }
   function leftOf(e){ var w = estW(e), al = e.al || 'l'; return e.t === 'mtext' ? e.p[0] : /^(c|m)$/.test(al) ? e.p[0] - w / 2 : /^r/.test(al) ? e.p[0] - w : e.p[0]; }
   // kết quả của công cụ đang chọn: các thay đổi chữ (đổi s, kiểu) hoặc đối tượng mới / xóa / sửa vị trí
@@ -497,12 +502,13 @@
     return R;
   }
   IMPL.TCTEXT = function(ctx, pre){
-    if (XDLG){ XDLG.dlg.el.focus(); XDLG.upd(); return; }
-    if (pre && XTOOLS.some(function(t){ return t[0] === pre; })) TX.tool = pre;
+    var known = pre && XTOOLS.some(function(t){ return t[0] === pre; });
+    if (XDLG){ var tb = known && $('[data-xt="' + pre + '"]', XDLG.dlg.el); if (tb) tb.click(); XDLG.dlg.el.focus(); XDLG.upd(); return; }
+    if (known) TX.tool = pre;
     var dlg = TC.dialog({ id:'tctext', title:'Công cụ text', cmd:'TCTEXT', code:'UI-J09', w:600, h:560, modal:false, flush:true,
       body:'<div class="vtabs" style="height:100%"><div class="vt-list" role="tablist" aria-label="Công cụ">' + XTOOLS.map(function(t){ return '<button class="vt" type="button" role="tab" data-xt="' + t[0] + '" aria-selected="' + (TX.tool === t[0]) + '">' + ic(t[2]) + esc(t[1]) + '</button>'; }).join('') + '</div><div class="vt-body stack" id="tx-b"></div></div>',
       foot:'<span class="faint" id="tx-n" style="font-size:var(--fs-s)"></span><span class="grow"></span><button class="btn ghost" type="button" data-x="close">Đóng</button><button class="btn primary" type="button" id="tx-ok"></button>', onClose:function(){ XDLG = null; TC.cad.reset(); } });
-    var cr = $('#cv').getBoundingClientRect(); dlg.el.style.left = (cr.left + 12) + 'px'; dlg.el.style.top = Math.max(12, cr.top + 8) + 'px';
+    besideCanvas(dlg);
     var $d = function(s){ return $(s, dlg.el); };
     function pane(){
       var t = TX.tool, r = function(n, v, lab){ return H.rad(n, v, lab, TX[{ txm:'mode', txo:'jOrd', txs:'jSep', txa:'jAs', txb:'sBy', txk:'aK', txop:'op', txw:'which' }[n]] === v); }, B = '';
@@ -713,18 +719,23 @@
       ctx.out('Đã chuyển ' + n.length + ' đối tượng từ ' + (toPaper ? 'Model ra Paper' : 'Paper vào Model') + ' qua viewport tỉ lệ 1:' + Math.round(vp.scale) + ' (kích thước ' + (toPaper ? 'chia ' : 'nhân ') + Math.round(vp.scale) + ', vị trí trên giấy giữ nguyên).');
     });
   };
-  // EXPORTLAYOUT: layout → Model của bản vẽ mới, 1:1 mm giấy; nội dung viewport thu theo tỉ lệ, cắt theo khung viewport
-  function primEnts(e, f, k){ var out = [], src = function(pr){ var s = pr.src || e, o = { layer:s.layer === '0' ? e.layer : s.layer }; if (s.color != null) o.color = s.color; else if (e.color != null) o.color = e.color; return o; };
-    (e._p || []).forEach(function(pr){ var o = src(pr);
-      if (pr.k === 'seg') out.push(Object.assign(o, { t:'line', p1:f(pr.a), p2:f(pr.b) }));
-      else if (pr.k === 'arc') out.push(Object.assign(o, { t:'arc', c:f(pr.c), r:pr.r * k, a0:pr.a0, a1:pr.a1 }));
-      else if (pr.k === 'circ') out.push(Object.assign(o, { t:'circle', c:f(pr.c), r:pr.r * k }));
-      else if (pr.k === 'ell') out.push(Object.assign(o, { t:'ellipse', c:f(pr.c), rx:pr.rx * k, ry:pr.ry * k, rot:pr.rot, a0:pr.a0, a1:pr.a1 }));
-      else if (pr.k === 'text') out.push(Object.assign(o, { t:'text', p:f(pr.p), h:pr.h * k, s:pr.s, rot:pr.rot || 0, al:pr.al || 'l', style:pr.style || 'Standard', bold:pr.bold }));
-      else if (pr.k === 'tick'){ var p = f(pr.p); out.push(Object.assign(o, { t:'line', p1:[p[0] - .8, p[1] - .8], p2:[p[0] + .8, p[1] + .8] })); }
-      else if (pr.k === 'tri') out.push(Object.assign(o, { t:'hatch', loops:[pr.pts.map(f)], pat:'SOLID' }));
-      else if (pr.k === 'hatch') out.push(Object.assign(o, { t:'hatch', loops:pr.loops.map(function(l){ return l.map(f); }), pat:pr.pat, sc:pr.sc * k, ang:pr.ang || 0 }));
-      else if (pr.k === 'pt') out.push(Object.assign(o, { t:'point', p:f(pr.p) })); });
+  // EXPORTLAYOUT: layout → Model của bản vẽ mới, 1:1 mm giấy; nội dung viewport thu theo tỉ lệ, cắt theo biên viewport (chữ nhật hoặc đa giác)
+  // cắt đoạn thẳng theo đa giác (kể cả đa giác lõm): giữ các khúc có trung điểm nằm trong
+  function clipSeg(a, b, poly){ var ts = [0, 1], dx = b[0] - a[0], dy = b[1] - a[1], out = [];
+    poly.forEach(function(p, i){ var q = poly[(i + 1) % poly.length], ex = q[0] - p[0], ey = q[1] - p[1], den = dx * ey - dy * ex; if (Math.abs(den) < 1e-12) return; var t = ((p[0] - a[0]) * ey - (p[1] - a[1]) * ex) / den, u = ((p[0] - a[0]) * dy - (p[1] - a[1]) * dx) / den; if (t > 0 && t < 1 && u >= 0 && u <= 1) ts.push(t); });
+    ts.sort(function(x, y){ return x - y; });
+    for (var i = 0; i < ts.length - 1; i++){ var m = (ts[i] + ts[i + 1]) / 2; if (ts[i + 1] - ts[i] > 1e-9 && G.inPoly([a[0] + dx * m, a[1] + dy * m], poly)) out.push([[a[0] + dx * ts[i], a[1] + dy * ts[i]], [a[0] + dx * ts[i + 1], a[1] + dy * ts[i + 1]]]); }
+    return out; }
+  // ponytail: cung, chữ, hatch giữ nguyên khi tâm (hoặc mọi đỉnh) nằm trong biên, không cắt dở; cắt chính xác khi cần bản xuất sạch hơn
+  function primEnts(e, f, k, poly){ var out = [], inn = function(q){ return G.inPoly(q, poly); }, src = function(pr){ var s = pr.src || e, o = { layer:s.layer === '0' ? e.layer : s.layer }; if (s.color != null) o.color = s.color; else if (e.color != null) o.color = e.color; return o; };
+    (e._p || []).forEach(function(pr){ var o = src(pr), c, p;
+      if (pr.k === 'seg') clipSeg(f(pr.a), f(pr.b), poly).forEach(function(z){ out.push(Object.assign({}, o, { t:'line', p1:z[0], p2:z[1] })); });
+      else if ((pr.k === 'arc' || pr.k === 'circ' || pr.k === 'ell') && inn(c = f(pr.c))) out.push(Object.assign(o, pr.k === 'arc' ? { t:'arc', c:c, r:pr.r * k, a0:pr.a0, a1:pr.a1 } : pr.k === 'circ' ? { t:'circle', c:c, r:pr.r * k } : { t:'ellipse', c:c, rx:pr.rx * k, ry:pr.ry * k, rot:pr.rot, a0:pr.a0, a1:pr.a1 }));
+      else if (pr.k === 'text' && inn(p = f(pr.p))) out.push(Object.assign(o, { t:'text', p:p, h:pr.h * k, s:pr.s, rot:pr.rot || 0, al:pr.al || 'l', style:pr.style || 'Standard', bold:pr.bold }));
+      else if (pr.k === 'tick' && inn(p = f(pr.p))) out.push(Object.assign(o, { t:'line', p1:[p[0] - .8, p[1] - .8], p2:[p[0] + .8, p[1] + .8] }));
+      else if (pr.k === 'tri' && pr.pts.map(f).every(inn)) out.push(Object.assign(o, { t:'hatch', loops:[pr.pts.map(f)], pat:'SOLID' }));
+      else if (pr.k === 'hatch'){ var ls = pr.loops.map(function(l){ return l.map(f); }); if (ls.every(function(l){ return l.every(inn); })) out.push(Object.assign(o, { t:'hatch', loops:ls, pat:pr.pat, sc:pr.sc * k, ang:pr.ang || 0 })); }
+      else if (pr.k === 'pt' && inn(p = f(pr.p))) out.push(Object.assign(o, { t:'point', p:p })); });
     return out; }
   IMPL.EXPORTLAYOUT = function(ctx){
     var d = D(), L = curL(); if (!L){ ctx.out('EXPORTLAYOUT xuất layout hiện tại. Chuyển sang một tab layout trước.'); return; }
@@ -738,13 +749,11 @@
         var nm = $('#ex-n', dlg.el).value.trim(); if (!nm || /[\\/:*?"<>|]/.test(nm)){ $('#ex-n', dlg.el).classList.add('err'); $('#ex-m', dlg.el).className = 'fmsg err'; $('#ex-m', dlg.el).innerHTML = ic('warn', 'xs') + 'Tên tệp không được trống hoặc chứa \\ / : * ? " &lt; &gt; |'; return; }
         dlg.close(true);
         var nd = TC.newDoc({ name:nm + '.dwg', frame:false }), used = {};
-        nd.layers = JSON.parse(JSON.stringify(d.layers)); nd.layerMap = {}; nd.layers.forEach(function(l){ nd.layerMap[l.name] = l; }); nd.layouts = []; nd.frame = 0; nd.views = [];
+        nd.layers = JSON.parse(JSON.stringify(d.layers)); nd.layerMap = {}; nd.layers.forEach(function(l){ nd.layerMap[l.name] = l; }); nd.layouts = []; nd.views = [];
         L.ents.forEach(function(e){ if (e.t === 'vpframe') return; var c = ED.clean(e); c.id = ++nd.seq; nd.ents.push(c); if (e.t === 'insert') used[e.name] = 1; });
         Object.keys(used).forEach(function(b){ if (d.blocks[b]) nd.blocks[b] = JSON.parse(JSON.stringify(d.blocks[b])); });
-        L.vports.forEach(function(vp, i){ var k = 1 / vp.scale, ctr = [vp.x + vp.w / 2, vp.y + vp.h / 2], f = function(p){ return [ctr[0] + (p[0] - vp.c[0]) * k, ctr[1] + (p[1] - vp.c[1]) * k]; }, hw = vp.w * vp.scale / 2, hh = vp.h * vp.scale / 2, win = [vp.c[0] - hw, vp.c[1] - hh, vp.c[0] + hw, vp.c[1] + hh], list = [], bn = 'VP' + (i + 1) + '-' + slug(L.name);
-          d.ents.forEach(function(e){ var b = e._bb; if (!b || e.t === 'xline' || e.t === 'ray' || !TC.entVisible(d, e) || (vp.frz || []).indexOf(e.layer) >= 0 || b[2] < win[0] || b[0] > win[2] || b[3] < win[1] || b[1] > win[3]) return; Array.prototype.push.apply(list, primEnts(e, f, k)); });
-          nd.blocks[bn] = { name:bn, desc:'Nội dung viewport ' + (i + 1) + ' của layout ' + L.name, ents:withIds(nd, list) };
-          nd.ents.push({ id:++nd.seq, t:'insert', name:bn, p:[0, 0], sx:1, sy:1, rot:0, layer:'0', clip:[vp.x, vp.y, vp.x + vp.w, vp.y + vp.h] }); });
+        L.vports.forEach(function(vp){ var k = 1 / vp.scale, ctr = [vp.x + vp.w / 2, vp.y + vp.h / 2], f = function(p){ return [ctr[0] + (p[0] - vp.c[0]) * k, ctr[1] + (p[1] - vp.c[1]) * k]; }, hw = vp.w * vp.scale / 2, hh = vp.h * vp.scale / 2, win = [vp.c[0] - hw, vp.c[1] - hh, vp.c[0] + hw, vp.c[1] + hh], poly = vp.clip ? clipPts(vp) : rp(vp.x, vp.y, vp.x + vp.w, vp.y + vp.h);
+          d.ents.forEach(function(e){ var b = e._bb; if (!b || e.t === 'xline' || e.t === 'ray' || !TC.entVisible(d, e) || (vp.frz || []).indexOf(e.layer) >= 0 || b[2] < win[0] || b[0] > win[2] || b[3] < win[1] || b[1] > win[3]) return; primEnts(e, f, k, poly).forEach(function(o){ o.id = ++nd.seq; nd.ents.push(o); }); }); });
         nd.initView = { c:[L.paper.w / 2, L.paper.h / 2], h:L.paper.h * 1.12 }; nd.dirty = true;
         TC.prepDoc(nd); A().docs.push(nd); A().openDoc(nd.id); V().zoomExtents();
         TC.toast('Đã xuất layout <b>' + esc(L.name) + '</b> thành Model của <b>' + esc(nd.name) + '</b> (1:1 mm giấy, ' + L.vports.length + ' viewport). Lưu bản vẽ mới bằng Ctrl+S.', { log:false, act:{ label:'Về bản vẽ gốc', fn:function(){ A().activate(d.id); } } });
@@ -776,7 +785,7 @@
   };
   OPEN['UI-J09'] = function(){
     var d = d1Model(); TX.tool = 'case'; TX.mode = 'upper';
-    d.sel = d.ents.filter(function(e){ return e.t === 'text' && e.layer === 'KT-GHICHU'; }).map(function(e){ return e.id; }); zoom([12600, 5800, 27500, 9400]); TC.cad.afterSel(); setTimeout(function(){ TC.cmd.run('TCTEXT'); }, 60);
+    d.sel = d.ents.filter(function(e){ return e.t === 'text' && e.layer === 'KT-GHICHU'; }).map(function(e){ return e.id; }); zoom([4600, 3200, 23400, 11000]); TC.cad.afterSel(); setTimeout(function(){ TC.cmd.run('TCTEXT'); }, 60);
   };
   OPEN['UI-J10'] = function(){ d1Model(); SY.kind = 'axes'; SY.y0 = 1000; zoom([118000, -6000, 150000, 16000]); setTimeout(function(){ TC.cmd.run('TCSYMBOL'); }, 60); };
   // layout minh họa phần v1.0: viewport chữ nhật 1:100, viewport đa giác (chữ L) 1:50, viewport tròn (theo đối tượng) 1:20

@@ -11,12 +11,14 @@ Viết bằng HTML, CSS và JS thuần, không cần build. Mở tệp bằng tr
 | Hệ thống thiết kế | `prototype/styleguide.html` | Token màu (Tối, Sáng), chữ, kích thước, biểu tượng, thành phần, danh sách kiểm |
 | Công cụ miễn phí (Đợt 0) | `prototype/cong-cu-mien-phi.html` | UI-N01 Bác sĩ Font, UI-N02 Thư viện TCVN, UI-N03 trang tải |
 | Thanh toán, tài khoản (Đợt 2) | `prototype/thanh-toan.html` | UI-L16 trang mua và trang tài khoản trên web |
+| Cổng quản trị doanh nghiệp (Đợt 4) | `prototype/quan-tri.html` | UI-L15 quản lý chỗ ngồi, triển khai, giấy phép floating và máy chủ giấy phép |
 | Ba hướng hình ảnh | `phuong-an/index.html` | Trang so sánh dùng để chọn hướng A · Than chì |
 
 Trong prototype, nút **Prototype** trên thanh tiêu đề dùng để:
 
-- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro, Đợt 3 cần Pro; mở từ Danh mục thì prototype tự chuyển;
+- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro, Đợt 3 và Đợt 4 cần Pro; mở từ Danh mục thì prototype tự chuyển;
 - đổi chủ đề, mật độ, Giao diện nhẹ;
+- đổi **Nền tảng** Windows hoặc macOS (thanh menu hệ thống, phím ⌘, hộp thoại dạng sheet);
 - xem khung 1366 hoặc 1920;
 - mở **Danh mục 172 màn hình**;
 - chạy các kịch bản như tệp lỗi, tệp lớn, thiếu xref.
@@ -52,6 +54,12 @@ prototype/
   js/screens6.js   Đợt 3: Hatch, Mảng, Đường biên, Xóa trùng lặp, Nhóm, Chọn nhanh, Bộ lọc chọn, Chọn tương tự, lệnh layer
   js/screens7.js   Đợt 3: block và attribute, tham chiếu ngoài, ảnh, layout và viewport, khung tên, mẫu TCVN, Excel, Thư viện TCVN
   js/screens8.js   Đợt 3: tệp bị khóa, phục hồi, dọn dẹp, kiểm tra lỗi, đổi tên, tìm và thay, LISP, script, viết tắt lệnh, chuyển cài đặt, dùng thử
+  js/screens9.js   Đợt 4: kiểu bảng, chèn bảng, sửa ô bảng, field, đoạn văn và cột MTEXT, tỉ lệ chú thích, QLEADER, dung sai hình học
+  js/screens10.js  Đợt 4: Block Editor, quản lý attribute, PDF underlay và nhập PDF, thay block, DesignCenter, Tool Palettes, REFEDIT, lệnh tab Mở rộng
+  js/screens11.js  Đợt 4: bộ bản vẽ, khung tên đầy đủ, khung in trong Model, đánh số, sao chép tăng dần, công cụ chữ, ký hiệu, phần còn lại của viewport
+  js/screens12.js  Đợt 4: bảng diện tích phòng, trích xuất dữ liệu, nhập attribute, Excel đầy đủ, đóng gói gửi đi, xử lý tệp hàng loạt
+  js/screens13.js  Đợt 4: lệnh v1.0 chạy trên dòng lệnh (GRADIENT, REGION, WIPEOUT, MLINE, ALIGN, GROUP, QDIM, DIMBREAK…)
+  js/screens14.js  Đợt 4: Thuộc tính nhanh, trạng thái và bộ lọc layer, duyệt layer, quản lý view và UCS, ViewCube, phím tắt, workspace, biến hệ thống, bản macOS, chia ô cửa sổ
   js/catalog.js    danh mục 172 mã, trạng thái thiết kế
 ```
 
@@ -63,7 +71,7 @@ prototype/
 | 1 | 48 | 48 | 0 | Viewer. Phần Pro của A12, C01, C03, D10, J02 xong ở Đợt 3 |
 | 2 | 12 | 12 | 0 | Viewer Pro. Các nút VP trên ribbon Viewer đều chạy được: G09, H04, H06, I04, I07, J03, J15, L01–L03, L16, M02 |
 | 3 | 59 | 59 | 0 | Pro EA (bản biên tập): ribbon đủ 8 tab và workspace Cổ điển, grip, nhập động, lệnh vẽ, sửa có hoàn tác, chú thích, kiểu, hatch, mảng, block, xref, layout, TCVN, LISP |
-| 4 | 38 | 0 | 0 | Pro 1.0 |
+| 4 | 38 | 38 | 0 | Pro 1.0: bảng và field, Block Editor, PDF, DesignCenter, Tool Palettes, bộ bản vẽ, công cụ VN, trích xuất dữ liệu, đóng gói, cổng quản trị, phím tắt, biến hệ thống, bản macOS, tab Mở rộng, 30 lệnh dòng lệnh |
 | 5 | 12 | 0 | 0 | Sau 1.0 |
 
 Danh mục trong prototype luôn hiện trạng thái mới nhất.
@@ -79,4 +87,6 @@ Danh mục trong prototype luôn hiện trạng thái mới nhất.
 - **Tác vụ nền** (in hàng loạt, chuyển font): đóng hộp thoại vẫn chạy; tiến trình và nút hủy ở thanh trạng thái; xong thì có toast kèm hành động.
 - **Hoàn tác theo lệnh:** mỗi lệnh là một bước hoàn tác (Ctrl+Z, nút tách trên QAT liệt kê 12 bước). Trong lệnh nhiều bước, tùy chọn Hoàn tác · U chỉ lùi bước con.
 - **Prompt:** chip tùy chọn ghi nhãn tiếng Việt kèm chữ tắt tiếng Anh (Bán kính · R). Gõ chữ tắt kiểu AutoCAD luôn chạy, kể cả từ khóa ẩn của grip (MO, RO, SC, MI).
-- **Lệnh chưa đến đợt:** nút ribbon của lệnh v1.0 hoặc sau v1.0 vẫn hiện, bấm thì báo đợt có lệnh đó.
+- **Phím tắt một nguồn:** bảng `KDEF` trong `screens14.js` là nguồn duy nhất cho phím tắt (hộp Phím tắt, bảng in, tooltip, menu). Trên macOS, `TC.keyLabel` đổi Ctrl thành ⌘ hoặc ⌃.
+- **macOS:** cùng bố cục với Windows; khác ở thanh menu hệ thống, nút cửa sổ bên trái, hộp thoại tệp và in dạng sheet, “Cài đặt” thay “Tùy chọn”, kéo hai ngón để pan.
+- **Lệnh chưa đến đợt:** mọi lệnh v1.0 đã chạy được. Nút của lệnh sau v1.0 vẫn hiện, mờ, ghi “sau v1.0”; bấm thì báo.
