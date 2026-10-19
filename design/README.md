@@ -15,7 +15,7 @@ Viết bằng HTML, CSS và JS thuần, không cần build. Mở tệp bằng tr
 
 Trong prototype, nút **Prototype** trên thanh tiêu đề dùng để:
 
-- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro; mở từ Danh mục thì prototype tự chuyển;
+- đổi phiên bản (Viewer, Viewer Pro, Pro, Dùng thử, Giáo dục, Doanh nghiệp). Màn hình Đợt 2 cần Viewer Pro, Đợt 3 cần Pro; mở từ Danh mục thì prototype tự chuyển;
 - đổi chủ đề, mật độ, Giao diện nhẹ;
 - xem khung 1366 hoặc 1920;
 - mở **Danh mục 172 màn hình**;
@@ -45,6 +45,13 @@ prototype/
   js/screens2.js   in và xuất, tùy chọn, nâng cấp, trợ giúp, ...
   js/screens3.js   Đợt 2: Đếm, Tổng chiều dài/diện tích, So sánh bản vẽ, Markup
   js/screens4.js   Đợt 2: In nhiều layout, In hàng loạt theo khung tên, chuyển font hàng loạt, attribute với Excel, giấy phép
+  js/editor.js     Đợt 3: lõi bản biên tập: hoàn tác theo nhóm lệnh, biến đổi, grip, nhập động, Lưu thành, đóng khi chưa lưu, clipboard
+  js/draw.js       Đợt 3: lệnh vẽ và sửa (LINE, PLINE, CIRCLE, ARC… MOVE, COPY, TRIM, FILLET, OFFSET, PEDIT…)
+  js/annot.js      Đợt 3: TEXT và sửa chữ tại chỗ, MTEXT và tab Soạn văn bản, kích thước, multileader, nhấp đúp theo loại đối tượng
+  js/screens5.js   Đợt 3: bộ chọn màu, linetype, lineweight, khớp thuộc tính, kiểu chữ, kiểu kích thước, kiểu multileader, plot style, đơn vị, hỗ trợ vẽ…
+  js/screens6.js   Đợt 3: Hatch, Mảng, Đường biên, Xóa trùng lặp, Nhóm, Chọn nhanh, Bộ lọc chọn, Chọn tương tự, lệnh layer
+  js/screens7.js   Đợt 3: block và attribute, tham chiếu ngoài, ảnh, layout và viewport, khung tên, mẫu TCVN, Excel, Thư viện TCVN
+  js/screens8.js   Đợt 3: tệp bị khóa, phục hồi, dọn dẹp, kiểm tra lỗi, đổi tên, tìm và thay, LISP, script, viết tắt lệnh, chuyển cài đặt, dùng thử
   js/catalog.js    danh mục 172 mã, trạng thái thiết kế
 ```
 
@@ -53,9 +60,9 @@ prototype/
 | Đợt | Số mã | Đã xong | Một phần | Ghi chú |
 |---|---|---|---|---|
 | 0 | 3 | 3 | 0 | Công cụ miễn phí |
-| 1 | 48 | 43 | 5 | Viewer. Một phần: A12, C01, C03, D10, J02; phần Pro của các mã này làm ở Đợt 3 |
+| 1 | 48 | 48 | 0 | Viewer. Phần Pro của A12, C01, C03, D10, J02 xong ở Đợt 3 |
 | 2 | 12 | 12 | 0 | Viewer Pro. Các nút VP trên ribbon Viewer đều chạy được: G09, H04, H06, I04, I07, J03, J15, L01–L03, L16, M02 |
-| 3 | 59 | 0 | 7 | Pro EA (bản biên tập) |
+| 3 | 59 | 59 | 0 | Pro EA (bản biên tập): ribbon đủ 8 tab và workspace Cổ điển, grip, nhập động, lệnh vẽ, sửa có hoàn tác, chú thích, kiểu, hatch, mảng, block, xref, layout, TCVN, LISP |
 | 4 | 38 | 0 | 0 | Pro 1.0 |
 | 5 | 12 | 0 | 0 | Sau 1.0 |
 
@@ -70,3 +77,6 @@ Danh mục trong prototype luôn hiện trạng thái mới nhất.
 - **Vùng vẽ:** palette Thuộc tính mở sẵn ở ≥ 1600 px. Ở 1920×1080, vùng vẽ chiếm khoảng 60%; khi palette tự ẩn hoặc bật Clean Screen thì ≥ 75% (07.1 §1).
 - **Viewer Pro không sửa DWG:** markup lưu tệp `.tcmk` cạnh bản vẽ, chuyển font lưu bản sao. Ghi đè tệp gốc, chèn vào bản vẽ, nhập attribute là của Pro.
 - **Tác vụ nền** (in hàng loạt, chuyển font): đóng hộp thoại vẫn chạy; tiến trình và nút hủy ở thanh trạng thái; xong thì có toast kèm hành động.
+- **Hoàn tác theo lệnh:** mỗi lệnh là một bước hoàn tác (Ctrl+Z, nút tách trên QAT liệt kê 12 bước). Trong lệnh nhiều bước, tùy chọn Hoàn tác · U chỉ lùi bước con.
+- **Prompt:** chip tùy chọn ghi nhãn tiếng Việt kèm chữ tắt tiếng Anh (Bán kính · R). Gõ chữ tắt kiểu AutoCAD luôn chạy, kể cả từ khóa ẩn của grip (MO, RO, SC, MI).
+- **Lệnh chưa đến đợt:** nút ribbon của lệnh v1.0 hoặc sau v1.0 vẫn hiện, bấm thì báo đợt có lệnh đó.

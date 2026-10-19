@@ -179,6 +179,8 @@
       if (o[5] === 'h') faces.push([a, c - t, a, c + t], [bb, c - t, bb, c + t]); else faces.push([c - t, a, c + t, a], [c - t, bb, c + t, bb]);
     });
     faces.forEach(function(f){ if (Math.hypot(f[2] - f[0], f[3] - f[1]) > 1) E({ t:'line', p1:[X(f[0]), Y(f[1])], p2:[X(f[2]), Y(f[3])], layer:'KT-TUONG' }); });
+    // bản vẽ thuê ngoài thường có nét trùng: vài nét tường tầng 2 vẽ hai lần (để thử OVERKILL)
+    if (v === 2) faces.filter(function(f){ return Math.hypot(f[2] - f[0], f[3] - f[1]) > 1000; }).slice(0, 6).forEach(function(f, i){ E({ t:'line', p1:[X(f[i % 2 ? 2 : 0]), Y(f[i % 2 ? 3 : 1])], p2:[X(f[i % 2 ? 0 : 2]), Y(f[i % 2 ? 1 : 3])], layer:'KT-TUONG' }); });
     // cửa đi và cửa sổ: block
     ops.forEach(function(o){
       var a = o[2], bb = o[3], c = o[1], t = o[4] / 2, w = bb - a;
@@ -350,6 +352,8 @@
   }
   // đếm đối tượng theo layer, kiểu chữ, bảng mã
   function finish(doc){
+    // khung viewport là đối tượng chọn được trong layout (grip góc, grip tỉ lệ, UI-H11)
+    doc.layouts.forEach(function(L){ L.vports.forEach(function(vp){ if (!L.ents.some(function(e){ return e.t === 'vpframe' && e.vp === vp.id; })) new B(doc).add({ t:'vpframe', vp:vp.id, layer:'KT-VIEWPORT' }, L.ents); }); });
     var cnt = {}; doc.layers.forEach(function(l){ cnt[l.name] = 0; });
     function walk(list){ list.forEach(function(e){ cnt[e.layer] = (cnt[e.layer] || 0) + 1; }); }
     walk(doc.ents); doc.layouts.forEach(function(l){ walk(l.ents); });
@@ -365,6 +369,21 @@
   }
 
   TC.buildDocs = function(){ return [buildDoc1(), buildDoc2()]; };
+  // bản vẽ mới từ mẫu (UI-J11): layout có khung tên và một viewport theo tỉ lệ
+  TC.newDoc = function(o){
+    o = o || {}; var n = (TC.newDoc.n = (TC.newDoc.n || 0) + 1), nm = o.name || ('Drawing' + n + '.dwg'), now = new Date();
+    var doc = makeDoc({ id:'new' + n, name:nm, path:'C:\\Users\\An\\Documents\\' + nm, bytes:48 * 1024, savedBy:'TrionCAD Pro', modified:TC.date(now) + ' ' + now.toTimeString().slice(0, 5), ver:'DWG 2018' });
+    defBlocks(doc); doc.isNew = true; doc.template = o.template || 'TCVN-A3-KT.dwt';
+    var P = o.paper || { w:420, h:297, name:'ISO A3 (420,00 × 297,00 mm)' }, sc = o.scale || 100, big = P.w >= 594, k = big ? P.w / 841 : P.w / 420;
+    var L = { name:o.layout || 'Layout1', paper:P, margin:[5, 5, 5, 5], ents:[], vports:[], setup:'' };
+    if (o.frame !== false && P.w > P.h) new B(doc).add({ t:'insert', name:big ? 'KHUNG-A1' : 'KHUNG-A3', p:[0, 0], sx:k, sy:k, rot:0, layer:'KT-KHUNG', attrs:{ TENBV:o.title || 'TÊN BẢN VẼ', KYHIEU:o.code || 'KT-01', TILE:'1:' + sc, CONGTRINH:o.project || 'CÔNG TRÌNH', NGAY:TC.date(now) } }, L.ents);
+    L.vports.push({ id:'nv' + n, x:30 * k, y:62 * k, w:P.w - 40 * k, h:P.h - 72 * k, c:[(P.w - 40 * k) * sc / 2, (P.h - 72 * k) * sc / 2], scale:sc, locked:false, frz:[] });
+    doc.layouts = [L]; doc.views = []; doc.pageSetups = []; doc.initView = { c:[(P.w - 40 * k) * sc / 2, (P.h - 72 * k) * sc / 2], h:(P.h - 72 * k) * sc * 1.1 };
+    doc.styles.forEach(function(s){ s.missing = false; });
+    if (o.layers) doc.layers = doc.layers.filter(function(l){ return o.layers.indexOf(l.name) >= 0 || l.name === '0' || l.name === 'Defpoints'; });
+    doc.layerMap = {}; doc.layers.forEach(function(l){ doc.layerMap[l.name] = l; });
+    return finish(doc);
+  };
   // tệp gần đây cho tab Start (mẫu)
   TC.RECENT = [
     { name:'Banve-01.dwg', path:'D:\\DuAn\\NhaO-2T\\KienTruc', date:'16/10/2026', size:'4,8 MB', ver:'DWG 2018', doc:'d1', pinned:true },

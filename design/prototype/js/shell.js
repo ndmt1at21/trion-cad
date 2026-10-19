@@ -43,7 +43,7 @@
       : [['new','Mới','NEW','Ctrl+N'],['open','Mở','OPEN','Ctrl+O'],['save','Lưu','QSAVE','Ctrl+S'],['saveas','Lưu thành','SAVEAS','Ctrl+Shift+S'],'|',['undo','Hoàn tác','U','Ctrl+Z'],['redo','Làm lại','REDO','Ctrl+Y'],'|',['print','In','PLOT','Ctrl+P']];
     $('#tb').innerHTML =
       '<button class="tb-app" type="button" id="tb-app" aria-haspopup="menu" aria-expanded="false" data-tip="Menu ứng dụng" data-desc="Mở, xuất, in, tiện ích bản vẽ, tùy chọn và tệp gần đây.">' + ic('logo', 'logo') + '<span class="tb-brand">TrionCAD</span>' + ic('down', 'xs') + '</button>' +
-      '<div class="qat" role="toolbar" aria-label="Thanh truy cập nhanh">' + qat.map(function(q){ return q === '|' ? '<span class="sep"></span>' : '<button class="ib" type="button" data-run="' + q[2] + '" aria-label="' + q[1] + '" data-tip="' + q[1] + '" data-cmd="' + q[2] + '" data-key="' + q[3] + '">' + ic(q[0]) + (q[0] === 'undo' || q[0] === 'print' ? ic('down', 'xs') : '') + '</button>'; }).join('') +
+      '<div class="qat" role="toolbar" aria-label="Thanh truy cập nhanh">' + qat.map(function(q){ if (q === '|') return '<span class="sep"></span>'; var split = q[0] === 'undo' || q[0] === 'redo' || q[0] === 'print', dis = d && !viewer && ((q[0] === 'undo' && !(d.undo || []).length) || (q[0] === 'redo' && !(d.redo || []).length)), b = '<button class="ib" type="button" data-run="' + q[2] + '" aria-label="' + q[1] + '" data-tip="' + q[1] + (q[0] === 'undo' && d && (d.undo || []).length ? ' ' + esc(d.undo[d.undo.length - 1].label) : '') + '" data-cmd="' + q[2] + '" data-key="' + q[3] + '"' + (dis ? ' disabled' : '') + '>' + ic(q[0]) + '</button>'; return split ? '<span class="qsplit">' + b + '<button class="ib qdd" type="button" data-qlist="' + q[0] + '" aria-label="' + (q[0] === 'print' ? 'Các kiểu in' : 'Danh sách ' + q[1].toLowerCase()) + '"' + (dis ? ' disabled' : '') + '>' + ic('down', 'xs') + '</button></span>' : b; }).join('') +
         '<button class="ib" type="button" id="qat-more" aria-label="Tùy biến thanh truy cập nhanh" data-tip="Tùy biến thanh truy cập nhanh">' + ic('down', 'xs') + '</button></div>' +
       '<div class="tb-doc" id="tb-doc">' + (d ? '<span class="tb-file">' + esc(d.name) + (d.dirty ? '<span class="tb-dirty">*</span>' : '') + '</span>' + (viewer ? '<span class="tb-flag">[Chỉ xem]</span>' : '') + (d.recovered ? '<span class="tb-flag">[Đã phục hồi]</span>' : '') + '<span>—</span>' : '') +
         '<span>' + ed.name + '</span>' + edBadge() + '</div>' +
@@ -53,6 +53,7 @@
       '<button class="ib" type="button" id="tb-help" aria-label="Trợ giúp" data-tip="Trợ giúp" data-key="F1">' + ic('help') + '</button>' +
       '<div class="win"><button type="button" aria-label="Thu nhỏ cửa sổ">' + ic('min') + '</button><button type="button" aria-label="Phóng to cửa sổ">' + ic('max') + '</button><button type="button" class="x" aria-label="Đóng TrionCAD" data-run="QUIT">' + ic('close') + '</button></div>';
     $('#tb-app').addEventListener('click', function(){ TC.screens.appMenu(this); });
+    $$('[data-qlist]', $('#tb')).forEach(function(b){ b.addEventListener('click', function(){ var k = b.dataset.qlist, r = b.getBoundingClientRect(); if (k === 'print') TC.menu([{ label:'In…', icon:'print', kbd:'Ctrl+P', act:function(){ TC.cmd.run('PLOT'); } }, { label:'In nhiều layout…', icon:'publish', need:'VP', act:function(){ TC.cmd.run('PUBLISH'); } }, { label:'In theo khung tên…', icon:'batchplot', need:'VP', act:function(){ TC.cmd.run('TCBATCHPLOT'); } }, { label:'Xem trước', icon:'preview', act:function(){ TC.cmd.run('PREVIEW'); } }], r.left, r.bottom + 2, { returnFocus:b }); else if (TC.ed) TC.ed.undoMenu(b, k === 'redo'); }); });
     $('#qat-more').addEventListener('click', function(){ var r = this.getBoundingClientRect(); TC.menu(qatMenu(), r.left, r.bottom + 2, { returnFocus:this }); });
     $('#proto').addEventListener('click', function(){ var r = this.getBoundingClientRect(); TC.menu(TC.protoMenu(), r.right, r.bottom + 2, { alignRight:true, returnFocus:this, minWidth:260 }); });
     $('#tb-user').addEventListener('click', function(){ var r = this.getBoundingClientRect(); TC.menu(userMenu(), r.right, r.bottom + 2, { alignRight:true, returnFocus:this, minWidth:250 }); });
@@ -60,6 +61,8 @@
     TC.search.bind($('#tb-q'));
   }
   // giấy phép cần xác minh định kỳ mà lâu chưa kết nối: huy hiệu đếm ngược số ngày còn dùng offline (UI-L03)
+  A.renderTitle = renderTitle;
+  TC.on('dirty', function(){ renderTitle(); A.renderFileTabs(); });
   function edBadge(cls){ var e = TC.S.edition; var off = TC.S.licSim === 'offline' && e !== 'viewer'; return '<span class="ed' + (cls ? ' ' + cls : '') + (off ? ' warn' : '') + '" data-ed="' + e + '">' + (e === 'trial' ? 'Dùng thử: còn ' + TC.S.trialDays + ' ngày' : TC.EDITIONS[e].badge) + (off ? ' · còn ' + TC.S.offDays + ' ngày offline' : '') + '</span>'; }
   A.edBadge = edBadge;
   function qatMenu(){
@@ -75,10 +78,13 @@
 
   /* ================= ribbon ================= */
   // Dữ liệu ribbon: tab › panel › điều khiển. need = phiên bản tối thiểu; menu = split button.
+  A.ws = TC.load('ws', '2d');
   function ribbonData(){
     if (TC.isViewer()) return TC.RIBBON_VIEWER;
+    if (A.ws === 'viewer') return { tabs:TC.RIBBON_VIEWER.tabs };
     return TC.RIBBON_PRO;
   }
+  A.setWs = function(ws){ A.ws = ws; TC.save('ws', ws); rbState.tab = 0; renderRibbon(); setTimeout(function(){ A.view.resize(); }, 0); TC.cmdline.msg('&lt;Workspace: ' + ({ '2d':'Soạn thảo 2D', classic:'Cổ điển', viewer:'Viewer' }[ws]) + '&gt;'); };
   var rbState = { tab:0, min:0 };
   function ctlHTML(c){
     var lock = c.need && !TC.can(c.need), lockB = lock ? '<span class="lkb" data-ed="' + (c.need === 'VP' ? 'vp' : 'pro') + '">' + ic('lock') + (c.need === 'VP' ? 'VP' : 'Pro') + '</span>' : '';
@@ -86,13 +92,17 @@
     if (c.t === 'lg') return '<button class="rb-lg' + (lock ? ' locked' : '') + '"' + attrs + '>' + ic(c.icon, 'lg') + '<span>' + esc(c.label).replace(/\n/g, '<br>') + (c.menu ? ic('down', 'xs') : '') + '</span>' + lockB + '</button>';
     if (c.t === 's' || c.t === 'io') return '<button class="rb-s' + (c.t === 'io' ? ' io' : '') + (lock ? ' locked' : '') + '"' + attrs + (c.t === 'io' ? ' aria-label="' + esc(c.label) + '"' : '') + '>' + ic(c.icon) + (c.sw ? '<i class="sw" style="background:' + c.sw + '"></i>' : '') + (c.t === 's' ? '<span class="t">' + esc(c.label) + '</span>' : '') + (c.menu ? ic('down', 'xs') : '') + lockB + '</button>';
     if (c.t === 'dd') return '<button class="rb-dd"' + attrs + ' style="width:' + (c.w || 160) + 'px" aria-label="' + esc(c.label) + '">' + (c.html ? c.html() : '') + '<span class="grow">' + esc(c.text ? c.text() : c.label) + '</span>' + ic('down', 'xs') + '</button>';
+    if (c.t === 'num') return '<label class="rb-num" data-tip="' + esc(c.label) + '"' + (c.desc ? ' data-desc="' + esc(c.desc) + '"' : '') + '><span>' + esc(c.label) + '</span><input class="mono" data-numctl="' + esc(c.id) + '" value="' + esc(c.get()) + '" style="width:' + (c.w || 60) + 'px" aria-label="' + esc(c.label) + '" spellcheck="false"></label>';
+    if (c.t === 'gal'){ var gi = c.cur(); return '<div class="rb-gal" data-galctl="' + esc(c.id) + '" style="width:' + (c.w || 280) + 'px"><div class="rb-gal-in" role="listbox" aria-label="' + esc(c.label) + '">' + c.items.map(function(it, i){ return '<button type="button" class="rb-gi' + (i === gi ? ' on' : '') + '" data-gi="' + i + '" role="option" aria-selected="' + (i === gi) + '" data-tip="' + esc(c.tip ? c.tip(it) : it[0]) + '"><canvas width="44" height="30"></canvas></button>'; }).join('') + '</div><span class="rb-gal-nav"><button type="button" data-galnav="-1" aria-label="Hàng trước">' + ic('up', 'xs') + '</button><button type="button" data-galnav="1" aria-label="Hàng sau">' + ic('down', 'xs') + '</button><button type="button" data-galmore aria-label="Mở toàn bộ gallery">' + ic('more', 'xs') + '</button></span></div>'; }
     if (c.t === 'col') return '<div class="rb-col"' + (c.gap ? ' style="gap:' + c.gap + 'px"' : '') + '>' + c.items.map(ctlHTML).join('') + '</div>';
     if (c.t === 'row') return '<div class="rb-row">' + c.items.map(ctlHTML).join('') + '</div>';
     return '';
   }
   var ctlIndex = {};
-  function indexCtls(list){ list.forEach(function(c){ if (c.items) indexCtls(c.items); else ctlIndex[c.id || c.cmd || c.label] = c; }); }
+  function indexCtls(list){ list.forEach(function(c){ if (c.items && c.t !== 'gal') indexCtls(c.items); else ctlIndex[c.id || c.cmd || c.label] = c; }); }
   function renderRibbon(){
+    if (A.ws === 'classic' && !TC.isViewer() && A.active !== 'start') return renderClassic();
+    $$('.vtb').forEach(function(x){ x.remove(); }); $('#app').classList.remove('ws-classic');
     var data = ribbonData(), rb = $('#rb'); ctlIndex = {};
     var tabs = data.tabs.concat(A.ctxTab ? [A.ctxTab] : []);
     if (rbState.tab >= tabs.length) rbState.tab = 0;
@@ -105,8 +115,32 @@
         return '<div class="rb-p" data-prio="' + (p.prio || 1) + '"><button class="rb-coll" type="button" aria-haspopup="true">' + ic(p.icon || 'more', 'lg') + '<span>' + esc(p.name) + ic('down', 'xs') + '</span></button>' +
           '<div class="rb-c">' + p.items.map(ctlHTML).join('') + '</div><div class="rb-l">' + (p.more ? '<button type="button" data-more="' + esc(p.name) + '" data-tip="Mở rộng panel ' + esc(p.name) + '">' + esc(p.name) + ic('down', 'xs') + '</button>' : esc(p.name)) + '</div></div>';
       }).join('') + (data.upsell ? '<div class="rb-up"><b>Sửa bản vẽ?</b><span>Dùng thử TrionCAD Pro 30 ngày, không cần thẻ.</span><button class="btn sm primary" type="button" data-trial>Dùng thử Pro 30 ngày</button></div>' : '') + '</div>';
+    paintGal(rb);
     fitRibbon();
   }
+  function paintGal(root){ $$('[data-galctl]', root).forEach(function(g){ var c = ctlIndex[g.dataset.galctl]; if (!c) return; $$('[data-gi]', g).forEach(function(b){ c.paint($('canvas', b), c.items[Number(b.dataset.gi)]); }); var on = $('.rb-gi.on', g), inn = $('.rb-gal-in', g); if (on) inn.scrollTop = Math.max(0, on.offsetTop - inn.offsetTop - 2); }); }
+  // workspace Cổ điển: thanh menu và toolbar thay cho ribbon (07.1 §3.1)
+  var TBON = TC.load('tbars', { Standard:1, Styles:1, Layers:1, Properties:1, Draw:1, Modify:1 });
+  function tbHTML(t){ var body = '';
+    if (Array.isArray(t[2])) body = t[2].map(function(b){ if (b === '|') return '<span class="sep"></span>'; var c = TC.CMDS[b[1]]; return '<button class="ib" type="button" data-tbc="' + b[1] + '" data-tbp="' + esc(b[2] || '') + '" data-tip="' + esc(c ? c.desc : b[1]) + '" data-cmd="' + b[1] + '"' + (c && c.need !== 'V' && !TC.can(c.need) ? ' data-need="' + c.need + '"' : '') + '>' + ic(b[0]) + '</button>'; }).join('');
+    else { var K = TC.CLASSIC_CTL, list = t[2] === 'styles' ? [K.tstyle, K.dstyle, K.bstyle, K.mstyle] : t[2] === 'layers' ? [K.layer] : [K.color, K.lt, K.lw]; indexCtls(list); body = list.map(ctlHTML).join('') + (t[2] === 'layers' ? '<button class="ib" type="button" data-tbc="LAYMCUR" data-tip="Layer của đối tượng thành hiện hành">' + ic('laycur') + '</button><button class="ib" type="button" data-tbc="LAYERP" data-tip="Trạng thái layer trước">' + ic('undo') + '</button><button class="ib" type="button" data-tbc="LAYER" data-tip="Quản lý layer">' + ic('layers') + '</button>' : ''); }
+    return '<div class="tbar' + (t[1] === 'L' || t[1] === 'R' ? ' v' : '') + '" role="toolbar" aria-label="Toolbar ' + esc(t[0]) + '" data-tbn="' + esc(t[0]) + '"><span class="tb-grip" aria-hidden="true"></span>' + body + '</div>'; }
+  function renderClassic(){
+    var rb = $('#rb'); ctlIndex = {}; rb.className = 'rb classic'; $('#app').classList.add('ws-classic');
+    rb.innerHTML = '<div class="mbar" role="menubar" aria-label="Thanh menu">' + TC.CLASSIC_MENUS.map(function(m, i){ return '<button type="button" role="menuitem" aria-haspopup="menu" data-mb="' + i + '">' + esc(m[0]) + '</button>'; }).join('') + '<span class="grow"></span><span class="faint mbar-ws">Workspace: Cổ điển</span></div><div class="tbars">' + TC.CLASSIC_TB.filter(function(t){ return TBON[t[0]] && t[1] !== 'L' && t[1] !== 'R'; }).map(tbHTML).join('') + '</div>';
+    $$('.vtb').forEach(function(x){ x.remove(); });
+    TC.CLASSIC_TB.filter(function(t){ return TBON[t[0]] && (t[1] === 'L' || t[1] === 'R'); }).forEach(function(t){ var el = TC.el('<div class="vtb ' + (t[1] === 'L' ? 'l' : 'r') + '">' + tbHTML(t) + '</div>'); el.addEventListener('mousedown', function(e){ e.stopPropagation(); }); el.addEventListener('click', tbClick); el.addEventListener('contextmenu', tbMenu); $('#cv').appendChild(el); });
+  }
+  function tbClick(e){ var b = e.target.closest('[data-tbc]'); if (!b) return; if (b.dataset.need){ TC.screens.upgrade(b.dataset.tip, b.dataset.need); return; } if (b.dataset.tbc === 'LAYER') TC.screens.layerManager(); else TC.cmd.run(b.dataset.tbc, b.dataset.tbp || null); }
+  function tbMenu(e){ e.preventDefault(); TC.menu([{ h:'Toolbar' }].concat(TC.CLASSIC_TB.map(function(t){ return { label:esc(t[0]), check:!!TBON[t[0]], act:function(){ TBON[t[0]] = TBON[t[0]] ? 0 : 1; TC.save('tbars', TBON); renderRibbon(); setTimeout(function(){ A.view.resize(); }, 0); } }; })).concat([{ sep:1 }, { label:'Khóa vị trí toolbar', check:true }, { label:'Chuyển về Soạn thảo 2D (ribbon)', act:function(){ A.setWs('2d'); } }]), e.clientX, e.clientY); }
+  document.addEventListener('click', function(e){ var m = e.target.closest('[data-mb]'); if (m){ TC.classicMenu(Number(m.dataset.mb), m); return; } if (e.target.closest('.tbars')) tbClick(e); });
+  document.addEventListener('contextmenu', function(e){ if (e.target.closest('.tbars, .mbar')) tbMenu(e); });
+  // ô số và gallery trên ribbon
+  document.addEventListener('change', function(e){ var n = e.target.closest && e.target.closest('[data-numctl]'); if (n && ctlIndex[n.dataset.numctl]) ctlIndex[n.dataset.numctl].set(n.value.trim()); });
+  document.addEventListener('keydown', function(e){ var n = e.target.closest && e.target.closest('[data-numctl]'); if (!n) return; if (e.key === 'Enter'){ e.preventDefault(); n.blur(); } else if (e.key === 'Escape'){ e.preventDefault(); n.value = ctlIndex[n.dataset.numctl].get(); n.blur(); } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown'){ e.preventDefault(); var v = parseFloat(n.value) || 0, st = Math.abs(v) >= 100 ? 10 : 1; n.value = String(Math.round((v + (e.key === 'ArrowUp' ? st : -st)) * 100) / 100); ctlIndex[n.dataset.numctl].set(n.value); } });
+  document.addEventListener('mouseover', function(e){ var b = e.target.closest && e.target.closest('[data-gi]'); if (!b) return; var g = b.closest('[data-galctl]'), c = g && ctlIndex[g.dataset.galctl]; if (c && c.hover) c.hover(c.items[Number(b.dataset.gi)]); });
+  document.addEventListener('mouseout', function(e){ var g = e.target.closest && e.target.closest('[data-galctl]'); if (!g || g.contains(e.relatedTarget)) return; var c = ctlIndex[g.dataset.galctl]; if (c && c.hover) c.hover(null); });
+  document.addEventListener('click', function(e){ var b = e.target.closest('[data-gi]'), g = e.target.closest('[data-galctl]'); if (!g) return; var c = ctlIndex[g.dataset.galctl]; if (!c) return; if (b){ c.pick(c.items[Number(b.dataset.gi)]); return; } var nv = e.target.closest('[data-galnav]'); if (nv){ var inn = $('.rb-gal-in', g); inn.scrollTop += Number(nv.dataset.galnav) * 32; return; } if (e.target.closest('[data-galmore]') && c.more) c.more(e.target.closest('[data-galmore]')); });
   A.renderRibbon = renderRibbon;
   // tab ngữ cảnh (07.1 §7.11): hiện sau các tab thường, tự chọn khi mới mở
   A.ctxTab = null;
@@ -160,8 +194,9 @@
   document.addEventListener('contextmenu', function(e){
     var t = e.target.closest('.ft-tab'); if (!t) return; e.preventDefault();
     var id = t.dataset.doc, d = A.docs.filter(function(x){ return x.id === id; })[0];
-    TC.menu([{ label:'Mới', icon:'new', need:'PRO', cmd:'NEW' }, { label:'Mở…', icon:'open', kbd:'Ctrl+O', act:function(){ TC.cmd.run('OPEN'); } }, { label:'Lưu', icon:'save', need:'PRO' }, { label:'Lưu tất cả', need:'PRO' }, { sep:1 },
-      { label:'Đóng', icon:'fileclose', kbd:'Ctrl+F4', dis:!d, act:function(){ A.closeDoc(id); } }, { label:'Đóng tất cả', act:function(){ A.docs.forEach(function(x){ if (x.open) A.closeDoc(x.id, true); }); } }, { label:'Đóng các tab khác', dis:!d, act:function(){ A.docs.forEach(function(x){ if (x.open && x.id !== id) A.closeDoc(x.id, true); }); } }, { sep:1 },
+    var closeMany = function(ids){ if (A.closeDocs) A.closeDocs(ids); else ids.forEach(function(x){ A.closeDoc(x, true); }); };
+    TC.menu([{ label:'Mới', icon:'new', need:'PRO', cmd:'NEW', act:function(){ TC.cmd.run('NEW'); } }, { label:'Mở…', icon:'open', kbd:'Ctrl+O', act:function(){ TC.cmd.run('OPEN'); } }, { label:'Lưu', icon:'save', need:'PRO', dis:!d, act:function(){ A.activate(id); TC.cmd.run('QSAVE'); } }, { label:'Lưu tất cả', need:'PRO', act:function(){ var n = 0; A.docs.forEach(function(x){ if (x.open && x.dirty){ x.dirty = false; x.savedOnce = true; n++; } }); renderTitle(); A.renderFileTabs(); TC.toast(n ? 'Đã lưu ' + n + ' bản vẽ.' : 'Không có bản vẽ nào cần lưu.', { log:false }); } }, { sep:1 },
+      { label:'Đóng', icon:'fileclose', kbd:'Ctrl+F4', dis:!d, act:function(){ A.closeDoc(id); } }, { label:'Đóng tất cả', act:function(){ closeMany(A.docs.filter(function(x){ return x.open; }).map(function(x){ return x.id; })); } }, { label:'Đóng các tab khác', dis:!d, act:function(){ closeMany(A.docs.filter(function(x){ return x.open && x.id !== id; }).map(function(x){ return x.id; })); } }, { sep:1 },
       { label:'Sao chép đường dẫn', icon:'copyclip', dis:!d, act:function(){ copyText(d.path); } }, { label:'Mở thư mục chứa', icon:'folder', dis:!d, act:function(){ TC.toast('Mở thư mục ' + esc(d.path.replace(/\\[^\\]+$/, '')) + ' trong File Explorer.', { type:'info', log:false }); } }, { label:'Gửi bản vẽ lỗi…', icon:'send', dis:!d, act:function(){ TC.cmd.run('TCREPORT'); } }], e.clientX, e.clientY);
   });
   // rê lên tab tệp: thumbnail Model và các layout (07.1 §5.6)
@@ -317,9 +352,10 @@
     renderLayoutTabs(); A.view.draw(); renderStatus(); TC.emit('sel'); TC.emit('space');
   }
   A.setSpace = setSpace;
-  document.addEventListener('click', function(e){ var t = e.target.closest('.lt-tab'); if (t) setSpace(t.dataset.sp === 'model' ? 'model' : Number(t.dataset.sp)); });
+  document.addEventListener('click', function(e){ var t = e.target.closest('.lt-tab'); if (t) setSpace(t.dataset.sp === 'model' ? 'model' : Number(t.dataset.sp)); if (e.target.closest('.lt-add')) TC.cmd.run('LAYOUT', 'N'); });
   document.addEventListener('contextmenu', function(e){
     var t = e.target.closest('.lt-tab, .lt'); if (!t) return; e.preventDefault(); var d = A.doc();
+    if (!TC.isViewer() && TC.screens.layoutMenu){ var tb = e.target.closest('.lt-tab'); TC.screens.layoutMenu(e, tb ? (tb.dataset.sp === 'model' ? 'model' : Number(tb.dataset.sp)) : d.space); return; }
     TC.menu([{ label:'Layout mới', icon:'plus', need:'PRO' }, { label:'Từ mẫu…', need:'PRO' }, { label:'Xóa', need:'PRO' }, { label:'Đổi tên', need:'PRO' }, { label:'Di chuyển hoặc sao chép…', need:'PRO' }, { sep:1 }, { label:'Chọn tất cả layout', dis:true }, { label:'Kích hoạt layout trước', act:function(){ if (d.viewHist.length) A.view.zoomPrev(); } },
       { label:'Quản lý thiết lập trang…', icon:'print', act:function(){ TC.cmd.run('PAGESETUP'); } }, { label:'In…', icon:'print', kbd:'Ctrl+P', act:function(){ TC.cmd.run('PLOT'); } }, { label:'Xuất layout thành Model…', need:'PRO' }, { sep:1 }, { label:'Ẩn tab layout và Model', act:function(){ $('#lt').hidden = true; TC.toast('Đã ẩn tab layout. Bật lại ở Hiển thị › Giao diện.', { type:'info', log:false }); } }], e.clientX, e.clientY);
   });
@@ -366,15 +402,16 @@
     else if (id === 'sb-clean') A.cleanScreen();
     else if (id === 'sb-taskbtn') TC.screens.tasks(e.target.closest('button'));
     else if (id === 'sb-custom') { var r = e.target.closest('button').getBoundingClientRect(); TC.menu([{ h:'Hiện trên thanh trạng thái' }, { label:'Tọa độ', check:true }, { label:'Model / Paper', check:true }, { label:'Bắt điểm', check:true }, { label:'Hiển thị độ dày nét', check:true }, { label:'Tỉ lệ chú thích / viewport', check:true }, { label:'Chỉ báo Bác sĩ Font', check:true }, { label:'Chỉ báo đồ họa', check:true }, { label:'Tác vụ nền', check:true }, { label:'Thông báo', check:true }, { label:'Huy hiệu phiên bản', check:true }, { label:'Clean Screen', check:true }], r.right, r.top, { alignRight:true, up:true }); }
-    else if (id === 'sb-vpscale' && !TC.isViewer()) { var r2 = e.target.closest('button').getBoundingClientRect(); TC.menu(['1:20','1:50','1:100','1:200'].map(function(s){ return { label:s, act:function(){} }; }), r2.left, r2.top, { up:true }); }
+    else if (id === 'sb-vpscale' && !TC.isViewer()) { var r2 = e.target.closest('button').getBoundingClientRect(), dd = A.doc(), L0 = dd.layouts[dd.space], vp0 = dd.activeVp && L0.vports.filter(function(v){ return v.id === dd.activeVp; })[0]; if (!vp0){ TC.toast('Nhấp đúp vào trong một viewport để đổi tỉ lệ của nó.', { type:'info', log:false }); return; } TC.menu([20, 25, 50, 75, 100, 200, 500].map(function(k){ return { label:'1:' + k, check:Math.round(vp0.scale) === k, act:function(){ if (vp0.locked){ TC.toast('Viewport đang khóa hiển thị. Mở khóa trước khi đổi tỉ lệ.', { type:'warn', log:false }); return; } TC.ed.setVpScale(vp0, k); } }; }).concat([{ sep:1 }, { label:'Danh sách tỉ lệ…', act:function(){ TC.cmd.run('SCALELISTEDIT'); } }]), r2.left, r2.top, { up:true }); }
     else if (id === 'sb-vpscale' || id === 'sb-anno') { if (TC.isViewer()) TC.toast('Viewer chỉ xem tỉ lệ. Đổi tỉ lệ có trong TrionCAD Pro.', { type:'info', log:false }); }
-    else if (id === 'sb-ws') { var r3 = e.target.closest('button').getBoundingClientRect(); TC.menu([{ label:'Soạn thảo 2D', check:true }, { label:'Cổ điển', check:false, act:function(){ TC.toast('Workspace Cổ điển thiết kế ở Đợt 3.', { type:'info', log:false }); } }, { label:'Viewer', check:false }, { sep:1 }, { label:'Lưu workspace hiện tại…', dis:true }], r3.right, r3.top, { alignRight:true, up:true }); }
+    else if (id === 'sb-ws') { var r3 = e.target.closest('button').getBoundingClientRect(); TC.menu([{ h:'Workspace' }, { label:'Soạn thảo 2D', check:A.ws === '2d', act:function(){ A.setWs('2d'); } }, { label:'Cổ điển (menu và toolbar)', check:A.ws === 'classic', act:function(){ A.setWs('classic'); } }, { label:'Viewer (ribbon giản lược)', check:A.ws === 'viewer', act:function(){ A.setWs('viewer'); } }, { sep:1 }, { label:'Lưu workspace hiện tại… (v1.0)', dis:true }, { label:'Thiết lập workspace… (v1.0)', dis:true }], r3.right, r3.top, { alignRight:true, up:true }); }
   });
   document.addEventListener('contextmenu', function(e){
     var t = e.target.closest('#sb [data-tgl]'); if (!t) return; e.preventDefault();
     if (t.dataset.tgl === 'osnap') { TC.menu(osnapMenu(), e.clientX, e.clientY, { up:true }); return; }
-    if (t.dataset.tgl === 'polar') { TC.menu(['90','45','30','22.5','18','15','10','5'].map(function(a){ return { label:a + '°', check:a === '90', act:function(){} }; }).concat([{ sep:1 }, { label:'Thiết lập theo dõi…', need:'PRO' }]), e.clientX, e.clientY, { up:true }); return; }
-    TC.menu([{ label:'Thiết lập…', need:t.dataset.tgl === 'lw' ? 'V' : 'PRO', act:function(){ TC.toast('Hộp thoại thiết lập (UI-D09, UI-C08) thiết kế ở Đợt 3.', { type:'info', log:false }); } }], e.clientX, e.clientY, { up:true });
+    if (t.dataset.tgl === 'polar') { TC.menu(['90','45','30','22.5','18','15','10','5'].map(function(a){ return { label:a + '°', check:Number(a) === (TC.S.polarInc || 90), act:function(){ TC.S.polarInc = Number(a); TC.save('polarInc', TC.S.polarInc); if (!TC.S.toggles.polar) toggle('polar'); TC.cmdline.msg('&lt;Góc polar tăng: ' + a + '°&gt;'); } }; }).concat([{ sep:1 }, { label:'Thiết lập theo dõi…', need:'PRO', act:function(){ TC.cmd.run('DSETTINGS', 'polar'); } }]), e.clientX, e.clientY, { up:true }); return; }
+    var tabOf = { grid:'snap', snap:'snap', ortho:'snap', otrack:'osnap', dyn:'dyn', cycle:'cyc', iso:'snap', transp:null };
+    TC.menu([{ label:'Thiết lập…', need:t.dataset.tgl === 'lw' ? 'V' : 'PRO', act:function(){ if (t.dataset.tgl === 'lw') TC.cmd.run('LWEIGHT'); else TC.cmd.run('DSETTINGS', tabOf[t.dataset.tgl] || 'snap'); } }], e.clientX, e.clientY, { up:true });
   });
   function osnapMenu(){
     var M = TC.S.osnap, k = ['end','mid','cen','gcen','node','quad','int','ext','ins','per','tan','nea','app','par'];
@@ -408,7 +445,9 @@
     cv.addEventListener('mouseleave', function(){ V.mouse = null; V.hover = null; V.snap = null; TC.cad.leave(); V.drawOver(); });
     cv.addEventListener('wheel', function(e){ e.preventDefault(); var m = local(e); V.zoomAt(m[0], m[1], e.deltaY < 0 ? 1.2 : 1 / 1.2); TC.cad.move(m, e); }, { passive:false });
     cv.addEventListener('mousedown', function(e){
-      cv.focus({ preventScroll:true }); TC.closeMenus(0);
+      if (e.target.closest('input, textarea, select, button')) return; // ô soạn chữ, thanh công cụ nổi trên canvas
+      // chặn hành động mặc định: nếu không, trình duyệt kéo focus về #cv sau khi lệnh đã mở ô soạn chữ
+      cv.focus({ preventScroll:true }); e.preventDefault(); TC.closeMenus(0);
       var m = local(e);
       if (e.button === 1){ e.preventDefault(); var now = Date.now(); if (now - lastMid < 350){ V.zoomExtents(); lastMid = 0; return; } lastMid = now; V.drag = { kind:'pan', last:m }; cv.classList.add('cur-panning'); return; }
       if (e.button !== 0) return;
@@ -465,9 +504,11 @@
       if (ctrl && (k === 'PageDown' || k === 'PageUp')){ e.preventDefault(); var d = A.doc(); if (!d) return; var sp = ['model'].concat(d.layouts.map(function(l, i){ return i; })); var j = sp.indexOf(d.space); setSpace(sp[TC.clamp(j + (k === 'PageDown' ? 1 : -1), 0, sp.length - 1)]); return; }
       if (ctrl && k === 'F4'){ e.preventDefault(); if (A.doc()) A.closeDoc(A.active); return; }
       if (ctrl && (k === 'i' || k === 'I')){ e.preventDefault(); TC.S.coordMode = TC.S.coordMode === 'abs' ? 'off' : 'abs'; updateCoord(lastCoord); return; }
-      if (ctrl && (k === 'z' || k === 'Z' || k === 'y' || k === 'Y' || k === 's' || k === 'S' || k === 'n' || k === 'N') && !inField){ e.preventDefault(); TC.cmd.run({ z:'U', y:'REDO', s:'QSAVE', n:'NEW' }[k.toLowerCase()]); return; }
+      if (ctrl && (k === 'z' || k === 'Z' || k === 'y' || k === 'Y' || k === 's' || k === 'S' || k === 'n' || k === 'N') && !inField){ e.preventDefault(); TC.cmd.run(e.shiftKey && k.toLowerCase() === 's' ? 'SAVEAS' : { z:'U', y:'REDO', s:'QSAVE', n:'NEW' }[k.toLowerCase()]); return; }
+      if (ctrl && !inField && !TC.isViewer() && /^[cvxCVX]$/.test(k)){ e.preventDefault(); var kk = k.toLowerCase(); TC.cmd.run(kk === 'x' ? 'CUTCLIP' : kk === 'c' ? (e.shiftKey ? 'COPYBASE' : 'COPYCLIP') : (e.shiftKey ? 'PASTEBLOCK' : 'PASTECLIP')); return; }
       if (ctrl || e.altKey || inField || A.active === 'start') return;
       if (k === 'Tab' && TC.cad.cycleSnap()) { e.preventDefault(); return; }
+      if (k === 'Tab' && TC.dyn && TC.dyn.tab($('#cmd-in'))) { e.preventDefault(); return; }
       if (k === 'Delete'){ e.preventDefault(); if (A.doc() && A.doc().sel.length) TC.cmd.run('ERASE'); return; }
       // mọi phím gõ trên vùng vẽ đều vào dòng lệnh (07.1 §8)
       TC.cmdline.key(e);

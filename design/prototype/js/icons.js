@@ -192,7 +192,28 @@ TC.ICONS = {
   model:'<path d="M1.5 2.5h13v11h-13z"/><path d="M4 11l3-4 2 2.5 1.5-1.5L12 11"/>',
   // Đợt 2: so sánh, markup, tác vụ nền
   overlay:'<path d="M2 5h9v8.5H2z" class="f"/><path d="M5 2.5h9V11H5z"/>', split:'<path d="M1.5 2.5h13v11h-13zM8 2.5v11"/>',
-  tick:'<circle cx="8" cy="8" r="6.2"/><path d="M5 8.2l2.1 2.1L11.2 6"/>', pause:'<path d="M5.5 3.5v9M10.5 3.5v9"/>'
+  tick:'<circle cx="8" cy="8" r="6.2"/><path d="M5 8.2l2.1 2.1L11.2 6"/>', pause:'<path d="M5.5 3.5v9M10.5 3.5v9"/>',
+  // soạn văn bản (UI-F01): định dạng chữ, canh lề, chèn
+  bold:'<path d="M4.5 2.8h4a2.5 2.5 0 0 1 0 5h-4zM4.5 7.8h4.8a2.7 2.7 0 0 1 0 5.4H4.5z"/><path d="M4.5 2.8v10.4"/>',
+  italic:'<path d="M7 2.8h5M4 13.2h5M9.8 2.8 6.2 13.2"/>',
+  underline:'<path d="M4.5 2.5v5.2a3.5 3.5 0 0 0 7 0V2.5M3 14h10"/>',
+  overline:'<path d="M3 2.2h10"/><ellipse cx="8" cy="9.3" rx="3.3" ry="3.8"/>',
+  strike:'<path d="M11.3 4.3C10.6 3.2 9.5 2.7 8 2.7c-1.9 0-3.3 1-3.3 2.5 0 1.4 1.4 2 3.3 2.5M7.3 9.3c1.9.5 3.9 1.2 3.9 2.6 0 1.5-1.5 2.5-3.5 2.5-1.6 0-2.9-.6-3.6-1.8M2.5 8.3h11"/>',
+  alignl:'<path d="M2.5 3.5h11M2.5 6.5h7M2.5 9.5h11M2.5 12.5h7"/>',
+  alignc:'<path d="M2.5 3.5h11M4.5 6.5h7M2.5 9.5h11M4.5 12.5h7"/>',
+  alignr:'<path d="M2.5 3.5h11M6.5 6.5h7M2.5 9.5h11M6.5 12.5h7"/>',
+  alignj:'<path d="M2.5 3.5h11M2.5 6.5h11M2.5 9.5h11M2.5 12.5h6"/>',
+  alignd:'<path d="M2.5 3.5h11M2.5 6.5h11M2.5 9.5h11M2.5 12.5h2M7 12.5h2M11.5 12.5h2"/>',
+  bullet:'<circle class="dot" cx="3.5" cy="4.5" r="1.1"/><circle class="dot" cx="3.5" cy="8" r="1.1"/><circle class="dot" cx="3.5" cy="11.5" r="1.1"/><path d="M6.5 4.5h7M6.5 8h7M6.5 11.5h7"/>',
+  lspace:'<path d="M3.5 2.5v11M1.8 4.2 3.5 2.5l1.7 1.7M1.8 11.8l1.7 1.7 1.7-1.7M7.5 4h6M7.5 8h6M7.5 12h6"/>',
+  symbol:'<circle cx="4.5" cy="4.5" r="2"/><path d="M11 2.8v6M8 5.8h6M8 12.8h6"/>',
+  columns:'<path d="M2.5 3.5h4.5M2.5 6.5h4.5M2.5 9.5h4.5M2.5 12.5h4.5M9 3.5h4.5M9 6.5h4.5M9 9.5h4.5"/>',
+  field:'<path d="M4.8 3H3v10h1.8M11.2 3H13v10h-1.8"/><rect class="f" x="5.8" y="6" width="4.4" height="4"/><path d="M5.8 6h4.4v4H5.8z"/>',
+  spell:'<path d="M2.2 9.5 4.5 3l2.3 6.5M3 7.4h3"/><path d="M8.3 10.2l2.1 2.1 3.8-4.6"/>',
+  case:'<path d="M1.8 12.5 4.8 3.5l3 9M2.9 9.3h3.8"/><circle cx="11.4" cy="10.4" r="2.1"/><path d="M13.5 8v4.5"/>',
+  bgmask:'<rect class="f" x="2" y="4" width="12" height="8"/><path d="M2 4h12v8H2z"/><path d="M4.5 6.6h7M4.5 9.4h5"/>',
+  ruler:'<path d="M1.5 5.5h13v5h-13z"/><path d="M4 5.5v2M6.5 5.5v3M9 5.5v2M11.5 5.5v3"/>',
+  justify:'<path d="M2.5 2.5h11v11h-11z"/><circle class="dot" cx="5" cy="5" r=".9"/><circle class="dot" cx="8" cy="5" r=".9"/><circle class="dot" cx="11" cy="5" r=".9"/><circle class="dot" cx="5" cy="8" r=".9"/><circle class="dot" cx="8" cy="8" r="1.4"/><circle class="dot" cx="11" cy="8" r=".9"/><circle class="dot" cx="5" cy="11" r=".9"/><circle class="dot" cx="8" cy="11" r=".9"/><circle class="dot" cx="11" cy="11" r=".9"/>'
 };
 TC.ic = function(name, cls){ return '<svg class="ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
 (function(){

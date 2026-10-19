@@ -41,7 +41,7 @@
     'BREAK|BR|PRO|3|Bẻ|be, cat doan|trim|Trang chủ › Sửa',
     'LENGTHEN|LEN|PRO|3|Kéo dài thêm|keo dai them|extend|Trang chủ › Sửa',
     'MATCHPROP|MA|PRO|3|Khớp thuộc tính|khop thuoc tinh, quet thuoc tinh|match|Trang chủ › Thuộc tính',
-    'OVERKILL|OVERKILL|PRO|4|Xóa trùng lặp|xoa trung, xoa trung lap|erase|Trang chủ › Sửa',
+    'OVERKILL|OVERKILL|PRO|3|Xóa trùng lặp|xoa trung, xoa trung lap|erase|Trang chủ › Sửa',
     'INSERT|I|PRO|3|Chèn block|chen block, chen|insert|Trang chủ › Block',
     'BLOCK|B|PRO|3|Tạo block|tao block|bcreate|Trang chủ › Block',
     'BEDIT|BE|PRO|4|Block Editor|sua block|bedit|Trang chủ › Block',
@@ -105,17 +105,176 @@
     'PUBLISH|PUBLISH|VP|2|In nhiều layout, nhiều bản vẽ|in nhieu layout|publish|In & Xuất › In',
     'TCMARKUP|TCMARKUP|VP|2|Ghi chú markup|ghi chu, markup, danh dau, dam may, con dau|markup|Ghi chú › Markup',
     'TCATTOUT|TCATTOUT|VP|2|Xuất attribute ra Excel|xuat attribute, excel, khung ten|stats|Công cụ › Bản vẽ',
-    'TCATTIN|TCATTIN|PRO|2|Nhập attribute từ Excel|nhap attribute, excel|stats|Công cụ › Bản vẽ'
+    'SELECT|SELECT|V|1|Chọn đối tượng|chon doi tuong|select|Dòng lệnh',
+    'TCATTIN|TCATTIN|PRO|2|Nhập attribute từ Excel|nhap attribute, excel|stats|Công cụ › Bản vẽ',
+    // Đợt 3 · bản biên tập (EA); đợt 4, 5 là lệnh của v1.0 và sau v1.0
+    'GRADIENT|GD|PRO|4|Tô chuyển màu (gradient)|to chuyen mau, gradient|hatch|Trang chủ › Vẽ',
+    'BOUNDARY|BO|PRO|3|Tạo đường biên kín|duong bien, boundary|pline|Trang chủ › Vẽ',
+    'RAY|RAY|PRO|3|Vẽ tia|tia|xline|Trang chủ › Vẽ',
+    'POINT|PO|PRO|3|Vẽ điểm|diem, point|idpoint|Trang chủ › Vẽ',
+    'DIVIDE|DIV|PRO|3|Chia đều đối tượng|chia deu|idpoint|Trang chủ › Vẽ',
+    'MEASURE|ME|PRO|3|Chia theo khoảng|chia theo khoang|idpoint|Trang chủ › Vẽ',
+    'REGION|REG|PRO|4|Tạo region|region|area|Trang chủ › Vẽ',
+    'WIPEOUT|WIPEOUT|PRO|4|Vùng che|vung che|rect|Chú thích › Đánh dấu',
+    'DONUT|DO|PRO|4|Vành khuyên|vanh khuyen|circle|Trang chủ › Vẽ',
+    'MLINE|ML|PRO|4|Đa tuyến song song|da tuyen song song, tuong doi|pline|Trang chủ › Vẽ',
+    'CENTERMARK|CM|PRO|4|Dấu tâm|dau tam|circle|Chú thích › Kích thước',
+    'CENTERLINE|CENL|PRO|4|Đường tâm|duong tam|line|Chú thích › Kích thước',
+    'ARRAYRECT|ARRAYRECT|PRO|3|Mảng chữ nhật|mang chu nhat, nhan ban|array|Trang chủ › Sửa',
+    'ARRAYPOLAR|ARRAYPOLAR|PRO|3|Mảng tròn|mang tron, nhan ban tron|array|Trang chủ › Sửa',
+    'ARRAYPATH|ARRAYPATH|PRO|4|Mảng theo đường|mang theo duong|array|Trang chủ › Sửa',
+    'ARRAYCLASSIC|ARRAYCLASSIC|PRO|3|Hộp thoại mảng cổ điển|mang co dien|array|Trang chủ › Sửa',
+    'BLEND|BLEND|PRO|4|Nối cong|noi cong|spline|Trang chủ › Sửa',
+    'BREAKATPOINT|BREAKATPOINT|PRO|3|Bẻ tại điểm|be tai diem|trim|Trang chủ › Sửa',
+    'ALIGN|AL|PRO|4|Căn chỉnh|can chinh|move|Trang chủ › Sửa',
+    'PEDIT|PE|PRO|3|Sửa polyline|sua polyline, noi polyline|pline|Trang chủ › Sửa',
+    'SPLINEDIT|SPE|PRO|4|Sửa spline|sua spline|spline|Trang chủ › Sửa',
+    'HATCHEDIT|HE|PRO|3|Sửa hatch|sua hatch|hatch|Trang chủ › Sửa',
+    'REVERSE|REVERSE|PRO|4|Đảo chiều|dao chieu|undo|Trang chủ › Sửa',
+    'DRAWORDER|DR|PRO|3|Thứ tự hiển thị|thu tu hien thi, len tren, xuong duoi|layers|Trang chủ › Sửa',
+    'TEXTTOFRONT|TEXTTOFRONT|PRO|3|Đưa chữ lên trên cùng|dua chu len tren|mtext|Trang chủ › Sửa',
+    'HATCHTOBACK|HATCHTOBACK|PRO|3|Đưa hatch xuống dưới cùng|dua hatch xuong duoi|hatch|Trang chủ › Sửa',
+    'SETBYLAYER|SETBYLAYER|PRO|3|Đặt thuộc tính về ByLayer|dat ve bylayer|layers|Trang chủ › Sửa',
+    'CHSPACE|CHSPACE|PRO|4|Chuyển đối tượng giữa Model và Paper|chuyen khong gian|layout|Layout › Không gian',
+    'COPYBASE|COPYBASE|PRO|3|Sao chép có điểm gốc|sao chep co diem goc|copybase|Trang chủ › Clipboard',
+    'COPYCLIP|COPYCLIP|PRO|3|Sao chép vào clipboard|sao chep clipboard|copyclip|Trang chủ › Clipboard',
+    'CUTCLIP|CUTCLIP|PRO|3|Cắt vào clipboard|cat clipboard|cut|Trang chủ › Clipboard',
+    'PASTECLIP|PASTECLIP|PRO|3|Dán|dan|paste|Trang chủ › Clipboard',
+    'PASTEBLOCK|PASTEBLOCK|PRO|3|Dán dạng block|dan dang block|paste|Trang chủ › Clipboard',
+    'PASTEORIG|PASTEORIG|PRO|3|Dán về tọa độ gốc|dan ve toa do goc|paste|Trang chủ › Clipboard',
+    'PASTESPEC|PASTESPEC|PRO|4|Dán đặc biệt|dan dac biet|paste|Trang chủ › Clipboard',
+    'SELECTSIMILAR|SELECTSIMILAR|PRO|3|Chọn tương tự|chon tuong tu|select|Trang chủ › Tiện ích',
+    'QSELECT|QSELECT|PRO|3|Chọn nhanh theo thuộc tính|chon nhanh, loc doi tuong|qselect|Trang chủ › Tiện ích',
+    'FILTER|FI|PRO|3|Bộ lọc chọn|bo loc chon|filter|Trang chủ › Tiện ích',
+    'ADDSELECTED|ADDSELECTED|PRO|3|Tạo đối tượng cùng loại|tao doi tuong cung loai|plus|Chuột phải › Có vùng chọn',
+    'GRIPEDIT|GRIPEDIT|PRO|3|Sửa bằng grip|grip|move|Vùng vẽ',
+    'LAYMCUR|LAYMCUR|PRO|3|Đặt layer của đối tượng làm hiện hành|dat layer hien hanh|laycur|Trang chủ › Layer',
+    'LAYMCH|LAYMCH|PRO|3|Khớp layer|khop layer, doi layer|laymatch|Trang chủ › Layer',
+    'LAYLCK|LAYLCK|PRO|3|Khóa layer của đối tượng|khoa layer|lock|Trang chủ › Layer',
+    'LAYULK|LAYULK|PRO|3|Mở khóa layer|mo khoa layer|unlock|Trang chủ › Layer',
+    'LAYERP|LAYERP|PRO|3|Trạng thái layer trước|trang thai layer truoc|undo|Trang chủ › Layer',
+    'LAYMRG|LAYMRG|PRO|4|Gộp layer|gop layer|layers|Trang chủ › Layer',
+    'LAYDEL|LAYDEL|PRO|4|Xóa layer và đối tượng|xoa layer|trash|Trang chủ › Layer',
+    'LAYWALK|LAYWALK|PRO|4|Duyệt layer|duyet layer|layers|Trang chủ › Layer',
+    'COPYTOLAYER|COPYTOLAYER|PRO|4|Sao chép sang layer|sao chep sang layer|copy|Trang chủ › Layer',
+    'LAYCUR|LAYCUR|PRO|4|Đổi sang layer hiện hành|doi sang layer hien hanh|laycur|Trang chủ › Layer',
+    'LAYVPI|LAYVPI|PRO|4|Cô lập layer trong viewport|co lap layer viewport|isolate|Layout › Layer',
+    'LAYERSTATE|LAS|PRO|4|Trạng thái layer|trang thai layer|layers|Trang chủ › Layer',
+    'EATTEDIT|EATTEDIT|PRO|3|Sửa attribute|sua attribute, khung ten|attedit|Trang chủ › Block',
+    'ATTEDIT|ATE|PRO|3|Sửa attribute (cổ điển)|sua attribute|attedit|Trang chủ › Block',
+    'ATTDEF|ATT|PRO|3|Định nghĩa attribute|dinh nghia attribute|attedit|Chèn › Định nghĩa block',
+    'BATTMAN|BATTMAN|PRO|4|Quản lý attribute của block|quan ly attribute|attedit|Chèn › Định nghĩa block',
+    'ATTSYNC|ATTSYNC|PRO|4|Đồng bộ attribute|dong bo attribute|refresh|Chèn › Định nghĩa block',
+    'ATTDISP|ATTDISP|PRO|3|Hiển thị attribute|hien thi attribute|eye|Chèn › Định nghĩa block',
+    'BLOCKSPALETTE|BLOCKSPALETTE|PRO|3|Palette Blocks|palette block, thu vien block|blocks|Chèn › Block',
+    'WBLOCK|W|PRO|3|Ghi block ra tệp|ghi block ra tep|saveas|Chèn › Block',
+    'BASE|BASE|PRO|3|Điểm gốc bản vẽ|diem goc ban ve|idpoint|Chèn › Block',
+    'GROUP|G|PRO|4|Tạo nhóm|nhom, tao nhom|group|Trang chủ › Nhóm',
+    'UNGROUP|UNGROUP|PRO|4|Bỏ nhóm|bo nhom|ungroup|Trang chủ › Nhóm',
+    'GROUPEDIT|GROUPEDIT|PRO|4|Sửa nhóm|sua nhom|bedit|Trang chủ › Nhóm',
+    'CLASSICGROUP|CLASSICGROUP|PRO|3|Quản lý nhóm|quan ly nhom|group|Trang chủ › Nhóm',
+    'PICKSTYLE|PICKSTYLE|PRO|4|Bật/tắt chọn theo nhóm|chon theo nhom|select|Trang chủ › Nhóm',
+    'COLOR|COL|PRO|3|Bộ chọn màu|mau, chon mau|plotstyle|Định dạng › Màu',
+    'LINETYPE|LT,LTYPE|PRO|3|Quản lý linetype|linetype, kieu duong, net dut|lw|Định dạng › Linetype',
+    'LWEIGHT|LW|PRO|3|Thiết lập độ dày nét|do day net, lineweight|lw|Định dạng › Lineweight',
+    'STYLE|ST|PRO|3|Kiểu chữ|kieu chu, font chu|mtext|Chú thích › Văn bản',
+    'DIMSTYLE|D,DST|PRO|3|Quản lý kiểu kích thước|kieu kich thuoc, dim style|dim|Chú thích › Kích thước',
+    'MLEADERSTYLE|MLS|PRO|3|Kiểu multileader|kieu multileader, kieu ghi chu|leader|Chú thích › Đường dẫn',
+    'TABLESTYLE|TS|PRO|4|Kiểu bảng|kieu bang|table|Chú thích › Bảng',
+    'STYLESMANAGER|STYLESMANAGER|PRO|3|Quản lý plot style (CTB, STB)|plot style, ctb, net in|plotstyle|Xuất › In',
+    'DDPTYPE|DDPTYPE,PTYPE|PRO|3|Kiểu điểm|kieu diem|idpoint|Định dạng › Kiểu điểm',
+    'MLSTYLE|MLSTYLE|PRO|3|Kiểu đa tuyến song song|kieu tuong, mline style|pline|Định dạng › Kiểu đa tuyến song song',
+    'UNITS|UN|PRO|3|Đơn vị bản vẽ|don vi, don vi ban ve|dist|Quản lý › Làm sạch',
+    'DSETTINGS|DS,SE,OS|PRO|3|Thiết lập hỗ trợ vẽ|ho tro ve, snap, luoi, bat diem|osnap|Thanh trạng thái › chuột phải',
+    'SCALELISTEDIT|SCALELISTEDIT|PRO|3|Danh sách tỉ lệ|danh sach ti le|anno|Chú thích › Tỉ lệ chú thích',
+    'VPORTS|VPORTS|PRO|3|Cấu hình viewport|cau hinh viewport, chia man hinh|ws|Hiển thị › Viewport',
+    'MVIEW|MV|PRO|3|Tạo viewport trong layout|tao viewport|layout|Layout › Viewport',
+    'VPMAX|VPMAX|PRO|3|Phóng to viewport|phong to viewport|fullscreen|Layout › Viewport',
+    'LAYOUT|LO|PRO|3|Layout mới, đổi tên, xóa|layout moi|layout|Layout › Layout',
+    'MLEDIT|MLEDIT|PRO|3|Sửa đa tuyến song song|sua tuong|pline|Sửa đổi › Đa tuyến song song',
+    'DIMALIGNED|DAL|PRO|3|Kích thước nghiêng|kich thuoc nghieng|dim|Chú thích › Kích thước',
+    'DIMANGULAR|DAN|PRO|3|Kích thước góc|kich thuoc goc|angle|Chú thích › Kích thước',
+    'DIMARC|DAR|PRO|4|Kích thước độ dài cung|kich thuoc cung|arc|Chú thích › Kích thước',
+    'DIMRADIUS|DRA|PRO|3|Kích thước bán kính|kich thuoc ban kinh|radius|Chú thích › Kích thước',
+    'DIMDIAMETER|DDI|PRO|3|Kích thước đường kính|kich thuoc duong kinh|circle|Chú thích › Kích thước',
+    'DIMJOGGED|DJO|PRO|4|Kích thước bán kính gãy|kich thuoc gay|radius|Chú thích › Kích thước',
+    'DIMORDINATE|DOR|PRO|4|Kích thước tọa độ điểm|kich thuoc toa do|idpoint|Chú thích › Kích thước',
+    'DIMCONTINUE|DCO|PRO|3|Kích thước nối tiếp|kich thuoc noi tiep|dim|Chú thích › Kích thước',
+    'DIMBASELINE|DBA|PRO|3|Kích thước cùng gốc|kich thuoc cung goc|dim|Chú thích › Kích thước',
+    'QDIM|QDIM|PRO|4|Ghi kích thước nhanh|kich thuoc nhanh|dim|Chú thích › Kích thước',
+    'DIMBREAK|DIMBREAK|PRO|4|Ngắt kích thước|ngat dim|dim|Chú thích › Kích thước',
+    'DIMSPACE|DIMSPACE|PRO|4|Giãn cách kích thước|gian cach dim|dim|Chú thích › Kích thước',
+    'DIMEDIT|DED|PRO|3|Sửa kích thước|sua kich thuoc|dim|Chú thích › Kích thước',
+    'DIMTEDIT|DIMTEDIT|PRO|3|Sửa vị trí chữ kích thước|vi tri chu kich thuoc|dim|Chú thích › Kích thước',
+    'MLEADEREDIT|MLE|PRO|3|Thêm, bớt nhánh multileader|them nhanh|leader|Chú thích › Đường dẫn',
+    'MLEADERALIGN|MLA|PRO|4|Gióng hàng multileader|giong hang ghi chu|leader|Chú thích › Đường dẫn',
+    'MLEADERCOLLECT|MLC|PRO|4|Gom nhóm multileader|gom ghi chu|leader|Chú thích › Đường dẫn',
+    'TEXTEDIT|ED,DDEDIT|PRO|3|Sửa chữ tại chỗ|sua chu, sua text|mtext|Nhấp đúp vào chữ',
+    'SCALETEXT|SCALETEXT|PRO|4|Đổi tỉ lệ chữ|ti le chu|mtext|Chú thích › Văn bản',
+    'JUSTIFYTEXT|JUSTIFYTEXT|PRO|4|Đổi điểm canh chữ|canh chu|mtext|Chú thích › Văn bản',
+    'TXT2MTXT|TXT2MTXT|PRO|4|Gộp chữ thành MText|gop chu|mtext|Chú thích › Văn bản',
+    'SPELL|SP|PRO|5|Kiểm tra chính tả|chinh ta|findtext|Chú thích › Văn bản',
+    'XATTACH|XA|PRO|3|Gắn DWG làm xref|gan xref, tham chieu ngoai|xref|Chèn › Tham chiếu',
+    'IMAGEATTACH|IAT|PRO|3|Gắn ảnh|gan anh, chen anh|image|Chèn › Tham chiếu',
+    'ATTACH|ATTACH|PRO|3|Gắn tham chiếu (DWG, ảnh, PDF)|gan tham chieu|xref|Chèn › Tham chiếu',
+    'PDFATTACH|PDFATTACH|PRO|4|Gắn PDF làm underlay|gan pdf|pdf|Chèn › Tham chiếu',
+    'CLIP|CLIP|PRO|3|Clip tham chiếu, ảnh, viewport|clip, cat khung|zwin|Chèn › Tham chiếu',
+    'XCLIP|XC|PRO|3|Clip xref, block|clip xref|zwin|Chèn › Tham chiếu',
+    'ADJUST|ADJUST|PRO|3|Điều chỉnh ảnh, underlay|dieu chinh anh|image|Chèn › Tham chiếu',
+    'FRAME|FRAME|PRO|3|Khung tham chiếu|khung tham chieu|rect|Chèn › Tham chiếu',
+    'XBIND|XB|PRO|3|Bind đối tượng phụ thuộc của xref|bind xref|xref|Chèn › Tham chiếu',
+    'REFEDIT|REFEDIT|PRO|4|Sửa tại chỗ block, xref|sua tai cho|bedit|Chèn › Tham chiếu',
+    'PDFIMPORT|PDFIMPORT|PRO|4|Nhập PDF thành đối tượng|nhap pdf|pdf|Chèn › Nhập',
+    'FIELD|FIELD|PRO|4|Chèn field|field, truong du lieu|mtext|Chèn › Dữ liệu',
+    'DATAEXTRACTION|DX|PRO|4|Trích xuất dữ liệu|trich xuat du lieu|stats|Chèn › Dữ liệu',
+    'ADCENTER|ADC|PRO|4|DesignCenter|designcenter|folder|Chèn › Nội dung',
+    'TOOLPALETTES|TP|PRO|4|Tool Palettes|tool palette|blocks|Chèn › Nội dung',
+    'DWGPROPS|DWGPROPS|V|1|Thuộc tính bản vẽ|thuoc tinh ban ve|info|Quản lý › Làm sạch',
+    'RENAME|REN|PRO|3|Đổi tên đối tượng có tên|doi ten, doi ten layer|bedit|Quản lý › Làm sạch',
+    'APPLOAD|AP|PRO|3|Nạp ứng dụng, LISP|nap lisp, nap ung dung|pkg|Quản lý › Ứng dụng',
+    'SCRIPT|SCR|PRO|3|Chạy script|chay script|play|Quản lý › Ứng dụng',
+    'SECURITYOPTIONS|SECURITYOPTIONS|PRO|3|Tùy chọn bảo mật|bao mat, thu muc tin cay|shield|Quản lý › Ứng dụng',
+    'ALIASEDIT|ALIASEDIT|PRO|3|Viết tắt lệnh|viet tat lenh, pgp|keyboard|Quản lý › Tùy biến',
+    'TCMIGRATE|TCMIGRATE|PRO|3|Chuyển cài đặt từ AutoCAD|chuyen cai dat, tu autocad|ext|Quản lý › Tùy biến',
+    'SYSVARMONITOR|SYSVARMONITOR|PRO|4|Theo dõi biến hệ thống|bien he thong|gear|Quản lý › Ứng dụng',
+    'SETVAR|SET|PRO|4|Đặt biến hệ thống|bien he thong|gear|Quản lý › Ứng dụng',
+    'CUI|CUI|PRO|5|Tùy biến giao diện|tuy bien giao dien|gear|Quản lý › Tùy biến',
+    'WORKSPACE|WSCURRENT|PRO|4|Workspace|workspace, khong gian lam viec|ws|Quản lý › Tùy biến',
+    'DRAWINGRECOVERY|DRM|PRO|3|Trình phục hồi bản vẽ|phuc hoi ban ve, tu luu|recover|Menu ứng dụng',
+    'TCEXCELPASTE|TCEXCELPASTE|PRO|3|Dán bảng từ Excel|dan excel, bang excel|table|Chú thích › Bảng',
+    'TCEXCELOUT|TCEXCELOUT|PRO|3|Xuất bảng ra Excel|xuat excel|stats|Chú thích › Bảng',
+    'TCFRAME|TCFRAME|PRO|4|Tạo khung in trong Model theo tỉ lệ|khung in|layout|Công cụ VN › TCVN',
+    'TCNUMBER|TCNUMBER|PRO|4|Đánh số tự động|danh so|mtext|Công cụ VN › Văn bản',
+    'TCINCCOPY|TCINCCOPY|PRO|4|Sao chép tăng số|sao chep tang so|copy|Công cụ VN › Văn bản',
+    'TCTEXT|TCTEXT|PRO|4|Công cụ text tiếng Việt|chu hoa chu thuong, noi text|mtext|Công cụ VN › Văn bản',
+    'TCSYMBOL|TCSYMBOL|PRO|4|Ký hiệu kỹ thuật TCVN|cao do, truc, ky hieu|anno|Công cụ VN › Ký hiệu',
+    'TCROOMAREA|TCROOMAREA|PRO|4|Bảng diện tích phòng|dien tich phong|area|Công cụ VN › Đo và thống kê',
+    'TCSHEETS|TCSHEETS|PRO|4|Quản lý bộ bản vẽ|bo ban ve|layout|Công cụ VN › In ấn',
+    'TCBATCH|TCBATCH|PRO|4|Xử lý tệp hàng loạt|xu ly hang loat|fontbatch|Quản lý › Tệp hàng loạt',
+    'ETRANSMIT|ETRANSMIT|PRO|4|Đóng gói gửi đi|dong goi|pkg|Xuất › Gửi',
+    'EXPORTLAYOUT|EXPORTLAYOUT|PRO|4|Xuất layout thành Model|xuat layout|layout|Xuất › Xuất',
+    'UCS|UCS|PRO|3|Hệ tọa độ người dùng|ucs, toa do|iso|Hiển thị › Tọa độ',
+    'UCSMAN|UC|PRO|4|Quản lý UCS|quan ly ucs|iso|Hiển thị › Tọa độ',
+    'PLAN|PLAN|PRO|3|Nhìn vuông góc mặt bằng UCS|mat bang|views|Hiển thị › Tọa độ',
+    'BURST|BURST|PRO|4|Phá block giữ chữ attribute|pha block giu chu|explode|Mở rộng › Block',
+    'NCOPY|NCOPY|PRO|4|Sao chép đối tượng lồng|sao chep long|copy|Mở rộng › Block',
+    'GATTE|GATTE|PRO|4|Sửa attribute hàng loạt|sua attribute hang loat|attedit|Mở rộng › Block',
+    'TXTEXP|TXTEXP|PRO|4|Phá chữ thành nét|pha chu|explode|Mở rộng › Văn bản',
+    'FLATTEN|FLATTEN|PRO|4|Làm phẳng Z|lam phang|move|Mở rộng › Sửa',
+    'EXTRIM|EXTRIM|PRO|4|Cắt theo đường bao|cat theo duong bao|trim|Mở rộng › Sửa',
+    'SAVEALL|SAVEALL|PRO|4|Lưu tất cả|luu tat ca|save|Mở rộng › Tệp'
   ];
   var SYSVARS = [['OSMODE','Chế độ bắt điểm đang bật (mã bit)','4133'],['LTSCALE','Tỉ lệ linetype toàn cục','100'],['CLAYER','Layer hiện hành','KT-TUONG'],['LWDISPLAY','Hiển thị độ dày nét','0'],['FILEDIA','Hiện hộp thoại chọn tệp','1'],['PICKFIRST','Chọn trước rồi gọi lệnh','1'],['DIMSCALE','Tỉ lệ tổng thể kích thước','100'],['CANNOSCALE','Tỉ lệ chú thích hiện hành','1:100'],['INSUNITS','Đơn vị nội dung chèn vào','4 (mm)'],['ORTHOMODE','Chế độ Ortho','0'],['CMDECHO','Hiện lệnh khi chạy LISP','1'],['MIRRTEXT','Lật chữ khi đối xứng','0']];
   var CMDS = {}, ALIAS = {};
   RAW.forEach(function(r){ var f = r.split('|'); var c = { name:f[0], aliases:f[1] ? f[1].split(',') : [], need:f[2], wave:Number(f[3]), desc:f[4], vi:f[5], icon:f[6], where:f[7] }; CMDS[c.name] = c; c.aliases.forEach(function(a){ ALIAS[a] = c.name; }); });
+  var HIDDEN = { GRIPEDIT:1 };
   TC.CMDS = CMDS; TC.SYSVARS = SYSVARS;
   var IMPL = {};
   var cmd = TC.cmd = {};
   cmd.impl = IMPL; // screens3/4 đăng ký lệnh của Đợt 2
   var usage = TC.load('usage', {});
   var recentCmds = [];
+  cmd.alias = function(a, n){ a = String(a).toUpperCase(); if (n) ALIAS[a] = n; else delete ALIAS[a]; };
   cmd.def = function(n){ n = String(n).toUpperCase().replace(/^[_.'\-]+/, ''); return CMDS[n] || CMDS[ALIAS[n]] || null; };
   cmd.last = function(){ return recentCmds[0] || null; };
   cmd.recent = function(){ return recentCmds.slice(0, 8); };
@@ -130,7 +289,7 @@
       '<div class="ac" id="ac" role="listbox" hidden></div>';
     els = { hist:$('#cmd-hist'), name:$('#cmd-name'), pr:$('#cmd-pr'), inp:$('#cmd-in'), ac:$('#ac'), nest:$('#cmd-nest') };
     els.inp.addEventListener('keydown', onKey);
-    els.inp.addEventListener('input', function(){ if (!prompt) updateAC(); else hideAC(); });
+    els.inp.addEventListener('input', function(){ if (!prompt) updateAC(); else hideAC(); if (TC.dyn) TC.dyn.typed(els.inp.value); });
     els.inp.addEventListener('blur', function(){ setTimeout(hideAC, 120); });
     $('#cmd-histbtn').addEventListener('click', function(){ TC.screens.textWindow(); });
     els.pr.addEventListener('click', function(e){ var c = e.target.closest('[data-opt]'); if (c) CL.submit(c.dataset.opt); });
@@ -145,6 +304,7 @@
   CL.status = function(html){ var last = els.hist.lastElementChild; if (last && last.dataset.status) last.innerHTML = html; else { line(html); els.hist.lastElementChild.dataset.status = '1'; } };
   function setIdle(){ prompt = null; els.name.textContent = ''; els.pr.innerHTML = ''; els.nest.textContent = ''; els.inp.placeholder = 'Gõ lệnh hoặc từ khóa tiếng Việt, ví dụ: đo, in, layer'; }
   function renderPrompt(){
+    if (TC.dyn) TC.dyn.prompt(prompt);
     if (!prompt) { setIdle(); return; }
     els.nest.textContent = prompt.nested ? '>>' : '';
     els.name.textContent = prompt.cmd;
@@ -153,6 +313,7 @@
   }
   CL.busy = function(){ return !!running; };
   CL.current = function(){ return running ? running.name : null; };
+  CL.prompt = function(){ return prompt; };
   CL.options = function(){ return prompt && prompt.opts ? prompt.opts.map(function(o){ return { label:o[0], key:o[1] }; }) : []; };
   CL.focus = function(){ els.inp.focus(); };
   CL.key = function(e){
@@ -169,7 +330,9 @@
     var k = e.key;
     if (!els.ac.hidden && (k === 'ArrowDown' || k === 'ArrowUp')){ e.preventDefault(); var n = $$('.ai', els.ac).length; acSel = (acSel + (k === 'ArrowDown' ? 1 : -1) + n) % n; paintAC(); return; }
     if (!els.ac.hidden && (k === 'Tab' || k === 'Enter' || (k === ' ' && !prompt))){ var pick = $$('.ai', els.ac)[acSel]; if (pick){ e.preventDefault(); els.inp.value = ''; hideAC(); cmd.run(pick.dataset.n); return; } }
-    if (k === 'Enter' || (k === ' ' && !(prompt && prompt.allowSpace))){ e.preventDefault(); var v = els.inp.value.trim(); els.inp.value = ''; hideAC(); if (!prompt && !v){ var l = cmd.last(); if (l) cmd.run(l); return; } CL.submit(v); return; }
+    if (prompt && TC.dyn && k === 'Tab' && TC.dyn.tab(els.inp)){ e.preventDefault(); return; }
+    if (prompt && TC.dyn && k === 'ArrowDown' && TC.dyn.down()){ e.preventDefault(); return; }
+    if (k === 'Enter' || (k === ' ' && !(prompt && prompt.allowSpace))){ e.preventDefault(); var v = els.inp.value.trim(); if (prompt && TC.dyn) v = TC.dyn.compose(v); els.inp.value = ''; hideAC(); if (!prompt && !v){ var l = cmd.last(); if (l) cmd.run(l); return; } CL.submit(v); return; }
     if (k === 'Escape'){ e.preventDefault(); els.inp.value = ''; hideAC(); if (running) cmd.cancel(); else { TC.cad.clearSel(); TC.cad.reset(); } els.inp.blur(); $('#cv').focus(); return; }
     if ((k === 'ArrowUp' || k === 'ArrowDown') && els.ac.hidden){ e.preventDefault(); browse(k === 'ArrowUp' ? 1 : -1); return; }
     if (k === 'F2'){ e.preventDefault(); TC.screens.textWindow(); }
@@ -185,6 +348,7 @@
   function matchCmds(q){
     var Q = q.toUpperCase(), F = TC.fold(q), out = [];
     Object.keys(CMDS).forEach(function(n){
+      if (HIDDEN[n]) return;
       var c = CMDS[n], s = 0;
       if (n === Q || c.aliases.indexOf(Q) >= 0) s = 100; else if (n.indexOf(Q) === 0) s = 80; else if (c.aliases.some(function(a){ return a.indexOf(Q) === 0; })) s = 70; else if (n.indexOf(Q) > 0 && Q.length > 2) s = 40;
       else if (F.length > 1 && (c.vi.split(',').some(function(k){ return k.trim().indexOf(F) === 0; }) || TC.fold(c.desc).indexOf(F) >= 0)) s = 55;
@@ -209,6 +373,8 @@
 
   /* ---------- chạy lệnh ---------- */
   var running = null, cancelers = [];
+  // Esc giữa chuỗi prompt lồng trong lệnh (sau hộp thoại…) là luồng bình thường, không phải lỗi
+  addEventListener('unhandledrejection', function(e){ if (e.reason === 'cancel') e.preventDefault(); });
   cmd.cancel = function(){
     if (!running) return;
     var r = running; running = null; prompt = null;
@@ -237,8 +403,7 @@
       if (!typed) TC.screens.upgrade(c.desc, c.need);
       return;
     }
-    usage[c.name] = (usage[c.name] || 0) + 1; TC.save('usage', usage);
-    recentCmds = [c.name].concat(recentCmds.filter(function(n){ return n !== c.name; })).slice(0, 12);
+    if (!HIDDEN[c.name]){ usage[c.name] = (usage[c.name] || 0) + 1; TC.save('usage', usage); recentCmds = [c.name].concat(recentCmds.filter(function(n){ return n !== c.name; })).slice(0, 12); }
     var impl = IMPL[c.name];
     if (!impl){
       line('<b>' + c.name + '</b> · ' + esc(c.desc) + ': màn hình này thiết kế ở Đợt ' + c.wave + '.', 'faint');
@@ -253,9 +418,9 @@
     TC.cad.reset();
     if (TC.app.view) TC.app.view.cursor = 'idle';
     var job = { name:c.name }; running = job;
-    line('Lệnh: <b>' + c.name + '</b>');
+    if (!HIDDEN[c.name]) line('Lệnh: <b>' + c.name + '</b>');
     if (preset == null && /\s/.test(raw)) preset = raw.split(/\s+/)[1];
-    Promise.resolve(impl(ctxFor(job), preset)).catch(function(err){ if (err !== 'cancel') console.error(err); }).then(function(){ if (running === job){ running = null; prompt = null; renderPrompt(); TC.app.view.badge = null; } });
+    Promise.resolve(impl(ctxFor(job), preset)).catch(function(err){ if (err !== 'cancel') console.error(err); }).then(function(){ if (running === job){ running = null; prompt = null; renderPrompt(); TC.app.view.badge = null; } TC.emit('cmdend', c.name); });
   };
   function ctxFor(job, nested){
     function alive(){ return nested || running === job; }
@@ -275,9 +440,10 @@
         return new Promise(function(res, rej){
           if (!alive()) return rej('cancel');
           var done = false, fin = function(v){ if (done) return; done = true; prompt = null; renderPrompt(); res(v); };
-          prompt = { cmd:job.name, text:text, opts:o.opts, def:o.def, nested:nested, take:function(v){
+          prompt = { cmd:job.name, text:text, opts:o.opts, def:o.def, nested:nested, num:!!o.num, dyn:o.dyn, take:function(v){
             if (!v){ TC.cad.cancelPoint(); fin({ enter:true }); return; }
-            var kw = (o.opts || []).filter(function(op){ return op[1].toUpperCase() === v.toUpperCase() || TC.fold(op[0]).indexOf(TC.fold(v)) === 0; })[0];
+            if (o.num && /^-?[\d.]+$/.test(v)){ TC.cad.cancelPoint(); fin({ num:Number(v) }); return; }
+            var kw = (o.opts || []).concat(o.hidden || []).filter(function(op){ return op[1].toUpperCase() === v.toUpperCase() || TC.fold(op[0]).indexOf(TC.fold(v)) === 0; })[0];
             if (kw){ TC.cad.cancelPoint(); fin({ kw:kw[1] }); return; }
             var p = parsePoint(v, o.base);
             if (p){ TC.cad.feedPoint(p); return; }
@@ -286,7 +452,7 @@
           } };
           cancelers.push(function(){ if (!done){ done = true; rej('cancel'); } });
           renderPrompt();
-          TC.cad.getPoint({ base:o.base, temp:o.temp, onMove:o.onMove, rubber:o.rubber }).then(function(r){ if (done) return; if (!r) { if (!alive()) return; return; } line('<b>' + esc(job.name) + '</b> ' + esc(text) + ': <span class="mono">' + TC.d(r.p[0]) + ',' + TC.d(r.p[1]) + '</span>', 'muted'); fin({ p:r.p }); });
+          TC.cad.getPoint({ base:o.base, temp:o.temp, onMove:o.onMove, rubber:o.rubber, pick:o.pick, nosnap:o.nosnap }).then(function(r){ if (done) return; if (!r) { if (!alive()) return; return; } if (!o.pick) line('<b>' + esc(job.name) + '</b> ' + esc(text) + ': <span class="mono">' + TC.d(r.p[0]) + ',' + TC.d(r.p[1]) + '</span>', 'muted'); fin({ p:r.p, s:r.s, shift:r.shift }); });
         });
       },
       sel:function(text){
@@ -294,10 +460,10 @@
         if (d.sel.length) return Promise.resolve(d.sel.slice());
         return new Promise(function(res, rej){
           if (!alive()) return rej('cancel');
-          prompt = { cmd:job.name, text:text || 'Chọn đối tượng', opts:[['Tất cả','ALL']], nested:nested, take:function(v){ if (v && v.toUpperCase() === 'ALL') TC.cad.selectAll(); TC.cad.endSel(); } };
+          prompt = { cmd:job.name, text:text || 'Chọn đối tượng', opts:TC.can('PRO') ? [['Tất cả','ALL'],['Cuối','L'],['Trước đó','P']] : [['Tất cả','ALL']], nested:nested, take:function(v){ var k = (v || '').toUpperCase(); if (k === 'ALL') TC.cad.selectAll(); else if (k === 'L' && d.lastEnt && d.byId[d.lastEnt]){ d.sel.push(d.lastEnt); TC.cad.afterSel(); renderPrompt(); return; } else if (k === 'P' && d.prevSel){ d.prevSel.forEach(function(id){ if (d.byId[id] && d.sel.indexOf(id) < 0) d.sel.push(id); }); TC.cad.afterSel(); renderPrompt(); return; } TC.cad.endSel(); } };
           cancelers.push(function(){ rej('cancel'); });
           renderPrompt();
-          TC.cad.getSel({ onPick:function(){ TC.cmdline.status('Đã chọn ' + TC.n(d.sel.length) + ' · Enter để kết thúc chọn'); } }).then(function(ids){ prompt = null; renderPrompt(); res(ids || []); });
+          TC.cad.getSel({ onPick:function(){ TC.cmdline.status('Đã chọn ' + TC.n(d.sel.length) + ' · Enter để kết thúc chọn'); } }).then(function(ids){ prompt = null; renderPrompt(); if (ids && ids.length) d.prevSel = ids.slice(); res(ids || []); });
         });
       },
       kw:function(text, opts, def){ return ask(text, { opts:opts, def:def }).then(function(r){ var v = r.raw || def; var k = opts.filter(function(o){ return o[1].toUpperCase() === String(v).toUpperCase() || TC.fold(o[0]).indexOf(TC.fold(v)) === 0; })[0]; return k ? k[1] : v; }); },
@@ -338,6 +504,7 @@
   IMPL.REGEN = function(ctx){ var t = performance.now(); view().draw(); ctx.out('Tạo lại hình xong: ' + TC.n(doc().ents.length) + ' đối tượng trong ' + Math.max(1, Math.round(performance.now() - t)) + ' ms.'); };
   IMPL.REGENALL = IMPL.REGEN;
   IMPL.SELECTALL = function(){ TC.cad.selectAll(); };
+  IMPL.SELECT = function(ctx){ TC.cad.clearSel(); return ctx.sel('Chọn đối tượng').then(function(ids){ TC.app.doc().sel = ids; TC.cad.afterSel(); }); };
   IMPL.CLEANSCREENON = function(){ TC.app.cleanScreen(); };
   IMPL.NEWTAB = function(){ TC.app.activate('start'); };
   IMPL.PROPERTIES = function(){ TC.app.showPalette('props', true); };
