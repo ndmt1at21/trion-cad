@@ -48,6 +48,7 @@
   --c-snap: #F5D33B; --c-track: #5DE0A6;
   --c-dyn-bg: #262A30; --c-dyn-t: #EEF0F2; --c-dyn-b: #5B626C;
   --c-snap-tip-bg: #FFF6C9; --c-snap-tip-t: #2A2300; --c-snap-tip-b: #CDB64B;
+  --c-mac-r: #FF5F57; --c-mac-y: #FEBC2E; --c-mac-g: #28C840; /* nút cửa sổ macOS, giống nhau ở hai chủ đề */
   --c-cmp-a: #FF9A3C; --c-cmp-b: #4CA8FF; --c-cmp-common: #6C737D;
   /* huy hiệu phiên bản */
   --c-ed-viewer: #3B4048; --c-ed-viewer-t: #E3E6EA; --c-ed-vp: #9B8CFF; --c-ed-vp-t: #140F2E;

@@ -59,6 +59,7 @@
     $('#tb-user').addEventListener('click', function(){ var r = this.getBoundingClientRect(); TC.menu(userMenu(), r.right, r.bottom + 2, { alignRight:true, returnFocus:this, minWidth:250 }); });
     $('#tb-help').addEventListener('click', function(){ var r = this.getBoundingClientRect(); TC.menu(helpMenu(), r.right, r.bottom + 2, { alignRight:true, returnFocus:this }); });
     TC.search.bind($('#tb-q'));
+    TC.emit('title');
   }
   // giấy phép cần xác minh định kỳ mà lâu chưa kết nối: huy hiệu đếm ngược số ngày còn dùng offline (UI-L03)
   A.renderTitle = renderTitle;
@@ -276,6 +277,7 @@
     var d = A.doc(), host = $('#banners'); if (!d) return;
     host.innerHTML = d.banners.map(function(b){ return '<div class="banner ' + (b.type || '') + '" role="status" data-b="' + b.id + '">' + ic(b.icon || 'info') + '<p>' + b.html + '</p><span class="acts">' + (b.acts || []).map(function(a, i){ return '<button class="btn sm' + (a.primary ? ' primary' : a.ghost ? ' ghost' : '') + '" type="button" data-ba="' + i + '">' + a.label + (a.need && !TC.can(a.need) ? ' <span class="ed xs" data-ed="' + (a.need === 'VP' ? 'vp' : 'pro') + '">' + (a.need === 'VP' ? 'VP' : 'Pro') + '</span>' : '') + '</button>'; }).join('') + '</span><button class="ib" type="button" aria-label="Đóng banner" data-bx>' + ic('x') + '</button></div>'; }).join('');
     $('#vpc').style.top = (host.offsetHeight + 6) + 'px';
+    TC.emit('banners');
   }
   A.renderBanners = renderBanners;
   document.addEventListener('click', function(e){
@@ -371,10 +373,11 @@
       '<button class="sb-coord" type="button" id="sb-coord" data-tip="Tọa độ con trỏ" data-key="Ctrl+I" data-desc="Bấm để đổi kiểu hiển thị: tuyệt đối, tương đối, tắt.">0.00, 0.00, 0.00</button>' +
       '<button class="sb-txt" type="button" id="sb-space" data-tip="Không gian làm việc" data-desc="Trong layout: chuyển giữa Paper và Model trong viewport.">' + sp + '</button><span class="sb-sep"></span>' +
       (viewer ? '' : tg('grid','grid','Lưới','F7','GRIDMODE') + tg('snap','snap','Snap','F9','SNAPMODE') + tg('dyn','dyn','Nhập động','F12','DYNMODE') + tg('ortho','ortho','Ortho','F8','ORTHOMODE') + tg('polar','polar','Polar','F10','AUTOSNAP') + '<span class="hide-1366">' + tg('iso','iso','Isometric','F5','ISODRAFT') + '</span>' + tg('otrack','otrack','Theo dõi bắt điểm','F11','AUTOSNAP')) +
-      tg('osnap','osnap','Bắt điểm' + (viewer ? ' (khi đo)' : ''),'F3','OSMODE') + tg('lw','lw','Hiển thị độ dày nét','','LWDISPLAY') + (viewer ? '' : tg('transp','transp','Hiển thị độ trong suốt','','TRANSPARENCYDISPLAY') + tg('cycle','cycle','Chọn luân phiên','Ctrl+W','SELECTIONCYCLING')) +
+      tg('osnap','osnap','Bắt điểm' + (viewer ? ' (khi đo)' : ''),'F3','OSMODE') + tg('lw','lw','Hiển thị độ dày nét','','LWDISPLAY') + (viewer ? '' : tg('transp','transp','Hiển thị độ trong suốt','','TRANSPARENCYDISPLAY') + tg('cycle','cycle','Chọn luân phiên','Ctrl+W','SELECTIONCYCLING') + tg('qp','qprops','Thuộc tính nhanh','Ctrl+Shift+P','QPMODE')) +
       '<span class="sb-sep"></span>' +
       (d && d.space !== 'model' ? '<button class="sb-txt" type="button" id="sb-vpscale" data-tip="Tỉ lệ viewport" data-desc="' + (viewer ? 'Viewer chỉ xem tỉ lệ, không đổi được.' : 'Đổi tỉ lệ viewport đang kích hoạt.') + '">' + ic('vplock') + (vpScale || 'Paper') + (viewer ? '' : ic('down', 'xs')) + '</button>' :
-        '<button class="sb-txt" type="button" id="sb-anno" data-tip="Tỉ lệ chú thích" data-desc="' + (viewer ? 'Viewer chỉ xem.' : 'Tỉ lệ cho đối tượng chú thích theo tỉ lệ.') + '">' + ic('anno') + '1:100' + (viewer ? '' : ic('down', 'xs')) + '</button>')) +
+        '<button class="sb-txt" type="button" id="sb-anno" data-tip="Tỉ lệ chú thích" data-desc="' + (viewer ? 'Viewer chỉ xem.' : 'Tỉ lệ cho đối tượng chú thích theo tỉ lệ.') + '">' + ic('anno') + esc(d && d.annoScale || '1:100') + (viewer ? '' : ic('down', 'xs')) + '</button>' + (viewer ? '' : tg('annovis','eye','Hiển thị chú thích ở mọi tỉ lệ','','ANNOALLVISIBLE') + tg('annoauto','annoauto','Tự thêm tỉ lệ khi đổi tỉ lệ chú thích','','ANNOAUTOSCALE')))) +
+      (viewer || !d ? '' : '<button class="sb-txt hide-1366" type="button" id="sb-units" data-tip="Đơn vị bản vẽ" data-desc="Đơn vị hiện hành. Bấm để đổi nhanh hoặc mở hộp thoại Đơn vị (UNITS).">' + esc((d.units && d.units.name) || 'mm') + ic('down', 'xs') + '</button>' + '<button class="sbt" type="button" id="sb-iso" aria-label="Cô lập đối tượng" data-tip="Cô lập đối tượng" data-desc="Cô lập hoặc ẩn đối tượng đang chọn; kết thúc cô lập để hiện lại.">' + ic(d.iso || d.hidden ? 'unisolate' : 'isolate') + '</button>') +
       '<span class="sb-grow"></span>' +
       '<span id="sb-tasks"></span>' +
       (font && font.issues ? '<button class="sb-chip warn" type="button" id="sb-font" data-tip="Bác sĩ Font" data-desc="' + font.missing + ' font đã thay thế · ' + font.legacy + ' đối tượng chữ mã cũ. Bấm để mở Bác sĩ Font.">' + ic('warn') + 'Font: ' + font.missing + ' thay thế</button>' : '') +
@@ -404,11 +407,14 @@
     else if (id === 'sb-custom') { var r = e.target.closest('button').getBoundingClientRect(); TC.menu([{ h:'Hiện trên thanh trạng thái' }, { label:'Tọa độ', check:true }, { label:'Model / Paper', check:true }, { label:'Bắt điểm', check:true }, { label:'Hiển thị độ dày nét', check:true }, { label:'Tỉ lệ chú thích / viewport', check:true }, { label:'Chỉ báo Bác sĩ Font', check:true }, { label:'Chỉ báo đồ họa', check:true }, { label:'Tác vụ nền', check:true }, { label:'Thông báo', check:true }, { label:'Huy hiệu phiên bản', check:true }, { label:'Clean Screen', check:true }], r.right, r.top, { alignRight:true, up:true }); }
     else if (id === 'sb-vpscale' && !TC.isViewer()) { var r2 = e.target.closest('button').getBoundingClientRect(), dd = A.doc(), L0 = dd.layouts[dd.space], vp0 = dd.activeVp && L0.vports.filter(function(v){ return v.id === dd.activeVp; })[0]; if (!vp0){ TC.toast('Nhấp đúp vào trong một viewport để đổi tỉ lệ của nó.', { type:'info', log:false }); return; } TC.menu([20, 25, 50, 75, 100, 200, 500].map(function(k){ return { label:'1:' + k, check:Math.round(vp0.scale) === k, act:function(){ if (vp0.locked){ TC.toast('Viewport đang khóa hiển thị. Mở khóa trước khi đổi tỉ lệ.', { type:'warn', log:false }); return; } TC.ed.setVpScale(vp0, k); } }; }).concat([{ sep:1 }, { label:'Danh sách tỉ lệ…', act:function(){ TC.cmd.run('SCALELISTEDIT'); } }]), r2.left, r2.top, { up:true }); }
     else if (id === 'sb-vpscale' || id === 'sb-anno') { if (TC.isViewer()) TC.toast('Viewer chỉ xem tỉ lệ. Đổi tỉ lệ có trong TrionCAD Pro.', { type:'info', log:false }); }
-    else if (id === 'sb-ws') { var r3 = e.target.closest('button').getBoundingClientRect(); TC.menu([{ h:'Workspace' }, { label:'Soạn thảo 2D', check:A.ws === '2d', act:function(){ A.setWs('2d'); } }, { label:'Cổ điển (menu và toolbar)', check:A.ws === 'classic', act:function(){ A.setWs('classic'); } }, { label:'Viewer (ribbon giản lược)', check:A.ws === 'viewer', act:function(){ A.setWs('viewer'); } }, { sep:1 }, { label:'Lưu workspace hiện tại… (v1.0)', dis:true }, { label:'Thiết lập workspace… (v1.0)', dis:true }], r3.right, r3.top, { alignRight:true, up:true }); }
+    else if (id === 'sb-units') { var ru = e.target.closest('button').getBoundingClientRect(), du = A.doc(); TC.menu([{ h:'Đơn vị độ dài' }].concat([['mm', 'Milimét'], ['cm', 'Xentimét'], ['m', 'Mét']].map(function(u){ return { label:u[1] + ' <span class="faint mono">' + u[0] + '</span>', check:(du.units && du.units.name || 'mm') === u[0], act:function(){ du.units = Object.assign({}, du.units, { name:u[0] }); renderStatus(); TC.cmdline.msg('&lt;Đơn vị hiện: ' + u[1] + '. Tọa độ không đổi; chỉ đổi cách hiển thị và chèn.&gt;'); } }; })).concat([{ sep:1 }, { label:'Đơn vị bản vẽ…', icon:'dist', act:function(){ TC.cmd.run('UNITS'); } }]), ru.left, ru.top, { up:true }); }
+    else if (id === 'sb-iso') { var ri = e.target.closest('button').getBoundingClientRect(), di = A.doc(); TC.menu([{ label:'Cô lập đối tượng', icon:'isolate', dis:!di.sel.length, act:function(){ TC.layers.isolateSel(); renderStatus(); } }, { label:'Ẩn đối tượng', icon:'eyeoff', dis:!di.sel.length, act:function(){ TC.layers.hideSel(); renderStatus(); } }, { label:'Kết thúc cô lập', icon:'unisolate', dis:!di.iso && !di.hidden, act:function(){ TC.layers.endIso(); renderStatus(); } }], ri.left, ri.top, { up:true }); }
+    else if (id === 'sb-ws') TC.wsMenu(e.target.closest('button'));
   });
   document.addEventListener('contextmenu', function(e){
     var t = e.target.closest('#sb [data-tgl]'); if (!t) return; e.preventDefault();
     if (t.dataset.tgl === 'osnap') { TC.menu(osnapMenu(), e.clientX, e.clientY, { up:true }); return; }
+    if (t.dataset.tgl === 'qp' && TC.qpMenu) { TC.qpMenu(e.clientX, e.clientY); return; }
     if (t.dataset.tgl === 'polar') { TC.menu(['90','45','30','22.5','18','15','10','5'].map(function(a){ return { label:a + '°', check:Number(a) === (TC.S.polarInc || 90), act:function(){ TC.S.polarInc = Number(a); TC.save('polarInc', TC.S.polarInc); if (!TC.S.toggles.polar) toggle('polar'); TC.cmdline.msg('&lt;Góc polar tăng: ' + a + '°&gt;'); } }; }).concat([{ sep:1 }, { label:'Thiết lập theo dõi…', need:'PRO', act:function(){ TC.cmd.run('DSETTINGS', 'polar'); } }]), e.clientX, e.clientY, { up:true }); return; }
     var tabOf = { grid:'snap', snap:'snap', ortho:'snap', otrack:'osnap', dyn:'dyn', cycle:'cyc', iso:'snap', transp:null };
     TC.menu([{ label:'Thiết lập…', need:t.dataset.tgl === 'lw' ? 'V' : 'PRO', act:function(){ if (t.dataset.tgl === 'lw') TC.cmd.run('LWEIGHT'); else TC.cmd.run('DSETTINGS', tabOf[t.dataset.tgl] || 'snap'); } }], e.clientX, e.clientY, { up:true });
@@ -421,9 +427,9 @@
   TC.osnapMenu = osnapMenu;
   function toggle(k){
     var T = TC.S.toggles; T[k] = !T[k]; TC.save('toggles', T);
-    var names = { grid:'Lưới', snap:'Snap', ortho:'Ortho', polar:'Polar', osnap:'Bắt điểm', otrack:'Theo dõi bắt điểm', dyn:'Nhập động', lw:'Hiển thị độ dày nét', transp:'Độ trong suốt', cycle:'Chọn luân phiên', iso:'Isometric' };
+    var names = { grid:'Lưới', snap:'Snap', ortho:'Ortho', polar:'Polar', osnap:'Bắt điểm', otrack:'Theo dõi bắt điểm', dyn:'Nhập động', lw:'Hiển thị độ dày nét', transp:'Độ trong suốt', cycle:'Chọn luân phiên', iso:'Isometric', qp:'Thuộc tính nhanh', annovis:'Hiển thị chú thích ở mọi tỉ lệ', annoauto:'Tự thêm tỉ lệ' };
     TC.cmdline.msg('&lt;' + names[k] + ' ' + (T[k] ? 'bật' : 'tắt') + '&gt;');
-    renderStatus(); if (k === 'lw' || k === 'grid') A.view.draw();
+    renderStatus(); if (k === 'lw' || k === 'grid' || k === 'annovis') A.view.draw(); TC.emit('toggle', k);
   }
   A.toggle = toggle;
   var lastCoord = null;
@@ -475,7 +481,7 @@
       el.addEventListener('drop', function(e){ e.preventDefault(); var h = $('.drop-hint', el); if (h) h.remove(); var f = e.dataTransfer.files[0]; if (f) TC.files.openDropped(f); });
     });
     $('#vpc').addEventListener('click', function(e){
-      var b = e.target.closest('[data-vpc]'); if (!b) return; var r = b.getBoundingClientRect(), k = b.dataset.vpc;
+      var b = e.target.closest('[data-vpc]'); if (!b) return; if (TC.vpcMenu) return TC.vpcMenu(b.dataset.vpc, b); var r = b.getBoundingClientRect(), k = b.dataset.vpc;
       var items = k === 'm' ? [{ label:'Phóng to viewport', icon:'fullscreen' }, { label:'Cấu hình viewport', sub:[{ label:'Một' }, { label:'Hai: dọc' }, { label:'Hai: ngang' }, { label:'Bốn' }].map(function(x){ x.need = 'PRO'; return x; }) }, { sep:1 }, { label:'ViewCube', check:false }, { label:'Navigation bar', check:false, dis:true }]
         : k === 'v' ? ['Trên','Dưới','Trái','Phải','Trước','Sau','Isometric Tây Nam','Isometric Đông Nam'].map(function(x, i){ return { label:x, check:i === 0, act:function(){ if (i) TC.toast('Bản vẽ này chỉ có đối tượng 2D.', { type:'info', log:false }); } }; })
         : ['2D Wireframe','Wireframe','Hidden','Shaded','Realistic'].map(function(x, i){ return { label:x, check:i === 0 }; });

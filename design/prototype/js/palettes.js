@@ -3,6 +3,7 @@
   'use strict';
   var TC = window.TC, $ = TC.$, $$ = TC.$$, esc = TC.esc, ic = TC.ic, G = TC.geo;
   var P = TC.PALETTES = {};
+  TC.propsExt = TC.propsExt || {}; // loại đối tượng mới (Đợt 4): t → function(d, e, f) trả các hàng [tên, giá trị, kiểu]
   function A(){ return TC.app; }
 
   /* ================= Thuộc tính UI-C01 ================= */
@@ -50,9 +51,11 @@
       case 'table': rows = [['Kiểu bảng', esc(e.tstyle || 'Standard')], ['Số hàng', String(e.rows.length), 'ro'], ['Số cột', String(e.cols.length), 'ro'], ['Rộng', f(e.cols.reduce(function(s, x){ return s + x; }, 0)), 'ro'], ['Cao', f(e.rows.reduce(function(s, x){ return s + x; }, 0)), 'ro'], ['Vị trí X', f(e.p[0]), 'num'], ['Vị trí Y', f(e.p[1]), 'num']]; break;
       case 'attdef': rows = [['Tag', esc(e.tag)], ['Prompt', esc(e.prompt || e.tag)], ['Giá trị mặc định', esc(e.s || '')], ['Kiểu chữ', esc(e.style)], ['Chiều cao', f(e.h), 'num'], ['Vị trí X', f(e.p[0]), 'num'], ['Vị trí Y', f(e.p[1]), 'num']]; break;
       case 'hatch': { var ar = e._p[0].loops.reduce(function(s, l, k){ return s + (k ? -1 : 1) * G.polyArea(l); }, 0); rows = [['Loại', e.pat === 'SOLID' ? 'Tô đặc' : 'Có sẵn'], ['Tên mẫu', e.pat], ['Chú thích theo tỉ lệ', 'Không'], ['Góc', f(e.ang || 0, 0) + '°', 'num'], ['Tỉ lệ', f(e.sc || 1, 4), 'num'], ['Gốc X', '0.00', 'num'], ['Gốc Y', '0.00', 'num'], ['Liên kết', e.assoc ? 'Có' : 'Không'], ['Nhận diện island', 'Thường'], ['Màu nền', 'Không'], ['Diện tích', f(Math.abs(ar), 0) + ' (' + f(Math.abs(ar) / 1e6) + ' m²)', 'ro']]; break; }
+      default: if (TC.propsExt[e.t]) rows = TC.propsExt[e.t](d, e, f);
     }
     return rows;
   }
+  TC.propRows = function(d, e){ return common(d, e).concat(geom(d, e)); };
   function attrRows(d, e){ if (e.t !== 'insert') return []; var bd = d.blocks[e.name]; if (!bd) return []; return bd.ents.filter(function(x){ return x.t === 'attdef'; }).map(function(a){ return [a.tag, esc(e.attrs && e.attrs[a.tag] != null ? e.attrs[a.tag] : a.s)]; }); }
   TC.describe = function(d, e){
     var out = [(TYPE[e.t] || e.t).toUpperCase() + '   Layer: "' + e.layer + '"   Không gian: ' + (e._paper ? 'Paper' : 'Model'), '   Handle = ' + (0x2A0 + e.id).toString(16).toUpperCase()];
@@ -133,7 +136,7 @@
   var lstate = { q:'', sort:'name', dir:1, sel:null, filter:'all' };
   function layerRows(d, compact){
     var q = lstate.q.trim(), re = q ? new RegExp('^' + q.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + (q.indexOf('*') < 0 ? '' : '$'), 'i') : null;
-    var list = d.layers.filter(function(l){ if (lstate.filter === 'used' && !l.count) return false; return !re || re.test(l.name) || TC.fold(l.name).indexOf(TC.fold(q)) >= 0; });
+    var list = d.layers.filter(function(l){ if (lstate.filter === 'used' && !l.count) return false; if (TC.layerFilterTest && !TC.layerFilterTest(d, l)) return false; return !re || re.test(l.name) || TC.fold(l.name).indexOf(TC.fold(q)) >= 0; });
     list.sort(function(a, b){ var k = lstate.sort; var x = a[k], y = b[k]; return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * lstate.dir; });
     return list;
   }
@@ -155,7 +158,7 @@
       : '<tr><th></th>' + th('name', 'Tên') + '<th class="ctr" title="Bật/Tắt">' + ic('bulb', 's12') + '</th><th class="ctr" title="Đóng băng">' + ic('snow', 's12') + '</th><th class="ctr" title="Khóa">' + ic('lock', 's12') + '</th><th class="ctr" title="Màu">' + ic('plotstyle', 's12') + '</th>' + th('count', 'Số', 'num') + '</tr>';
     var body = rows.map(function(l){
       var cur = l.name === (TC.ed && !viewer ? TC.ed.clayer(d) : 'KT-TUONG'), st = cur ? '<span class="tag acc" title="Layer hiện hành" style="height:16px;padding:0 4px">' + ic('check', 's12') + '</span>' : l.count ? '<span title="Đang dùng" style="color:var(--c-text-2)">●</span>' : '<span title="Không có đối tượng" class="faint">○</span>';
-      return '<tr class="' + (lstate.sel === l.name ? 'is-sel' : '') + '" data-lrow="' + esc(l.name) + '"><td class="ctr">' + st + '</td><td data-lname="' + esc(l.name) + '">' + esc(l.name) + (d.tempLayers[l.name] && Object.keys(d.tempLayers[l.name]).length ? ' <span class="tag info" style="height:15px;font-size:9.5px">tạm</span>' : '') + '</td>' +
+      return '<tr class="' + (lstate.sel === l.name ? 'is-sel' : '') + '" data-lrow="' + esc(l.name) + '"' + (full && !viewer ? ' draggable="true"' : '') + '><td class="ctr">' + st + '</td><td data-lname="' + esc(l.name) + '">' + esc(l.name) + (d.tempLayers[l.name] && Object.keys(d.tempLayers[l.name]).length ? ' <span class="tag info" style="height:15px;font-size:9.5px">tạm</span>' : '') + '</td>' +
         '<td class="ctr">' + tgl(d, l, 'on', 'bulb', 'bulboff', 'Bật/Tắt') + '</td><td class="ctr">' + tgl(d, l, 'frz', 'sun', 'snow', 'Đóng băng') + '</td><td class="ctr">' + tgl(d, l, 'lck', 'unlock', 'lock', 'Khóa', 'PRO') + '</td>' +
         (full ? '<td class="ctr">' + tgl(d, l, 'plot', 'print', 'x', 'In', 'PRO') + '</td>' + (d.space !== 'model' && !viewer ? '<td class="ctr">' + vpTgl(d, l) + '</td><td class="ctr">' + tgl(d, l, 'vpfrz', 'snow', 'sun', 'Đóng băng ở viewport mới', 'PRO') + '</td>' : '') + '<td data-lcol="' + esc(l.name) + '">' + swatch(l.color) + ' ' + (l.color <= 7 ? TC.aciName(l.color) : l.color) + '</td><td data-llt="' + esc(l.name) + '"><span class="lt-s' + (l.lt === 'CENTER' ? ' center' : /DASH|HIDDEN/.test(l.lt) ? ' dash' : '') + '"></span> ' + esc(l.lt) + '</td><td class="num" data-llw="' + esc(l.name) + '">' + TC.d(l.lw) + ' mm</td><td class="num">0</td><td>Color_' + l.color + '</td><td data-ldesc="' + esc(l.name) + '">' + esc(l.desc || '') + '</td>' : '<td class="ctr" data-lcol="' + esc(l.name) + '">' + swatch(l.color) + '</td>') +
         '<td class="num">' + TC.n(l.count) + '</td></tr>';
@@ -176,7 +179,7 @@
       var LT0 = function(k){ return function(){ if (TC.layerTool) TC.layerTool(k, d, rerender); }; };
       TC.menu([{ label:'Đặt hiện hành', need:'PRO', act:function(){ TC.ed.setCurLayer(n, d); rerender(); } }, { label:'Layer mới', need:'PRO', act:LT0('new') }, { label:'Đổi tên', need:'PRO', kbd:'F2', act:function(){ var c = $('[data-lname="' + n.replace(/"/g, '') + '"]', root); if (c && TC.layerRename) TC.layerRename(d, c, rerender); } }, { label:'Xóa', need:'PRO', act:LT0('trash') }, { label:'Sửa mô tả', need:'PRO', act:function(){ var c = $('[data-ldesc="' + n.replace(/"/g, '') + '"]', root); if (c && TC.layerRename) TC.layerRename(d, c, rerender, true); else TC.screens.ask('Mô tả layer', 'Mô tả', d.layerMap[n].desc || '', null, 'UI-C03').then(function(v){ if (v != null){ d.layerMap[n].desc = v; rerender(); } }); } }, { sep:1 },
         { label:'Chọn đối tượng trên layer này', icon:'select', act:function(){ d.sel = d.ents.filter(function(x){ return x.layer === n && TC.entVisible(d, x); }).map(function(x){ return x.id; }); TC.cad.afterSel(); TC.cmdline.msg('Đã chọn ' + d.sel.length + ' đối tượng trên layer ' + esc(n) + '.'); } },
-        { label:'Cô lập layer này', icon:'isolate', act:function(){ L.isolate(d, [n]); rerender(); } }, { label:'Gộp layer này vào…', need:'PRO', act:LT0('merge') }, { sep:1 }, { label:'Lưu trạng thái layer (v1.0)', need:'PRO', dis:!TC.isViewer() }, { label:'Khôi phục như tệp gốc', icon:'undo', dis:!L.changed(d), act:function(){ L.restore(d); } }], e.clientX, e.clientY);
+        { label:'Cô lập layer này', icon:'isolate', act:function(){ L.isolate(d, [n]); rerender(); } }, { label:'Gộp layer này vào…', need:'PRO', act:LT0('merge') }, { sep:1 }, { label:'Lưu trạng thái layer…', need:'PRO', act:function(){ TC.screens.layerStateNew(d); } }, { label:'Trạng thái layer…', need:'PRO', act:function(){ TC.screens.layerStates(); } }, { label:'Khôi phục như tệp gốc', icon:'undo', dis:!L.changed(d), act:function(){ L.restore(d); } }], e.clientX, e.clientY);
     });
   }
   P.layers = { name:'Layer', render:function(host, d){
@@ -376,7 +379,8 @@
       layerUndo(d, 'Xóa layer', function(){ d.layers = d.layers.filter(function(l){ return l !== sel; }); delete d.layerMap[sel.name]; }); ls.sel = null; rer(); TC.cmdline.msg('Đã xóa layer ' + esc(sel.name) + '.'); return; }
     if (k === 'merge'){ if (!sel) return; SC.ask('Gộp layer ' + sel.name + ' vào', 'Layer đích', TC.ed.clayer(d) === sel.name ? '0' : TC.ed.clayer(d), function(v){ return !d.layerMap[v] ? 'Không có layer “' + v + '”.' : v === sel.name ? 'Chọn layer khác.' : null; }, 'UI-C03').then(function(v){ if (!v) return; var n0 = 0; TC.ed.run('Gộp layer', function(){ d.ents.concat.apply(d.ents, d.layouts.map(function(L){ return L.ents; })).forEach(function(e){ if (e.layer === sel.name){ TC.ed.mod(e, function(x){ x.layer = v; }); n0++; } }); layerUndo(d, 'Gộp layer', function(){ d.layers = d.layers.filter(function(l){ return l !== sel; }); delete d.layerMap[sel.name]; }); }); ls.sel = v; rer(); TC.toast('Đã gộp ' + esc(sel.name) + ' vào <b>' + esc(v) + '</b>: ' + n0 + ' đối tượng.', { log:false }); }); return; }
     if (k === 'lib'){ A().showPalette('tcvnlib'); TC.toast('Chọn “Bộ layer theo bộ môn” trong Thư viện TCVN để nạp.', { type:'info', log:false }); return; }
-    if (k === 'layers' || k === 'filter'){ TC.toast((k === 'layers' ? 'Trạng thái layer (UI-C04)' : 'Bộ lọc layer (UI-C05)') + ' có ở v1.0.', { type:'info', log:false }); return; }
+    if (k === 'layers'){ SC.layerStates(); return; }
+    if (k === 'filter'){ SC.layerFilterEdit(d, null, rer); return; }
     if (k === 'gear'){ var dlg = TC.dialog({ id:'layset', title:'Thiết lập layer', code:'UI-C03', w:480, body:'<div class="stack"><div class="grp"><div class="gh">Cô lập layer (LAYISO)</div><label class="chk"><input type="radio" name="lis" checked> Khóa và làm mờ các layer khác</label><div class="hrow" style="padding-left:20px">Độ mờ <input type="range" min="0" max="90" value="50" aria-label="Độ mờ"> <span class="mono">50%</span></div><label class="chk"><input type="radio" name="lis"> Tắt các layer khác</label><div class="gh">Trong layout</div><label class="chk"><input type="radio" name="lil" checked> Đóng băng ở viewport hiện tại</label><label class="chk"><input type="radio" name="lil"> Tắt</label></div><label class="chk"><input type="checkbox" checked> Áp bộ lọc đang chọn lên dropdown layer trên ribbon</label><label class="chk"><input type="checkbox" checked> Tô nền khác cho ô ghi đè theo viewport</label><label class="chk"><input type="checkbox" disabled> Báo khi bản vẽ có layer mới (sau v1.0)</label></div>', foot:'<span class="grow"></span><button class="btn ghost" type="button" data-x="cancel">Hủy</button><button class="btn primary" type="button" data-x="close">OK</button>' }); return; }
   };
 })();

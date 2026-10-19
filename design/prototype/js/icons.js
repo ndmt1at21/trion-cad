@@ -213,7 +213,62 @@ TC.ICONS = {
   case:'<path d="M1.8 12.5 4.8 3.5l3 9M2.9 9.3h3.8"/><circle cx="11.4" cy="10.4" r="2.1"/><path d="M13.5 8v4.5"/>',
   bgmask:'<rect class="f" x="2" y="4" width="12" height="8"/><path d="M2 4h12v8H2z"/><path d="M4.5 6.6h7M4.5 9.4h5"/>',
   ruler:'<path d="M1.5 5.5h13v5h-13z"/><path d="M4 5.5v2M6.5 5.5v3M9 5.5v2M11.5 5.5v3"/>',
-  justify:'<path d="M2.5 2.5h11v11h-11z"/><circle class="dot" cx="5" cy="5" r=".9"/><circle class="dot" cx="8" cy="5" r=".9"/><circle class="dot" cx="11" cy="5" r=".9"/><circle class="dot" cx="5" cy="8" r=".9"/><circle class="dot" cx="8" cy="8" r="1.4"/><circle class="dot" cx="11" cy="8" r=".9"/><circle class="dot" cx="5" cy="11" r=".9"/><circle class="dot" cx="8" cy="11" r=".9"/><circle class="dot" cx="11" cy="11" r=".9"/>'
+  justify:'<path d="M2.5 2.5h11v11h-11z"/><circle class="dot" cx="5" cy="5" r=".9"/><circle class="dot" cx="8" cy="5" r=".9"/><circle class="dot" cx="11" cy="5" r=".9"/><circle class="dot" cx="5" cy="8" r=".9"/><circle class="dot" cx="8" cy="8" r="1.4"/><circle class="dot" cx="11" cy="8" r=".9"/><circle class="dot" cx="5" cy="11" r=".9"/><circle class="dot" cx="8" cy="11" r=".9"/><circle class="dot" cx="11" cy="11" r=".9"/>',
+  // ==== Đợt 4 · screens9.js · chú thích, bảng ====
+  // tab ngữ cảnh Ô bảng (UI-F07): hàng, cột, gộp, viền, kiểu dữ liệu, công thức
+  rowabove:'<path d="M2 8h12v6H2zM2 11h12M6.5 8v6M10.5 8v6"/><path d="M8 1.5v4.5M5.75 3.75h4.5"/>',
+  rowbelow:'<path d="M2 2h12v6H2zM2 5h12M6.5 2v6M10.5 2v6"/><path d="M8 10v4.5M5.75 12.25h4.5"/>',
+  rowdel:'<path d="M2 2.5h12M2 13.5h12"/><path d="M2 5.5h12v5H2z" class="f"/><path d="M6.2 6.3l3.6 3.4M9.8 6.3l-3.6 3.4"/>',
+  colleft:'<path d="M8 2h6v12H8zM11 2v12M8 6.5h6M8 10.5h6"/><path d="M1.5 8h4.5M3.75 5.75v4.5"/>',
+  colright:'<path d="M2 2h6v12H2zM5 2v12M2 6.5h6M2 10.5h6"/><path d="M10 8h4.5M12.25 5.75v4.5"/>',
+  coldel:'<path d="M2.5 2v12M13.5 2v12"/><path d="M5.5 2h5v12h-5z" class="f"/><path d="M6.3 6.2l3.4 3.6M9.7 6.2l-3.4 3.6"/>',
+  merge:'<path d="M1.5 3.5h13v9h-13z"/><path d="M3.3 8H7M5.6 6.6 7 8 5.6 9.4M12.7 8H9M10.4 6.6 9 8l1.4 1.4"/>',
+  unmerge:'<path d="M1.5 3.5h13v9h-13zM8 3.5v9"/><path d="M6.2 8H3.4M4.8 6.6 3.4 8l1.4 1.4M9.8 8h2.8M11.2 6.6 12.6 8l-1.4 1.4"/>',
+  borders:'<path d="M2 2h12v12H2z" style="stroke-width:2"/><path d="M2 8h12M8 2v12" class="dots"/>',
+  bdall:'<path d="M2 2h12v12H2zM2 8h12M8 2v12"/>',
+  bdout:'<path d="M2 2h12v12H2z"/><path d="M2 8h12M8 2v12" class="dots"/>',
+  bdin:'<path d="M2 2h12v12H2z" class="dots"/><path d="M2 8h12M8 2v12"/>',
+  bdnone:'<path d="M2 2h12v12H2zM2 8h12M8 2v12" class="dots"/>',
+  bdtop:'<path d="M2 2h12"/><path d="M2 14h12M2 2v12M14 2v12M2 8h12M8 2v12" class="dots"/>',
+  bdbot:'<path d="M2 14h12"/><path d="M2 2h12M2 2v12M14 2v12M2 8h12M8 2v12" class="dots"/>',
+  bdleft:'<path d="M2 2v12"/><path d="M2 2h12M2 14h12M14 2v12M2 8h12M8 2v12" class="dots"/>',
+  bdright:'<path d="M14 2v12"/><path d="M2 2h12M2 14h12M2 2v12M2 8h12M8 2v12" class="dots"/>',
+  pct:'<circle cx="4.5" cy="4.5" r="2"/><circle cx="11.5" cy="11.5" r="2"/><path d="M12.5 2.5 3.5 13.5"/>',
+  fx:'<path d="M7.5 3.2C6.4 2.5 4.8 2.7 4.5 4.6L3.2 13.5M2 7h4.4"/><path d="M8.6 7.5l4.6 6M13.2 7.5l-4.6 6"/>',
+  // soạn MText (UI-F02, F03): xếp chồng, đoạn văn
+  stack:'<path d="M5.5 1.8v4.7M4.2 3 5.5 1.8"/><path d="M2.5 8h11"/><path d="M8.7 10.4a1.6 1.5 0 0 1 3.2.3c0 1.4-3.2 2.1-3.2 3.8h3.4"/>',
+  para:'<path d="M8 2.5v11M11 2.5v11M13 2.5H7.2a3 3 0 0 0 0 6H8"/>',
+  // ==== hết screens9.js ====
+  // ==== Đợt 4 · screens10.js · block, tham chiếu, Mở rộng ====
+  construct:'<path class="dash" d="M3.5 12.5l9-9"/><path d="M1.5 11.5h3v3h-3zM11.5 1.5h3v3h-3z"/>',
+  param:'<path d="M2 5h12M2 11h12"/><path class="f" d="M4.2 3h2.6v4H4.2zM9.2 9h2.6v4H9.2z"/><path d="M4.2 3h2.6v4H4.2zM9.2 9h2.6v4H9.2z"/>',
+  contrast:'<circle cx="8" cy="8" r="5.8"/><path class="dot" d="M8 2.2a5.8 5.8 0 0 1 0 11.6z"/>',
+  breplace:'<path d="M1.5 1.5h5v5h-5z"/><path class="f" d="M9.5 9.5h5v5h-5z"/><path d="M9.5 9.5h5v5h-5z"/><path d="M8.5 4h3.5v3.5M10.5 6.2 12 7.7l1.5-1.5M7.5 12H4V8.5M2.5 9.8 4 8.3l1.5 1.5"/>',
+  pickrem:'<path d="M2.5 2.5l4 10.5 1.6-4.3 4.3-1.6z" class="f"/><path d="M10 12.5h5"/>',
+  tpal:'<path d="M2.5 1.5h9v13h-9z"/><path d="M11.5 3.5h2v3h-2M11.5 8.5h2v3h-2"/><path class="f" d="M4.5 3.5h5v3h-5z"/><path d="M4.5 9h5M4.5 11.5h3.5"/>',
+  dcenter:'<path d="M1.5 2.5h5v11h-5z" class="f"/><path d="M1.5 2.5h13v11h-13zM6.5 2.5v11"/><path d="M8.5 5h4M8.5 7.5h4M8.5 10h2.5"/>',
+  // ==== hết screens10.js ====
+  // ==== Đợt 4 · screens11.js · công cụ VN, bộ bản vẽ ====
+  sheetset:'<path class="f" d="M5.5 1.5h8v10h-8z"/><path d="M5.5 1.5h8v10h-8z"/><path d="M3.5 3.5v10h8"/><path d="M1.5 5.5v9h7"/><path d="M8 4.5h3.5M8 7h3.5"/>',
+  elev:'<path class="f" d="M5 12.5 2.8 8.5h4.4z"/><path d="M5 12.5 2.8 8.5h4.4z"/><path d="M2.8 8.5h11.7M8.5 5.5h5"/><path d="M1.5 12.5h7"/>',
+  axisgrid:'<circle cx="4" cy="3.5" r="2.2"/><circle cx="12" cy="3.5" r="2.2"/><path d="M4 5.7v8.8M12 5.7v8.8" class="dash"/><path d="M1.5 11h13" class="dash"/>',
+  cutsym:'<path d="M1.5 10.5h4M10.5 10.5h4"/><path d="M3 10.5V5M13 10.5V5"/><path d="M1.3 6.7 3 4.3l1.7 2.4M11.3 6.7 13 4.3l1.7 2.4"/><path d="M6.5 10.5h3" class="dash"/>',
+  detailsym:'<circle cx="8" cy="8" r="6"/><path d="M2 8h12"/><path d="M6.8 5h2.4M6 11h4"/>',
+  north:'<circle cx="8" cy="9" r="5.5"/><path class="f" d="M8 1.5 5.4 12.2 8 10.4l2.6 1.8z"/><path d="M8 1.5 5.4 12.2 8 10.4l2.6 1.8z"/>',
+  slope:'<path d="M1.5 12.5 14 6"/><path d="M10.6 5.8 14 6l-1.9 2.8"/><path d="M2.5 6h5"/>',
+  txjoin:'<path d="M1.5 3.5h5M1.5 7h5M1.5 10.5h5"/><path d="M8.5 7h5.5M11.5 4.5 14 7l-2.5 2.5"/><path d="M1.5 13.5h12.5"/>',
+  txsplit:'<path d="M1.5 3.5h12.5"/><path d="M1.5 9h5M4 6.5 6.5 9 4 11.5"/><path d="M9 6.5h5M9 9.5h5M9 12.5h5"/>',
+  // ==== hết screens11.js ====
+  // ==== Đợt 4 · screens12.js · dữ liệu, tệp ====
+  // ==== hết screens12.js ====
+  // ==== Đợt 4 · screens13.js · lệnh v1.0 ====
+  gradient:'<path d="M2.5 3.5h11v9h-11z"/><path class="f" d="M2.5 3.5h4v9h-4z"/><path d="M6.5 3.5v9M9 3.5v9M11 3.5v9M12.4 3.5v9"/>',
+  gcenter:'<path d="M2.5 3.5h11v9h-11z"/><circle cx="8" cy="8" r="2.4"/><circle class="dot" cx="8" cy="8" r=".9"/>',
+  // ==== hết screens13.js ====
+  // ==== Đợt 4 · screens14.js · khung ứng dụng, macOS ====
+  qprops:'<path d="M2.5 3.5h8v7h-8z" class="f"/><path d="M2.5 3.5h8v7h-8z"/><path d="M4.5 5.5h4M4.5 7.5h2.5"/><path d="M9.5 9.5l4.5 1.8-1.8.8-.8 1.9z"/>',
+  annoauto:'<path d="M1.5 13.5 5.4 3.5h1.2l3.9 10"/><path d="M3.1 9.5h5.3"/><path d="M12.5 2.5v5M10 5h5"/>',
+  // ==== hết screens14.js ====
 };
 TC.ic = function(name, cls){ return '<svg class="ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
 (function(){

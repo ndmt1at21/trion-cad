@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quản trị TrionCAD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/page.css">
+<link rel="stylesheet" href="css/web.css">
+<script>/* chủ đề chọn ở trang này hoặc trong prototype (cùng khóa lưu) */ try { var t0 = JSON.parse(localStorage.getItem('tc-proto-theme')); if (t0 === 'dark' || t0 === 'light') document.documentElement.setAttribute('data-theme', t0); } catch (e) {}</script>
+<style>
+/* UI-L15 · cổng quản trị doanh nghiệp và giao diện quản lý của máy chủ floating. Thành phần web dùng chung ở css/web.css; phần dưới là riêng của trang này. */
+*, *::before, *::after{ box-sizing:border-box }
+.ico{ width:16px; height:16px; flex:none; fill:none; stroke:currentColor; stroke-width:var(--sw); stroke-linecap:var(--cap); stroke-linejoin:var(--join); overflow:visible; vertical-align:-3px }
+.ico .dot{ fill:currentColor; stroke:none } .ico .f{ fill:var(--c-icon-fill) }
+.ico.ok{ color:var(--c-ok) } .ico.warn{ color:var(--c-warn) } .ico.err, .ico.danger{ color:var(--c-danger) } .ico.info{ color:var(--c-info) }
+.mono{ font-family:var(--f-mono); font-variant-numeric:tabular-nums }
+.sr{ position:absolute !important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
+.faint{ color:var(--c-text-3) }
+[tabindex="-1"]:focus{ outline:none }
+.toc{ align-items:center } .toc .dev{ margin-left:auto } .states .dev{ margin-left:8px }
+/* trang duyệt: khung trình duyệt rộng như trang thật, ghi chú xuống dưới (như thanh-toan.html) */
+.scr-grid.wide{ grid-template-columns:minmax(0,1fr) } .scr-grid.wide .notes{ display:block; columns:2 320px; column-gap:32px } .scr-grid.wide .notes > *{ break-inside:avoid } .scr-grid.wide .notes h3{ margin:0 0 8px } .scr-grid.wide .notes ul{ margin-bottom:14px }
+
+/* nút, ô nhập, nhãn trạng thái */
+.b{ font:inherit; font-size:13px; font-weight:500; line-height:1; height:32px; padding:0 12px; display:inline-flex; align-items:center; justify-content:center; gap:7px; border-radius:var(--r-xl); border:1px solid var(--c-border-ctl); background:var(--c-raised); color:var(--c-text); cursor:pointer; white-space:nowrap; text-decoration:none }
+.b:hover{ border-color:var(--c-text-2) } .b .ico{ width:14px; height:14px }
+.b.pri{ background:var(--c-accent); border-color:transparent; color:var(--c-accent-t); font-weight:600 } .b.pri:hover{ background:var(--c-accent-hi) }
+.b.dz{ background:var(--c-danger); border-color:transparent; color:var(--c-base); font-weight:600 }
+.b:disabled, .b.pri:disabled, .fileb.is-dis{ background:var(--c-raised); border-color:var(--c-border); color:var(--c-text-dis); cursor:not-allowed }
+.lnk{ font:inherit; font-size:13px; background:none; border:0; padding:0; color:var(--c-accent); cursor:pointer; text-decoration:none; white-space:nowrap }
+.lnk:hover{ text-decoration:underline } .lnk.danger{ color:var(--c-danger) } .lnk:disabled{ color:var(--c-text-dis); cursor:not-allowed; text-decoration:none }
+.b:focus-visible, .lnk:focus-visible, .chips button:focus-visible, .seg2 button:focus-visible, .side button:focus-visible, .sw2:focus-visible, .th-sort:focus-visible, .chart:focus-visible, .log:focus-visible, .tscroll:focus-visible, .web a:focus-visible, .srv button:focus-visible, .srv a:focus-visible, details.params summary:focus-visible, input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible{ outline:2px solid var(--c-focus); outline-offset:2px }
+.fileb:focus-within{ outline:2px solid var(--c-focus); outline-offset:2px }
+.inp{ font:inherit; font-size:13.5px; height:32px; padding:0 10px; min-width:0; background:var(--c-base); color:var(--c-text); border:1px solid var(--c-border-ctl); border-radius:var(--r-xl) }
+.inp:focus-visible, .rsel:focus-visible, .vinp:focus-visible{ outline:2px solid var(--c-focus); outline-offset:0; border-color:var(--c-focus) }
+.inp[aria-invalid="true"], .vinp[aria-invalid="true"]{ border-color:var(--c-danger); box-shadow:0 0 0 1px var(--c-danger) }
+.inp:disabled{ color:var(--c-text-2); background:var(--c-sunken); cursor:not-allowed }
+.inp.mono{ font-family:var(--f-mono); font-size:13px }
+textarea.inp{ height:auto; width:100%; padding:8px 10px; resize:vertical; font:13px/1.55 var(--f-mono) }
+.pill{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; line-height:20px; padding:0 8px; border-radius:var(--r-xl); background:var(--c-active); color:var(--c-text-2); white-space:nowrap }
+.pill.ok{ background:var(--c-ok-soft); color:var(--c-ok) } .pill.warn{ background:var(--c-warn-soft); color:var(--c-warn) } .pill.err{ background:var(--c-danger-soft); color:var(--c-danger) } .pill.info{ background:var(--c-info-soft); color:var(--c-info) }
+.hint{ margin:0; font-size:12.5px; color:var(--c-text-3) }
+.btns{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.sub{ display:block; font-size:12px; color:var(--c-text-3) }
+.msg-e{ display:block; font-size:12px; color:var(--c-danger) }
+
+/* cổng web: khung trang */
+.web-in.wide{ max-width:none }
+.web-nav .prod{ font-size:13px; color:var(--c-text-2); padding-left:14px; border-left:1px solid var(--c-border); white-space:nowrap }
+.who{ display:inline-flex; align-items:center; gap:8px; font-size:13px; line-height:1.25 } .who small{ display:block; font-size:11.5px; color:var(--c-text-3) } .who b{ font-weight:500 }
+.av{ width:28px; height:28px; border-radius:50%; display:inline-grid; place-items:center; flex:none; background:var(--c-active); color:var(--c-text); font:600 11px/1 var(--f-ui) }
+.adm{ display:grid; grid-template-columns:212px minmax(0,1fr); gap:28px; padding:22px 0 8px; align-items:start }
+.side{ display:grid; gap:2px; position:sticky; top:12px }
+.side .org{ display:grid; gap:2px; padding:0 10px 12px; margin-bottom:6px; border-bottom:1px solid var(--c-border) }
+.side .org b{ font-size:13.5px; line-height:1.4; font-weight:600 } .side .org span{ font-size:12px; color:var(--c-text-3) }
+.side button{ display:flex; align-items:center; gap:10px; width:100%; font:inherit; font-size:14px; line-height:1.3; text-align:left; padding:8px 10px; border:0; border-radius:var(--r-lg); background:none; color:var(--c-text-2); cursor:pointer; white-space:nowrap }
+.side button:hover{ background:var(--c-hover); color:var(--c-text) }
+.side button[aria-current="page"]{ background:var(--c-accent-soft); color:var(--c-text); font-weight:600; box-shadow:inset 3px 0 0 var(--c-accent) }
+.side .cnt{ margin-left:auto; font:500 12px var(--f-mono); color:var(--c-text-3) }
+.sdot{ display:inline-block; width:8px; height:8px; border-radius:50% } .sdot.ok{ background:var(--c-ok) } .sdot.warn{ background:var(--c-warn) } .sdot.err{ background:var(--c-danger) }
+.mn{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; min-width:0; align-content:start }
+.mh{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 16px }
+.web .h3{ margin:0; font-size:26px; line-height:1.2; font-weight:600; letter-spacing:-.01em }
+.web .sub2{ margin:4px 0 0; font-size:13.5px; color:var(--c-text-2) }
+.card{ display:grid; gap:12px; padding:16px 18px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised); min-width:0 }
+.card > h4{ margin:0; font-size:15px; font-weight:600; line-height:1.35; display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px }
+.card > h4 > .ico{ color:var(--c-text-2) } .card > h4 .sp{ margin-left:auto }
+.alert{ display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:var(--r-xl); font-size:13.5px; line-height:1.5 }
+.alert > .ico{ margin-top:2px } .alert .grow{ flex:1; min-width:0; display:grid; gap:8px } .alert b{ font-weight:600 }
+.alert.warn{ background:var(--c-warn-soft) } .alert.warn > .ico{ color:var(--c-warn) }
+.alert.err{ background:var(--c-danger-soft) } .alert.err > .ico{ color:var(--c-danger) }
+.alert.info{ background:var(--c-info-soft) } .alert.info > .ico{ color:var(--c-info) }
+.fix{ margin:0; padding-left:20px; display:grid; gap:3px }
+.kpis{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px } .kpis.k3{ grid-template-columns:repeat(3, minmax(0,1fr)) }
+.kpi{ display:grid; gap:6px; align-content:start; padding:14px 16px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised); min-width:0 }
+.kpi .l{ font-size:12.5px; color:var(--c-text-2) }
+.kpi .v{ font-size:24px; font-weight:600; line-height:1.15; letter-spacing:-.01em } .kpi .v small{ font-size:13.5px; font-weight:500; color:var(--c-text-2); letter-spacing:0 }
+.kpi .s{ font-size:12.5px; color:var(--c-text-3); display:flex; gap:6px; align-items:flex-start } .kpi .s .ico{ margin-top:1px }
+.kpi .s .lnk{ font-size:12.5px }
+.meter{ display:block; height:6px; border-radius:3px; overflow:hidden; background:color-mix(in srgb, var(--c-accent) 20%, transparent) }
+.meter i{ display:block; height:100%; border-radius:3px; background:var(--c-accent) }
+.meter.warn{ background:color-mix(in srgb, var(--c-warn) 22%, transparent) } .meter.warn i{ background:var(--c-warn) } .meter.off{ background:var(--c-active) }
+.two{ display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); gap:16px; align-items:start }
+.todo, .act, .setup{ margin:0; padding:0; list-style:none; display:grid }
+.todo li{ display:grid; grid-template-columns:16px minmax(0,1fr); gap:8px 10px; padding:12px 0; border-top:1px solid var(--c-border); font-size:13.5px; line-height:1.5 }
+.todo li:first-child{ border-top:0; padding-top:0 } .todo li > .ico{ margin-top:3px } .todo .btns{ grid-column:2 }
+.todo b, .act b{ font-weight:600; color:var(--c-text) }
+.act{ gap:10px; font-size:13px; color:var(--c-text-2) } .act time{ display:block; font-size:12px; color:var(--c-text-3) }
+.setup{ counter-reset:st }
+.setup li{ display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:6px 14px; align-items:center; padding:14px 0; border-top:1px solid var(--c-border); counter-increment:st }
+.setup li:first-child{ border-top:0; padding-top:4px }
+.setup li::before{ content:counter(st); width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--c-active); font:600 13px var(--f-mono) }
+.setup b{ font-size:14px; font-weight:600 } .setup p{ margin:2px 0 0; font-size:13px; color:var(--c-text-2) }
+.emp{ display:grid; justify-items:center; text-align:center; gap:10px; padding:40px 16px; border:1px dashed var(--c-border-ctl); border-radius:var(--r-xl) }
+.emp > .ico{ width:32px; height:32px; color:var(--c-text-3); stroke-width:calc(var(--sw) * .62) }
+.emp b{ font-size:15px; font-weight:600 } .emp p{ margin:0; max-width:56ch; font-size:13.5px; color:var(--c-text-2) }
+.sk{ display:block; height:12px; border-radius:var(--r); background:var(--c-active) }
+.skr{ display:flex; gap:14px; align-items:center; padding:10px 0; border-top:1px solid var(--c-border) }
+
+/* danh sách: thanh công cụ, bảng */
+.tb{ display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center }
+.srch{ position:relative; flex:1 1 220px; max-width:320px; display:flex } .srch > .ico{ position:absolute; left:10px; top:8px; color:var(--c-text-3); pointer-events:none } .srch .inp{ width:100%; padding-left:32px }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; min-width:0 }
+.chips button{ font:inherit; font-size:12.5px; height:28px; padding:0 10px; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised); color:var(--c-text-2); cursor:pointer; white-space:nowrap }
+.chips button b{ font:500 11.5px var(--f-mono); color:var(--c-text-3); margin-left:5px }
+.chips button[aria-pressed="true"]{ border-color:var(--c-accent); background:var(--c-accent-soft); color:var(--c-text) }
+.bulk{ display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px 12px; border-radius:var(--r-xl); background:var(--c-accent-soft); font-size:13px }
+.tscroll{ max-height:560px; overflow:auto; border:1px solid var(--c-border); border-radius:var(--r-xl); background:var(--c-raised) }
+.wtbl{ width:100%; border-collapse:collapse; font-size:13px }
+.wtbl th, .wtbl td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--c-border); vertical-align:middle }
+.wtbl thead th{ position:sticky; top:0; z-index:1; background:var(--c-raised); color:var(--c-text-3); font-weight:600; font-size:12px; white-space:nowrap; border-bottom:0; box-shadow:inset 0 -1px 0 var(--c-border) }
+.wtbl tbody tr:last-child td{ border-bottom:0 }
+.wtbl tbody tr:hover td{ background:var(--c-hover) } .wtbl tr.is-sel td{ background:var(--c-accent-soft) }
+.wtbl td.num, .wtbl th.num{ text-align:right } .wtbl td.num{ font-family:var(--f-mono) }
+.wtbl .chk{ width:38px; padding-right:0 }
+.wtbl input[type="checkbox"], .lock input, .chk3 input, .radios input{ width:15px; height:15px; margin:0; accent-color:var(--c-accent); flex:none }
+.u{ display:flex; align-items:center; gap:10px; min-width:0 } .u > span:last-child{ display:grid; min-width:0 } .u b{ font-weight:500 }
+.mail{ font-family:var(--f-mono); font-size:12px; color:var(--c-text-2); overflow-wrap:anywhere }
+.dn{ font-family:var(--f-mono); font-size:12.5px } .nw{ white-space:nowrap }
+.stc{ display:grid; gap:2px; justify-items:start }
+.ra{ text-align:right } .acts{ display:inline-flex; gap:14px; align-items:center }
+.rsel{ font:inherit; font-size:13px; height:28px; padding:0 4px; border:1px solid transparent; border-radius:var(--r-lg); background:transparent; color:var(--c-text); cursor:pointer; max-width:100% }
+.rsel:hover{ border-color:var(--c-border-ctl) } .rsel:disabled{ cursor:not-allowed; color:var(--c-text-2) } .rsel option{ background:var(--c-raised); color:var(--c-text) }
+.th-sort{ font:inherit; font-size:12px; font-weight:600; color:inherit; background:none; border:0; padding:0; cursor:pointer; display:inline-flex; gap:4px; align-items:center }
+.th-sort .ico{ width:12px; height:12px }
+.on-dot{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--c-ok); margin-right:6px; vertical-align:1px }
+.only-s{ display:none }
+.roles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px 16px; margin:0 }
+.roles dt{ font-weight:600; font-size:13px } .roles dd{ margin:2px 0 0; font-size:12.5px; color:var(--c-text-2) }
+
+/* lịch sử dùng: lọc, biểu đồ */
+.filters{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center }
+.seg2{ display:inline-flex; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); overflow:hidden; max-width:100% }
+.seg2 button{ font:inherit; font-size:13px; height:30px; padding:0 12px; border:0; border-right:1px solid var(--c-border); background:var(--c-raised); color:var(--c-text-2); cursor:pointer; white-space:nowrap }
+.seg2 button:last-child{ border-right:0 } .seg2 button[aria-pressed="true"]{ background:var(--c-accent); color:var(--c-accent-t); font-weight:600 }
+.web{ --h0:color-mix(in oklab, var(--c-accent) 7%, var(--c-raised)); --h1:color-mix(in oklab, var(--c-accent) 24%, var(--c-raised)); --h2:color-mix(in oklab, var(--c-accent) 42%, var(--c-raised)); --h3:color-mix(in oklab, var(--c-accent) 60%, var(--c-raised)); --h4:color-mix(in oklab, var(--c-accent) 80%, var(--c-raised)); --h5:var(--c-accent) }
+.chart{ position:relative; min-height:40px; border-radius:var(--r) } .chart svg{ display:block; overflow:visible; touch-action:pan-y }
+.chart .grid{ stroke:var(--c-border); stroke-width:1 } .chart .capl{ stroke:var(--c-text-3); stroke-width:1 }
+.chart text{ fill:var(--c-text-3); font:11px var(--f-mono) } .chart text.lab{ fill:var(--c-text-2); font:600 11.5px var(--f-mono) }
+.chart .bar{ fill:var(--c-accent) } .chart .bar.full{ fill:var(--c-warn) } .chart .bar.hl{ fill:var(--c-accent-hi) } .chart .bar.full.hl{ opacity:.78 } .chart .mk{ fill:var(--c-warn) }
+.hm .c0{ fill:var(--h0) } .hm .c1{ fill:var(--h1) } .hm .c2{ fill:var(--h2) } .hm .c3{ fill:var(--h3) } .hm .c4{ fill:var(--h4) } .hm .c5{ fill:var(--h5) } .hm .hl{ stroke:var(--c-text); stroke-width:2 }
+.tip{ position:absolute; z-index:3; pointer-events:none; display:grid; gap:1px; padding:6px 10px; border:1px solid var(--c-border-ctl); border-radius:var(--r-lg); background:var(--c-raised); font-size:12px; line-height:1.4; color:var(--c-text-2); white-space:nowrap; transform:translate(-50%, -100%) }
+.tip b{ font:600 14px var(--f-ui); color:var(--c-text) }
+.lg{ display:flex; flex-wrap:wrap; gap:6px 18px; font-size:12px; color:var(--c-text-2) } .lg span{ display:inline-flex; align-items:center; gap:6px }
+.lg i{ width:10px; height:10px; border-radius:2px; background:var(--c-accent) } .lg i.full{ background:var(--c-warn) } .lg i.line{ width:14px; height:0; border-top:1px solid var(--c-text-3); border-radius:0; background:none }
+.scale{ display:flex; flex-wrap:wrap; align-items:center; gap:3px; font:11px var(--f-mono); color:var(--c-text-3) } .scale span{ margin:0 5px }
+.scale i{ width:26px; height:10px; border-radius:2px } .scale .c0{ background:var(--h0) } .scale .c1{ background:var(--h1) } .scale .c2{ background:var(--h2) } .scale .c3{ background:var(--h3) } .scale .c4{ background:var(--h4) } .scale .c5{ background:var(--h5) }
+
+/* triển khai, máy chủ floating trên cổng */
+.dlr{ display:flex; flex-wrap:wrap; gap:12px 20px; align-items:center; justify-content:space-between } .dlr p{ margin:3px 0 0 } .dlr b{ font-weight:600 }
+.cfg{ display:grid }
+.cfg-row{ display:grid; grid-template-columns:210px minmax(0,1fr) 76px; gap:6px 16px; align-items:start; padding:12px 0; border-top:1px solid var(--c-border) }
+.cfg-row:first-child{ border-top:0; padding-top:2px }
+.cfg-row > .lb{ font-size:13.5px; font-weight:500; padding-top:6px; line-height:1.35 } .cfg-row > .lb small{ display:block; margin-top:2px; font-weight:400; font-size:12px; color:var(--c-text-3) }
+.cv{ display:grid; gap:6px; min-width:0 } .cv .inp{ width:100%; max-width:560px } .cv > select.inp{ max-width:360px } .ctl2{ display:flex; flex-wrap:wrap; gap:8px; align-items:center } .ctl2 .inp{ width:auto; flex:1 1 200px; max-width:360px }
+.lock{ display:inline-flex; gap:6px; align-items:center; font-size:12.5px; color:var(--c-text-2); padding-top:8px; white-space:nowrap; cursor:pointer } .lock .ico{ width:13px; height:13px }
+.radios{ display:flex; flex-wrap:wrap; gap:6px 18px; padding-top:6px; font-size:13.5px } .radios label{ display:inline-flex; gap:7px; align-items:center; cursor:pointer }
+.chks{ display:grid; gap:8px; padding-top:6px }
+.chk3{ display:flex; gap:9px; align-items:flex-start; font-size:13.5px; cursor:pointer } .chk3 input{ margin-top:3px }
+.cmd{ display:grid; gap:8px }
+.cmd pre{ margin:0; font:12.5px/1.7 var(--f-mono); color:var(--c-text); background:var(--c-sunken); border:1px solid var(--c-border); border-radius:var(--r-xl); padding:12px 14px; white-space:pre-wrap; overflow-wrap:anywhere }
+details.params summary{ cursor:pointer; font-size:13.5px; font-weight:500 } details.params[open] summary{ margin-bottom:8px }
+.srvst{ display:flex; flex-wrap:wrap; gap:12px 14px; align-items:center }
+.srvic{ width:40px; height:40px; flex:none; border-radius:var(--r-xl); display:grid; place-items:center; background:var(--c-ok-soft); color:var(--c-ok) } .srvic.warn{ background:var(--c-warn-soft); color:var(--c-warn) } .srvic.err{ background:var(--c-danger-soft); color:var(--c-danger) }
+.srvic .ico{ width:22px; height:22px; stroke-width:calc(var(--sw) * .75) }
+.srvst .grow{ flex:1 1 220px; min-width:0 } .srvst p{ margin:2px 0 0 }
+.facts{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin:0 } .facts div{ display:grid; gap:2px; min-width:0 } .facts dt{ font-size:12px; color:var(--c-text-3) } .facts dd{ margin:0; font-size:15px; font-weight:600 }
+.keyrow{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.keyv{ font:500 14px var(--f-mono); letter-spacing:.04em; padding:6px 10px; border:1px dashed var(--c-border-ctl); border-radius:var(--r-xl); background:var(--c-sunken); overflow-wrap:anywhere }
+.fileb{ position:relative }
+
+/* hộp xác nhận, thông báo */
+.dlg{ width:min(480px, calc(100vw - 32px)); max-height:calc(100dvh - 48px); padding:0; border:1px solid var(--c-border-ctl); border-radius:var(--r-xl); background:var(--c-raised); color:var(--c-text); font:14px/1.5 var(--f-ui) }
+.dlg.wide{ width:min(680px, calc(100vw - 32px)) }
+.dlg::backdrop{ background:var(--c-scrim) }
+.dlg[open]{ display:flex; flex-direction:column; overflow:hidden }
+.dlg form{ display:flex; flex-direction:column; min-height:0; flex:1 }
+.dlg-h{ display:flex; align-items:center; gap:10px; padding:16px 18px 6px } .dlg-h h3{ margin:0; font-size:16px; font-weight:600; line-height:1.35; overflow-wrap:anywhere } .dlg-h .ico{ width:20px; height:20px; stroke-width:calc(var(--sw) * .85) }
+.dlg-b{ padding:6px 18px 4px; display:grid; gap:12px; overflow:auto; min-height:0; font-size:13.5px; color:var(--c-text-2) } .dlg-b p{ margin:0 } .dlg-b b{ color:var(--c-text); font-weight:600 }
+.dlg-f{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; padding:14px 18px 16px }
+.dlg .fld label{ color:var(--c-text-2) }
+.row2{ display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center } .row2 .sp{ flex:1 }
+.inl{ display:inline-flex; align-items:center; gap:8px; font-size:13px } .inl .inp{ width:auto }
+.invsum{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:13px }
+.tscroll.ip{ max-height:210px }
+.who-l{ margin:0; padding-left:18px; display:grid; gap:2px; color:var(--c-text) }
+.toast{ position:fixed; z-index:20; left:50%; bottom:20px; transform:translateX(-50%); display:flex; align-items:center; gap:16px; width:max-content; max-width:calc(100vw - 32px); padding:10px 14px; border-radius:var(--r-xl); background:var(--c-text); color:var(--c-base); font-size:13.5px; line-height:1.45 }
+.toast:empty{ display:none } .toast b{ font-weight:600 }
+.toast button{ font:inherit; font-weight:600; color:inherit; background:none; border:0; padding:0; text-decoration:underline; cursor:pointer; white-space:nowrap }
+.toast button:focus-visible{ outline:2px solid var(--c-base); outline-offset:2px }
+@media (max-width:560px){ .dlg .hide-s{ display:none } }
+
+/* máy chủ floating: ứng dụng nhỏ, mật độ gọn như ứng dụng chính */
+#br-srv .win-bar{ display:none; align-items:center; gap:8px; height:30px; padding-left:10px; background:var(--c-chrome); border-bottom:1px solid var(--c-border); font-size:12px; color:var(--c-text-2) }
+#br-srv .win-bar .ico{ color:var(--c-accent) } #br-srv .win-bar .sp{ flex:1 } #br-srv .win-bar .wb{ width:40px; height:30px; display:grid; place-items:center; color:var(--c-text-2) }
+#br-srv[data-frame="win"]{ max-width:880px } #br-srv[data-frame="win"] .browser-bar{ display:none } #br-srv[data-frame="win"] .win-bar{ display:flex }
+.srv{ container-type:inline-size; background:var(--c-base); color:var(--c-text); font:var(--fs)/var(--lh) var(--f-ui) }
+.srv-hd{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:8px 12px; background:var(--c-chrome); border-bottom:1px solid var(--c-border) }
+.srv-brand{ display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:var(--fs-m) } .srv-brand .ico{ color:var(--c-accent) }
+.srv-id{ display:inline-flex; gap:8px; align-items:baseline; color:var(--c-text-2) } .srv-id b{ font:500 var(--fs) var(--f-mono); color:var(--c-text) }
+.srv-hd .sp{ flex:1 }
+.srv .pill{ font-size:11px; line-height:18px }
+.sb{ display:inline-flex; vertical-align:middle; align-items:center; gap:6px; height:var(--h-ctl); padding:0 10px; font:500 var(--fs)/1 var(--f-ui); color:var(--c-text); background:var(--c-raised); border:1px solid var(--c-border-ctl); border-radius:var(--r); cursor:pointer; white-space:nowrap; text-decoration:none }
+.sb:hover{ border-color:var(--c-text-2) } .sb .ico{ width:14px; height:14px } .sb.pri{ background:var(--c-accent); color:var(--c-accent-t); border-color:transparent; font-weight:600 } .sb.dzo{ color:var(--c-danger) } .sb:disabled{ color:var(--c-text-dis); border-color:var(--c-border); cursor:not-allowed }
+.srv-bd{ display:grid; grid-template-columns:192px minmax(0,1fr); min-height:460px }
+.srv-nav{ display:flex; flex-direction:column; gap:1px; padding:6px; background:var(--c-sunken); border-right:1px solid var(--c-border) }
+.srv-nav button{ display:flex; align-items:center; gap:8px; height:28px; padding:0 8px; border:0; border-radius:var(--r); background:none; color:var(--c-text-2); font:inherit; cursor:pointer; text-align:left; white-space:nowrap }
+.srv-nav button:hover{ background:var(--c-hover); color:var(--c-text) } .srv-nav button[aria-selected="true"]{ background:var(--c-active); color:var(--c-text); font-weight:600 }
+.srv-nav .cnt{ margin-left:auto; padding-left:8px; font:var(--fs-xs) var(--f-mono); color:var(--c-text-3) }
+.srv-mn{ padding:12px 16px 16px; display:grid; gap:12px; align-content:start; min-width:0 }
+.vh{ margin:0; font-size:var(--fs-m); font-weight:600 } .vh2{ margin:4px 0 0; font-size:var(--fs); font-weight:600 }
+.vrow{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px } .vrow .sp{ flex:1 }
+.vkv{ display:grid; grid-template-columns:210px minmax(0,1fr); margin:0; border-top:1px solid var(--c-border) }
+.vkv dt, .vkv dd{ margin:0; padding:5px 0; border-bottom:1px solid var(--c-border) } .vkv dt{ color:var(--c-text-2) } .vkv dd{ min-width:0; overflow-wrap:anywhere }
+.vtw{ overflow-x:auto }
+.stbl{ width:100%; border-collapse:collapse; font-size:var(--fs) }
+.stbl th{ height:24px; padding:0 8px; text-align:left; font-size:var(--fs-xs); font-weight:600; color:var(--c-text-3); border-bottom:1px solid var(--c-border); white-space:nowrap }
+.stbl td{ padding:5px 8px; border-bottom:1px solid var(--c-border); vertical-align:middle } .stbl .sub{ font-size:var(--fs-xs) } .stbl.stale{ opacity:.6 } .stbl .ra{ white-space:nowrap }
+.stbl tbody tr:hover td{ background:var(--c-hover) }
+.stbl .warn{ color:var(--c-warn); font-weight:600 }
+.log{ margin:0; padding:6px 0; background:var(--c-sunken); border:1px solid var(--c-border); border-radius:var(--r); font:var(--fs-xs)/1.7 var(--f-mono); max-height:340px; overflow:auto }
+.ll{ display:grid; grid-template-columns:62px 72px minmax(0,1fr); gap:0 8px; padding:1px 10px } .ll time{ color:var(--c-text-3) } .ll .lv{ color:var(--c-text-2) }
+.ll.lv-warn .lv{ color:var(--c-warn); font-weight:500 } .ll.lv-err{ background:var(--c-danger-soft) } .ll.lv-err .lv{ color:var(--c-danger); font-weight:600 } .ll .lm{ overflow-wrap:anywhere }
+.vtools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.vinp{ height:var(--h-ctl); padding:0 8px; font:inherit; color:var(--c-text); background:var(--c-base); border:1px solid var(--c-border-ctl); border-radius:var(--r); min-width:0 } .vinp.mono{ font-family:var(--f-mono) }
+.vtools .vinp{ flex:1 1 200px; max-width:300px }
+.vseg{ display:inline-flex; border:1px solid var(--c-border-ctl); border-radius:var(--r); overflow:hidden }
+.vseg button{ height:22px; padding:0 10px; border:0; border-right:1px solid var(--c-border); background:var(--c-raised); color:var(--c-text-2); font:inherit; cursor:pointer } .vseg button:last-child{ border-right:0 } .vseg button[aria-pressed="true"]{ background:var(--c-active); color:var(--c-text); font-weight:600 }
+.vform{ display:grid; gap:10px; max-width:660px }
+.vf{ display:grid; grid-template-columns:210px minmax(0,1fr); gap:3px 12px; align-items:center } .vf .vinp{ width:100%; max-width:280px } .vf > .vl{ color:var(--c-text-2) }
+.vf .vm{ grid-column:2; font-size:var(--fs-xs); color:var(--c-text-3) } .vf .vm.err{ color:var(--c-danger) }
+.vinl{ display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center } .vinl .vinp{ width:auto } .vmeter{ width:140px; margin-left:6px }
+.vbtns{ display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center }
+.vemp{ display:grid; justify-items:center; text-align:center; gap:6px; padding:28px 12px; color:var(--c-text-2); border:1px dashed var(--c-border-ctl); border-radius:var(--r) } .vemp .ico{ width:24px; height:24px; color:var(--c-text-3); stroke-width:calc(var(--sw) * .8) } .vemp b{ color:var(--c-text) }
+.boot{ display:grid; gap:8px; padding:10px 12px; border:1px solid var(--c-border); border-radius:var(--r); background:var(--c-info-soft) }
+.boot ol{ margin:0; padding:0; list-style:none; display:grid; gap:3px } .boot li{ display:flex; gap:8px; align-items:center; color:var(--c-text-3) } .boot li.done{ color:var(--c-text-2) } .boot li.done .ico{ color:var(--c-ok) } .boot li.now{ color:var(--c-text); font-weight:600 }
+.srv .alert{ font-size:var(--fs); padding:8px 10px; border-radius:var(--r); line-height:1.5 } .srv .alert > .ico{ margin-top:1px }
+.srv .hint{ font-size:var(--fs-xs) }
+.sw2{ position:relative; width:32px; height:18px; border-radius:9px; background:var(--c-active); border:0; cursor:pointer; flex:none; padding:0 }
+.sw2::after{ content:""; position:absolute; top:3px; left:3px; width:12px; height:12px; border-radius:50%; background:var(--c-text-2); transition:left var(--t) }
+.sw2[aria-checked="true"]{ background:var(--c-accent) } .sw2[aria-checked="true"]::after{ left:17px; background:var(--c-accent-t) }
+.srv-ft{ display:flex; flex-wrap:wrap; gap:2px 16px; padding:5px 12px; border-top:1px solid var(--c-border); background:var(--c-chrome); font-size:var(--fs-xs); color:var(--c-text-3) }
+.vonly-s{ display:none } .vacts{ display:inline-flex; gap:6px; justify-content:flex-end }
+
+/* khung hẹp */
+@container (max-width: 1000px){
+  .kpis{ grid-template-columns:repeat(2, minmax(0,1fr)) } .kpis.k3{ grid-template-columns:repeat(3, minmax(0,1fr)) }
+  .two{ grid-template-columns:minmax(0,1fr) }
+  .wtbl .hide-m{ display:none }
+  .roles, .facts{ grid-template-columns:repeat(2, minmax(0,1fr)) }
+  .cfg-row{ grid-template-columns:170px minmax(0,1fr) 70px }
+}
+@container (max-width: 760px){
+  .web-nav .prod, .who .nm{ display:none }
+  .adm{ grid-template-columns:minmax(0,1fr); gap:14px; padding-top:14px }
+  .side{ position:relative; display:flex; flex-wrap:wrap; gap:4px }
+  .side .org{ display:none } .side button{ width:auto; flex:none; font-size:13.5px; padding:6px 10px } .side button[aria-current="page"]{ box-shadow:inset 0 -2px 0 var(--c-accent) } .side .cnt{ margin-left:2px }
+  .web .h3{ font-size:22px }
+  .wtbl .hide-s{ display:none } .only-s{ display:block } .stc.only-s{ display:grid; margin-top:4px }
+  .acts{ flex-direction:column; align-items:flex-end; gap:8px }
+  .srch{ max-width:none; flex-basis:100% }
+  .chips{ flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin }
+  .cfg-row{ grid-template-columns:minmax(0,1fr) auto } .cfg-row > .lb{ grid-column:1 / -1; padding-top:0 } .cfg-row > .cv{ grid-column:1 } .cfg-row > .lock{ padding-top:6px }
+  .setup li{ grid-template-columns:28px minmax(0,1fr) } .setup li > .b{ grid-column:2; justify-self:start }
+  .mh .btns{ width:100% }
+}
+@container (max-width: 480px){
+  .kpis, .kpis.k3, .roles, .facts{ grid-template-columns:minmax(0,1fr) }
+  .kpi .v{ font-size:22px }
+}
+@container (max-width: 640px){
+  .srv-bd{ grid-template-columns:minmax(0,1fr); min-height:0 }
+  .srv-nav{ flex-direction:row; flex-wrap:wrap; border-right:0; border-bottom:1px solid var(--c-border) }
+  .srv-nav button{ flex:none }
+  .srv-mn{ padding:12px }
+  .vkv, .vf{ grid-template-columns:minmax(0,1fr) } .vkv dt{ padding-bottom:0; border-bottom:0; font-size:var(--fs-xs) } .vf .vm{ grid-column:1 }
+  .stbl .vh-s{ display:none } .vonly-s{ display:block } .vacts{ flex-direction:column; align-items:flex-end }
+  .ll{ grid-template-columns:62px minmax(0,1fr) } .ll .lm{ grid-column:1 / -1 }
+  .srv-id .mono{ display:none }
+}
+</style>
+</head>
+<body>
+<main class="pg">
+  <header class="pg-head">
+    <p class="eyebrow">TrionCAD · Đợt 4 / 5 · Doanh nghiệp · phát hành 1.0</p>
+    <h1>Cổng quản trị doanh nghiệp và máy chủ giấy phép</h1>
+    <p class="lead">UI-L15 theo đặc tả 07.3 §6. Có hai giao diện. <b>Cổng quản trị</b> trên web: quản trị viên của công ty xem ghế, gán ghế cho email nhân viên, quản lý thiết bị, xem lịch sử dùng, lấy bộ cài MSI và đặt cấu hình chung cho cả công ty. <b>Máy chủ floating</b>: dịch vụ chạy trong mạng LAN của công ty, có giao diện quản lý nhỏ để xem trạng thái, ghế đang dùng, hàng đợi và nhật ký. Cả hai dùng chung token và kiểu chữ với ứng dụng.</p>
+    <div class="rules">
+      <span><b>Ghế gán theo người</b>: mỗi ghế cho một email, dùng trên 2 máy. Người được gán đăng nhập TrionCAD bằng email đó là dùng được, không cần key.</span>
+      <span><b>Ghế floating</b>: dùng chung trong mạng công ty. Máy chủ cấp ghế khi mở TrionCAD, nhận lại khi đóng; hết ghế thì người đến sau vào hàng đợi (UI-L01).</span>
+      <span><b>Thu hồi ghế, gỡ kích hoạt</b> không đụng tới bản vẽ: máy chuyển về Viewer, bản vẽ vẫn mở và in được.</span>
+      <span><b>Công ty, email, tên máy, địa chỉ IP</b> trong trang là dữ liệu mẫu.</span>
+    </div>
+    <div class="toc"><a href="#cong">Cổng quản trị</a><a href="#may-chu">Máy chủ floating</a><a href="thanh-toan.html">Thanh toán, tài khoản (UI-L16)</a><a href="index.html">← Mở prototype ứng dụng</a>
+      <span class="dev" role="group" aria-label="Chủ đề"><button type="button" data-th="auto" aria-pressed="true">Theo hệ thống</button><button type="button" data-th="dark" aria-pressed="false">Tối</button><button type="button" data-th="light" aria-pressed="false">Sáng</button></span></div>
+  </header>
+
+  <!-- ===================== Cổng quản trị ===================== -->
+  <section class="scr" id="cong" aria-labelledby="h-cong">
+    <div class="scr-h"><span class="code-tag">UI-L15</span><h2 id="h-cong">Cổng quản trị: ghế, người dùng, thiết bị, triển khai</h2><span class="rel">Web · mở từ Trạng thái giấy phép (UI-L03) › Quản trị, email chào mừng khi mua gói Doanh nghiệp · 1.0</span></div>
+    <div class="states" role="group" aria-label="Trạng thái cổng quản trị">Trạng thái:
+      <button type="button" data-st="def" aria-pressed="true">Đang dùng</button><button type="button" data-st="empty" aria-pressed="false">Công ty mới, chưa gán ghế</button><button type="button" data-st="full" aria-pressed="false">Hết ghế</button><button type="button" data-st="lost" aria-pressed="false">Mất kết nối máy chủ floating</button><button type="button" data-st="ro" aria-pressed="false">Quản trị phụ (chỉ xem)</button><button type="button" data-st="load" aria-pressed="false">Đang tải</button>
+      <span class="dev"><button type="button" data-dev="desktop" data-for="br-adm" aria-pressed="true">Máy tính</button><button type="button" data-dev="phone" data-for="br-adm" aria-pressed="false">Điện thoại</button></span>
+    </div>
+    <div class="scr-grid wide">
+      <div class="browser" id="br-adm" data-dev="desktop"><div class="browser-bar"><span class="addr" id="adm-addr">[tên-miền]/quan-tri</span></div><div class="web"><div class="web-in wide" id="adm"></div></div></div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li><b>Vai trò</b>: Chủ tài khoản (thanh toán và mọi quyền), Quản trị (ghế, thiết bị, triển khai, máy chủ), Quản trị phụ (chỉ xem, xuất báo cáo), Thành viên (chỉ dùng ghế). Đổi vai trò ngay trong bảng.</li>
+          <li><b>Mời hàng loạt</b>: dán email (mỗi dòng một người, kèm họ tên sau dấu phẩy; dán từ Excel hoặc Outlook được) hoặc chọn tệp CSV. Bảng xem trước báo email sai, trùng, đã có ghế, ngoài tên miền công ty, vượt số ghế trống. Lời mời hết hạn sau 14 ngày, gửi lại được.</li>
+          <li><b>Thu hồi ghế</b> (một người hoặc chọn nhiều): hộp xác nhận nêu tên, số ghế, số máy bị ảnh hưởng; máy về Viewer ở lần kết nối tới; hoàn tác được ngay trên thông báo.</li>
+          <li><b>Gỡ kích hoạt</b> trả lại lượt kích hoạt cho người dùng; máy đang tắt nhận lệnh khi kết nối lại.</li>
+          <li><b>Lịch sử dùng</b>: thanh lọc (7, 30, 90 ngày; loại ghế) áp dụng cho mọi số liệu bên dưới. Rê chuột hoặc dùng phím mũi tên trên biểu đồ để xem từng giá trị; mỗi biểu đồ có bảng số liệu thay thế. Xuất CSV theo bộ lọc.</li>
+          <li><b>Triển khai</b>: lệnh cài im lặng đổi theo lựa chọn. Cấu hình chung lưu thành phiên bản; máy đã cài nhận ở lần mở TrionCAD tới; mục có dấu Khóa thì người dùng không đổi được trong Tùy chọn. Tệp .tcconf dành cho máy không ra Internet.</li>
+          <li>Thử: dán <code>a@anphu.vn, b@gmail.com, sai@</code> vào Mời nhân viên; tìm “ket cau”; sửa đường dẫn mẫu thành <code>fs01\CAD</code> rồi Lưu cấu hình.</li>
+        </ul>
+        <h3>Cần xác minh</h3>
+        <ul>
+          <li>Số mặc định đề xuất: lời mời hết hạn sau 14 ngày; ân hạn 2 giờ khi mất kết nối máy chủ; tự thu hồi ghế floating sau 60 phút không hoạt động; giữ ghế 3 phút cho người đầu hàng đợi.</li>
+          <li>Tên tham số MSI, đuôi tệp <code>.tcconf</code> và <code>.tcprofile</code>: chốt với nhóm trình cài đặt.</li>
+          <li>Máy chủ gửi lên cổng mỗi 5 phút: số ghế, tên máy, tài khoản. Không gửi nội dung bản vẽ.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== Máy chủ floating ===================== -->
+  <section class="scr" id="may-chu" aria-labelledby="h-srv">
+    <div class="scr-h"><span class="code-tag">UI-L15</span><h2 id="h-srv">Máy chủ giấy phép floating: giao diện quản lý</h2><span class="rel">Dịch vụ trong mạng LAN của công ty · mở bằng trình duyệt trong mạng nội bộ, hoặc cửa sổ nhỏ từ biểu tượng ở khay hệ thống của máy chủ · 1.0</span></div>
+    <div class="states" role="group" aria-label="Trạng thái dịch vụ">Trạng thái:
+      <button type="button" data-vst="run" aria-pressed="true">Đang chạy</button><button type="button" data-vst="full" aria-pressed="false">Hết ghế, có hàng đợi</button><button type="button" data-vst="stop" aria-pressed="false">Dịch vụ dừng do lỗi</button><button type="button" data-vst="boot" aria-pressed="false">Đang khởi động</button>
+      <span class="dev"><button type="button" data-frame="browser" aria-pressed="true">Trình duyệt</button><button type="button" data-frame="win" aria-pressed="false">Cửa sổ nhỏ</button></span>
+    </div>
+    <div class="scr-grid wide">
+      <div class="browser" id="br-srv" data-frame="browser">
+        <div class="browser-bar"><span class="addr">https://lic-anphu.local:27081</span></div>
+        <div class="win-bar" aria-hidden="true"><svg class="ico" viewBox="0 0 16 16"><path d="M8 3 14.2 13.5H1.8z"/><circle class="dot" cx="8" cy="3" r="2"/></svg>Máy chủ giấy phép TrionCAD · LIC-ANPHU<span class="sp"></span><span class="wb"><svg class="ico" viewBox="0 0 16 16"><path d="M3.5 8.5h9"/></svg></span><span class="wb"><svg class="ico" viewBox="0 0 16 16"><path d="M3.8 3.8l8.4 8.4M12.2 3.8l-8.4 8.4"/></svg></span></div>
+        <div class="srv" id="srv"></div>
+      </div>
+      <aside class="notes">
+        <h3>Hành vi</h3>
+        <ul>
+          <li>Dịch vụ Windows hoặc Linux cài trên một máy luôn bật trong mạng công ty. Giao diện chỉ mở được từ dải địa chỉ cho phép, đăng nhập bằng mật khẩu quản trị đặt khi cài. Cửa sổ nhỏ là cùng giao diện, mở từ biểu tượng ở khay hệ thống của máy chủ.</li>
+          <li><b>Thu hồi ghế</b>: máy khách hiện thông báo, cho 5 phút để lưu bản vẽ, rồi về Viewer; ghế chuyển ngay cho người đầu hàng đợi.</li>
+          <li><b>Hàng đợi</b>: người mở TrionCAD khi hết ghế chọn “Báo khi có ghế trống” (UI-L01). Ghế trống được giữ 3 phút cho người đầu hàng đợi; quản trị đưa người lên đầu hoặc bỏ khỏi hàng đợi.</li>
+          <li><b>Dịch vụ dừng</b>: nói rõ nguyên nhân và cách khắc phục; máy đang dùng giữ ghế trong thời gian ân hạn. Khởi động có tiến trình từng bước và nút Hủy.</li>
+          <li><b>Nhật ký</b> giữ 90 ngày, lọc theo mức, tìm, xuất .log. <b>Sao lưu</b> gồm khóa máy chủ, cấu hình và nhật ký; khôi phục có xác nhận.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+</main>
+<dialog class="dlg" id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s, r){ return (r || document).querySelector(s); }, $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); };
+  var num = function(v, p){ return Number(v).toLocaleString('vi-VN', { minimumFractionDigits:p || 0, maximumFractionDigits:p || 0 }); };
+  var fold = function(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase(); };
+  var rnd = function(seed){ var s = seed >>> 0; return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; };
+  var p2 = function(x){ return (x < 10 ? '0' : '') + x; };
+  // "hôm nay" của dữ liệu mẫu: thứ Hai 19/10/2026, 14:40
+  var day = function(n){ return new Date(2026, 9, 19 - n); };
+  var dmy = function(d){ return p2(d.getDate()) + '/' + p2(d.getMonth() + 1) + '/' + d.getFullYear(); };
+  var dm = function(d){ return p2(d.getDate()) + '/' + p2(d.getMonth() + 1); };
+  var WD = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+  var mins = function(hm){ var t = hm.split(':'); return 14 * 60 + 40 - (+t[0] * 60 + +t[1]); };
+  var dur = function(m){ return (m >= 60 ? Math.floor(m / 60) + ' giờ ' : '') + (m % 60) + ' phút'; };
+
+  /* biểu tượng: nét 1,25, đầu vuông, lưới 16 (phần lớn lấy từ js/icons.js) */
+  var P = {
+    logo:'<path d="M8 3 14.2 13.5H1.8z"/><circle class="dot" cx="8" cy="3" r="2"/>',
+    gauge:'<path d="M2 12a6 6 0 1 1 12 0"/><path d="M8 12l3-4.5"/><circle class="dot" cx="8" cy="12" r="1.2"/>',
+    user:'<circle cx="8" cy="5.5" r="3"/><path d="M2.5 14.5c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/>',
+    monitor:'<path d="M1.5 2.5h13v9h-13z"/><path d="M5.5 14.5h5M8 11.5v3"/>',
+    chart:'<path d="M1.5 13.5h13"/><path d="M4 13.5V9M7 13.5V4M10 13.5V7M13 13.5v-3"/>',
+    pkg:'<path d="M8 1.5 14 4.5v7L8 14.5 2 11.5v-7z"/><path d="M2 4.5l6 3 6-3M8 7.5v7"/>',
+    server:'<path d="M2.5 2.5h11v4.5h-11zM2.5 9h11v4.5h-11z"/><path d="M8.5 4.75h3M8.5 11.25h3"/><circle class="dot" cx="5" cy="4.75" r=".9"/><circle class="dot" cx="5" cy="11.25" r=".9"/>',
+    search:'<circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5l4 4"/>',
+    mail:'<path d="M1.5 3.5h13v9h-13z"/><path d="M1.5 3.5 8 9l6.5-5.5"/>',
+    plus:'<path d="M8 3v10M3 8h10"/>',
+    check:'<path d="M3 8.5l3.2 3.2L13 5"/>',
+    warn:'<path d="M8 2 14.8 13.8H1.2z"/><path d="M8 6.2v3.8"/><circle class="dot" cx="8" cy="11.9" r=".85"/>',
+    error:'<circle cx="8" cy="8" r="6.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/>',
+    info:'<circle cx="8" cy="8" r="6.5"/><path d="M8 7.3v4"/><circle class="dot" cx="8" cy="4.9" r=".85"/>',
+    okc:'<circle cx="8" cy="8" r="6.5"/><path d="M5 8.2l2 2 4-4.4"/>',
+    lock:'<path d="M3.5 7.5h9v7h-9z" class="f"/><path d="M5.5 7.5V5.2a2.5 2.5 0 0 1 5 0v2.3"/>',
+    key:'<circle cx="5" cy="11" r="3"/><path d="M7.2 8.8 14 2M11.5 4.5l2 2M10 6l1.5 1.5"/>',
+    copy:'<path d="M5.5 5h8v9.5h-8z" class="f"/><path d="M3 11V2.5h8"/>',
+    down:'<path d="M8 1.5v9M4.5 7 8 10.5 11.5 7"/><path d="M2.5 11v3.5h11V11"/>',
+    up2:'<path d="M8 14.5v-9M4.5 9 8 5.5 11.5 9"/><path d="M2.5 5V1.5h11V5"/>',
+    file:'<path d="M3.5 1.5h6l3 3v10h-9z"/><path d="M9.5 1.5v3h3"/><path d="M5.5 8h5M5.5 10.5h5"/>',
+    refresh:'<path d="M13.5 8A5.5 5.5 0 1 1 11.9 4"/><path d="M12.4 1.6v2.9H9.5"/>',
+    eye:'<path d="M1.2 8s2.5-4.8 6.8-4.8S14.8 8 14.8 8s-2.5 4.8-6.8 4.8S1.2 8 1.2 8z"/><circle cx="8" cy="8" r="2.2"/>',
+    eyeoff:'<path d="M2.5 2.5l11 11"/><path d="M6.3 3.5A7 7 0 0 1 8 3.2c4.3 0 6.8 4.8 6.8 4.8a12 12 0 0 1-1.9 2.6M10.4 12.3A6.6 6.6 0 0 1 8 12.8C3.7 12.8 1.2 8 1.2 8a11.8 11.8 0 0 1 2.4-3"/>',
+    clock:'<circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.5"/>',
+    list:'<path d="M2.5 2.5h11v11h-11z"/><path d="M5 5.5h6M5 8h6M5 10.5h4"/>',
+    globe:'<circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c-2 2-2 10.4 0 12.4M8 1.8c2 2 2 10.4 0 12.4"/>',
+    disk:'<path d="M2 4.5h12v7H2z"/><circle cx="11" cy="8" r="1"/><path d="M4 8h4"/>',
+    gear:'<circle cx="8" cy="8" r="2.3"/><path d="M8 1.2v2.2M8 12.6v2.2M1.2 8h2.2M12.6 8h2.2M3.2 3.2l1.6 1.6M11.2 11.2l1.6 1.6M3.2 12.8l1.6-1.6M11.2 4.8l1.6-1.6"/>',
+    play:'<path d="M5 3.2v9.6L12.8 8z"/>', stop:'<path d="M4 4h8v8H4z"/>', top:'<path d="M3.5 2.5h9M8 14V5.5M4.5 9 8 5.5 11.5 9"/>',
+    arrowR:'<path d="M2.5 8h11M9.5 4l4 4-4 4"/>', dotc:'<circle cx="8" cy="8" r="2.5"/>',
+    sort:'<path d="M5 2.5v11M2.5 11 5 13.5 7.5 11M11 13.5v-11M8.5 5 11 2.5 13.5 5"/>', sortu:'<path d="M8 13V3.5M4.5 7 8 3.5 11.5 7"/>', sortd:'<path d="M8 3v9.5M4.5 9 8 12.5 11.5 9"/>'
+  };
+  var ic = function(k, c){ return '<svg class="ico' + (c ? ' ' + c : '') + '" viewBox="0 0 16 16" aria-hidden="true" focusable="false">' + P[k] + '</svg>'; };
+
+  /* ---------- chủ đề: theo hệ thống, hoặc ép Tối/Sáng ---------- */
+  function setTheme(t){
+    if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+    try { localStorage.setItem('tc-proto-theme', JSON.stringify(t)); } catch (e) {}
+    $$('[data-th]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.th === t)); });
+  }
+  $$('[data-th]').forEach(function(b){ b.addEventListener('click', function(){ setTheme(b.dataset.th); }); });
+  $$('[data-th]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.th === (document.documentElement.getAttribute('data-theme') || 'auto'))); });
+
+  /* ---------- thông báo, tải tệp, sao chép ---------- */
+  var toastT;
+  function toast(html, act){
+    var t = $('#toast'); clearTimeout(toastT);
+    t.innerHTML = '<span>' + html + '</span>' + (act ? '<button type="button">' + act.label + '</button>' : '');
+    if (act) t.lastChild.onclick = function(){ t.innerHTML = ''; act.fn(); };
+    toastT = setTimeout(function(){ t.innerHTML = ''; }, act ? 9000 : 5000);
+  }
+  function dl(name, text, type){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([type ? text : '\ufeff' + text], { type:type || 'text/csv;charset=utf-8' }));
+    a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function csv(rows){ return rows.map(function(r){ return r.map(function(c){ c = String(c == null ? '' : c); return /[",\r\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\r\n') + '\r\n'; }
+  function copy(text, btn){
+    try { navigator.clipboard.writeText(text).catch(function(){}); } catch (e) {}
+    var old = btn.innerHTML; btn.innerHTML = ic('check') + 'Đã sao chép'; setTimeout(function(){ if (btn.isConnected) btn.innerHTML = old; }, 1800);
+  }
+  function alertB(t, html, btns){ return '<div class="alert ' + t + '">' + ic(t === 'err' ? 'error' : t === 'warn' ? 'warn' : 'info') + '<div class="grow"><span>' + html + '</span>' + (btns ? '<span class="btns">' + btns + '</span>' : '') + '</div></div>'; }
+  // khóa để trả focus về đúng nút sau khi dựng lại
+  function keyOf(el){ if (!el || el === document.body) return null; if (el.dataset && el.dataset.a) return '[data-a="' + el.dataset.a + '"]' + (el.dataset.v != null ? '[data-v="' + el.dataset.v + '"]' : ''); return el.id ? '#' + el.id : null; }
+
+  /* ---------- hộp xác nhận (dialog gốc: giữ focus, Esc để đóng) ---------- */
+  var dlg = $('#dlg'), dO = null, dKey = null, dRoot = null;
+  function openDlg(o){
+    if (dlg.open) dlg.close();
+    dO = o; dKey = keyOf(document.activeElement); dRoot = document.activeElement && document.activeElement.closest ? document.activeElement.closest('#adm, #srv') : null;
+    dlg.className = 'dlg' + (o.wide ? ' wide' : '');
+    dlg.innerHTML = '<form method="dialog"><div class="dlg-h">' + (o.icon || '') + '<h3 id="dlg-t">' + o.title + '</h3></div><div class="dlg-b">' + o.body + '</div><div class="dlg-f">' +
+      '<button type="button" class="b" data-x="no"' + (o.danger ? ' autofocus' : '') + '>' + (o.cancel || 'Hủy') + '</button><button type="submit" class="b ' + (o.danger ? 'dz' : 'pri') + '" value="ok" data-ok>' + o.ok + '</button></div></form>';
+    dlg.setAttribute('aria-labelledby', 'dlg-t'); dlg.returnValue = '';
+    dlg.showModal();
+    if (o.open) o.open();
+  }
+  dlg.addEventListener('click', function(e){ var x = e.target.closest('[data-x]'); if (!x) return; if (x.dataset.x === 'no') dlg.close(''); else if (dO && dO.x) dO.x(x.dataset.x, x); });
+  dlg.addEventListener('input', function(){ if (dO && dO.input) dO.input(); });
+  dlg.addEventListener('change', function(e){ if (dO && dO.change) dO.change(e); });
+  dlg.addEventListener('submit', function(e){ if (dO && dO.check && !dO.check()) e.preventDefault(); });
+  dlg.addEventListener('close', function(){
+    var o = dO; dO = null;
+    if (dlg.returnValue === 'ok' && o && o.go) o.go();
+    var el = (dKey && document.querySelector(dKey)) || (dRoot && dRoot.querySelector('[data-home]'));
+    if (el) el.focus({ preventScroll:true });
+  });
+
+  /* =================== dữ liệu mẫu =================== */
+  var CO = 'Công ty CP Tư vấn Thiết kế An Phú', CUR = '1.0.3';
+  var DEPT = { kt:'Kiến trúc', kc:'Kết cấu', me:'Cơ điện', dt:'Dự toán', ql:'Quản lý dự án', it:'Hành chính – IT' };
+  var ROLE = { owner:'Chủ tài khoản', admin:'Quản trị', sub:'Quản trị phụ', mem:'Thành viên' };
+  // [họ tên, email, phòng, vai trò, trạng thái, số máy, lần cuối dùng (số ngày trước; -1 = đang mở), ngày mời (số ngày trước)]
+  var PPL = [
+    ['Trần Thị Hạnh', 'hanh.tran', 'it', 'owner', 'on', 1, -1], ['Phạm Quốc Bảo', 'bao.pham', 'it', 'admin', 'on', 2, -1],
+    ['Nguyễn Minh An', 'an.nguyen', 'kt', 'sub', 'on', 2, -1], ['Lê Thu Chi', 'chi.le', 'kt', 'mem', 'on', 2, -1],
+    ['Đỗ Quang Huy', 'huy.do', 'kt', 'mem', 'on', 1, 0], ['Vũ Thị Lan', 'lan.vu', 'kt', 'mem', 'on', 1, -1],
+    ['Hoàng Đức Thắng', 'thang.hoang', 'kt', 'mem', 'on', 2, -1], ['Bùi Ngọc Mai', 'mai.bui', 'kt', 'mem', 'on', 1, 1],
+    ['Phan Thanh Tùng', 'tung.phan', 'kt', 'mem', 'on', 1, -1], ['Trịnh Hải Yến', 'yen.trinh', 'kt', 'mem', 'on', 1, -1],
+    ['Đặng Văn Khoa', 'khoa.dang', 'kt', 'mem', 'idle', 1, 47], ['Ngô Thùy Dung', 'dung.ngo', 'kt', 'mem', 'on', 1, 0],
+    ['Trần Văn Dũng', 'dung.tran', 'kc', 'mem', 'on', 2, -1], ['Lý Minh Khang', 'khang.ly', 'kc', 'mem', 'on', 1, -1],
+    ['Hồ Thị Ngọc', 'ngoc.ho', 'kc', 'mem', 'on', 1, -1], ['Mai Xuân Trường', 'truong.mai', 'kc', 'mem', 'on', 2, 0],
+    ['Tạ Quang Vinh', 'vinh.ta', 'kc', 'mem', 'on', 1, -1], ['Dương Thị Hương', 'huong.duong', 'kc', 'mem', 'on', 1, 2],
+    ['Lương Đình Phúc', 'phuc.luong', 'kc', 'mem', 'idle', 1, 38], ['Võ Minh Nhật', 'nhat.vo', 'me', 'mem', 'on', 1, -1],
+    ['Kiều Thị Trang', 'trang.kieu', 'me', 'mem', 'on', 2, -1], ['Lâm Văn Sơn', 'son.lam', 'me', 'mem', 'on', 1, 0],
+    ['Quách Ngọc Hân', 'han.quach', 'me', 'mem', 'on', 1, -1], ['Tô Đức Anh', 'anh.to', 'me', 'mem', 'on', 1, 3],
+    ['Huỳnh Thị Thảo', 'thao.huynh', 'dt', 'mem', 'on', 1, -1], ['Đinh Công Minh', 'minh.dinh', 'dt', 'mem', 'on', 2, 0],
+    ['La Thị Kim Oanh', 'oanh.la', 'dt', 'mem', 'on', 1, -1], ['Nguyễn Hoàng Long', 'long.nguyen', 'ql', 'admin', 'on', 1, 0],
+    ['Phạm Thị Thu Hà', 'ha.pham', 'ql', 'mem', 'on', 1, 1], ['Cao Văn Lực', 'luc.cao', 'ql', 'mem', 'on', 1, -1],
+    ['', 'minh.tran', 'kc', 'mem', 'inv', 0, null, 4], ['', 'quang.le', 'me', 'mem', 'inv', 0, null, 2],
+    ['', 'thu.nguyen', 'kt', 'mem', 'inv', 0, null, 0], ['', 'khanh.do', 'dt', 'mem', 'exp', 0, null, 17]
+  ];
+  var MORE = [['', 'nam.trinh', 'kt', 'mem', 'inv', 0, null, 1], ['', 'ly.hoang', 'kt', 'mem', 'inv', 0, null, 1], ['', 'tai.nguyen', 'kc', 'mem', 'inv', 0, null, 0], ['', 'vy.pham', 'me', 'mem', 'inv', 0, null, 0], ['', 'duc.le', 'dt', 'mem', 'inv', 0, null, 0], ['', 'hoa.tran', 'ql', 'mem', 'inv', 0, null, 0]];
+  var ACT = [['Hôm nay 11:02', '<b>Phạm Quốc Bảo</b> gỡ kích hoạt AP-KC-LT03 (máy gửi bảo hành)'], ['Hôm nay 09:15', '<b>Trần Thị Hạnh</b> mời thu.nguyen@anphu.vn'], ['17/10/2026 16:20', '<b>Phạm Quốc Bảo</b> lưu cấu hình triển khai v4'], ['17/10/2026 08:40', '<b>Trần Thị Hạnh</b> mời quang.le@anphu.vn'], ['15/10/2026 10:05', '<b>Trần Thị Hạnh</b> mời minh.tran@anphu.vn'], ['12/10/2026 21:30', 'Máy chủ floating LIC-ANPHU tự cập nhật lên 1.0.2']];
+  // ghế floating đang dùng: [họ tên, tài khoản Windows, máy, IP, từ lúc, không hoạt động (phút)]
+  var FLT = [['Nguyễn Thị Ngọc Ánh', 'ANPHU\\anh.nguyen', 'AP-FL-01', '192.168.1.61', '08:12', 0], ['Hà Văn Toàn', 'ANPHU\\toan.ha', 'AP-FL-02', '192.168.1.62', '08:30', 4], ['Lưu Bích Ngọc', 'ANPHU\\ngoc.luu', 'AP-FL-04', '192.168.1.64', '09:05', 0], ['Đoàn Minh Trí', 'ANPHU\\tri.doan', 'AP-FL-05', '192.168.1.65', '10:47', 52], ['Vương Thảo Vy', 'ANPHU\\vy.vuong', 'AP-FL-07', '192.168.1.67', '13:02', 0], ['Thân Đức Long', 'ANPHU\\long.than', 'AP-FL-08', '192.168.1.68', '13:40', 12], ['Mạc Thị Yến', 'ANPHU\\yen.mac', 'AP-FL-09', '192.168.1.69', '14:21', 0]];
+  var FLX = [['Phan Văn Lộc', 'ANPHU\\loc.phan', 'AP-FL-10', '192.168.1.70', '14:24', 0], ['Đỗ Thị Thanh Tâm', 'ANPHU\\tam.do', 'AP-FL-03', '192.168.1.63', '14:27', 0], ['Triệu Minh Tuấn', 'ANPHU\\tuan.trieu', 'AP-FL-06', '192.168.1.66', '14:29', 0]];
+  var QUE = [['Âu Thị Hồng', 'ANPHU\\hong.au', 'AP-KT-PC31', '192.168.1.81', '14:31'], ['Lò Văn Kiên', 'ANPHU\\kien.lo', 'AP-KC-LT09', '192.168.1.92', '14:35'], ['Giáp Thu Trang', 'ANPHU\\trang.giap', 'AP-ME-PC12', '192.168.1.77', '14:38']];
+  var FLN = { 'AP-FL-03':'Phùng Thị Mỹ', 'AP-FL-06':'Hà Quang Trung', 'AP-FL-10':'Lê Văn Hậu' };
+
+  function mkDevs(users, inUse){
+    var r = rnd(42), cnt = {}, out = [];
+    users.forEach(function(u){
+      for (var j = 0; j < u.ndev; j++){
+        var mac = u.role === 'owner' && j === 0, lt = !mac && (j === 1 || r() < .3), k = u.dept + (lt ? 'L' : 'P'), x = r(), v = r();
+        cnt[k] = (cnt[k] || 0) + 1;
+        out.push({ name: mac ? 'AP-IT-MB01' : 'AP-' + u.dept.toUpperCase() + '-' + (lt ? 'LT' : 'PC') + p2(cnt[k]), user:u.name, mail:u.mail, kind:'named',
+          os: mac ? 'macOS 26' : x < .6 ? 'Windows 11 24H2' : x < .86 ? 'Windows 11 23H2' : 'Windows 10 22H2',
+          ver: v < .86 ? CUR : v < .93 ? '1.0.2' : '1.0.1', act: dmy(day(40 + Math.floor(r() * 230))),
+          last: j === 0 ? u.last : Math.max(u.last, 1 + Math.floor(r() * 9)) });
+      }
+    });
+    for (var i = 1; i <= 10; i++){
+      var nm = 'AP-FL-' + p2(i), f = inUse.filter(function(s){ return s[2] === nm; })[0];
+      out.push({ name:nm, user: f ? f[0] : FLN[nm], mail:'', kind:'flt', os:'Windows 11 24H2', ver: i === 6 ? '1.0.2' : CUR, act:'', last: f ? -1 : i % 3 });
+    }
+    return out;
+  }
+
+  // 90 ngày số ghế dùng: gán theo người = số người dùng trong ngày; floating = số ghế dùng cùng lúc, cao nhất trong ngày
+  var HIST = (function(){
+    var r = rnd(7), named = [], flt = [];
+    for (var i = 89; i >= 0; i--){
+      var d = day(i), w = d.getDay(), hol = d.getMonth() === 8 && d.getDate() <= 2, a = r(), b = r();
+      named.push({ d:d, v: i === 0 ? 24 : w === 0 || hol ? 1 + Math.floor(a * 3) : w === 6 ? 9 + Math.floor(a * 6) : Math.min(34, 26 + Math.floor(a * 8)) });
+      flt.push({ d:d, v: i === 0 ? 10 : w === 0 || hol ? Math.floor(b * 2) : w === 6 ? 3 + Math.floor(b * 3) : 7 + Math.floor(b * 3.9) });
+    }
+    return { named:named, flt:flt };
+  })();
+  var SHAPE = [.12, .5, .86, .97, .9, .38, .62, .9, .95, .82, .5, .2, .08, .04]; // 7h → 20h
+  function heat(){
+    var cap = S.kind === 'named' ? 40 : 10, r = rnd(S.range * 7 + (S.kind === 'named' ? 1 : 2)), pk = S.kind === 'named' ? .8 : .97, M = [];
+    for (var d = 0; d < 7; d++){
+      var row = [];
+      for (var h = 0; h < 14; h++){ var f = d < 4 ? 1 : d === 4 ? (h > 8 ? .84 : 1) : d === 5 ? (h < 5 ? .42 : .07) : .03; row.push(Math.min(cap, cap * pk * SHAPE[h] * f * (.92 + r() * .14))); }
+      M.push(row);
+    }
+    return M;
+  }
+
+  /* =================== cổng quản trị =================== */
+  var S = { st:'def', tab:'over', q:'', f:'all', sort:['name', 1], sel:{}, dq:'', df:'all', range:30, kind:'named', tblDay:false, tblHeat:false, di:-1, hi:null, showKey:false, retry:'14:38' };
+  var D, DEP, FS;
+  var SLUG = { over:'tong-quan', seats:'nguoi-dung', dev:'thiet-bi', hist:'lich-su', dep:'trien-khai', flt:'floating' };
+  function build(){
+    var rows = S.st === 'empty' ? [] : S.st === 'full' ? PPL.concat(MORE) : PPL;
+    var users = rows.map(function(r){ return { name:r[0], mail:r[1] + '@anphu.vn', dept:r[2], role:r[3], st:r[4], ndev:r[5], last:r[6], inv:r[7] }; });
+    D = { users:users, devs: S.st === 'empty' ? [] : mkDevs(users, S.st === 'full' ? FLT.concat(FLX) : FLT),
+      log: S.st === 'empty' ? [['Hôm nay 08:05', '<b>Trần Thị Hạnh</b> mua TrionCAD Doanh nghiệp: 40 ghế gán theo người, 10 ghế floating']] : ACT.slice(),
+      renew: S.st === 'empty' ? '19/10/2027' : '15/01/2027', left: S.st === 'empty' ? 365 : 88 };
+    DEP = { mode:'both', server:'lic-anphu.local:27080', org:true, file:false, sc:false, prof:'kt', tpl:'\\\\fs01\\CAD\\Mau', tplf:'AP-A1-TCVN.dwt', lib:'\\\\fs01\\CAD\\ThuVien', ctb:'\\\\fs01\\CAD\\In\\AnPhu-TCVN.ctb', ch:'stable', lock:{ prof:false, tpl:true, lib:true, ctb:true, ch:true }, ver:4, saved:'17/10/2026 16:20', by:'Phạm Quốc Bảo', got:44, errs:{} };
+    FS = { grace:'2', idle:'60', hold:'3', key:'TCFS-APHU-4M7Q-K2XD-9H3B' };
+  }
+  var ro = function(){ return S.st === 'ro'; };
+  var NOPERM = 'Cần vai trò Quản trị. Liên hệ Trần Thị Hạnh (chủ tài khoản).';
+  var dis = function(){ return ro() ? ' disabled title="' + NOPERM + '"' : ''; };
+  var meName = function(){ return ro() ? 'Nguyễn Minh An' : 'Trần Thị Hạnh'; };
+  var isMe = function(u){ return u.mail === (ro() ? 'an.nguyen@anphu.vn' : 'hanh.tran@anphu.vn'); };
+  var byMail = function(m){ return D.users.filter(function(u){ return u.mail === m; })[0]; };
+  var logA = function(html){ D.log.unshift(['Hôm nay 14:4' + Math.min(9, D.log.length % 9 + 1), html]); };
+  function stats(){ var c = { all:D.users.length, on:0, inv:0, exp:0, idle:0, adm:0 }; D.users.forEach(function(u){ c[u.st]++; if (u.role !== 'mem') c.adm++; }); c.free = 40 - c.all; return c; }
+  function fl(){ return S.st === 'empty' ? { none:true } : S.st === 'lost' ? { lost:true } : S.st === 'full' ? { use:10, q:3 } : { use:7, q:0 }; }
+  function initials(u){ if (!u.name) return u.mail.charAt(0).toUpperCase(); var w = u.name.replace(/\(.*?\)/g, '').trim().split(/\s+/); return w[0].charAt(0) + (w.length > 1 ? w[w.length - 1].charAt(0) : ''); }
+  function lastTxt(a){ return a == null ? '—' : a < 0 ? '<span class="on-dot"></span>Đang mở' : a === 0 ? 'Hôm nay' : a === 1 ? 'Hôm qua' : dmy(day(a)) + (a > 30 ? ' · ' + a + ' ngày' : ''); }
+  function lastPlain(a){ return a == null ? '' : a < 0 ? 'Đang mở' : a === 0 ? 'Hôm nay' : a === 1 ? 'Hôm qua' : dmy(day(a)); }
+  function head(t, sub, act){ return '<div class="mh"><div><h3 class="h3" tabindex="-1" data-home>' + t + '</h3>' + (sub ? '<p class="sub2">' + sub + '</p>' : '') + '</div>' + (act ? '<div class="btns">' + act + '</div>' : '') + '</div>' +
+    (ro() ? alertB('info', '<b>Bạn đang xem với vai trò Quản trị phụ.</b> Xem và xuất báo cáo được. Gán ghế, thu hồi, đổi cấu hình cần vai trò Quản trị; liên hệ Trần Thị Hạnh (chủ tài khoản) nếu cần thêm quyền.') : ''); }
+  function empty(icon, title, text, act){ return '<div class="emp">' + ic(icon) + '<b>' + title + '</b><p>' + text + '</p>' + (act ? '<div class="btns">' + act + '</div>' : '') + '</div>'; }
+  function meter(x, cls){ return '<span class="meter' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><i style="width:' + Math.round(Math.min(1, x) * 100) + '%"></i></span>'; }
+  function kpi(l, v, m, s){ return '<div class="kpi"><span class="l">' + l + '</span><span class="v">' + v + '</span>' + (m || '') + '<span class="s">' + s + '</span></div>'; }
+  var BUY = '<a class="b" href="thanh-toan.html#mua">Mua thêm ghế</a>';
+
+  function topnav(){
+    var me = ro() ? ['Nguyễn Minh An', 'Quản trị phụ', 'NA'] : ['Trần Thị Hạnh', 'Chủ tài khoản', 'TH'];
+    return '<nav class="web-nav" aria-label="TrionCAD"><a class="brand" href="#cong"><svg viewBox="0 0 16 16" class="ico" aria-hidden="true">' + P.logo + '</svg>TrionCAD</a><span class="prod">Quản trị doanh nghiệp</span>' +
+      '<span class="links"><a href="thanh-toan.html#tai-khoan">Tài khoản và hóa đơn</a><a href="#cong">Hỗ trợ</a></span><span class="who"><span class="av" aria-hidden="true">' + me[2] + '</span><span class="nm"><b>' + me[0] + '</b><small>' + me[1] + '</small></span><span class="sr">Đăng nhập: ' + me[0] + ', ' + me[1] + '</span></span></nav>';
+  }
+  function side(){
+    var c = stats(), f = fl(), ld = S.st === 'load';
+    var fd = ld || f.none ? '' : f.lost ? '<span class="sdot err"></span><span class="sr">mất kết nối</span>' : f.use >= 10 ? '<span class="sdot warn"></span><span class="sr">hết ghế</span>' : '<span class="sdot ok"></span><span class="sr">đang chạy</span>';
+    var T = [['over', 'Tổng quan', 'gauge', ''], ['seats', 'Ghế và người dùng', 'user', ld ? '' : c.all + '/40'], ['dev', 'Thiết bị', 'monitor', ld ? '' : D.devs.length], ['hist', 'Lịch sử dùng', 'chart', ''], ['dep', 'Triển khai', 'pkg', ''], ['flt', 'Máy chủ floating', 'server', fd]];
+    return '<nav class="side" aria-label="Mục quản trị"><div class="org"><b>' + CO + '</b><span>Doanh nghiệp · 40 ghế + 10 floating</span></div>' + T.map(function(t){
+      return '<button type="button" data-a="tab" data-v="' + t[0] + '"' + (S.tab === t[0] ? ' aria-current="page"' : '') + '>' + ic(t[2]) + '<span>' + t[1] + '</span>' + (t[3] !== '' ? '<span class="cnt">' + t[3] + '</span>' : '') + '</button>';
+    }).join('') + '</nav>';
+  }
+  function actList(){ return '<ul class="act">' + D.log.slice(0, 6).map(function(a){ return '<li><time>' + a[0] + '</time>' + a[1] + '</li>'; }).join('') + '</ul>'; }
+
+  var PG = {};
+  /* ----- Tổng quan ----- */
+  PG.over = function(){
+    var c = stats(), f = fl(), dv = D.devs, onl = dv.filter(function(d){ return d.last < 0; }).length, old = dv.filter(function(d){ return d.ver !== CUR; }).length;
+    var full30 = HIST.flt.slice(-30).filter(function(p){ return p.v >= 10; }).length;
+    var h = head('Tổng quan', CO + ' · TrionCAD Doanh nghiệp · thuê bao năm', S.st === 'empty' ? '' : '<button class="b" data-a="go" data-v="hist">' + ic('chart') + 'Báo cáo dùng</button><button class="b pri" data-a="invite"' + dis() + '>' + ic('plus') + 'Mời nhân viên</button>');
+    if (S.st === 'full') h += alertB('err', '<b>Đã gán hết 40/40 ghế.</b> Lời mời mới chưa gửi được. Mua thêm ghế, hoặc thu hồi ghế của ' + c.idle + ' người không dùng hơn 30 ngày.', BUY + '<button class="b" data-a="go" data-v="seats:idle">Xem người không dùng</button>');
+    if (S.st === 'lost') h += alertB('err', '<b>Không nhận được báo cáo từ máy chủ floating LIC-ANPHU từ 13:52.</b> Nếu chỉ mất Internet, máy chủ vẫn cấp ghế trong mạng công ty. Nếu dịch vụ đã dừng, máy đang dùng giữ ghế đến 15:52 (ân hạn 2 giờ) và máy mở mới chưa lấy được ghế.', '<button class="b" data-a="go" data-v="flt">Xem cách khắc phục</button><button class="b" data-a="srvui" data-v="stop">Mở giao diện máy chủ</button>');
+    h += '<div class="kpis">' +
+      kpi('Ghế gán theo người', c.all + '<small> / 40</small>', meter(c.all / 40, c.free > 0 ? '' : 'warn'), c.free > 0 ? '<span>' + c.free + ' ghế trống' + (c.inv + c.exp ? ' · ' + (c.inv + c.exp) + ' lời mời chưa nhận' : '') + '</span>' : ic('warn', 'warn') + '<span>Hết ghế trống</span>') +
+      kpi('Ghế floating', f.none ? 'Chưa cài' : f.lost ? '—<small> / 10</small>' : f.use + '<small> / 10 đang dùng</small>', meter(f.use ? f.use / 10 : 0, f.none || f.lost ? 'off' : f.use >= 10 ? 'warn' : ''),
+        f.none ? '<span>Cài máy chủ trong mạng công ty để dùng</span>' : f.lost ? ic('error', 'err') + '<span>Mất kết nối từ 13:52</span>' : f.q ? ic('warn', 'warn') + '<span>' + f.q + ' người đang chờ ghế</span>' : '<span>Cao nhất hôm nay 10/10 lúc 10:15</span>') +
+      kpi('Gia hạn', D.renew, '', '<span>Còn ' + D.left + ' ngày · tự động gia hạn · <a class="lnk" href="thanh-toan.html#tai-khoan">Hóa đơn</a></span>') +
+      kpi('Thiết bị', dv.length + '<small> máy</small>', '', '<span>' + (dv.length ? onl + ' đang mở TrionCAD · ' + old + ' máy chưa lên ' + CUR : 'Máy hiện ở đây khi nhân viên đăng nhập lần đầu') + '</span>') + '</div>';
+    if (S.st === 'empty') return h + '<div class="two"><section class="card"><h4>Bắt đầu với TrionCAD Doanh nghiệp</h4><p class="hint">Ba bước, làm theo thứ tự nào cũng được.</p><ol class="setup">' +
+      '<li><div><b>Mời nhân viên vào 40 ghế gán theo người</b><p>Dán danh sách email hoặc tải tệp CSV. Người được mời đăng nhập TrionCAD bằng email đó là dùng được.</p></div><button class="b pri" data-a="invite">Mời nhân viên</button></li>' +
+      '<li><div><b>Cài TrionCAD hàng loạt</b><p>Tải bộ cài MSI, lấy lệnh cài im lặng; đặt mẫu bản vẽ, thư viện và CTB chung cho cả công ty.</p></div><button class="b" data-a="go" data-v="dep">Mở Triển khai</button></li>' +
+      '<li><div><b>Cài máy chủ floating cho 10 ghế dùng chung</b><p>Cài dịch vụ trên một máy luôn bật trong mạng công ty, rồi nhập khóa máy chủ.</p></div><button class="b" data-a="go" data-v="flt">Mở Máy chủ floating</button></li></ol></section>' +
+      '<section class="card"><h4>Hoạt động quản trị gần đây</h4>' + actList() + '</section></div>';
+    var todo = [];
+    if (full30) todo.push(['warn', '<b>Ghế floating hết ' + full30 + ' ngày</b> trong 30 ngày qua, chủ yếu 9:00–11:00. Người đến sau phải chờ trong hàng đợi.', '<button class="b" data-a="go" data-v="hist:flt">Xem lịch sử</button><a class="b" href="thanh-toan.html#mua">Mua thêm ghế floating</a>']);
+    if (c.idle) todo.push(['warn', '<b>' + c.idle + ' người không dùng TrionCAD hơn 30 ngày.</b> Thu hồi để gán ghế cho người cần.', '<button class="b" data-a="go" data-v="seats:idle">Xem danh sách</button>']);
+    if (c.exp || c.inv) todo.push(['info', '<b>' + c.inv + ' lời mời đang chờ nhận' + (c.exp ? ', ' + c.exp + ' lời mời đã hết hạn' : '') + '.</b> Người được mời cần mở email và đăng nhập TrionCAD.', (c.exp ? '<button class="b" data-a="resendexp"' + dis() + '>Gửi lại lời mời hết hạn</button>' : '') + '<button class="b" data-a="go" data-v="seats:inv">Xem lời mời</button>']);
+    if (old) todo.push(['info', '<b>' + old + ' máy chưa lên TrionCAD ' + CUR + '.</b> Bản này sửa lỗi in PDF với font SHX và mở tệp lớn nhanh hơn.', '<button class="b" data-a="go" data-v="dev:old">Xem các máy</button>']);
+    return h + '<div class="two"><section class="card"><h4>Cần xử lý</h4>' + (todo.length ? '<ul class="todo">' + todo.map(function(t){ return '<li>' + ic(t[0], t[0]) + '<span>' + t[1] + '</span><span class="btns">' + t[2] + '</span></li>'; }).join('') + '</ul>' : '<p class="hint">Không có việc cần xử lý.</p>') + '</section>' +
+      '<section class="card"><h4>Hoạt động quản trị gần đây</h4>' + actList() + '</section></div>';
+  };
+
+  /* ----- Ghế và người dùng ----- */
+  var nameKey = function(u){ var w = u.name.split(' '); return u.name ? w[w.length - 1] + ' ' + u.name : '\uffff' + u.mail; };
+  function visUsers(){
+    var q = fold(S.q).trim();
+    return D.users.filter(function(u){ return (S.f === 'all' || (S.f === 'adm' ? u.role !== 'mem' : u.st === S.f)) && (!q || fold([u.name, u.mail, DEPT[u.dept], ROLE[u.role]].join(' ')).indexOf(q) >= 0); })
+      .sort(function(a, b){ return S.sort[1] * (S.sort[0] === 'last' ? (a.last == null ? 9999 : a.last) - (b.last == null ? 9999 : b.last) : nameKey(a).localeCompare(nameKey(b), 'vi')); });
+  }
+  function stPill(u){
+    return u.st === 'on' ? '<span class="pill ok">Đang dùng</span>' : u.st === 'idle' ? '<span class="pill warn">Không dùng ' + u.last + ' ngày</span>'
+      : u.st === 'inv' ? '<span class="pill info">Đã mời</span><span class="sub">' + dm(day(u.inv)) + ' · hết hạn ' + dm(day(u.inv - 14)) + '</span>' : '<span class="pill err">Lời mời hết hạn</span><span class="sub">Hết hạn ' + dmy(day(u.inv - 14)) + '</span>';
+  }
+  function userRow(u){
+    var me = isMe(u), sel = !!S.sel[u.mail], nm = esc(u.name || u.mail), mv = esc(u.mail);
+    var role = u.role === 'owner' ? 'Chủ tài khoản' : '<select class="rsel" data-a="role" data-v="' + mv + '" aria-label="Vai trò của ' + nm + '"' + dis() + '>' + ['mem', 'sub', 'admin'].map(function(k){ return '<option value="' + k + '"' + (u.role === k ? ' selected' : '') + '>' + ROLE[k] + '</option>'; }).join('') + '</select>';
+    var acts = me ? '<span class="hint">Bạn</span>' : '<span class="acts">' + (u.st === 'inv' || u.st === 'exp' ? '<button class="lnk" type="button" data-a="resend" data-v="' + mv + '"' + dis() + '>Gửi lại</button><button class="lnk danger" type="button" data-a="revoke" data-v="' + mv + '"' + dis() + '>Hủy lời mời</button>' : '<button class="lnk danger" type="button" data-a="revoke" data-v="' + mv + '"' + dis() + '>Thu hồi</button>') + '</span>';
+    return '<tr' + (sel ? ' class="is-sel"' : '') + '>' + (ro() ? '' : '<td class="chk">' + (me ? '' : '<input type="checkbox" data-a="sel" data-v="' + mv + '"' + (sel ? ' checked' : '') + ' aria-label="Chọn ' + nm + '">') + '</td>') +
+      '<td><div class="u"><span class="av" aria-hidden="true">' + initials(u) + '</span><span>' + (u.name ? '<b>' + esc(u.name) + '</b>' : '<b class="faint">Chưa nhận lời mời</b>') + '<span class="mail">' + mv + '</span>' +
+      '<span class="only-s sub">' + (DEPT[u.dept] || '—') + ' · ' + ROLE[u.role] + (u.last != null ? ' · ' + lastPlain(u.last) : '') + '</span><span class="stc only-s">' + stPill(u) + '</span></span></div></td>' +
+      '<td class="hide-m nw">' + (DEPT[u.dept] || '—') + '</td><td class="hide-s">' + role + '</td><td class="hide-s"><div class="stc">' + stPill(u) + '</div></td><td class="hide-m num">' + (u.ndev ? u.ndev + '/2' : '—') + '</td><td class="hide-s">' + lastTxt(u.last) + '</td><td class="ra">' + acts + '</td></tr>';
+  }
+  function userRows(){ var L = visUsers(); return L.length ? L.map(userRow).join('') : '<tr><td colspan="8"><p class="hint" style="padding:16px 0;text-align:center">Không có người dùng khớp bộ lọc. <button class="lnk" type="button" data-a="clearf">Xóa bộ lọc</button></p></td></tr>'; }
+  function bulkBar(){
+    var ks = Object.keys(S.sel); if (!ks.length) return '';
+    var inv = ks.filter(function(k){ var u = byMail(k); return u && u.st !== 'on' && u.st !== 'idle'; }).length;
+    return '<div class="bulk" role="group" aria-label="Thao tác với người đã chọn"><b>Đã chọn ' + ks.length + '</b>' + (inv ? '<button class="b" type="button" data-a="bresend">Gửi lại ' + inv + ' lời mời</button>' : '') + '<button class="b" type="button" data-a="brevoke">Thu hồi ' + ks.length + ' ghế</button><button class="lnk" type="button" data-a="bclear">Bỏ chọn</button></div>';
+  }
+  function sortTh(k, label, cls){ var on = S.sort[0] === k; return '<th scope="col"' + (cls ? ' class="' + cls + '"' : '') + ' aria-sort="' + (on ? (S.sort[1] > 0 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="th-sort" data-a="sort" data-v="' + k + '">' + label + ic(on ? (S.sort[1] > 0 ? 'sortu' : 'sortd') : 'sort') + '</button></th>'; }
+  function updUsers(){
+    var b = $('#b-users'); if (!b) return;
+    b.innerHTML = userRows(); $('#bulk').innerHTML = bulkBar(); $('#n-users').textContent = 'Hiện ' + visUsers().length + ' / ' + D.users.length;
+    var all = $('#adm [data-a="selall"]'); if (all){ var vis = visUsers().filter(function(u){ return !isMe(u); }), n = vis.filter(function(u){ return S.sel[u.mail]; }).length; all.checked = !!vis.length && n === vis.length; all.indeterminate = n > 0 && n < vis.length; }
+  }
+  PG.seats = function(){
+    var c = stats();
+    var h = head('Ghế và người dùng', c.all + '/40 ghế gán theo người · ' + Math.max(0, c.free) + ' ghế trống · 10 ghế floating dùng chung, không cần gán',
+      (c.all ? '<button class="b" data-a="csv" data-v="users">' + ic('down') + 'Xuất CSV</button>' : '') + '<button class="b pri" data-a="invite"' + dis() + '>' + ic('plus') + 'Mời nhân viên</button>');
+    if (!c.all) return h + empty('user', 'Chưa gán ghế nào', 'Mời nhân viên bằng email: dán danh sách hoặc tải tệp CSV. Người được mời đăng nhập TrionCAD bằng email đó là dùng được, không cần nhập key. Bạn là chủ tài khoản; tự mời mình nếu cũng dùng TrionCAD.', '<button class="b pri" data-a="invite">' + ic('mail') + 'Mời nhân viên</button><button class="b" data-a="csvtpl">' + ic('down') + 'Tải tệp CSV mẫu</button>');
+    if (c.free <= 0) h += alertB('warn', '<b>Đã gán hết 40/40 ghế.</b> Mua thêm ghế, hoặc thu hồi ghế của người không còn dùng (' + c.idle + ' người không dùng hơn 30 ngày).', BUY + '<button class="b" data-a="chip" data-v="idle">Lọc người không dùng</button>');
+    var chips = [['all', 'Tất cả', c.all], ['on', 'Đang dùng', c.on], ['inv', 'Lời mời đang chờ', c.inv], ['exp', 'Lời mời hết hạn', c.exp], ['idle', 'Không dùng > 30 ngày', c.idle], ['adm', 'Có vai trò quản trị', c.adm]];
+    h += '<div class="tb"><label class="srch"><span class="sr">Tìm người dùng</span>' + ic('search') + '<input class="inp" id="q-users" type="search" placeholder="Tìm tên, email, phòng ban" value="' + esc(S.q) + '" autocomplete="off"></label>' +
+      '<div class="chips" role="group" aria-label="Lọc theo trạng thái">' + chips.map(function(x){ return '<button type="button" data-a="chip" data-v="' + x[0] + '" aria-pressed="' + (S.f === x[0]) + '">' + x[1] + '<b>' + x[2] + '</b></button>'; }).join('') + '</div><span class="hint" id="n-users" aria-live="polite">Hiện ' + visUsers().length + ' / ' + c.all + '</span></div>';
+    h += '<div id="bulk">' + bulkBar() + '</div><div class="tscroll"><table class="wtbl"><caption class="sr">Người dùng có ghế gán theo người</caption><thead><tr>' + (ro() ? '' : '<th class="chk"><input type="checkbox" data-a="selall" aria-label="Chọn tất cả người đang hiện"></th>') +
+      sortTh('name', 'Người dùng') + '<th scope="col" class="hide-m">Phòng ban</th><th scope="col" class="hide-s">Vai trò</th><th scope="col" class="hide-s">Trạng thái</th><th scope="col" class="hide-m num">Máy</th>' + sortTh('last', 'Lần cuối dùng', 'hide-s') + '<th scope="col"><span class="sr">Thao tác</span></th></tr></thead><tbody id="b-users">' + userRows() + '</tbody></table></div>';
+    h += '<section class="card"><h4>Vai trò</h4><dl class="roles"><div><dt>Chủ tài khoản</dt><dd>Thanh toán, hóa đơn và mọi quyền quản trị. Một người.</dd></div><div><dt>Quản trị</dt><dd>Gán, thu hồi ghế; thiết bị; triển khai; máy chủ floating.</dd></div><div><dt>Quản trị phụ</dt><dd>Chỉ xem và xuất báo cáo.</dd></div><div><dt>Thành viên</dt><dd>Dùng ghế được gán; không vào cổng quản trị.</dd></div></dl>' +
+      '<p class="hint">Ghế floating không cần gán: ai trong mạng công ty cũng dùng được khi còn ghế. Xem người đang dùng ở <span class="nw"><button class="lnk" type="button" data-a="go" data-v="flt">Máy chủ floating</button>.</span></p></section>';
+    return h;
+  };
+
+  /* ----- Thiết bị ----- */
+  function devCounts(){ var dv = D.devs; return { onl: dv.filter(function(d){ return d.last < 0; }).length, old: dv.filter(function(d){ return d.ver !== CUR; }).length, off: dv.filter(function(d){ return d.last > 30; }).length, flt: dv.filter(function(d){ return d.kind === 'flt'; }).length }; }
+  function visDevs(){ var q = fold(S.dq).trim(); return D.devs.filter(function(d){ return (S.df === 'all' || (S.df === 'onl' ? d.last < 0 : S.df === 'old' ? d.ver !== CUR : S.df === 'off' ? d.last > 30 : d.kind === 'flt')) && (!q || fold([d.name, d.user, d.os, d.ver].join(' ')).indexOf(q) >= 0); }); }
+  function devRow(d){
+    var fltd = d.kind === 'flt', ver = '<span class="mono">' + d.ver + '</span>' + (d.ver !== CUR ? ' <span class="pill warn">Cũ</span>' : '');
+    return '<tr><td><span class="dn">' + d.name + '</span><span class="sub">' + (fltd ? 'Máy floating' : 'Kích hoạt ' + d.act) + '</span><span class="only-s sub">' + esc(d.user) + ' · ' + d.os + ' · ' + d.ver + (d.ver !== CUR ? ' (cũ)' : '') + ' · ' + lastPlain(d.last) + '</span></td>' +
+      '<td class="hide-s">' + esc(d.user) + (fltd ? '<span class="sub">người dùng gần nhất</span>' : '') + '</td><td class="hide-m">' + d.os + '</td><td class="hide-s">' + ver + '</td><td class="hide-m">' + (fltd ? 'Floating' : 'Gán theo người') + '</td><td class="hide-s">' + lastTxt(d.last) + '</td>' +
+      '<td class="ra">' + (fltd ? '<span class="hint" title="Ghế floating không gắn với máy. Thu hồi ghế ở máy chủ floating.">Không cần</span>' : '<button class="lnk danger" type="button" data-a="deact" data-v="' + d.name + '"' + dis() + '>Gỡ kích hoạt</button>') + '</td></tr>';
+  }
+  function devRows(){ var L = visDevs(); return L.length ? L.map(devRow).join('') : '<tr><td colspan="7"><p class="hint" style="padding:16px 0;text-align:center">Không có máy khớp bộ lọc.</p></td></tr>'; }
+  PG.dev = function(){
+    var dv = D.devs, c = devCounts();
+    var h = head('Thiết bị', dv.length ? dv.length + ' máy · ' + c.onl + ' đang mở TrionCAD · ' + c.old + ' máy chưa lên ' + CUR : 'Máy đã kích hoạt TrionCAD của công ty', dv.length ? '<button class="b" data-a="csv" data-v="devs">' + ic('down') + 'Xuất CSV</button>' : '');
+    if (!dv.length) return h + empty('monitor', 'Chưa có máy nào', 'Máy hiện ở đây khi nhân viên đăng nhập TrionCAD lần đầu, hoặc khi máy lấy ghế từ máy chủ floating.', '<button class="b" data-a="go" data-v="dep">Xem cách cài hàng loạt</button>');
+    var chips = [['all', 'Tất cả', dv.length], ['onl', 'Đang mở', c.onl], ['old', 'Chưa lên ' + CUR, c.old], ['off', 'Không online > 30 ngày', c.off], ['flt', 'Máy floating', c.flt]];
+    h += '<div class="tb"><label class="srch"><span class="sr">Tìm máy</span>' + ic('search') + '<input class="inp" id="q-dev" type="search" placeholder="Tìm tên máy, người dùng, hệ điều hành" value="' + esc(S.dq) + '" autocomplete="off"></label>' +
+      '<div class="chips" role="group" aria-label="Lọc máy">' + chips.map(function(x){ return '<button type="button" data-a="dchip" data-v="' + x[0] + '" aria-pressed="' + (S.df === x[0]) + '">' + x[1] + '<b>' + x[2] + '</b></button>'; }).join('') + '</div></div>';
+    h += '<div class="tscroll"><table class="wtbl"><caption class="sr">Máy đã kích hoạt</caption><thead><tr><th scope="col">Máy</th><th scope="col" class="hide-s">Người dùng</th><th scope="col" class="hide-m">Hệ điều hành</th><th scope="col" class="hide-s">TrionCAD</th><th scope="col" class="hide-m">Ghế</th><th scope="col" class="hide-s">Lần cuối online</th><th scope="col"><span class="sr">Thao tác</span></th></tr></thead><tbody id="b-dev">' + devRows() + '</tbody></table></div>';
+    return h + '<p class="hint">Mỗi ghế gán theo người dùng trên tối đa 2 máy. Máy floating không cần kích hoạt; quản lý ở <span class="nw"><button class="lnk" type="button" data-a="go" data-v="flt">Máy chủ floating</button>.</span></p>';
+  };
+
+  /* ----- Lịch sử dùng ----- */
+  function hStats(){
+    var data = HIST[S.kind].slice(-S.range), cap = S.kind === 'named' ? 40 : 10, wk = data.filter(function(p){ return p.d.getDay() % 6 !== 0; }), mx = data[0];
+    data.forEach(function(p){ if (p.v >= mx.v) mx = p; });
+    return { data:data, cap:cap, avg: wk.reduce(function(a, p){ return a + p.v; }, 0) / Math.max(1, wk.length), mx:mx, full: data.filter(function(p){ return p.v >= cap; }).length };
+  }
+  PG.hist = function(){
+    var h = head('Lịch sử dùng', 'Số ghế dùng mỗi ngày và giờ cao điểm', S.st === 'empty' ? '' : '<button class="b" data-a="csv" data-v="hist">' + ic('down') + 'Xuất CSV</button>');
+    if (S.st === 'empty') return h + empty('chart', 'Chưa có số liệu', 'Biểu đồ có số liệu từ ngày đầu tiên có người dùng TrionCAD. Số liệu cập nhật mỗi 5 phút.', '<button class="b" data-a="go" data-v="seats">Mời nhân viên trước</button>');
+    var k = hStats(), nm = S.kind === 'named', unit = nm ? 'người' : 'ghế';
+    h += '<div class="filters" role="group" aria-label="Phạm vi số liệu"><span class="seg2" role="group" aria-label="Khoảng thời gian">' + [7, 30, 90].map(function(r){ return '<button type="button" data-a="range" data-v="' + r + '" aria-pressed="' + (S.range === r) + '">' + r + ' ngày</button>'; }).join('') + '</span>' +
+      '<span class="seg2" role="group" aria-label="Loại ghế">' + [['named', 'Gán theo người'], ['flt', 'Floating']].map(function(x){ return '<button type="button" data-a="kind" data-v="' + x[0] + '" aria-pressed="' + (S.kind === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span><span class="hint">' + dmy(day(S.range - 1)) + ' – 19/10/2026 14:40</span></div>';
+    if (S.st === 'lost' && !nm) h += alertB('warn', 'Thiếu số liệu floating từ 13:52 hôm nay do mất kết nối với máy chủ. Số liệu bù lại khi máy chủ kết nối lại.');
+    var idleN = D.users.filter(function(u){ return u.last != null && u.last > S.range; }).length;
+    h += '<div class="kpis k3">' + (nm
+      ? kpi('Trung bình ngày làm việc', num(k.avg) + '<small> người</small>', '', '<span>' + Math.round(k.avg / 40 * 100) + '% của 40 ghế</span>') + kpi('Cao nhất', k.mx.v + '<small> người</small>', '', '<span>' + WD[k.mx.d.getDay()] + ', ' + dmy(k.mx.d) + '</span>') +
+        kpi('Không dùng trong ' + S.range + ' ngày', idleN + '<small> người</small>', '', idleN ? '<span>Cân nhắc thu hồi ghế · <button class="lnk" type="button" data-a="go" data-v="seats:idle">Xem</button></span>' : '<span>Mọi người có ghế đều đã dùng</span>')
+      : kpi('Cao nhất cùng lúc', k.mx.v + '<small> / 10</small>', '', '<span>' + WD[k.mx.d.getDay()] + ', ' + dmy(k.mx.d) + '</span>') + kpi('Số ngày hết ghế', k.full + '<small> ngày</small>', '', k.full ? ic('warn', 'warn') + '<span>Người đến sau phải chờ, chủ yếu 9:00–11:00</span>' : '<span>Không ngày nào hết ghế</span>') +
+        kpi('Trung bình ngày làm việc', num(k.avg, 1) + '<small> ghế</small>', '', '<span>Mức cao nhất trong ngày, ' + Math.round(k.avg * 10) + '% của 10 ghế</span>')) + '</div>';
+    h += '<section class="card"><h4>' + (nm ? 'Số người dùng mỗi ngày' : 'Số ghế floating dùng cùng lúc, cao nhất mỗi ngày') + '<button class="lnk sp" type="button" data-a="tbl" data-v="day" aria-pressed="' + S.tblDay + '">' + (S.tblDay ? 'Xem biểu đồ' : 'Xem bảng số liệu') + '</button></h4>' +
+      '<div class="lg"><span><i></i>' + (nm ? 'Người dùng trong ngày' : 'Ghế dùng cùng lúc, cao nhất') + '</span>' + (nm ? '' : '<span><i class="full"></i>' + ic('warn', 'warn') + 'Hết ghế (10/10)</span>') + '<span><i class="line"></i>Tổng ' + k.cap + ' ghế</span></div>' +
+      (S.tblDay ? dayTable(k) : '<div class="chart" id="ch-day" tabindex="0" role="group" aria-roledescription="biểu đồ cột" aria-label="' + (nm ? 'Số người dùng' : 'Số ghế floating dùng cùng lúc') + ' mỗi ngày, ' + S.range + ' ngày. Cao nhất ' + k.mx.v + ' ' + unit + ' ngày ' + dmy(k.mx.d) + '. Dùng phím mũi tên trái, phải để xem từng ngày."></div>') + '</section>';
+    if (!nm && k.full >= 3) h += alertB('warn', '<b>Hết ghế floating ' + k.full + ' ngày trong ' + S.range + ' ngày.</b> Thêm 2 ghế floating đủ cho giờ cao điểm 9:00–11:00 theo số liệu này.', '<a class="b" href="thanh-toan.html#mua">Mua thêm ghế floating</a>');
+    var M = heat(), cap = k.cap, pk = [0, 0]; M.forEach(function(r, i){ r.forEach(function(v, j){ if (v > M[pk[0]][pk[1]]) pk = [i, j]; }); });
+    h += '<section class="card"><h4>Giờ cao điểm<span class="hint">trung bình mỗi giờ trong ' + S.range + ' ngày</span><button class="lnk sp" type="button" data-a="tbl" data-v="heat" aria-pressed="' + S.tblHeat + '">' + (S.tblHeat ? 'Xem biểu đồ' : 'Xem bảng số liệu') + '</button></h4>' +
+      (S.tblHeat ? heatTable(M) : '<div class="chart hm" id="ch-heat" tabindex="0" role="group" aria-roledescription="bản đồ nhiệt" aria-label="Số ' + unit + ' dùng trung bình theo thứ và giờ. Dùng phím mũi tên để xem từng ô."></div><div class="scale" aria-hidden="true"><span>0</span><i class="c0"></i><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><i class="c5"></i><span>' + cap + ' ' + unit + '</span></div>') +
+      '<p class="hint">Cao điểm: ' + WD[(pk[0] + 1) % 7] + ', ' + (7 + pk[1]) + ':00–' + (8 + pk[1]) + ':00, trung bình ' + num(M[pk[0]][pk[1]], 1) + ' ' + unit + '. Thấp nhất trong giờ làm việc: 12:00–13:00, nghỉ trưa.</p></section>';
+    return h;
+  };
+  function dayTable(k){ var nm = S.kind === 'named'; return '<div class="tscroll" style="max-height:320px" tabindex="0"><table class="wtbl"><caption class="sr">Số liệu theo ngày</caption><thead><tr><th scope="col">Ngày</th><th scope="col" class="num">' + (nm ? 'Người dùng' : 'Ghế cùng lúc, cao nhất') + '</th><th scope="col" class="num">Tỉ lệ</th></tr></thead><tbody>' +
+    k.data.slice().reverse().map(function(p){ return '<tr><td>' + WD[p.d.getDay()] + ', ' + dmy(p.d) + (!nm && p.v >= k.cap ? ' <span class="pill warn">Hết ghế</span>' : '') + '</td><td class="num">' + p.v + ' / ' + k.cap + '</td><td class="num">' + Math.round(p.v / k.cap * 100) + '%</td></tr>'; }).join('') + '</tbody></table></div>'; }
+  function heatTable(M){ return '<div class="tscroll" tabindex="0"><table class="wtbl"><caption class="sr">Trung bình theo thứ và giờ</caption><thead><tr><th scope="col">Thứ</th>' + SHAPE.map(function(x, j){ return '<th scope="col" class="num">' + (7 + j) + 'h</th>'; }).join('') + '</tr></thead><tbody>' +
+    M.map(function(r, i){ return '<tr><th scope="row">' + WD[(i + 1) % 7] + '</th>' + r.map(function(v){ return '<td class="num">' + num(v, 1) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>'; }
+
+  function bar(x, y, w, h){ var r = Math.min(2, w / 2, h); return 'M' + x + ' ' + (y + h) + 'V' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ' ' + y + ' ' + (x + w) + ' ' + (y + r) + 'V' + (y + h) + 'Z'; }
+  function drawDay(){
+    var el = $('#ch-day'); if (!el) return;
+    var k = hStats(), data = k.data, cap = k.cap, nm = S.kind === 'named', W = el.clientWidth, H = 220, m = { l:28, r:6, t:nm ? 14 : 20, b:24 }, pw = W - m.l - m.r, ph = H - m.t - m.b, n = data.length, slot = pw / n, bw = Math.min(18, Math.max(1, slot - (slot >= 8 ? 2 : 1)));
+    var Y = function(v){ return m.t + ph * (1 - v / cap); }, mi = data.indexOf(k.mx);
+    var s = '<svg width="' + W + '" height="' + H + '" aria-hidden="true">';
+    (nm ? [0, 10, 20, 30, 40] : [0, 2, 4, 6, 8, 10]).forEach(function(t){ var y = Math.round(Y(t)) + .5; s += '<line class="' + (t === cap ? 'capl' : 'grid') + '" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + y + '" y2="' + y + '"/><text x="' + (m.l - 7) + '" y="' + (y + 3.5) + '" text-anchor="end">' + t + '</text>'; });
+    data.forEach(function(p, i){
+      var x = m.l + i * slot + (slot - bw) / 2, y = Y(p.v), full = !nm && p.v >= cap;
+      if (p.v > 0) s += '<path class="bar' + (full ? ' full' : '') + '" data-i="' + i + '" d="' + bar(x, y, bw, Y(0) - y) + '"/>';
+      if (full && slot >= 9) s += '<path class="mk" d="M' + (x + bw / 2 - 3.5) + ' ' + (y - 3) + 'h7l-3.5-6z"/>';
+    });
+    var every = Math.max(1, Math.ceil(46 / slot));
+    data.forEach(function(p, i){ if ((n - 1 - i) % every === 0) s += '<text x="' + (m.l + i * slot + slot / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + dm(p.d) + '</text>'; });
+    if (nm) s += '<text class="lab" x="' + (m.l + mi * slot + slot / 2) + '" y="' + (Y(k.mx.v) - 6) + '" text-anchor="middle">' + k.mx.v + '</text>';
+    el.innerHTML = s + '</svg><div class="tip" hidden></div>';
+    var show = function(i){
+      var tip = el.querySelector('.tip'); S.di = i;
+      $$('.bar', el).forEach(function(b){ b.classList.toggle('hl', +b.dataset.i === i); });
+      if (i < 0){ tip.hidden = true; return; }
+      var p = data[i], full = !nm && p.v >= cap;
+      tip.innerHTML = '<b>' + p.v + ' / ' + cap + ' ' + (nm ? 'người' : 'ghế') + '</b><span>' + WD[p.d.getDay()] + ', ' + dmy(p.d) + (i === n - 1 ? ' (đến 14:40)' : '') + (full ? ' · hết ghế' : '') + '</span>';
+      tip.hidden = false; tip.style.left = Math.max(74, Math.min(W - 74, m.l + i * slot + slot / 2)) + 'px'; tip.style.top = Math.max(0, Y(p.v) - (full ? 14 : 8)) + 'px';
+    };
+    el.onpointermove = function(e){ var i = Math.floor((e.clientX - el.getBoundingClientRect().left - m.l) / slot); show(i >= 0 && i < n ? i : -1); };
+    el.onpointerleave = function(){ if (document.activeElement !== el) show(-1); };
+    el.onfocus = function(){ show(S.di >= 0 ? S.di : n - 1); };
+    el.onblur = function(){ show(-1); };
+    el.onkeydown = function(e){ var i = S.di < 0 ? n - 1 : S.di, kk = e.key; if (kk === 'ArrowLeft') i--; else if (kk === 'ArrowRight') i++; else if (kk === 'Home') i = 0; else if (kk === 'End') i = n - 1; else if (kk === 'Escape') { show(-1); return; } else return; e.preventDefault(); show(Math.max(0, Math.min(n - 1, i))); };
+  }
+  function drawHeat(){
+    var el = $('#ch-heat'); if (!el) return;
+    var M = heat(), cap = S.kind === 'named' ? 40 : 10, unit = S.kind === 'named' ? 'người' : 'ghế', W = el.clientWidth, m = { l:28, t:2, b:20 }, cw = (W - m.l) / 14, ch = 26, H = m.t + 7 * ch + m.b;
+    var bin = function(v){ var f = v / cap; return f < .05 ? 0 : Math.min(5, 1 + Math.floor(f * 5)); };
+    var s = '<svg width="' + W + '" height="' + H + '" aria-hidden="true">';
+    ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].forEach(function(lb, r){
+      s += '<text x="0" y="' + (m.t + r * ch + ch / 2 + 4) + '">' + lb + '</text>';
+      M[r].forEach(function(v, c){ s += '<rect class="c' + bin(v) + '" data-r="' + r + '" data-c="' + c + '" x="' + (m.l + c * cw + 1) + '" y="' + (m.t + r * ch + 1) + '" width="' + Math.max(1, cw - 2) + '" height="' + (ch - 2) + '" rx="2"/>'; });
+    });
+    for (var c = 0; c < 14; c++) if (cw >= 30 || c % 2 === 0) s += '<text x="' + (m.l + c * cw + cw / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + (7 + c) + 'h</text>';
+    el.innerHTML = s + '</svg><div class="tip" hidden></div>';
+    var show = function(rc){
+      var tip = el.querySelector('.tip'); S.hi = rc;
+      $$('rect', el).forEach(function(x){ x.classList.toggle('hl', !!rc && +x.dataset.r === rc[0] && +x.dataset.c === rc[1]); });
+      if (!rc){ tip.hidden = true; return; }
+      tip.innerHTML = '<b>' + num(M[rc[0]][rc[1]], 1) + ' ' + unit + '</b><span>' + WD[(rc[0] + 1) % 7] + ', ' + (7 + rc[1]) + ':00–' + (8 + rc[1]) + ':00 · trung bình</span>';
+      tip.hidden = false; tip.style.left = Math.max(84, Math.min(W - 84, m.l + rc[1] * cw + cw / 2)) + 'px'; tip.style.top = (m.t + rc[0] * ch - 4) + 'px';
+    };
+    el.onpointermove = function(e){ var b = el.getBoundingClientRect(), c = Math.floor((e.clientX - b.left - m.l) / cw), r = Math.floor((e.clientY - b.top - m.t) / ch); show(c >= 0 && c < 14 && r >= 0 && r < 7 ? [r, c] : null); };
+    el.onpointerleave = function(){ if (document.activeElement !== el) show(null); };
+    el.onfocus = function(){ show(S.hi || [1, 3]); };
+    el.onblur = function(){ show(null); };
+    el.onkeydown = function(e){ var rc = (S.hi || [1, 3]).slice(), kk = e.key; if (kk === 'ArrowLeft') rc[1]--; else if (kk === 'ArrowRight') rc[1]++; else if (kk === 'ArrowUp') rc[0]--; else if (kk === 'ArrowDown') rc[0]++; else if (kk === 'Escape') { show(null); return; } else return; e.preventDefault(); show([Math.max(0, Math.min(6, rc[0])), Math.max(0, Math.min(13, rc[1]))]); };
+  }
+  function drawCharts(){ if (S.tab === 'hist') { drawDay(); drawHeat(); } }
+
+  /* ----- Triển khai ----- */
+  var PROF = [['kt', 'An Phú · Kiến trúc', 'AnPhu-KienTruc.tcprofile'], ['kc', 'An Phú · Kết cấu', 'AnPhu-KetCau.tcprofile'], ['me', 'An Phú · Cơ điện', 'AnPhu-CoDien.tcprofile']];
+  var TPLS = ['AP-A1-TCVN.dwt', 'AP-A3-TCVN.dwt', 'AP-KetCau-A1.dwt'];
+  var MODEH = { named:'Người dùng đăng nhập TrionCAD bằng email được gán ghế.', floating:'Máy lấy ghế từ máy chủ trong mạng công ty khi mở TrionCAD.', both:'Dùng ghế gán theo người nếu có; không có thì lấy ghế floating.' };
+  var CHH = { stable:'Nhận bản mới khi phát hành chính thức. Khuyên dùng.', beta:'Nhận bản thử nghiệm sớm. Chỉ nên dùng cho vài máy.', managed:'Chỉ cài bản quản trị đã duyệt ở đây. Bản đang duyệt: ' + CUR + '.' };
+  function cmdText(){
+    var L = ['msiexec /i TrionCAD-' + CUR + '-x64.msi /qn /norestart'];
+    if (DEP.org) L.push('ORG_ID=DN-0187');
+    L.push('LICENSE_MODE=' + DEP.mode); if (DEP.mode !== 'named') L.push('LICENSE_SERVER=' + DEP.server);
+    if (DEP.file) L.push('CONFIG="\\\\fs01\\CAD\\TrionCAD\\anphu.tcconf"');
+    L.push('UPDATE_CHANNEL=' + DEP.ch, 'DESKTOP_SHORTCUT=' + (DEP.sc ? 1 : 0), '/l*v "%TEMP%\\TrionCAD-cai-dat.log"');
+    return L.join(' ^\n  ');
+  }
+  function updCmd(){ var x = $('#cmd-txt'); if (x) x.textContent = cmdText(); }
+  function cfgRow(id, label, sub, ctl, lk, err){
+    return '<div class="cfg-row"><label class="lb" for="' + id + '">' + label + (sub ? '<small>' + sub + '</small>' : '') + '</label><div class="cv">' + ctl + (err ? '<span class="msg-e" id="' + id + '-e">' + err + '</span>' : '') + '</div>' +
+      (lk ? '<label class="lock" title="Người dùng không đổi được mục này trong Tùy chọn"><input type="checkbox" data-a="lock" data-v="' + lk + '"' + (DEP.lock[lk] ? ' checked' : '') + dis() + '>' + ic('lock') + 'Khóa</label>' : '') + '</div>';
+  }
+  function pathIn(id, k){ var e = DEP.errs[k]; return '<input class="inp mono" id="' + id + '" data-a="cset" data-v="' + k + '" value="' + esc(DEP[k]) + '" spellcheck="false" autocomplete="off" aria-invalid="' + !!e + '"' + (e ? ' aria-describedby="' + id + '-e"' : '') + dis() + '>'; }
+  PG.dep = function(){
+    var h = head('Triển khai', 'Cài TrionCAD hàng loạt, đặt cấu hình chung cho cả công ty');
+    h += '<section class="card"><h4>' + ic('pkg') + 'Bộ cài MSI cho Windows</h4><div class="dlr"><div><b>TrionCAD ' + CUR + ' · Windows 10, 11 (64-bit)</b><p class="hint">TrionCAD-' + CUR + '-x64.msi · 412 MB · phát hành 07/10/2026 · có chữ ký số</p><p class="hint mono">SHA-256 5f3a9c41…d07be2c91e</p></div>' +
+      '<div class="btns"><button class="b pri" data-a="msi">' + ic('down') + 'Tải bộ cài MSI</button><button class="lnk" type="button" data-a="msi" data-v="old">Bản trước 1.0.2</button></div></div></section>';
+    h += '<section class="card"><h4>Lệnh cài im lặng</h4><p class="hint">Chạy bằng quyền quản trị, hoặc dùng trong GPO, Intune, PDQ Deploy. Lệnh đổi theo lựa chọn dưới đây.</p><div class="cfg">' +
+      '<div class="cfg-row"><span class="lb" id="lb-mode">Giấy phép trên máy</span><div class="cv"><div class="radios" role="radiogroup" aria-labelledby="lb-mode">' + [['named', 'Gán theo người'], ['floating', 'Floating'], ['both', 'Cả hai']].map(function(r){ return '<label><input type="radio" name="dmode" value="' + r[0] + '" data-a="mode"' + (DEP.mode === r[0] ? ' checked' : '') + '>' + r[1] + '</label>'; }).join('') + '</div><span class="hint" id="mode-h">' + MODEH[DEP.mode] + '</span></div></div>' +
+      '<div class="cfg-row" id="row-srv"' + (DEP.mode === 'named' ? ' hidden' : '') + '><label class="lb" for="d-srv">Máy chủ floating<small>tên máy hoặc IP, kèm cổng</small></label><div class="cv"><input class="inp mono" id="d-srv" data-a="cset" data-v="server" value="' + esc(DEP.server) + '" spellcheck="false" autocomplete="off"></div></div>' +
+      '<div class="cfg-row"><span class="lb">Tùy chọn</span><div class="chks">' + [['org', 'Gắn máy với công ty, tự tải cấu hình chung từ cổng', 'ORG_ID'], ['file', 'Đọc cấu hình từ tệp trên mạng, cho máy không ra Internet', 'CONFIG'], ['sc', 'Tạo lối tắt trên màn hình nền', 'DESKTOP_SHORTCUT']].map(function(o){ return '<label class="chk3"><input type="checkbox" data-a="dopt" data-v="' + o[0] + '"' + (DEP[o[0]] ? ' checked' : '') + '><span>' + o[1] + ' <span class="mono faint">' + o[2] + '</span></span></label>'; }).join('') + '</div></div></div>' +
+      '<div class="cmd"><pre id="cmd-txt" tabindex="0" aria-label="Lệnh cài im lặng">' + esc(cmdText()) + '</pre><div class="btns"><button class="b" data-a="copycmd">' + ic('copy') + 'Sao chép lệnh</button><span class="hint">Gỡ cài: <span class="mono">msiexec /x TrionCAD-' + CUR + '-x64.msi /qn</span></span></div></div>' +
+      '<details class="params"><summary>Mọi tham số</summary><div class="tscroll" tabindex="0"><table class="wtbl"><thead><tr><th scope="col">Tham số</th><th scope="col">Giá trị</th><th scope="col">Ý nghĩa</th></tr></thead><tbody>' +
+      [['ORG_ID', 'DN-0187', 'Gắn máy với công ty: máy tự tải cấu hình chung và hiện trong mục Thiết bị.'], ['LICENSE_MODE', 'named, floating, both', 'Cách lấy giấy phép.'], ['LICENSE_SERVER', 'tên-máy:cổng', 'Địa chỉ máy chủ floating.'], ['CONFIG', 'đường dẫn .tcconf', 'Cấu hình từ tệp, cho máy không ra Internet.'], ['UPDATE_CHANNEL', 'stable, beta, managed', 'managed: chỉ cài bản quản trị đã duyệt.'], ['DESKTOP_SHORTCUT', '0, 1', 'Lối tắt trên màn hình nền.'], ['INSTALLDIR', 'thư mục', 'Mặc định C:\\Program Files\\TrionCAD.']].map(function(r){ return '<tr><td class="mono">' + r[0] + '</td><td class="mono">' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>'; }).join('') + '</tbody></table></div></details></section>';
+    var e = DEP.errs;
+    h += '<section class="card" id="cfg"><h4>Cấu hình mặc định cho cả công ty <span class="pill">v' + DEP.ver + '</span></h4><p class="hint">Lưu ' + DEP.saved + ' bởi ' + DEP.by + ' · ' + DEP.got + '/' + D.devs.length + ' máy đã nhận. Máy đã cài nhận cấu hình mới ở lần mở TrionCAD tới. Mục có dấu Khóa thì người dùng không đổi được trong Tùy chọn.</p>' +
+      (Object.keys(e).length ? alertB('err', 'Chưa lưu: ' + Object.keys(e).length + ' mục cần sửa, ghi ngay dưới ô.') : '') + '<div class="cfg">' +
+      cfgRow('c-prof', 'Hồ sơ', 'tùy chọn, workspace, phím tắt', '<div class="ctl2"><select class="inp" id="c-prof" data-a="cset" data-v="prof"' + dis() + '>' + PROF.map(function(p){ return '<option value="' + p[0] + '"' + (DEP.prof === p[0] ? ' selected' : '') + '>' + p[1] + '</option>'; }).join('') + '</select><label class="b fileb' + (ro() ? ' is-dis' : '') + '">' + ic('up2') + 'Tải lên hồ sơ<input type="file" class="sr" accept=".tcprofile" data-a="upprof"' + dis() + '></label></div><span class="hint">Xuất hồ sơ trong TrionCAD: Tùy chọn › Hồ sơ › Xuất (.tcprofile).</span>', 'prof') +
+      cfgRow('c-tpl', 'Đường dẫn mẫu chung', 'thư mục mẫu bản vẽ (.dwt)', pathIn('c-tpl', 'tpl') + '<span class="ctl2"><label class="hint" for="c-tplf">Mẫu khi tạo bản vẽ mới</label><select class="inp" id="c-tplf" data-a="cset" data-v="tplf"' + dis() + '>' + TPLS.map(function(t){ return '<option' + (DEP.tplf === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></span>', 'tpl', e.tpl) +
+      cfgRow('c-lib', 'Thư viện chung', 'block, khung tên, ký hiệu', pathIn('c-lib', 'lib') + '<span class="hint">Hiện trong palette Thư viện TCVN và Block của mọi máy.</span>', 'lib', e.lib) +
+      cfgRow('c-ctb', 'CTB chung', 'bảng nét in', pathIn('c-ctb', 'ctb') + '<span class="hint">Dùng mặc định khi in và xuất PDF.</span>', 'ctb', e.ctb) +
+      '<div class="cfg-row"><span class="lb" id="lb-ch">Kênh cập nhật</span><div class="cv"><div class="radios" role="radiogroup" aria-labelledby="lb-ch">' + [['stable', 'Ổn định'], ['beta', 'Beta'], ['managed', 'Do quản trị duyệt']].map(function(r){ return '<label><input type="radio" name="dch" value="' + r[0] + '" data-a="cset" data-v="ch"' + (DEP.ch === r[0] ? ' checked' : '') + dis() + '>' + r[1] + '</label>'; }).join('') + '</div><span class="hint" id="ch-h">' + CHH[DEP.ch] + '</span></div>' +
+      '<label class="lock" title="Người dùng không đổi được mục này trong Tùy chọn"><input type="checkbox" data-a="lock" data-v="ch"' + (DEP.lock.ch ? ' checked' : '') + dis() + '>' + ic('lock') + 'Khóa</label></div></div>' +
+      '<div class="btns"><button class="b pri" data-a="savecfg"' + dis() + '>Lưu cấu hình</button><button class="b" data-a="expcfg">' + ic('down') + 'Xuất tệp cấu hình (.tcconf)</button></div></section>';
+    return h;
+  };
+
+  /* ----- Máy chủ floating (trên cổng) ----- */
+  PG.flt = function(){
+    var f = fl(), h = head('Máy chủ floating', '10 ghế dùng chung trong mạng công ty, cấp qua máy chủ giấy phép đặt tại công ty');
+    var key = '<section class="card"><h4>' + ic('key') + 'Khóa máy chủ</h4><p class="hint">Nhập khóa này khi cài dịch vụ. Khóa gắn với 10 ghế floating của công ty; mỗi khóa chỉ dùng cho một máy chủ.</p><div class="keyrow"><code class="keyv">' + (S.showKey ? FS.key : FS.key.replace(/^(TCFS-APHU-)\w{4}-\w{4}/, '$1••••-••••')) + '</code>' +
+      '<button class="b" data-a="showkey" aria-pressed="' + S.showKey + '"' + dis() + '>' + ic(S.showKey ? 'eyeoff' : 'eye') + (S.showKey ? 'Ẩn' : 'Hiện') + '</button><button class="b" data-a="copykey"' + dis() + '>' + ic('copy') + 'Sao chép</button><button class="b" data-a="newkey"' + dis() + '>' + ic('refresh') + 'Tạo khóa mới</button></div></section>';
+    var dlc = '<section class="card"><h4>' + ic('down') + 'Tải dịch vụ máy chủ</h4><div class="dlr"><div><b>TrionCAD License Server 1.0.2</b><p class="hint">Cài trên một máy luôn bật trong mạng công ty: Windows Server 2016 trở lên, Windows 10, 11, hoặc Ubuntu 22.04, 24.04. Cần 2 GB RAM và cổng 27080 TCP.</p></div><div class="btns"><button class="b" data-a="srvdl" data-v="msi">Windows (.msi)</button><button class="b" data-a="srvdl" data-v="deb">Linux (.deb)</button></div></div></section>';
+    if (f.none) return h + '<section class="card"><h4>Chưa có máy chủ floating</h4><p class="hint">10 ghế floating dùng được khi có một máy chủ giấy phép trong mạng công ty.</p><ol class="setup">' +
+      '<li><div><b>Tải và cài dịch vụ</b><p>Trên một máy luôn bật: máy chủ tệp, máy chủ in, hoặc một PC không tắt.</p></div><button class="b" data-a="srvdl" data-v="msi">' + ic('down') + 'Tải cho Windows</button></li>' +
+      '<li><div><b>Nhập khóa máy chủ</b><p>Khi cài, dịch vụ hỏi khóa ở mục bên dưới.</p></div><button class="b" data-a="copykey">' + ic('copy') + 'Sao chép khóa</button></li>' +
+      '<li><div><b>Trỏ máy khách tới máy chủ</b><p>Tham số LICENSE_SERVER trong lệnh cài im lặng, hoặc Tùy chọn › Giấy phép trên từng máy.</p></div><button class="b" data-a="go" data-v="dep">Mở Triển khai</button></li></ol></section>' + key + dlc;
+    var st = f.lost ? ['err', 'Mất kết nối'] : f.use >= 10 ? ['warn', 'Hết ghế'] : ['ok', 'Đang chạy'];
+    h += '<section class="card"><div class="srvst"><span class="srvic ' + st[0] + '">' + ic('server') + '</span><div class="grow"><b class="mono">LIC-ANPHU</b> <span class="pill ' + st[0] + '">' + st[1] + '</span><p class="hint mono">lic-anphu.local:27080 · 192.168.1.20 · dịch vụ 1.0.2</p></div><button class="b" data-a="srvui" data-v="' + (f.lost ? 'stop' : f.use >= 10 ? 'full' : 'run') + '">Mở giao diện quản lý' + ic('arrowR') + '</button></div>' +
+      (f.lost ? alertB('err', '<b>Không nhận được báo cáo từ LIC-ANPHU từ 13:52.</b> Kiểm tra lần lượt:</span><ol class="fix"><li>Máy LIC-ANPHU (192.168.1.20) còn bật và vào được mạng.</li><li>Dịch vụ “TrionCAD License Server” đang chạy: mở giao diện quản lý, hoặc services.msc trên máy chủ.</li><li>Cổng 27080 không bị chương trình khác chiếm; tường lửa cho phép cổng 27080 TCP.</li><li>Máy chủ ra Internet được, tới [tên-miền] cổng 443, để gửi báo cáo.</li></ol><span>', '<button class="b" data-a="retry">' + ic('refresh') + 'Thử kết nối lại</button><span class="hint">Lần thử gần nhất: ' + S.retry + '</span>') : '') +
+      '<dl class="facts"><div><dt>Ghế đang dùng</dt><dd>' + (f.lost ? '—' : f.use + ' / 10') + '</dd></div><div><dt>Người chờ ghế</dt><dd>' + (f.lost ? '—' : f.q) + '</dd></div><div><dt>Báo cáo gần nhất</dt><dd>' + (f.lost ? '13:52 · 48 phút trước' : '14:35 · 5 phút một lần') + '</dd></div><div><dt>Chạy liên tục</dt><dd>' + (f.lost ? '—' : '12 ngày 4 giờ') + '</dd></div></dl><p class="hint">Giao diện quản lý chỉ mở được từ mạng công ty.</p></section>';
+    var sel = function(id, k, opts, label, sub, hint){ return cfgRow(id, label, sub, '<select class="inp" id="' + id + '" data-a="fset" data-v="' + k + '"' + dis() + '>' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (FS[k] === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select><span class="hint">' + hint + '</span>'); };
+    h += '<section class="card"><h4>' + ic('gear') + 'Cấu hình máy chủ</h4><div class="cfg">' +
+      sel('f-grace', 'grace', [['0.5', '30 phút'], ['1', '1 giờ'], ['2', '2 giờ (mặc định)'], ['4', '4 giờ'], ['8', '8 giờ']], 'Ân hạn khi mất kết nối', '', 'Máy đang dùng giữ ghế khi không liên lạc được máy chủ.') +
+      sel('f-idle', 'idle', [['0', 'Không tự thu hồi'], ['30', '30 phút'], ['60', '60 phút (mặc định)'], ['120', '2 giờ']], 'Tự thu hồi ghế không hoạt động', '', 'Không thao tác trong TrionCAD quá thời gian này thì trả ghế; máy được báo trước 5 phút.') +
+      sel('f-hold', 'hold', [['1', '1 phút'], ['3', '3 phút (mặc định)'], ['5', '5 phút'], ['10', '10 phút']], 'Giữ ghế cho người đầu hàng đợi', '', 'Quá thời gian này mà người đó chưa nhận thì ghế chuyển cho người kế tiếp.') +
+      cfgRow('f-borrow', 'Mượn ghế mang đi', 'dùng offline N ngày', '<span class="ctl2"><select class="inp" id="f-borrow" disabled><option>Tắt</option></select><span class="pill">Sau 1.0</span></span><span class="hint">Cho máy ra công trường không có mạng (07.3 UI-L03, P2).</span>') +
+      '</div><div class="btns"><button class="b pri" data-a="savesrv"' + dis() + '>Lưu cấu hình</button><span class="hint">Máy chủ nhận cấu hình ở lần đồng bộ tới, tối đa 5 phút.</span></div></section>';
+    return h + key + dlc;
+  };
+
+  /* ----- Đang tải ----- */
+  function loading(){
+    var sk = function(w, hh){ return '<span class="sk" style="width:' + w + (hh ? ';height:' + hh + 'px' : '') + '"></span>'; };
+    return '<p class="sr" role="status">Đang tải dữ liệu quản trị</p><div style="display:grid;gap:8px">' + sk('180px', 26) + sk('min(340px, 90%)') + '</div><div class="kpis">' + [1, 2, 3, 4].map(function(){ return '<div class="kpi">' + sk('55%') + sk('40%', 24) + sk('100%', 6) + sk('75%') + '</div>'; }).join('') + '</div>' +
+      '<div class="card">' + sk('140px', 16) + [1, 2, 3, 4, 5].map(function(){ return '<div class="skr">' + sk('28px', 28) + sk('38%') + sk('18%') + '</div>'; }).join('') + '</div><p class="hint">Đang tải dữ liệu quản trị…</p>';
+  }
+
+  function render(home){
+    var host = $('#adm'), k = !home && host.contains(document.activeElement) ? keyOf(document.activeElement) : null;
+    S.di = -1; S.hi = null;
+    host.innerHTML = topnav() + '<div class="adm">' + side() + '<div class="mn"' + (S.st === 'load' ? ' aria-busy="true"' : '') + '>' + (S.st === 'load' ? loading() : PG[S.tab]()) + '</div></div>' +
+      '<footer class="web-foot"><span>TrionCAD Doanh nghiệp · dữ liệu khách hàng lưu tại Việt Nam · hỗ trợ doanh nghiệp qua Zalo OA và điện thoại, 8:00–21:00</span><span class="fine">Trang mẫu cho thiết kế, dữ liệu là giả định.</span></footer>';
+    $('#adm-addr').textContent = '[tên-miền]/quan-tri/' + SLUG[S.tab];
+    var el = home ? host.querySelector('[data-home]') : k && host.querySelector(k);
+    if (el) el.focus({ preventScroll:!home });
+    drawCharts();
+  }
+
+  /* ----- mời nhân viên ----- */
+  var EMAIL = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[a-z]{2,}$/i;
+  function parseInv(text){
+    var out = [], seen = {};
+    var add = function(mail, name, dept){
+      mail = String(mail || '').trim().replace(/^mailto:/i, '').toLowerCase(); if (!mail || mail === 'email') return;
+      var u = byMail(mail), dk = Object.keys(DEPT).filter(function(k){ return fold(DEPT[k]) === fold(dept).trim(); })[0] || '';
+      out.push({ mail:mail, name:String(name || '').replace(/["']/g, '').trim(), dept:dk, pend: !!u && u.st !== 'on' && u.st !== 'idle', st: !EMAIL.test(mail) ? 'bad' : seen[mail] ? 'dup' : u ? 'has' : /@anphu\.vn$/.test(mail) ? 'ok' : 'ext' }); seen[mail] = 1;
+    };
+    text.split(/\r?\n|;/).forEach(function(part){
+      part = part.trim(); if (!part) return;
+      var m = part.match(/^(.*?)<([^>]+)>/);
+      if (m) return add(m[2], m[1]);
+      if ((part.match(/@/g) || []).length > 1) return part.split(/[\s,]+/).forEach(function(x){ if (x) add(x); });
+      var c = part.split(/[,\t]/); add(c[0], c[1], c[2]);
+    });
+    return out;
+  }
+  function invState(){
+    var rows = parseInv(($('#inv-t') || {}).value || ''), free = Math.max(0, 40 - D.users.length), n = 0;
+    rows.forEach(function(r){ if (r.st === 'ok' || r.st === 'ext'){ if (n < free){ n++; r.go = true; } else r.over = true; } });
+    return { rows:rows, free:free, n:n, want: rows.filter(function(r){ return r.go || r.over; }).length };
+  }
+  var RES = { ok:'<span class="pill ok">Sẽ mời</span>', ext:'<span class="pill info">Ngoài anphu.vn, vẫn mời</span>', bad:'<span class="pill err">Email chưa đúng</span>', has:'<span class="pill">Đã có ghế</span>', dup:'<span class="pill">Trùng dòng trên</span>' };
+  function invPreview(){
+    var s = invState(), box = $('#inv-p'), btn = dlg.querySelector('[data-ok]');
+    btn.textContent = s.n ? 'Gửi ' + s.n + ' lời mời' : 'Gửi lời mời'; btn.disabled = !s.n;
+    if (!s.rows.length){ box.innerHTML = '<p class="hint">Còn ' + s.free + ' ghế trống.' + (s.free ? '' : ' Mua thêm ghế hoặc thu hồi ghế không dùng trước khi mời.') + '</p>'; return; }
+    var c = { ok:0, ext:0, bad:0, has:0, dup:0 }; s.rows.forEach(function(r){ c[r.st]++; });
+    var over = s.want - s.n;
+    box.innerHTML = '<div class="invsum">' + [['ok', 'hợp lệ', c.ok + c.ext], ['bad', 'email chưa đúng', c.bad], ['has', 'đã có ghế', c.has], ['dup', 'trùng', c.dup]].filter(function(x){ return x[2]; }).map(function(x){ return '<span class="pill' + (x[0] === 'ok' ? ' ok' : x[0] === 'bad' ? ' err' : '') + '">' + x[2] + ' ' + x[1] + '</span>'; }).join('') + '<span class="hint">còn ' + s.free + ' ghế trống</span></div>' +
+      (over > 0 ? alertB(s.n ? 'warn' : 'err', (s.n ? 'Cần ' + s.want + ' ghế, còn ' + s.free + ' ghế trống: gửi cho ' + s.n + ' người đầu danh sách, ' + over + ' người còn lại chưa được mời.' : 'Hết ghế trống: chưa gửi được lời mời nào.') + ' Mua thêm ' + over + ' ghế, hoặc thu hồi ghế của người không còn dùng.', '<a class="b" href="thanh-toan.html#mua">Mua thêm ' + over + ' ghế</a>') : '') +
+      '<div class="tscroll ip" tabindex="0"><table class="wtbl"><caption class="sr">Xem trước danh sách mời</caption><thead><tr><th scope="col">Email</th><th scope="col" class="hide-s">Họ tên</th><th scope="col">Kết quả</th></tr></thead><tbody>' +
+      s.rows.map(function(r){ return '<tr><td class="mail">' + esc(r.mail) + '</td><td class="hide-s">' + esc(r.name || '—') + '</td><td>' + (r.over ? '<span class="pill warn">Hết ghế, chưa mời</span>' : r.pend ? '<span class="pill">Đã mời, chưa nhận</span>' : RES[r.st]) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function openInvite(){
+    openDlg({ title:'Mời nhân viên', icon:ic('mail'), wide:true, ok:'Gửi lời mời', check:function(){ return invState().n > 0; },
+      body:'<p>Mỗi người nhận email kèm đường dẫn. Đăng nhập TrionCAD bằng email đó là dùng được, không cần key. Lời mời hết hạn sau 14 ngày.</p>' +
+        '<div class="fld"><label for="inv-t">Danh sách email</label><textarea class="inp" id="inv-t" rows="6" autofocus spellcheck="false" placeholder="minh.tran@anphu.vn&#10;thu.nguyen@anphu.vn, Nguyễn Anh Thư&#10;Lê Quang &lt;quang.le@anphu.vn&gt;"></textarea><span class="help">Mỗi dòng một người: email, có thể kèm họ tên sau dấu phẩy. Dán thẳng từ Excel hoặc Outlook cũng được.</span></div>' +
+        '<div class="row2"><label class="b fileb">' + ic('file') + 'Chọn tệp CSV<input type="file" class="sr" id="inv-f" accept=".csv,text/csv"></label><button type="button" class="lnk" data-x="tpl">Tải tệp CSV mẫu</button><button type="button" class="lnk" data-x="sample">Dán ví dụ</button><span class="sp"></span>' +
+        '<label class="inl">Vai trò<select class="inp" id="inv-r"><option value="mem">Thành viên</option><option value="sub">Quản trị phụ</option><option value="admin">Quản trị</option></select></label></div><div id="inv-p" aria-live="polite"></div>',
+      open:invPreview, input:invPreview,
+      change:function(e){ if (e.target.id !== 'inv-f' || !e.target.files[0]) return; var fr = new FileReader(); fr.onload = function(){ $('#inv-t').value = String(fr.result).replace(/^\ufeff/, ''); invPreview(); }; fr.readAsText(e.target.files[0]); },
+      x:function(a){ if (a === 'tpl') A.csvtpl(); else { $('#inv-t').value = 'phong.vu@anphu.vn, Vũ Thanh Phong, Kết cấu\nNguyễn Anh Thư <thu.nguyen.kt@anphu.vn>\nngan.ho@anphu.vn, Hồ Kim Ngân, Dự toán\nkts.hai@gmail.com, Trần Hải (cộng tác)\nchi.le@anphu.vn\nminh.tran@anphu.vn\nlinh.do@anphu\nphong.vu@anphu.vn'; invPreview(); } },
+      go:function(){
+        var s = invState(), role = $('#inv-r').value;
+        s.rows.forEach(function(r){ if (r.go) D.users.push({ name:r.name, mail:r.mail, dept:r.dept, role:role, st:'inv', ndev:0, last:null, inv:0 }); });
+        logA('<b>' + meName() + '</b> mời ' + s.n + ' người'); S.tab = 'seats'; S.f = 'inv'; S.q = ''; render();
+        toast('Đã gửi <b>' + s.n + ' lời mời</b>. Người nhận đăng nhập TrionCAD bằng email được mời là dùng được.');
+      } });
+  }
+  /* ----- thu hồi ghế, gỡ kích hoạt ----- */
+  function askRevoke(list){
+    list = list.filter(Boolean); if (!list.length) return;
+    var one = list.length === 1, u0 = list[0], inv = list.filter(function(u){ return u.st === 'inv' || u.st === 'exp'; }).length, devs = D.devs.filter(function(d){ return list.some(function(u){ return u.mail === d.mail; }); });
+    var onlyInv = inv === list.length;
+    openDlg({ danger:true, icon:ic('warn', 'danger'), cancel:'Không, giữ lại',
+      title: one ? (onlyInv ? 'Hủy lời mời gửi tới ' + esc(u0.mail) + '?' : 'Thu hồi ghế của ' + esc(u0.name) + '?') : 'Thu hồi ' + list.length + ' ghế?',
+      ok: one ? (onlyInv ? 'Hủy lời mời' : 'Thu hồi ghế') : 'Thu hồi ' + list.length + ' ghế',
+      body: (one ? '' : '<ul class="who-l">' + list.slice(0, 5).map(function(u){ return '<li>' + esc(u.name || u.mail) + '</li>'; }).join('') + (list.length > 5 ? '<li>và ' + (list.length - 5) + ' người khác</li>' : '') + '</ul>') +
+        (devs.length ? '<p>' + (one ? 'Máy <b class="mono">' + devs.map(function(d){ return d.name; }).join(', ') + '</b>' : '<b>' + devs.length + ' máy</b> của họ') + ' chuyển về Viewer ở lần kết nối tới, thường trong vòng 1 giờ. Bản vẽ trên máy không bị ảnh hưởng, vẫn mở và in được.</p>' : '') +
+        (inv ? '<p>' + (one ? 'Đường dẫn trong email mời hết hiệu lực.' : inv + ' lời mời chưa nhận hết hiệu lực.') + '</p>' : '') + '<p><b>' + list.length + ' ghế</b> trống lại ngay để gán cho người khác.</p>',
+      go:function(){
+        var bu = D.users.slice(), bd = D.devs.slice();
+        D.users = D.users.filter(function(u){ return list.indexOf(u) < 0; }); D.devs = D.devs.filter(function(d){ return devs.indexOf(d) < 0; }); S.sel = {};
+        logA('<b>' + meName() + '</b> ' + (onlyInv ? 'hủy ' + list.length + ' lời mời' : 'thu hồi ' + list.length + ' ghế')); render();
+        toast(one ? (onlyInv ? 'Đã hủy lời mời gửi tới <b>' + esc(u0.mail) + '</b>.' : 'Đã thu hồi ghế của <b>' + esc(u0.name) + '</b>.') : 'Đã thu hồi <b>' + list.length + ' ghế</b>.', { label:'Hoàn tác', fn:function(){ D.users = bu; D.devs = bd; render(); toast('Đã hoàn tác. Ghế và máy được giữ nguyên.'); } });
+      } });
+  }
+  function askDeact(d){
+    var u = byMail(d.mail), left = D.devs.filter(function(x){ return x.mail === d.mail; }).length - 1;
+    openDlg({ danger:true, icon:ic('warn', 'danger'), cancel:'Không, giữ lại', title:'Gỡ kích hoạt ' + d.name + '?', ok:'Gỡ kích hoạt',
+      body:'<p>Máy của <b>' + esc(d.user) + '</b> chuyển về Viewer khi nhận lệnh: ' + (d.last < 0 ? 'máy đang mở TrionCAD nên trong vòng 1 phút' : 'máy đang tắt nên ở lần kết nối tới') + '. Bản vẽ trên máy không bị ảnh hưởng, vẫn mở và in được.</p><p>' + esc(d.user) + ' dùng lại lượt kích hoạt này trên máy khác; sau khi gỡ còn ' + left + '/2 máy.</p>',
+      go:function(){
+        var bd = D.devs.slice(); D.devs = D.devs.filter(function(x){ return x !== d; }); if (u) u.ndev = Math.max(0, u.ndev - 1);
+        logA('<b>' + meName() + '</b> gỡ kích hoạt ' + d.name); render();
+        toast('Đã gỡ kích hoạt <b>' + d.name + '</b>.', { label:'Hoàn tác', fn:function(){ D.devs = bd; if (u) u.ndev++; render(); toast('Đã hoàn tác. ' + d.name + ' giữ kích hoạt.'); } });
+      } });
+  }
+  function exportCsv(v){
+    var rows, name;
+    if (v === 'users'){ name = 'anphu-nguoi-dung.csv'; rows = [['Họ tên', 'Email', 'Phòng ban', 'Vai trò', 'Trạng thái', 'Số máy', 'Lần cuối dùng']].concat(visUsers().map(function(u){ return [u.name, u.mail, DEPT[u.dept] || '', ROLE[u.role], { on:'Đang dùng', idle:'Không dùng > 30 ngày', inv:'Đã mời', exp:'Lời mời hết hạn' }[u.st], u.ndev, lastPlain(u.last)]; })); }
+    else if (v === 'devs'){ name = 'anphu-thiet-bi.csv'; rows = [['Máy', 'Người dùng', 'Hệ điều hành', 'TrionCAD', 'Ghế', 'Kích hoạt', 'Lần cuối online']].concat(visDevs().map(function(d){ return [d.name, d.user, d.os, d.ver, d.kind === 'flt' ? 'Floating' : 'Gán theo người', d.act, lastPlain(d.last)]; })); }
+    else { var k = hStats(); name = 'anphu-lich-su-' + (S.kind === 'named' ? 'ghe-gan' : 'floating') + '-' + S.range + '-ngay.csv'; rows = [['Ngày', 'Thứ', 'Loại ghế', 'Số ghế dùng', 'Tổng số ghế']].concat(k.data.map(function(p){ return [dmy(p.d), WD[p.d.getDay()], S.kind === 'named' ? 'Gán theo người' : 'Floating', p.v, k.cap]; })); }
+    dl(name, csv(rows)); toast('Đã xuất <b>' + name + '</b> (' + (rows.length - 1) + ' dòng).');
+  }
+  var PATH = /^(\\\\[^\\\/:*?"<>|]+\\[^\\\/:*?"<>|]+(\\[^\\\/:*?"<>|]*)*|[A-Za-z]:\\([^\\\/:*?"<>|]+\\?)*)$/;
+
+  var A = {
+    tab:function(v){ S.tab = v; S.sel = {}; render(); },
+    go:function(v){ var p = v.split(':'); S.tab = p[0]; S.sel = {}; if (p[1]){ if (p[0] === 'seats'){ S.f = p[1]; S.q = ''; } else if (p[0] === 'dev'){ S.df = p[1]; S.dq = ''; } else S.kind = p[1]; } render(true); },
+    chip:function(v){ S.f = v; S.sel = {}; render(); }, dchip:function(v){ S.df = v; render(); },
+    clearf:function(){ S.f = 'all'; S.q = ''; render(); var q = $('#q-users'); if (q) q.focus(); },
+    sort:function(v){ S.sort = S.sort[0] === v ? [v, -S.sort[1]] : [v, 1]; render(); },
+    invite:openInvite,
+    csvtpl:function(){ dl('mau-moi-nhan-vien.csv', 'email,ho_ten,phong_ban\r\nminh.tran@anphu.vn,Trần Quang Minh,Kết cấu\r\nthu.nguyen@anphu.vn,Nguyễn Anh Thư,Kiến trúc\r\n'); toast('Đã tải <b>mau-moi-nhan-vien.csv</b>: cột email bắt buộc, họ tên và phòng ban tùy chọn.'); },
+    resend:function(v){ var u = byMail(v); u.st = 'inv'; u.inv = 0; logA('<b>' + meName() + '</b> gửi lại lời mời tới ' + esc(v)); render(); toast('Đã gửi lại lời mời tới <b>' + esc(v) + '</b>. Lời mời mới hết hạn sau 14 ngày.'); },
+    resendexp:function(){ var n = 0; D.users.forEach(function(u){ if (u.st === 'exp'){ u.st = 'inv'; u.inv = 0; n++; } }); logA('<b>' + meName() + '</b> gửi lại ' + n + ' lời mời hết hạn'); render(); toast('Đã gửi lại <b>' + n + ' lời mời</b>. Lời mời mới hết hạn sau 14 ngày.'); },
+    bresend:function(){ var n = 0; Object.keys(S.sel).forEach(function(k){ var u = byMail(k); if (u && (u.st === 'inv' || u.st === 'exp')){ u.st = 'inv'; u.inv = 0; n++; } }); S.sel = {}; render(); toast('Đã gửi lại <b>' + n + ' lời mời</b>.'); },
+    revoke:function(v){ askRevoke([byMail(v)]); }, brevoke:function(){ askRevoke(Object.keys(S.sel).map(byMail)); }, bclear:function(){ S.sel = {}; updUsers(); },
+    deact:function(v){ askDeact(D.devs.filter(function(d){ return d.name === v; })[0]); },
+    range:function(v){ S.range = +v; render(); }, kind:function(v){ S.kind = v; render(); },
+    tbl:function(v){ if (v === 'day') S.tblDay = !S.tblDay; else S.tblHeat = !S.tblHeat; render(); },
+    csv:exportCsv,
+    msi:function(v){ toast('Prototype: bản thật tải tệp <b>TrionCAD-' + (v ? '1.0.2' : CUR) + '-x64.msi</b> (412 MB) ở bước này.'); },
+    srvdl:function(v){ toast('Prototype: bản thật tải <b>TrionCAD-License-Server-1.0.2.' + v + '</b> ở bước này.'); },
+    copycmd:function(v, t){ copy(cmdText().replace(/ \^\n {2}/g, ' '), t); },
+    savecfg:function(){
+      var e = {};
+      ['tpl', 'lib', 'ctb'].forEach(function(k){ var x = String(DEP[k]).trim(); DEP[k] = x; if (!PATH.test(x)) e[k] = 'Cần đường dẫn mạng dạng \\\\máy-chủ\\thư-mục, hoặc ổ mạng như Z:\\CAD, để mọi máy đều mở được.'; });
+      if (!e.ctb && !/\.(ctb|stb)$/i.test(DEP.ctb)) e.ctb = 'Cần tệp bảng nét in có đuôi .ctb hoặc .stb.';
+      DEP.errs = e;
+      if (Object.keys(e).length){ render(); var f = $('#adm [aria-invalid="true"]'); if (f) f.focus(); return; }
+      DEP.ver++; DEP.saved = '19/10/2026 14:41'; DEP.by = meName(); DEP.got = 0; logA('<b>' + meName() + '</b> lưu cấu hình triển khai v' + DEP.ver); render();
+      toast('Đã lưu cấu hình <b>v' + DEP.ver + '</b>. Máy đã cài nhận ở lần mở TrionCAD tới.');
+    },
+    expcfg:function(){
+      var p = PROF.filter(function(x){ return x[0] === DEP.prof; })[0];
+      dl('anphu-trioncad-v' + DEP.ver + '.tcconf', JSON.stringify({ org:'DN-0187', version:DEP.ver, profile:p[2], templatePath:DEP.tpl, templateFile:DEP.tplf, libraryPath:DEP.lib, plotStyle:DEP.ctb, updateChannel:DEP.ch, locked:Object.keys(DEP.lock).filter(function(k){ return DEP.lock[k]; }) }, null, 2) + '\n', 'application/json');
+      toast('Đã xuất <b>anphu-trioncad-v' + DEP.ver + '.tcconf</b>. Đặt tệp ở thư mục mạng rồi trỏ tham số CONFIG tới đó.');
+    },
+    showkey:function(){ S.showKey = !S.showKey; render(); },
+    copykey:function(v, t){ copy(FS.key, t); },
+    newkey:function(){
+      openDlg({ danger:true, icon:ic('warn', 'danger'), title:'Tạo khóa máy chủ mới?', ok:'Tạo khóa mới', cancel:'Không, giữ khóa cũ',
+        body: fl().none ? '<p>Khóa hiện tại ngừng hoạt động ngay. Chưa có máy chủ nào dùng khóa này nên không ai bị ảnh hưởng.</p>' : '<p>Khóa hiện tại ngừng hoạt động ngay. Máy chủ LIC-ANPHU ngừng cấp ghế mới cho tới khi nhập khóa mới trong giao diện quản lý.</p>' + (fl().lost ? '' : '<p><b>' + fl().use + ' người</b> đang dùng giữ ghế trong 2 giờ ân hạn, không bị ngắt ngay.</p>') + '<p>Chỉ nên làm khi khóa bị lộ, hoặc khi chuyển máy chủ sang máy khác.</p>',
+        go:function(){ FS.key = 'TCFS-APHU-8R2N-W5TC-3JQA'; S.showKey = true; logA('<b>' + meName() + '</b> tạo khóa máy chủ mới'); render(); toast('Đã tạo khóa mới. Nhập khóa này ở máy chủ trong vòng 2 giờ để không ai bị ngắt.'); } });
+    },
+    savesrv:function(){ logA('<b>' + meName() + '</b> đổi cấu hình máy chủ floating'); render(); toast('Đã lưu. Máy chủ LIC-ANPHU nhận cấu hình ở lần đồng bộ tới, tối đa 5 phút.'); },
+    retry:function(v, t){ t.disabled = true; t.innerHTML = ic('refresh') + 'Đang kiểm tra…'; setTimeout(function(){ S.retry = '14:41'; render(); toast('Vẫn chưa kết nối được LIC-ANPHU. Kiểm tra theo các bước trong khung báo lỗi.'); }, 1200); },
+    srvui:function(v){ vSet(v || 'run'); $('#may-chu').scrollIntoView({ block:'start' }); var t = $('#srv [aria-selected="true"]'); if (t) t.focus({ preventScroll:true }); }
+  };
+  // ô chọn, ô đánh dấu, ô nhập
+  var C = {
+    role:function(v, t){ var u = byMail(v); u.role = t.value; logA('<b>' + meName() + '</b> đổi vai trò của ' + esc(u.name || u.mail) + ' thành ' + ROLE[t.value]); render(); toast('Đã đổi vai trò của <b>' + esc(u.name || u.mail) + '</b> thành ' + ROLE[t.value] + '.'); },
+    sel:function(v, t){ if (t.checked) S.sel[v] = 1; else delete S.sel[v]; updUsers(); var x = $('#adm [data-a="sel"][data-v="' + v + '"]'); if (x) x.focus(); },
+    selall:function(v, t){ visUsers().forEach(function(u){ if (isMe(u)) return; if (t.checked) S.sel[u.mail] = 1; else delete S.sel[u.mail]; }); updUsers(); $('#adm [data-a="selall"]').focus(); },
+    mode:function(v, t){ DEP.mode = t.value; $('#row-srv').hidden = t.value === 'named'; $('#mode-h').textContent = MODEH[t.value]; updCmd(); },
+    dopt:function(v, t){ DEP[v] = t.checked; updCmd(); },
+    cset:function(v, t){ DEP[v] = t.value; if (v === 'ch'){ $('#ch-h').textContent = CHH[t.value]; } updCmd(); },
+    lock:function(v, t){ DEP.lock[v] = t.checked; },
+    fset:function(v, t){ FS[v] = t.value; },
+    upprof:function(v, t){ var f = t.files[0]; if (!f) return; if (!/\.tcprofile$/i.test(f.name)){ toast('Tệp <b>' + esc(f.name) + '</b> không phải hồ sơ TrionCAD. Xuất hồ sơ trong TrionCAD: Tùy chọn › Hồ sơ › Xuất.'); return; } PROF.push(['up' + PROF.length, f.name.replace(/\.tcprofile$/i, ''), f.name]); DEP.prof = 'up' + (PROF.length - 1); render(); toast('Đã tải lên hồ sơ <b>' + esc(f.name) + '</b>.'); }
+  };
+  var I = {
+    'q-users':function(v, t){ S.q = t.value; S.sel = {}; updUsers(); },
+    'q-dev':function(v, t){ S.dq = t.value; $('#b-dev').innerHTML = devRows(); },
+    cset:function(v, t){ if (t.tagName === 'INPUT' && t.type !== 'radio'){ DEP[v] = t.value; if (v === 'server') updCmd(); } }
+  };
+  var adm = $('#adm');
+  adm.addEventListener('click', function(e){
+    var t = e.target.closest('[data-a]');
+    if (!t || !adm.contains(t) || t.disabled || /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+    var f = A[t.dataset.a]; if (!f) return;
+    e.preventDefault(); f(t.dataset.v, t);
+  });
+  adm.addEventListener('change', function(e){ var t = e.target, f = t.dataset && C[t.dataset.a]; if (f) f(t.dataset.v, t); });
+  adm.addEventListener('input', function(e){ var t = e.target, f = I[t.id] || (t.dataset && I[t.dataset.a]); if (f) f(t.dataset.v, t); });
+
+  /* =================== máy chủ floating: ứng dụng nhỏ =================== */
+  var LOG = [['14:35:02', 'info', 'Đồng bộ với cổng quản trị: 7/10 ghế, 0 người chờ'], ['14:21:47', 'info', 'Cấp ghế: yen.mac @ AP-FL-09 (192.168.1.69)'], ['14:02:13', 'info', 'Trả ghế: my.phung @ AP-FL-03 (đóng TrionCAD)'], ['13:40:20', 'info', 'Cấp ghế: long.than @ AP-FL-08 (192.168.1.68)'], ['13:02:55', 'info', 'Cấp ghế: vy.vuong @ AP-FL-07 (192.168.1.67)'], ['11:58:31', 'info', 'Thu hồi ghế không hoạt động 60 phút: trung.ha @ AP-FL-06'], ['10:47:10', 'info', 'Cấp ghế: tri.doan @ AP-FL-05 (192.168.1.65)'], ['10:21:44', 'info', 'Cấp ghế cho người đầu hàng đợi: kien.lo @ AP-KC-LT09, chờ 6 phút'], ['10:15:09', 'warn', 'Hết ghế 10/10: kien.lo @ AP-KC-LT09 vào hàng đợi, vị trí 1'], ['09:05:37', 'info', 'Cấp ghế: ngoc.luu @ AP-FL-04 (192.168.1.64)'], ['08:30:12', 'info', 'Cấp ghế: toan.ha @ AP-FL-02 (192.168.1.62)'], ['08:12:30', 'info', 'Cấp ghế: anh.nguyen @ AP-FL-01 (192.168.1.61)'], ['02:00:04', 'info', 'Sao lưu xong: lic-20261019-0200.tcbak (184 KB)'], ['01:12:44', 'warn', 'Mất kết nối máy khách AP-KC-PC12; giữ ghế trong 2 giờ ân hạn'], ['00:00:00', 'info', 'Xoay vòng nhật ký: giữ 90 ngày']];
+  var LOGFULL = [['14:38:06', 'warn', 'Hết ghế 10/10: trang.giap @ AP-ME-PC12 vào hàng đợi, vị trí 3'], ['14:35:20', 'warn', 'Hết ghế 10/10: kien.lo @ AP-KC-LT09 vào hàng đợi, vị trí 2'], ['14:31:02', 'warn', 'Hết ghế 10/10: hong.au @ AP-KT-PC31 vào hàng đợi, vị trí 1'], ['14:29:40', 'info', 'Cấp ghế: tuan.trieu @ AP-FL-06 (192.168.1.66)'], ['14:27:13', 'info', 'Cấp ghế: tam.do @ AP-FL-03 (192.168.1.63)'], ['14:24:51', 'info', 'Cấp ghế: loc.phan @ AP-FL-10 (192.168.1.70)']];
+  var LOGSTOP = [['13:52:07', 'err', 'Không mở được cổng 27080: cổng đang được dùng bởi tiến trình khác (java.exe, PID 4120). Dịch vụ dừng.'], ['13:52:05', 'info', 'Khởi động dịch vụ'], ['13:49:40', 'info', 'Dừng dịch vụ: máy chủ khởi động lại sau cập nhật Windows']];
+  var BAKS = [['lic-20261019-0200.tcbak', '19/10/2026 02:00', '184 KB'], ['lic-20261018-0200.tcbak', '18/10/2026 02:00', '183 KB'], ['lic-20261017-0200.tcbak', '17/10/2026 02:00', '183 KB'], ['lic-20261016-0200.tcbak', '16/10/2026 02:00', '181 KB'], ['lic-20261015-0200.tcbak', '15/10/2026 02:00', '180 KB']];
+  var LV = { info:'Thông tin', warn:'Cảnh báo', err:'Lỗi' };
+  var V = { tab:'over', lf:'all', lq:'', port:27080, ui:27081, allow:'192.168.1.0/24', bak:true, at:'02:00', keep:'14', dir:'D:\\TrionLicense\\Backup', timer:0, errs:{}, f:null };
+  var sec = 0, clk = function(){ sec += 9; return '14:4' + Math.min(9, 1 + Math.floor(sec / 60)) + ':' + p2(sec % 60); };
+  var seatOf = function(r){ return { name:r[0], acct:r[1], pc:r[2], ip:r[3], since:r[4], idle:r[5] || 0 }; };
+  var uid = function(s){ return s.acct.split('\\')[1] + ' @ ' + s.pc; };
+  function vSet(st){
+    clearInterval(V.timer);
+    V.st = st === 'full' ? 'run' : st; V.why = 'port'; V.boot = st === 'boot' ? 1 : -1; V.errs = {}; V.f = null; V.port = 27080;
+    V.seats = (st === 'full' ? FLT.concat(FLX) : FLT).filter(function(r){ return st === 'run' || st === 'full' || r[4] < '13:52'; }).map(seatOf);
+    V.queue = st === 'full' ? QUE.map(seatOf) : [];
+    V.log = (st === 'full' ? LOGFULL.concat(LOG.slice(1)) : st === 'run' ? LOG : (st === 'boot' ? [['14:41:02', 'info', 'Khởi động dịch vụ']] : []).concat(LOGSTOP, LOG.filter(function(l){ return l[0] < '13:49'; }))).map(function(l){ return l.slice(); });
+    V.baks = BAKS.map(function(b){ return b.slice(); });
+    renderSrv();
+  }
+  function vStart(msg){
+    clearInterval(V.timer); V.st = 'boot'; V.boot = 0; V.log.unshift([clk(), 'info', 'Khởi động dịch vụ']); renderSrv();
+    V.timer = setInterval(function(){
+      V.boot++;
+      if (V.boot >= 4){ clearInterval(V.timer); V.st = 'run'; V.boot = -1; V.log.unshift([clk(), 'info', 'Dịch vụ đã chạy trên cổng ' + V.port]); toast(msg || 'Dịch vụ đang chạy trên cổng ' + V.port + '. Máy khách lấy lại ghế tự động.'); }
+      renderSrv();
+    }, 700);
+  }
+  function vLogs(){ var q = fold(V.lq).trim(); return V.log.filter(function(l){ return (V.lf === 'all' || l[1] !== 'info') && (!q || fold(l[0] + ' ' + l[2]).indexOf(q) >= 0); }); }
+  function logBox(L){ return L.length ? '<div class="log" role="log" tabindex="0" aria-label="Nhật ký dịch vụ">' + L.map(function(l){ return '<div class="ll lv-' + l[1] + '"><time>' + l[0] + '</time><span class="lv">' + LV[l[1]] + '</span><span class="lm">' + esc(l[2]) + '</span></div>'; }).join('') + '</div>' : '<p class="hint">Không có dòng nhật ký khớp.</p>'; }
+  function vBanner(full){
+    if (V.st === 'boot') return '<div class="boot" role="status"><b>Đang khởi động dịch vụ…</b><ol>' + ['Đọc cấu hình', 'Kiểm tra khóa máy chủ', 'Mở cổng ' + V.port, 'Nhận lại ghế đang dùng'].map(function(s, i){ return '<li class="' + (i < V.boot ? 'done' : i === V.boot ? 'now' : '') + '">' + ic(i < V.boot ? 'check' : i === V.boot ? 'clock' : 'dotc') + '<span>' + s + (i < V.boot ? '<span class="sr"> (xong)</span>' : '') + '</span></li>'; }).join('') + '</ol>' + meter(V.boot / 4) + '</div>';
+    if (V.st === 'stop') return alertB('err', V.why === 'port' ? '<b>Dịch vụ dừng lúc 13:52: cổng 27080 đang bị chương trình khác dùng</b> (java.exe, PID 4120). Máy đang mở TrionCAD giữ ghế đến 15:52 (ân hạn 2 giờ); máy mở mới chưa lấy được ghế. Cách khắc phục: dừng chương trình đang chiếm cổng rồi khởi động dịch vụ, hoặc đổi cổng.' : '<b>Dịch vụ đang dừng</b> theo yêu cầu quản trị. Máy đang dùng giữ ghế trong 2 giờ ân hạn; máy mở mới chưa lấy được ghế.',
+      '<button class="sb pri" type="button" data-a="vstart">' + ic('play') + 'Khởi động dịch vụ</button>' + (V.why === 'port' ? '<button class="sb" type="button" data-a="vtab" data-v="net">Đổi cổng</button>' : ''));
+    if (full) return alertB('warn', '<b>Hết ghế: 10/10 đang dùng' + (V.queue.length ? ', ' + V.queue.length + ' người chờ' : '') + '.</b> Ghế trống được giữ ' + FS.hold + ' phút cho người đầu hàng đợi. Thu hồi ghế không hoạt động, hoặc mua thêm ghế floating.', (V.queue.length ? '<button class="sb" type="button" data-a="vtab" data-v="queue">Xem hàng đợi</button>' : '') + '<a class="sb" href="thanh-toan.html#mua">Mua thêm ghế</a>');
+    return '';
+  }
+  function vh(t, extra){ return '<div class="vrow"><h3 class="vh" tabindex="-1" data-home>' + t + '</h3>' + (extra || '') + '</div>'; }
+  var VP = {
+    over:function(live, full){
+      var n = V.seats.length;
+      return vh('Tổng quan') + '<dl class="vkv">' + [
+        ['Trạng thái', V.st === 'stop' ? 'Đã dừng' : V.st === 'boot' ? 'Đang khởi động' : full ? 'Đang chạy, hết ghế' : 'Đang chạy'],
+        ['Ghế', live ? '<span class="vinl">' + n + ' / 10 đang dùng' + (V.queue.length ? ' · ' + V.queue.length + ' người chờ' : '') + '<span class="vmeter">' + meter(n / 10, full ? 'warn' : '') + '</span></span>' : '—'],
+        ['Chạy liên tục', live ? '12 ngày 4 giờ' : '—'], ['Phiên bản dịch vụ', '1.0.2 · mới nhất'],
+        ['Khóa máy chủ', '<span class="mono">TCFS-APHU-••••-••••-9H3B</span> · hợp lệ đến 15/01/2027'],
+        ['Đồng bộ với cổng quản trị', live ? '14:35 · 5 phút một lần' : 'Gián đoạn từ 13:52'],
+        ['Địa chỉ cho máy khách', '<span class="mono">lic-anphu.local:' + V.port + '</span>'], ['Sao lưu gần nhất', V.baks[0][1]]
+      ].map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>' +
+        '<h4 class="vh2">Sự kiện gần đây</h4>' + logBox(V.log.slice(0, 5)) + '<div><button class="lnk" type="button" data-a="vtab" data-v="log" style="font-size:var(--fs)">Xem toàn bộ nhật ký</button></div>';
+    },
+    seats:function(live){
+      var stale = !live;
+      if (!V.seats.length) return vh('Ghế đang dùng') + '<div class="vemp">' + ic('user') + '<b>Chưa có ai dùng ghế</b><span>Ghế được cấp khi có người mở TrionCAD trong mạng công ty.</span></div>';
+      return vh('Ghế đang dùng', '<span class="hint">' + (stale ? 'Số liệu lúc 13:52, trước khi dịch vụ dừng' : V.seats.length + ' / 10 · tự thu hồi sau ' + FS.idle + ' phút không hoạt động') + '</span>') +
+        '<div class="vtw"><table class="stbl' + (stale ? ' stale' : '') + '"><caption class="sr">Ghế floating đang dùng</caption><thead><tr><th scope="col">Người dùng</th><th scope="col" class="vh-s">Máy</th><th scope="col" class="vh-s">Từ lúc</th><th scope="col" class="vh-s">Không hoạt động</th><th scope="col"><span class="sr">Thao tác</span></th></tr></thead><tbody>' +
+        V.seats.map(function(s, i){ return '<tr><td><b>' + esc(s.name) + '</b><span class="sub mono">' + esc(s.acct) + '</span><span class="sub vonly-s">' + s.pc + ' · từ ' + s.since + (s.idle ? ' · không hoạt động ' + s.idle + ' phút' : '') + '</span></td><td class="vh-s"><span class="mono">' + s.pc + '</span><span class="sub mono">' + s.ip + '</span></td><td class="vh-s">' + s.since + '<span class="sub">' + dur(mins(s.since)) + '</span></td>' +
+          '<td class="vh-s">' + (s.idle ? '<span class="' + (s.idle >= 30 ? 'warn' : '') + '">' + s.idle + ' phút</span>' : 'Đang dùng') + '</td><td class="ra">' + (stale ? '' : '<button class="sb" type="button" data-a="vrevoke" data-v="' + i + '">Thu hồi</button>') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+    },
+    queue:function(live){
+      var h = vh('Hàng đợi', '<span class="hint">Ghế trống được giữ ' + FS.hold + ' phút cho người đầu hàng đợi</span>');
+      if (!live) return h + '<div class="vemp">' + ic('clock') + '<b>Hàng đợi tạm dừng</b><span>Dịch vụ chưa chạy nên chưa nhận người chờ.</span></div>';
+      if (!V.queue.length) return h + '<div class="vemp">' + ic('clock') + '<b>Không có ai chờ ghế</b><span>Khi hết ghế, người mở TrionCAD bấm “Báo khi có ghế trống” (UI-L01) là vào hàng đợi này.</span></div>';
+      return h + '<div class="vtw"><table class="stbl"><caption class="sr">Người chờ ghế</caption><thead><tr><th scope="col">#</th><th scope="col">Người dùng</th><th scope="col" class="vh-s">Máy</th><th scope="col" class="vh-s">Chờ từ</th><th scope="col"><span class="sr">Thao tác</span></th></tr></thead><tbody>' +
+        V.queue.map(function(q, i){ return '<tr><td class="mono">' + (i + 1) + '</td><td><b>' + esc(q.name) + '</b><span class="sub mono">' + esc(q.acct) + '</span><span class="sub vonly-s">' + q.pc + ' · chờ ' + dur(mins(q.since)) + '</span></td><td class="vh-s"><span class="mono">' + q.pc + '</span><span class="sub mono">' + q.ip + '</span></td><td class="vh-s">' + q.since + '<span class="sub">' + dur(mins(q.since)) + '</span></td>' +
+          '<td class="ra"><span class="vacts">' + (i ? '<button class="sb" type="button" data-a="vtop" data-v="' + i + '">' + ic('top') + 'Lên đầu</button>' : '') + '<button class="sb" type="button" data-a="vdrop" data-v="' + i + '">Bỏ khỏi hàng đợi</button></span></td></tr>'; }).join('') + '</tbody></table></div>';
+    },
+    log:function(){
+      return vh('Nhật ký', '<span class="sp"></span><button class="sb" type="button" data-a="vlogdl">' + ic('down') + 'Xuất .log</button>') +
+        '<div class="vtools"><input class="vinp" id="v-lq" type="search" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký" value="' + esc(V.lq) + '" autocomplete="off"><span class="vseg" role="group" aria-label="Mức">' + [['all', 'Tất cả'], ['warn', 'Cảnh báo, lỗi']].map(function(x){ return '<button type="button" data-a="vlf" data-v="' + x[0] + '" aria-pressed="' + (V.lf === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span></div>' +
+        '<div id="v-log">' + logBox(vLogs()) + '</div><p class="hint">Hôm nay, 19/10/2026 · nhật ký giữ 90 ngày.</p>';
+    },
+    net:function(){
+      var e = V.errs, f = V.f || { port:V.port, ui:V.ui, allow:V.allow };
+      var fld = function(id, label, val, err, hint, mono){ return '<div class="vf"><label class="vl" for="' + id + '">' + label + '</label><input class="vinp' + (mono ? ' mono' : '') + '" id="' + id + '" value="' + esc(val) + '" inputmode="' + (mono ? 'numeric' : 'text') + '" autocomplete="off" aria-invalid="' + !!err + '" aria-describedby="' + id + '-m"><span class="vm' + (err ? ' err' : '') + '" id="' + id + '-m">' + (err || hint) + '</span></div>'; };
+      return vh('Cổng mạng') + '<div class="vform">' + fld('v-port', 'Cổng cấp ghế (TCP)', f.port, e.port, 'TrionCAD trên máy khách kết nối tới cổng này.', true) + fld('v-ui', 'Cổng giao diện quản lý (HTTPS)', f.ui, e.ui, 'Địa chỉ trang này: https://lic-anphu.local:' + V.ui, true) +
+        fld('v-allow', 'Cho phép quản lý từ', f.allow, e.allow, 'Dải địa chỉ trong mạng công ty, dạng 192.168.1.0/24. Ngoài dải: từ chối.') +
+        '<div class="vf"><span class="vl">Tường lửa Windows</span><span>' + ic('okc', 'ok') + ' Đã mở cổng ' + V.port + ' và ' + V.ui + ' (quy tắc “TrionCAD License Server”)</span></div><div class="vf"><span class="vl">Tên trong mạng</span><span class="mono">lic-anphu.local · 192.168.1.20</span></div></div>' +
+        '<div class="vbtns"><button class="sb pri" type="button" data-a="vsavenet">' + (V.st === 'stop' ? 'Lưu và khởi động dịch vụ' : 'Lưu và khởi động lại dịch vụ') + '</button><span class="hint">Mất khoảng 10 giây. Máy đang dùng giữ ghế, không ai bị ngắt.</span></div>';
+    },
+    bak:function(){
+      return vh('Sao lưu') + '<div class="vform"><div class="vf"><span class="vl" id="v-bak-l">Tự động sao lưu</span><span class="vinl"><button class="sw2" type="button" role="switch" aria-checked="' + V.bak + '" aria-labelledby="v-bak-l" data-a="vbak"></button>' +
+        (V.bak ? '<label for="v-at">hằng ngày lúc</label><select class="vinp" id="v-at">' + ['00:00', '01:00', '02:00', '03:00', '04:00', '22:00', '23:00'].map(function(t){ return '<option' + (V.at === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select><label for="v-keep">· giữ</label><input class="vinp mono" id="v-keep" value="' + esc(V.keep) + '" size="3" inputmode="numeric"><span>bản</span>' : '<span class="hint">Đang tắt</span>') + '</span></div>' +
+        '<div class="vf"><label class="vl" for="v-dir">Thư mục sao lưu</label><input class="vinp mono" id="v-dir" value="' + esc(V.dir) + '" spellcheck="false"></div></div>' +
+        '<div class="vbtns"><button class="sb" type="button" data-a="vbaknow">' + ic('disk') + 'Sao lưu ngay</button><span class="hint">Bản sao lưu gồm khóa máy chủ, cấu hình và nhật ký; không chứa bản vẽ.</span></div>' +
+        '<div class="vtw"><table class="stbl"><caption class="sr">Bản sao lưu</caption><thead><tr><th scope="col">Bản sao lưu</th><th scope="col" class="vh-s">Lúc</th><th scope="col" class="vh-s">Kích thước</th><th scope="col"><span class="sr">Thao tác</span></th></tr></thead><tbody>' +
+        V.baks.map(function(b, i){ return '<tr><td><span class="mono">' + b[0] + '</span><span class="sub vonly-s">' + b[1] + ' · ' + b[2] + '</span></td><td class="vh-s">' + b[1] + '</td><td class="vh-s mono">' + b[2] + '</td><td class="ra"><button class="sb" type="button" data-a="vrestore" data-v="' + i + '">Khôi phục</button></td></tr>'; }).join('') + '</tbody></table></div>';
+    }
+  };
+  function renderSrv(){
+    var host = $('#srv'), k = host.contains(document.activeElement) ? keyOf(document.activeElement) : null, live = V.st === 'run', n = V.seats.length, full = live && n >= 10;
+    var pill = V.st === 'stop' ? ['err', 'Đã dừng'] : V.st === 'boot' ? ['info', 'Đang khởi động'] : full ? ['warn', 'Hết ghế'] : ['ok', 'Đang chạy'];
+    var T = [['over', 'Tổng quan', 'gauge'], ['seats', 'Ghế đang dùng', 'user', live ? n + '/10' : '—'], ['queue', 'Hàng đợi', 'clock', live ? String(V.queue.length) : '—'], ['log', 'Nhật ký', 'list'], ['net', 'Cổng mạng', 'globe'], ['bak', 'Sao lưu', 'disk']];
+    var btn = V.st === 'stop' ? '<button class="sb pri" type="button" data-a="vstart">' + ic('play') + 'Khởi động dịch vụ</button>' : V.st === 'boot' ? '<button class="sb" type="button" data-a="vcancel">Hủy khởi động</button>'
+      : '<button class="sb" type="button" data-a="vrestart">' + ic('refresh') + 'Khởi động lại</button><button class="sb dzo" type="button" data-a="vstop">' + ic('stop') + 'Dừng dịch vụ</button>';
+    host.innerHTML = '<div class="srv-hd"><span class="srv-brand">' + ic('logo') + 'Máy chủ giấy phép</span><span class="srv-id"><b>LIC-ANPHU</b><span class="mono">192.168.1.20</span></span><span class="pill ' + pill[0] + '">' + pill[1] + '</span><span class="sp"></span>' + btn + '</div>' +
+      '<div class="srv-bd"><div class="srv-nav" role="tablist" aria-label="Mục quản lý máy chủ">' + T.map(function(t){ return '<button type="button" role="tab" id="vt-' + t[0] + '" aria-controls="vp" aria-selected="' + (V.tab === t[0]) + '" tabindex="' + (V.tab === t[0] ? 0 : -1) + '" data-a="vtab" data-v="' + t[0] + '">' + ic(t[2]) + '<span>' + t[1] + '</span>' + (t[3] != null ? '<span class="cnt">' + t[3] + '</span>' : '') + '</button>'; }).join('') + '</div>' +
+      '<div class="srv-mn" id="vp" role="tabpanel" aria-labelledby="vt-' + V.tab + '">' + vBanner(full) + VP[V.tab](live, full) + '</div></div>' +
+      '<div class="srv-ft"><span>TrionCAD License Server 1.0.2</span><span>Windows Server 2022</span><span class="mono">D:\\TrionLicense</span><span>Đăng nhập: quản trị, từ 192.168.1.15</span></div>';
+    var el = k && host.querySelector(k); if (el) el.focus({ preventScroll:true });
+    var pre = V.st === 'run' ? (full && V.queue.length ? 'full' : 'run') : V.st;
+    $$('[data-vst]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.vst === pre)); });
+  }
+  var VA = {
+    vtab:function(v){ V.tab = v; renderSrv(); },
+    vstart:function(){ vStart(); },
+    vrestart:function(){ vStart('Đã khởi động lại dịch vụ. ' + V.seats.length + ' ghế đang dùng được giữ nguyên.'); },
+    vcancel:function(){ clearInterval(V.timer); V.st = 'stop'; V.why = 'user'; V.boot = -1; V.log.unshift([clk(), 'warn', 'Hủy khởi động dịch vụ']); renderSrv(); toast('Đã hủy khởi động. Dịch vụ đang dừng.'); },
+    vstop:function(){
+      openDlg({ danger:true, icon:ic('warn', 'danger'), cancel:'Không, để chạy', title:'Dừng dịch vụ máy chủ giấy phép?', ok:'Dừng dịch vụ',
+        body:'<p><b>' + V.seats.length + ' người</b> đang dùng giữ ghế trong 2 giờ ân hạn; sau đó TrionCAD trên máy họ chuyển về Viewer, bản vẽ vẫn mở và in được.</p><p>Máy mở TrionCAD mới không lấy được ghế cho tới khi dịch vụ chạy lại.</p>',
+        go:function(){ V.st = 'stop'; V.why = 'user'; V.log.unshift([clk(), 'warn', 'Dừng dịch vụ theo yêu cầu quản trị']); renderSrv(); toast('Đã dừng dịch vụ.'); } });
+    },
+    vrevoke:function(v){
+      var s = V.seats[+v], q = V.queue[0]; if (!s) return;
+      openDlg({ danger:true, icon:ic('warn', 'danger'), cancel:'Không, giữ lại', title:'Thu hồi ghế của ' + esc(s.name) + '?', ok:'Thu hồi ghế',
+        body:'<p>TrionCAD trên máy <b class="mono">' + s.pc + '</b> hiện thông báo và cho 5 phút để lưu bản vẽ, rồi chuyển về Viewer. Bản vẽ vẫn mở và in được.</p><p>' + (q ? 'Ghế chuyển ngay cho người đầu hàng đợi: <b>' + esc(q.name) + '</b>, máy ' + q.pc + '.' : 'Ghế trống lại cho người mở TrionCAD tiếp theo.') + '</p>',
+        go:function(){
+          V.seats.splice(V.seats.indexOf(s), 1); V.log.unshift([clk(), 'info', 'Thu hồi ghế theo yêu cầu quản trị: ' + uid(s)]);
+          if (q){ V.queue.shift(); V.seats.push({ name:q.name, acct:q.acct, pc:q.pc, ip:q.ip, since:'14:41', idle:0 }); V.log.unshift([clk(), 'info', 'Cấp ghế cho người đầu hàng đợi: ' + uid(q)]); }
+          renderSrv(); toast('Đã thu hồi ghế của <b>' + esc(s.name) + '</b>' + (q ? '. Ghế chuyển cho ' + esc(q.name) + '.' : '.'));
+        } });
+    },
+    vtop:function(v){ var q = V.queue.splice(+v, 1)[0]; V.queue.unshift(q); V.log.unshift([clk(), 'info', 'Đưa lên đầu hàng đợi: ' + uid(q)]); renderSrv(); toast('Đã đưa <b>' + esc(q.name) + '</b> lên đầu hàng đợi.'); },
+    vdrop:function(v){ var i = +v, q = V.queue.splice(i, 1)[0]; V.log.unshift([clk(), 'info', 'Bỏ khỏi hàng đợi: ' + uid(q)]); renderSrv(); toast('Đã bỏ <b>' + esc(q.name) + '</b> khỏi hàng đợi. TrionCAD trên máy này báo không còn chờ ghế.', { label:'Hoàn tác', fn:function(){ V.queue.splice(i, 0, q); renderSrv(); } }); },
+    vlf:function(v){ V.lf = v; renderSrv(); },
+    vlogdl:function(){ dl('lic-anphu-20261019.log', V.log.slice().reverse().map(function(l){ return '2026-10-19 ' + l[0] + ' ' + l[1].toUpperCase() + ' ' + l[2]; }).join('\r\n') + '\r\n', 'text/plain;charset=utf-8'); toast('Đã xuất nhật ký hôm nay (' + V.log.length + ' dòng).'); },
+    vsavenet:function(){
+      var port = $('#v-port').value.trim(), ui = $('#v-ui').value.trim(), allow = $('#v-allow').value.trim(), e = {}, okp = function(x){ return /^\d+$/.test(x) && +x >= 1024 && +x <= 65535; };
+      if (!okp(port)) e.port = 'Cổng cần là số từ 1024 đến 65535.';
+      if (!okp(ui)) e.ui = 'Cổng cần là số từ 1024 đến 65535.'; else if (ui === port) e.ui = 'Cần khác cổng cấp ghế.';
+      if (!/^(\d{1,3}\.){3}\d{1,3}\/([89]|[12]\d|3[0-2])$/.test(allow)) e.allow = 'Cần dải địa chỉ dạng 192.168.1.0/24.';
+      V.errs = e; V.f = { port:port, ui:ui, allow:allow };
+      if (Object.keys(e).length){ renderSrv(); var x = $('#srv [aria-invalid="true"]'); if (x) x.focus(); return; }
+      var changed = +port !== V.port; V.port = +port; V.ui = +ui; V.allow = allow; V.f = null;
+      vStart(changed ? 'Dịch vụ chạy trên cổng ' + V.port + '. Máy khách cần địa chỉ mới lic-anphu.local:' + V.port + ': cập nhật LICENSE_SERVER ở cổng quản trị, mục Triển khai.' : 'Đã lưu cổng mạng. Dịch vụ đang chạy.');
+    },
+    vbak:function(){ V.bak = !V.bak; renderSrv(); },
+    vbaknow:function(v, t){ t.disabled = true; t.innerHTML = ic('clock') + 'Đang sao lưu…'; setTimeout(function(){ V.baks.unshift(['lic-20261019-1441.tcbak', '19/10/2026 14:41', '185 KB']); V.log.unshift([clk(), 'info', 'Sao lưu xong: lic-20261019-1441.tcbak (185 KB)']); renderSrv(); toast('Đã sao lưu: <b>lic-20261019-1441.tcbak</b>.'); }, 1200); },
+    vrestore:function(v){
+      var b = V.baks[+v];
+      openDlg({ danger:true, icon:ic('warn', 'danger'), cancel:'Không, giữ hiện tại', title:'Khôi phục bản sao lưu ' + b[1] + '?', ok:'Khôi phục',
+        body:'<p>Cấu hình và khóa máy chủ quay về bản <b class="mono">' + b[0] + '</b>. Thay đổi sau thời điểm đó bị bỏ.</p><p>Dịch vụ khởi động lại, mất khoảng 10 giây. ' + V.seats.length + ' người đang dùng giữ ghế, không bị ngắt.</p>',
+        go:function(){ V.log.unshift([clk(), 'warn', 'Khôi phục từ ' + b[0]]); vStart('Đã khôi phục từ ' + b[0] + '. Dịch vụ đang chạy.'); } });
+    }
+  };
+  var srv = $('#srv');
+  srv.addEventListener('click', function(e){
+    var t = e.target.closest('[data-a]');
+    if (!t || !srv.contains(t) || t.disabled || /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+    var f = VA[t.dataset.a]; if (!f) return;
+    e.preventDefault(); f(t.dataset.v, t);
+  });
+  srv.addEventListener('input', function(e){ if (e.target.id === 'v-lq'){ V.lq = e.target.value; $('#v-log').innerHTML = logBox(vLogs()); } });
+  srv.addEventListener('change', function(e){ var id = e.target.id; if (id === 'v-at') V.at = e.target.value; else if (id === 'v-keep') V.keep = e.target.value; else if (id === 'v-dir') V.dir = e.target.value; });
+  // thanh tab: mũi tên, Home, End
+  srv.addEventListener('keydown', function(e){
+    var t = e.target; if (t.getAttribute('role') !== 'tab') return;
+    var tabs = $$('[role="tab"]', t.parentNode), i = tabs.indexOf(t), j = { ArrowDown:i + 1, ArrowRight:i + 1, ArrowUp:i - 1, ArrowLeft:i - 1, Home:0, End:tabs.length - 1 }[e.key];
+    if (j == null) return;
+    e.preventDefault(); var nx = tabs[(j + tabs.length) % tabs.length]; nx.focus(); nx.click();
+  });
+
+  /* ---------- trang duyệt: trạng thái, khung ---------- */
+  $$('[data-st]').forEach(function(b){ b.addEventListener('click', function(){
+    S.st = b.dataset.st; S.sel = {}; S.q = ''; S.f = 'all'; S.dq = ''; S.df = 'all'; S.showKey = false; S.retry = '14:38'; build();
+    $$('[data-st]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); render();
+  }); });
+  $$('[data-vst]').forEach(function(b){ b.addEventListener('click', function(){ vSet(b.dataset.vst); }); });
+  $$('button[data-dev]').forEach(function(b){ b.addEventListener('click', function(){ document.getElementById(b.dataset.for).dataset.dev = b.dataset.dev; $$('button[data-for="' + b.dataset.for + '"]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); }); });
+  $$('button[data-frame]').forEach(function(b){ b.addEventListener('click', function(){ $('#br-srv').dataset.frame = b.dataset.frame; $$('button[data-frame]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); }); });
+  var lastW = 0;
+  if (window.ResizeObserver) new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width); if (w !== lastW){ lastW = w; drawCharts(); } }).observe(adm);
+
+  var h0 = (location.hash || '').slice(1);
+  Object.keys(SLUG).forEach(function(k){ if (SLUG[k] === h0) S.tab = k; });
+  build(); render(); vSet('run');
+  if (h0) setTimeout(function(){ var t = document.getElementById(h0 === 'may-chu' ? 'may-chu' : 'cong'); if (t) t.scrollIntoView(); }, 0);
+})();
+</script>
+</body>
+</html>

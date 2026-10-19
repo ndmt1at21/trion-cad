@@ -20,7 +20,7 @@
       var b = TC.el('<button class="mi' + (it.sub ? ' sub' : '') + '" role="menuitem" type="button"' + (it.dis ? ' aria-disabled="true"' : '') + '>' +
         (it.check != null ? '<span class="chkm">' + (it.check ? TC.ic('check', 's12') : '') + '</span>' : '<span class="ico">' + (it.icon ? TC.ic(it.icon) : '') + '</span>') +
         '<span>' + it.label + '</span>' + (lockEd ? '<span class="ed xs" data-ed="' + (it.need === 'VP' ? 'vp' : 'pro') + '">' + (it.need === 'VP' ? 'Viewer Pro' : 'Pro') + '</span>' : '') +
-        (it.kbd ? '<span class="k">' + esc(it.kbd) + '</span>' : '') + '</button>');
+        (it.kbd ? '<span class="k">' + esc(TC.keyLabel ? TC.keyLabel(it.kbd) : it.kbd) + '</span>' : '') + '</button>');
       if (it.cmd) { b.dataset.tip = it.tipName || it.label.replace(/<[^>]+>/g, ''); b.dataset.cmd = it.cmd; }
       b.addEventListener('click', function(e){
         e.stopPropagation();
@@ -63,7 +63,7 @@
   function showTip(t, level){
     var d = t.dataset; hideTip(); tipFor = t;
     var html = '<span class="tn">' + esc(d.tip) + (d.need && !TC.can(d.need) ? ' <span class="ed xs" data-ed="' + (d.need === 'VP' ? 'vp' : 'pro') + '">' + (d.need === 'VP' ? 'Viewer Pro' : 'Pro') + '</span>' : '') + '</span>';
-    if (d.cmd || d.key) html += '<span class="tc">' + [d.cmd, d.key].filter(Boolean).map(esc).join(' · ') + '</span>';
+    if (d.cmd || d.key) html += '<span class="tc">' + [d.cmd, d.key && TC.keyLabel ? TC.keyLabel(d.key) : d.key].filter(Boolean).map(esc).join(' · ') + '</span>';
     if (level === 2 && d.desc) html += '<span class="td">' + esc(d.desc) + '</span>';
     if (level === 2 && d.cmd) html += '<span class="tf">Nhấn F1 để xem trợ giúp</span>';
     tipEl = TC.el('<div class="tip" role="tooltip">' + html + '</div>');

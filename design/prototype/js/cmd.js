@@ -262,7 +262,33 @@
     'TXTEXP|TXTEXP|PRO|4|Phá chữ thành nét|pha chu|explode|Mở rộng › Văn bản',
     'FLATTEN|FLATTEN|PRO|4|Làm phẳng Z|lam phang|move|Mở rộng › Sửa',
     'EXTRIM|EXTRIM|PRO|4|Cắt theo đường bao|cat theo duong bao|trim|Mở rộng › Sửa',
-    'SAVEALL|SAVEALL|PRO|4|Lưu tất cả|luu tat ca|save|Mở rộng › Tệp'
+    'SAVEALL|SAVEALL|PRO|4|Lưu tất cả|luu tat ca|save|Mở rộng › Tệp',
+    // Đợt 4 (v1.0): lệnh mới của các màn hình C02–L15, tab Mở rộng P1
+    'UPDATEFIELD|UPDATEFIELD|PRO|4|Cập nhật field|cap nhat field, cap nhat truong du lieu|refresh|Chèn › Dữ liệu',
+    'OBJECTSCALE|OBJECTSCALE|PRO|4|Tỉ lệ chú thích của đối tượng|ti le chu thich doi tuong|anno|Chú thích › Tỉ lệ chú thích',
+    'TOLERANCE|TOL|PRO|4|Khung dung sai hình học|dung sai hinh hoc, gdt, dung sai|dim|Chú thích › Kích thước',
+    'BLOCKREPLACE|BLOCKREPLACE|PRO|4|Thay block|thay block, doi block|insert|Mở rộng › Block',
+    'TCBLOCKMATCH|TCBLOCKMATCH|PRO|5|Tìm và chuyển đổi block|tim va chuyen doi block, smart match|insert|Mở rộng › Block',
+    'XPLODE|XPLODE|PRO|4|Phá block theo tùy chọn thuộc tính|pha block tuy chon|explode|Mở rộng › Block',
+    'MPEDIT|MPEDIT|PRO|4|Sửa nhiều polyline|sua nhieu polyline|pline|Mở rộng › Sửa',
+    'BCOUNT|BCOUNT|PRO|4|Đếm block (Express Tools)|dem block|count|Mở rộng › Block',
+    'TCASE|TCASE|PRO|4|Đổi chữ hoa, thường|chu hoa, chu thuong, doi hoa thuong|mtext|Mở rộng › Văn bản',
+    'TCOUNT|TCOUNT|PRO|4|Đánh số thứ tự cho chữ|danh so chu|mtext|Mở rộng › Văn bản',
+    'SYSVDLG|SYSVDLG|PRO|4|Trình sửa biến hệ thống|bien he thong, sysvar|gear|Mở rộng › Công cụ',
+    'TCKEYS|TCKEYS|PRO|4|Phím tắt|phim tat, gan phim|keyboard|Quản lý › Tùy biến',
+    'WSSAVE|WSSAVE|PRO|4|Lưu workspace hiện tại|luu workspace, luu khong gian lam viec|ws|Quản lý › Tùy biến',
+    'WSSETTINGS|WSSETTINGS|PRO|4|Thiết lập workspace|thiet lap workspace|ws|Quản lý › Tùy biến',
+    'TCATTIN|TCATTIN|PRO|4|Nhập attribute từ Excel|nhap attribute, excel, khung ten|stats|Công cụ VN › Đo và thống kê',
+    'BCLOSE|BCLOSE|PRO|4|Đóng Block Editor|dong block editor|close|Block Editor › Đóng',
+    'BSAVE|BSAVE|PRO|4|Lưu block trong Block Editor|luu block|save|Block Editor › Mở/Lưu',
+    'REFCLOSE|REFCLOSE|PRO|4|Lưu hoặc hủy thay đổi khi sửa tại chỗ|luu tham chieu|save|Sửa tham chiếu',
+    'REFSET|REFSET|PRO|4|Thêm, bớt đối tượng của tập làm việc|tap lam viec|plus|Sửa tham chiếu',
+    'ULAYERS|ULAYERS|PRO|4|Layer của underlay|layer underlay, layer pdf|layers|Chèn › Tham chiếu',
+    'UOSNAP|UOSNAP|PRO|4|Bắt điểm vào underlay|bat diem underlay|osnap|Chèn › Tham chiếu',
+    'VPCLIP|VPCLIP|PRO|4|Clip viewport|clip viewport|zwin|Layout › Viewport',
+    'UCSICON|UCSICON|V|4|Biểu tượng UCS|bieu tuong ucs|iso|Hiển thị › Giao diện',
+    'NAVVCUBE|NAVVCUBE|V|4|ViewCube|viewcube, khoi xem|views|Hiển thị › Giao diện',
+    '3DORBIT|3DO|V|4|Xoay 3D|xoay 3d, orbit|views|Hiển thị › Điều hướng'
   ];
   var SYSVARS = [['OSMODE','Chế độ bắt điểm đang bật (mã bit)','4133'],['LTSCALE','Tỉ lệ linetype toàn cục','100'],['CLAYER','Layer hiện hành','KT-TUONG'],['LWDISPLAY','Hiển thị độ dày nét','0'],['FILEDIA','Hiện hộp thoại chọn tệp','1'],['PICKFIRST','Chọn trước rồi gọi lệnh','1'],['DIMSCALE','Tỉ lệ tổng thể kích thước','100'],['CANNOSCALE','Tỉ lệ chú thích hiện hành','1:100'],['INSUNITS','Đơn vị nội dung chèn vào','4 (mm)'],['ORTHOMODE','Chế độ Ortho','0'],['CMDECHO','Hiện lệnh khi chạy LISP','1'],['MIRRTEXT','Lật chữ khi đối xứng','0']];
   var CMDS = {}, ALIAS = {};
@@ -388,6 +414,10 @@
     var raw = String(input).trim(), transparent = raw[0] === "'";
     var c = cmd.def(raw);
     if (!c){
+      // gõ thẳng tên biến hệ thống: bản Pro hỏi giá trị mới (SETVAR), Viewer chỉ xem (UI-K13)
+      var svn = raw.toUpperCase(), sdf = TC.SV && TC.SV.def(svn);
+      if (sdf && TC.can('PRO')) return cmd.run('SETVAR', svn);
+      if (sdf){ line('<b>' + svn + '</b> = <span class="mono">' + esc(TC.SV.fmt(svn)) + '</span> · ' + esc(sdf.desc) + ' (chỉ xem trong Viewer)'); return; }
       var sv = SYSVARS.filter(function(s){ return s[0] === raw.toUpperCase(); })[0];
       if (sv){ line('<b>' + sv[0] + '</b> = <span class="mono">' + esc(sv[2]) + '</span> · ' + esc(sv[1]) + (TC.isViewer() ? ' (chỉ xem trong Viewer)' : '')); return; }
       var viHits = matchCmds(raw).filter(function(m){ return m.s >= 55; }).slice(0, 4);

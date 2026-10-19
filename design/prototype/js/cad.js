@@ -5,7 +5,7 @@
   var M = { kind:'idle' }, cyc = 0, labels = [];
   var cad = TC.cad = {};
   // móc cho bản biên tập (editor.js): grip, nhập động, nhấp đúp theo loại đối tượng
-  cad.hook = {};
+  cad.hook = {}; cad.ctxExt = [];
   function endHook(){ if (cad.hook.end) cad.hook.end(); }
   function V(){ return TC.app.view; } function D(){ return TC.app.doc(); }
   cad.mode = function(){ return M.kind; };
@@ -164,6 +164,8 @@
       if (!viewer && first && (first.t === 'text' || first.t === 'mtext')) it.push({ label:'Sửa chữ', act:function(){ cad.hook.dbl && cad.hook.dbl(first); } });
       if (!viewer && first && first.t === 'insert') it.push({ label:'Sửa attribute…', act:function(){ TC.cmd.run('EATTEDIT'); } }, { label:'Chọn các block cùng tên', act:function(){ d.sel = d.ents.filter(function(x){ return x.t === 'insert' && x.name === first.name; }).map(function(x){ return x.id; }); afterSel(); } });
       if (!viewer && first && first.t === 'hatch') it.push({ label:'Sửa hatch', act:function(){ cad.hook.dbl && cad.hook.dbl(first); } });
+      // Đợt 4: các tệp screens9–14 thêm mục theo loại đối tượng (cad.ctxExt.push(function(it, first, d){ … }))
+      cad.ctxExt.forEach(function(f){ f(it, first, d); });
       if (first && first.t === 'insert') it.push({ label:'Đếm block “' + esc(first.name) + '”', need:'VP', act:function(){ TC.cmd.run('COUNT'); } });
       it.push({ label:'Liệt kê thông tin', icon:'list', act:function(){ TC.cmd.run('LIST'); } }, { label:'Thuộc tính', icon:'props', kbd:'Ctrl+1', act:function(){ TC.app.showPalette('props'); } });
       if (first && first.t === 'text' && TC.fontDoctor) it.push({ sep:1 }, { label:'Bác sĩ Font: kiểu chữ “' + esc(first.style) + '”', icon:'fontdoc', act:function(){ TC.cmd.run('FIXFONT'); } });

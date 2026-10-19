@@ -19,6 +19,7 @@
     var r = (ins.rot || 0) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), sx = ins.sx || 1, sy = ins.sy || sx;
     return { m:function(p){ var x = p[0] * sx, y = p[1] * sy; return [ins.p[0] + x * c - y * s, ins.p[1] + x * s + y * c]; }, rot:ins.rot || 0, sx:sx, sy:sy, k:Math.abs(sy) };
   }
+  TC.flatExt = TC.flatExt || {};
   function angMap(a, t){ var m = t.sx < 0 && t.sy < 0 ? 180 + a : t.sx < 0 ? 180 - a : t.sy < 0 ? -a : a; return m + t.rot; }
   function flat(doc, e, t, out, host){
     var P = t ? t.m : function(p){ return p; };
@@ -31,7 +32,8 @@
       case 'spline': { var sp = splinePts(e.pts, e.closed).map(P); for (var si = 0; si < sp.length - 1; si++) o({ k:'seg', a:sp[si], b:sp[si + 1], sm:1, first:si === 0, last:si === sp.length - 2 }); break; }
       case 'xline': case 'ray': { var q0 = P(e.p), dd = e.dir, far = 1e7; o({ k:'seg', a:e.t === 'ray' ? q0 : [q0[0] - dd[0] * far, q0[1] - dd[1] * far], b:[q0[0] + dd[0] * far, q0[1] + dd[1] * far], inf:1 }); break; }
       case 'point': o({ k:'pt', p:P(e.p) }); break;
-      case 'table': { var X0 = [e.p[0]], Y0 = [e.p[1]], mg = e.merge || [], th = e.th || 250; e.cols.forEach(function(w){ X0.push(X0[X0.length - 1] + w); }); e.rows.forEach(function(h){ Y0.push(Y0[Y0.length - 1] - h); }); var nc = e.cols.length, nr = e.rows.length, merged = function(r, j){ return mg.some(function(m){ return m[0] === r && j > m[1] && j <= m[2]; }); };
+      // bảng v1.0 (kiểu bảng, kiểu ô, ô gộp hai chiều, công thức, field) do screens9.js vẽ; trang không nạp screens9.js vẽ kiểu cũ dưới đây
+      case 'table': { if (TC.flatTable){ TC.flatTable({ doc:doc, e:e, t:t, P:P, o:o, sub:function(x){ flat(doc, x, t, out, host || e); } }); break; } var X0 = [e.p[0]], Y0 = [e.p[1]], mg = e.merge || [], th = e.th || 250; e.cols.forEach(function(w){ X0.push(X0[X0.length - 1] + w); }); e.rows.forEach(function(h){ Y0.push(Y0[Y0.length - 1] - h); }); var nc = e.cols.length, nr = e.rows.length, merged = function(r, j){ return mg.some(function(m){ return m[0] === r && j > m[1] && j <= m[2]; }); };
         Y0.forEach(function(y){ o({ k:'seg', a:P([X0[0], y]), b:P([X0[nc], y]) }); }); o({ k:'seg', a:P([X0[0], Y0[0]]), b:P([X0[0], Y0[nr]]) }); o({ k:'seg', a:P([X0[nc], Y0[0]]), b:P([X0[nc], Y0[nr]]) });
         for (var tr = 0; tr < nr; tr++) for (var tj = 1; tj < nc; tj++) if (!merged(tr, tj)) o({ k:'seg', a:P([X0[tj], Y0[tr]]), b:P([X0[tj], Y0[tr + 1]]) });
         (e.cells || []).forEach(function(row, r2){ row.forEach(function(txt, c2){ if (txt == null || txt === '') return; var m2 = mg.filter(function(m){ return m[0] === r2 && m[1] === c2; })[0], xa = X0[c2], xb = X0[m2 ? m2[2] + 1 : c2 + 1], hd = r2 < (e.head || 0), num2 = !hd && /^[\d.,\s]+$/.test(String(txt)); o({ k:'text', p:P([num2 ? xb - th * .5 : hd ? (xa + xb) / 2 : xa + th * .5, (Y0[r2] + Y0[r2 + 1]) / 2]), h:hd ? th * 1.1 : th, s:String(txt), rot:0, al:num2 ? 'rm' : hd ? 'm' : 'lm', style:e.style || 'Standard', bold:hd }); }); });
@@ -68,6 +70,8 @@
         bd.ents.forEach(function(be){ if (be.t === 'attdef' && doc.attdisp === 'OFF') return; flat(doc, be, tt, out, e); });
         if (e.clip){ var cb = e.clip, keep = out.splice(n0).map(function(pr){ return clipPrim(pr, cb); }).filter(Boolean); Array.prototype.push.apply(out, keep); o({ k:'seg', a:[cb[0], cb[1]], b:[cb[2], cb[1]], clipb:1 }); o({ k:'seg', a:[cb[2], cb[1]], b:[cb[2], cb[3]], clipb:1 }); o({ k:'seg', a:[cb[2], cb[3]], b:[cb[0], cb[3]], clipb:1 }); o({ k:'seg', a:[cb[0], cb[3]], b:[cb[0], cb[1]], clipb:1 }); }
         o({ k:'ins', p:e.p }); break; }
+      // loại đối tượng do các tệp Đợt 4 đăng ký (TC.flatExt[t]): ghép từ các nguyên tố có sẵn (seg, arc, circ, text, hatch, img…)
+      default: if (TC.flatExt[e.t]) TC.flatExt[e.t]({ doc:doc, e:e, t:t, P:P, o:o, host:host, sub:function(x, tt, h){ flat(doc, x, tt || t, out, h || host || e); } });
     }
   }
   // cắt nguyên tố theo khung chữ nhật [x0, y0, x1, y1] (clip xref, block)

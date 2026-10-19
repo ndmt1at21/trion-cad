@@ -278,13 +278,15 @@
       var t = TC.layerTable(d0, true);
       $('#lm-body', dlg.el).innerHTML = t.html;
       var used = d0.layers.filter(function(l){ return l.count; }).length;
-      $('#lm-tree', dlg.el).innerHTML = [['all','Tất cả', d0.layers.length], ['used','Layer đang dùng', used], ['vp','Viewport có ghi đè', 0]].map(function(f){ return '<button class="tn" type="button" data-lmf="' + f[0] + '" aria-selected="' + (ls.filter === f[0]) + '">' + ic(f[0] === 'all' ? 'layers' : 'filter', 's12') + f[1] + '<span class="cnt">' + f[2] + '</span></button>'; }).join('') + '<div class="gh" style="padding:8px 6px 4px">Xref</div>' + d0.xrefs.map(function(x){ return '<button class="tn" type="button" disabled>' + ic('xref', 's12') + esc(x.name) + '<span class="cnt">' + (x.status === 'Đã nạp' ? 6 : 0) + '</span></button>'; }).join('');
+      var tn = function(f){ return '<button class="tn" type="button" data-lmf="' + f[0] + '" aria-selected="' + (ls.filter === f[0]) + '">' + ic(f[0] === 'all' ? 'layers' : 'filter', 's12') + f[1] + '<span class="cnt">' + f[2] + '</span></button>'; };
+      $('#lm-tree', dlg.el).innerHTML = [['all','Tất cả', d0.layers.length], ['used','Layer đang dùng', used]].map(tn).join('') + (SC.layerTreeHTML && !TC.isViewer() ? SC.layerTreeHTML(d0, ls) : '') + tn(['vp','Viewport có ghi đè', 0]) + '<div class="gh" style="padding:8px 6px 4px">Xref</div>' + d0.xrefs.map(function(x){ return '<button class="tn" type="button" disabled>' + ic('xref', 's12') + esc(x.name) + '<span class="cnt">' + (x.status === 'Đã nạp' ? 6 : 0) + '</span></button>'; }).join('') + (SC.layerTreeFoot && !TC.isViewer() ? SC.layerTreeFoot(ls) : '');
       $('#lm-foot', dlg.el).innerHTML = '<span>Hiện ' + t.n + '/' + d0.layers.length + ' layer · ' + (ls.sel ? '1 đang chọn' : '0 đang chọn') + (TC.isViewer() ? '' : ' · hiện hành: <b>' + esc(TC.ed.clayer(d0)) + '</b>') + '</span><span class="grow"></span>' + (TC.isViewer() ? (TC.layers.changed(d0) ? '<button class="btn sm" type="button" id="lm-restore">' + ic('undo') + 'Khôi phục như tệp gốc</button>' : '<span class="faint">Không có thay đổi tạm thời</span>') : '<span class="faint">Nhấp đúp để đặt hiện hành · F2 đổi tên · chuột phải để có thêm thao tác</span>');
       var rs = $('#lm-restore', dlg.el); if (rs) rs.onclick = function(){ TC.layers.restore(d0); render(); };
     }
     TC.bindLayerTable($('#lm-body', dlg.el), d0, function(){ render(); A().refreshPalettes(); });
+    if (SC.layerTreeBind && !TC.isViewer()) SC.layerTreeBind($('#lm-body', dlg.el), $('#lm-tree', dlg.el), d0, render);
     $('#lm-q', dlg.el).addEventListener('input', function(){ ls.q = this.value; render(); });
-    dlg.el.addEventListener('click', function(e){ var f = e.target.closest('[data-lmf]'); if (f){ ls.filter = f.dataset.lmf === 'used' ? 'used' : 'all'; render(); } var t = e.target.closest('[data-lmt]'); if (t){ if (t.dataset.need && !TC.can(t.dataset.need)) SC.upgrade(t.dataset.tip, t.dataset.need); else if (TC.layerTool) TC.layerTool(t.dataset.lmt, d0, render, t); else render(); } });
+    dlg.el.addEventListener('click', function(e){ var f = e.target.closest('[data-lmf]'); if (f){ ls.filter = f.dataset.lmf === 'vp' ? 'all' : f.dataset.lmf; render(); A().refreshPalettes(); } var t = e.target.closest('[data-lmt]'); if (t){ if (t.dataset.need && !TC.can(t.dataset.need)) SC.upgrade(t.dataset.tip, t.dataset.need); else if (TC.layerTool) TC.layerTool(t.dataset.lmt, d0, render, t); else render(); } });
     TC.on('layers', function(){ if (!dlg.closed) render(); });
     render();
   };
