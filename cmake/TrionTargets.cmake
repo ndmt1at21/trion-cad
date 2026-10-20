@@ -3,7 +3,8 @@
 # trion_add_fuzz(<tên> SOURCES ... LIBS ... [CORPUS thư mục]): chỉ build ở preset fuzz. ctest chạy
 #   khói 20 s (nhãn fuzz); chạy dài: build/fuzz/bin/<tên> -max_total_time=3600 <corpus>.
 #   Test dùng Qt Test (có sẵn trong Qt, 05 §2). Chạy với QT_QPA_PLATFORM=offscreen.
-#   DoD-C 2: bộ test của một module chạy dưới 60 s, nên TIMEOUT mặc định 60.
+#   DoD-C 2: bộ test của một module chạy dưới 60 s, nên TIMEOUT mặc định 60. Mọi test C++ có thêm nhãn cpp
+#   (bản Windows chỉ chạy nhãn này: test Python/node chạy ở bản Linux).
 # Bản Windows (preset win): mọi .exe vào <build>/bin cạnh DLL của Qt (trion_deploy_qt_runtime), nên
 # chạy được ngay, kể cả từ WSL (ctest trên WSL gọi .exe; biến môi trường qua WSLENV).
 
@@ -66,6 +67,6 @@ function(trion_add_test name)
   endif()
   set_tests_properties(${name} PROPERTIES
     TIMEOUT ${A_TIMEOUT}
-    LABELS "${A_LABELS}"
+    LABELS "${A_LABELS};cpp"
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_ENABLE_HIGHDPI_SCALING=0;WSLENV=QT_QPA_PLATFORM:QT_ENABLE_HIGHDPI_SCALING")
 endfunction()
