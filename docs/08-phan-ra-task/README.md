@@ -58,10 +58,10 @@ Mỗi task ghi DoD nào áp dụng ở dòng cuối của **Tiêu chí nghiệm 
 1. Biên dịch sạch trên MSVC (bản 2022 mới nhất) và Clang (≥ 17) cho Windows, macOS, Linux; cảnh báo là lỗi; clang-tidy sạch theo cấu hình kho mã.
 2. Kiểm thử đơn vị cho mọi hàm công khai, kể cả nhánh lỗi. Bộ kiểm thử của module chạy dưới 60 giây.
 3. ASan và UBSan sạch. Mã đa luồng chạy TSan sạch.
-4. **Tất định:** cùng đầu vào cho cùng đầu ra từng bit trên 3 hệ điều hành và mọi số luồng (CI so hash kết quả). Không phụ thuộc thứ tự băm, địa chỉ bộ nhớ, thứ tự hoàn thành của luồng.
+4. **Tất định:** cùng đầu vào cho cùng đầu ra từng bit trên 3 hệ điều hành và mọi số luồng (CI so hash kết quả, job NT-107). Không phụ thuộc thứ tự băm, địa chỉ bộ nhớ, thứ tự hoàn thành của luồng.
 5. Không `-ffast-math`. Bật `-ffp-contract=off` (tắt FMA) ở `core/geom` và mọi mã quyết định tô-pô. So sánh số thực đi qua `Tolerance` (GEO-002), không so sánh `==` trực tiếp.
 6. Không con trỏ thô sở hữu. Đường nóng không cấp phát trong vòng lặp (benchmark đếm số lần cấp phát, NT-004); dùng arena/pool (NT-007).
-7. **Đầu vào không tin cậy** (tệp bản vẽ, LISP, DCL, PAT, LIN, SHX, PGP, CUIX, CTB, PC3, dữ liệu mạng): kiểm biên mọi lần đọc, giới hạn kích thước cấp phát, có fuzz target chạy ≥ 1 giờ không lỗi trước khi merge, sau đó vào fuzzing liên tục (QA-006).
+7. **Đầu vào không tin cậy** (tệp bản vẽ, LISP, DCL, PAT, LIN, SHX, PGP, CUIX, CTB, PC3, dữ liệu mạng): kiểm biên mọi lần đọc, giới hạn kích thước cấp phát (NT-103), có fuzz target chạy ≥ 1 giờ không lỗi trước khi merge, sau đó vào fuzzing liên tục (QA-006).
 8. Mọi thay đổi bản vẽ đi qua API `core/doc` (DOC-007), có undo và sự kiện. Không có đường tắt.
 9. Đường nóng có benchmark. Ngưỡng ghi trong task. CI chặn merge nếu vượt ngưỡng hoặc chậm hơn baseline quá 5% (NT-003).
 10. Header công khai có chú thích. Chỗ cố ý làm đơn giản ghi rõ giới hạn và hướng nâng cấp ngay trong mã.
@@ -159,6 +159,9 @@ Dữ liệu chung, do module QA quản lý (task neo ở §5):
 | Đọc/ghi thuộc tính chung (Properties, `entget`/`entmod`, so sánh) | Metadata thuộc tính DOC-017 | UI và LISP không tự ánh xạ trường |
 | BVH cho chọn, OSNAP, culling | GEO-017 (cấu trúc), DOC-009 + INT-009 (chỉ mục trên bản vẽ), RND-010 (culling) | Không dựng BVH riêng trong từng module |
 | Định dạng số và đơn vị | RGN-013 dùng chung cho kích thước, `rtos`/`angtos`, DYN, tọa độ thanh trạng thái, Properties | Không tự định dạng số ở nơi khác |
+| Đọc số, khoảng cách, góc từ chuỗi | INT-105 dùng chung cho dòng lệnh, ô nhập, `distof`/`angtof` | RGN-013 chỉ định dạng, không phân tích |
+| Biến đổi hình học | GEO-022 (đường cong), DOC-115 (entity trong transaction), DWG-169 (khối ACIS) | Lệnh không tự biến đổi entity |
+| Chạy nhiều tệp | INT-019 (mở không giao diện); hàng đợi của VN-006 dùng lại ở CMD-264 (TCBATCH) | Không viết hàng đợi riêng cho từng công cụ |
 | Zoom, pan, lăn chuột, lịch sử view | INT-016 (engine và lệnh ZOOM, PAN) | CMD chỉ có REGEN, REDRAW, VIEWRES, VIEW |
 | UCS, OSNAP, POLAR, GRID, SNAP, ORTHO, DSETTINGS | INT-010, INT-011, INT-015 | |
 | Grip của đường cong cơ bản và text | INT-013 | Grip của kích thước, mleader, hatch, bảng, viewport, xref, ảnh, mảng, dynamic block: task CMD/RGN của đối tượng đó đăng ký qua API của INT-013 |
@@ -345,7 +348,7 @@ Task neo là task mà module khác được phép phụ thuộc. Mã, tên và p
 | RGN-014 | Kích thước thẳng, nghiêng, xoay theo đủ DIMVAR (mũi tên, vị trí chữ, quy tắc fit, đơn vị chính và phụ, dung sai); xem dùng block lưu sẵn, sửa thì sinh lại | V |
 | RGN-015 | Kích thước góc, bán kính, đường kính, cung, gãy khúc, tọa độ điểm | V |
 | RGN-016 | Leader và MLeader (nội dung MTEXT/block, landing, dogleg, mũi tên) | V |
-| RGN-017 | Bảng: dùng block đại diện khi xem (V); sinh lại từ dữ liệu ô khi sửa (1.0) | V |
+| RGN-017 | Bảng: dùng block đại diện khi xem (V); sinh lại từ dữ liệu ô khi sửa (EA) | V |
 | RGN-018 | Block: insert lồng nhau, attribute, ATTDISP, MINSERT; dữ liệu instancing (hình học định nghĩa + ma trận) | V |
 | RGN-019 | Dynamic block: hiển thị qua `*U` (V); engine EvalGraph cho parameter và action (1.0) | V |
 | RGN-020 | Proxy graphics: parser và regen (P1) | V |
@@ -567,3 +570,36 @@ Lỗi tìm được khi chạy kho bản vẽ, bộ tham chiếu, bộ LISP, fuz
 ```
 
 Mã `FIX-<module>-NNNN` đặt theo thứ tự tạo. Bảng chỉ số QA-010 xếp hạng cụm lỗi theo số tệp bị ảnh hưởng, để sửa theo tần suất thực tế (06 §9 rủi ro 1).
+
+## 8. Thống kê
+
+Số liệu ngày 20/10/2026, sinh bằng `python3 tools/check_tasks.py`; chạy lại để có số mới.
+
+- **Tổng:** 1.266 task trong 20 tệp, gồm 286 task neo.
+- **Theo mốc:** S1 57 · S2 31 · S3 28 · S4 9 · S5 9 · S6 17 · CC 10 · V 335 · VP 70 · EA 334 · 1.0 264 · Sau 102.
+- **Theo cỡ:** S 237 · M 791 · L 238. **Theo ưu tiên:** P0 799 · P1 358 · P2 109.
+- **Độ phủ:** 176/176 mã màn hình có task; 125/125 lệnh P0 của 03 Phụ lục A có task chủ; 559 tên lệnh được khai báo, mỗi tên đúng một task.
+- **Kiểm tra:** `check_tasks.py -v` cho 0 lỗi, 0 cảnh báo (cú pháp, mã trùng, phụ thuộc, chu trình, mốc, neo, độ phủ).
+
+| Tệp | Task |
+|---|---|
+| [core-cmd-1-ve-chon-truy-van.md](core-cmd-1-ve-chon-truy-van.md) | 81 |
+| [core-cmd-2-sua-tep-tien-ich.md](core-cmd-2-sua-tep-tien-ich.md) | 82 |
+| [core-cmd-3-chu-thich-layout.md](core-cmd-3-chu-thich-layout.md) | 81 |
+| [core-cmd-4-layer-block-xref.md](core-cmd-4-layer-block-xref.md) | 80 |
+| [core-doc-mo-hinh.md](core-doc-mo-hinh.md) | 42 |
+| [core-dwg-codec.md](core-dwg-codec.md) | 63 |
+| [core-geo-hinh-hoc.md](core-geo-hinh-hoc.md) | 62 |
+| [core-int-tuong-tac.md](core-int-tuong-tac.md) | 62 |
+| [core-lsp-lisp-sdk.md](core-lsp-lisp-sdk.md) | 62 |
+| [core-nt-nen-tang.md](core-nt-nen-tang.md) | 29 |
+| [core-plf-he-thong.md](core-plf-he-thong.md) | 28 |
+| [core-plt-in-xuat.md](core-plt-in-xuat.md) | 34 |
+| [core-qa-kiem-thu.md](core-qa-kiem-thu.md) | 28 |
+| [core-rgn-regen.md](core-rgn-regen.md) | 63 |
+| [core-rnd-renderer.md](core-rnd-renderer.md) | 53 |
+| [core-vn-viet-nam.md](core-vn-viet-nam.md) | 57 |
+| [ui-0-nen-tang-khung.md](ui-0-nen-tang-khung.md) | 70 |
+| [ui-1-tep-thuoc-tinh-kieu-ve.md](ui-1-tep-thuoc-tinh-kieu-ve.md) | 97 |
+| [ui-2-chu-thich-block-in-truy-van.md](ui-2-chu-thich-block-in-truy-van.md) | 108 |
+| [ui-3-vn-tudong-hethong.md](ui-3-vn-tudong-hethong.md) | 84 |

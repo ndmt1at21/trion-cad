@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Kiểm bộ task docs/08-phan-ra-task: cú pháp, phụ thuộc, chu trình, mốc, neo, độ phủ.
 
-Chạy: python3 tools/check_tasks.py [-v] [--json tệp.json]. Mã thoát 1 nếu có LỖI."""
+Chạy: python3 tools/check_tasks.py [-v] [--json tệp.json] [--anchors-ok] [--file tên-tệp.md]
+  --anchors-ok  coi task neo ở README §5 là đã có (khi các module khác chưa viết xong)
+  --file        chỉ in lỗi và cảnh báo của một tệp
+  --summary     (cùng --file) in mục "## Tóm tắt theo mốc" của tệp đó, để dán thay mục cũ
+Mã thoát 1 nếu có LỖI."""
 import re, sys, glob, os, json
 from collections import defaultdict, Counter
 
@@ -10,6 +14,8 @@ DIR = os.path.join(ROOT, 'docs/08-phan-ra-task')
 ID = r'[A-Z][A-Z0-9]{1,3}-\d{3}'
 UICODE = r'UI-(?:[A-N]\d{2}|MAC|MR2|MR|PAR)\b'
 RANK = {**{f'S{i}': 0 for i in range(1, 7)}, 'CC': 0, 'V': 1, 'VP': 2, 'EA': 3, '1.0': 4, 'Sau': 5}
+ORDER = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'CC', 'V', 'VP', 'EA', '1.0', 'Sau']  # thứ tự in
+okey = lambda k: ORDER.index(k) if k in ORDER else len(ORDER)
 P0 = ('NEW OPEN SAVE SAVEAS QSAVE CLOSE RECOVER AUDIT PURGE UNITS OPTIONS ZOOM PAN REGEN REDRAW VIEWRES '
       'LINE XLINE PLINE RECTANG POLYGON CIRCLE ARC ELLIPSE SPLINE POINT DDPTYPE DIVIDE MEASURE BOUNDARY HATCH HATCHEDIT '
       'ERASE OOPS MOVE COPY ROTATE SCALE MIRROR STRETCH OFFSET TRIM EXTEND BREAK BREAKATPOINT JOIN FILLET CHAMFER EXPLODE '
@@ -27,9 +33,14 @@ def ui_codes():
     return codes + ['UI-MAC', 'UI-MR', 'UI-PAR', 'UI-MR2']
 
 def anchors():
+    """Mã neo → mốc (ô cuối của dòng bảng ở README §5)."""
     txt = open(os.path.join(DIR, 'README.md'), encoding='utf-8').read()
     sec = txt.split('## 5. Task neo', 1)[1].split('\n## 6.', 1)[0]
-    return re.findall(rf'^\| ({ID}) \|', sec, re.M)
+    out = {}
+    for row in re.findall(rf'^\| {ID} \|.*$', sec, re.M):
+        cells = [c.strip() for c in row.strip('|').split('|')]
+        out[cells[0]] = cells[-1]
+    return out
 
 def parse(path):
     tasks, errs = [], []
@@ -78,6 +89,9 @@ def parse(path):
     return tasks, errs
 
 def main():
+    anc_ok = '--anchors-ok' in sys.argv
+    only = sys.argv[sys.argv.index('--file') + 1] if '--file' in sys.argv else None
+    anc = anchors()
     files = sorted(f for f in glob.glob(os.path.join(DIR, '*.md')) if not f.endswith('README.md'))
     tasks, errs, warns = [], [], []
     for f in files:
@@ -95,20 +109,26 @@ def main():
     for t in tasks:
         r = RANK.get(t['mmoc'], 9)
         for d in t['dep_ids']:
-            if d not in by_id: errs.append(f"{t['id']}: phụ thuộc {d} không tồn tại"); continue
+            if d not in by_id:
+                if anc_ok and d in anc:
+                    if RANK.get(anc[d], 9) > r: warns.append(f"MỐC {t['id']} ({t['mmoc']}) phụ thuộc neo {d} ({anc[d]})")
+                else: errs.append(f"{t['id']}: phụ thuộc {d} không tồn tại")
+                continue
             if d == t['id']: errs.append(f"{t['id']}: tự phụ thuộc"); continue
             graph[t['id']].add(d)
             if RANK.get(by_id[d]['mmoc'], 9) > r:
                 warns.append(f"MỐC {t['id']} ({t['mmoc']}) phụ thuộc {d} ({by_id[d]['mmoc']})")
         for c in t['dep_cmds']:
             own = [o for o in cmd_owner.get(c, []) if o != t['id']]
-            if not own: errs.append(f"{t['id']}: CMD:{c} không task nào khai báo **Lệnh:**"); continue
+            if not own:
+                (warns if anc_ok else errs).append(f"{'NGOAI ' if anc_ok else ''}{t['id']}: CMD:{c} không task nào khai báo **Lệnh:**"); continue
             graph[t['id']].update(own)
             if min(RANK.get(by_id[o]['mmoc'], 9) for o in own) > r:
                 warns.append(f"MỐC {t['id']} ({t['mmoc']}) phụ thuộc CMD:{c} (sớm nhất {min(by_id[o]['mmoc'] for o in own)})")
         for u in t['dep_uis']:
             own = [o for o in ui_owner.get(u, []) if o != t['id']]
-            if not own: errs.append(f"{t['id']}: {u} không task UI nào có **Màn hình:**"); continue
+            if not own:
+                (warns if anc_ok else errs).append(f"{'NGOAI ' if anc_ok else ''}{t['id']}: {u} không task UI nào có **Màn hình:**"); continue
             if min(RANK.get(by_id[o]['mmoc'], 9) for o in own) > r:
                 warns.append(f"MỐC {t['id']} ({t['mmoc']}) phụ thuộc {u}")
     # chu trình (chỉ trên phụ thuộc theo mã và CMD)
@@ -126,9 +146,13 @@ def main():
         if not color.get(u): dfs(u, [])
     for c in cycles[:30]: errs.append('Chu trình: ' + ' → '.join(c))
     # neo
-    anc = anchors()
     for a in anc:
-        if a not in by_id: errs.append(f'Thiếu task neo {a}')
+        if a not in by_id and not anc_ok and not only: errs.append(f'Thiếu task neo {a}')
+    if only:  # chỉ lỗi và cảnh báo nhắc tới task của tệp này; neo do task giao việc tự kiểm bằng grep
+        mine = {t['id'] for t in tasks if t['file'] == only}
+        keep = lambda m: m.startswith(only) or any(re.search(rf'(?<![A-Z0-9]){re.escape(i)}(?!\d)', m) for i in mine)
+        errs = [e for e in dict.fromkeys(errs) if keep(e)]
+        warns = [w for w in warns if keep(w)]
     # độ phủ
     uis = ui_codes()
     miss_ui = [u for u in uis if u not in ui_owner]
@@ -139,11 +163,19 @@ def main():
         if not re.search(r'\d', t['ac'].replace('DoD', '')): warns.append(f"SỐ {t['id']}: tiêu chí không có con số nào")
         if t['file'].startswith('ui-') and not t['screens']: errs.append(f"{t['id']}: task UI thiếu **Màn hình:**")
     dup_cmd = {c: o for c, o in cmd_owner.items() if len(o) > 1}
+    if only and '--summary' in sys.argv:
+        mine = [t for t in tasks if t['file'] == only]
+        print('## Tóm tắt theo mốc\n\n| Mốc | Task | Số task |\n|---|---|---|')
+        for m in sorted({t['mmoc'] for t in mine}, key=okey):
+            ids = [t['id'] for t in mine if t['mmoc'] == m]
+            print(f"| {m} | {', '.join(ids)} | {len(ids)} |")
+        print(f'| **Tổng** | | **{len(mine)}** |')
+        return
     # báo cáo
     print(f'Tệp: {len(files)} · Task: {len(tasks)} · Neo: {len(anc)}')
     per_file = Counter(t['file'] for t in tasks)
     for f in sorted(per_file): print(f'  {f}: {per_file[f]}')
-    print('Theo mốc:', dict(sorted(Counter(t["mmoc"] for t in tasks).items(), key=lambda kv: RANK.get(kv[0], 9))))
+    print('Theo mốc:', dict(sorted(Counter(t["mmoc"] for t in tasks).items(), key=lambda kv: okey(kv[0]))))
     print('Theo cỡ:', dict(Counter(t['size'] for t in tasks)), '· Ưu tiên:', dict(Counter(t['prio'] for t in tasks)))
     print(f'Mã màn hình: {len(uis) - len(miss_ui)}/{len(uis)} có task' + (f' · thiếu: {" ".join(miss_ui)}' if miss_ui else ''))
     print(f'Lệnh P0 (03 Phụ lục A): {len(P0) - len(miss_p0)}/{len(P0)}' + (f' · thiếu: {" ".join(miss_p0)}' if miss_p0 else ''))
