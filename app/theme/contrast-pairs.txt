@@ -1,0 +1,74 @@
+# Cặp tương phản kiểm lúc build (UI0-102, tools/tokengen). Mỗi cặp kiểm ở Tối và Sáng theo WCAG 2.x;
+# cặp không đạt làm build lỗi và in tỉ số. Không hạ ngưỡng: cặp không đạt ghi thành chú thích kèm tỉ số
+# và lý do, báo nhà thiết kế sửa tokens.css.
+#
+# Dòng: <chữ hoặc viền> <nền> [<nền đục bên dưới>] <ngưỡng>
+# Màu có alpha được trộn lên lớp dưới nó trước khi tính; lớp cuối cùng phải đục.
+
+# Chữ (cột 't' của styleguide) trên nền chính. --c-text-dis được miễn (chữ vô hiệu): Tối 3,43:1, Sáng 2,74:1.
+--c-text         --c-base      4.5
+--c-text-2       --c-base      4.5
+--c-text-3       --c-base      4.5
+--c-accent       --c-base      4.5
+--c-on           --c-base      4.5
+--c-off          --c-base      4.5
+--c-ok           --c-base      4.5
+--c-warn         --c-base      4.5
+--c-danger       --c-base      4.5
+--c-info         --c-base      4.5
+
+# Chữ trên các bề mặt khác (app.css dùng)
+--c-text         --c-chrome    4.5
+--c-text         --c-raised    4.5
+--c-text         --c-sunken    4.5
+--c-text         --c-active    4.5
+--c-text         --c-banner    4.5
+--c-text-2       --c-chrome    4.5
+--c-text-2       --c-raised    4.5
+--c-text-2       --c-sunken    4.5
+--c-text-2       --c-active    4.5
+--c-text-3       --c-raised    4.5
+--c-text-3       --c-sunken    4.5
+
+# Chữ trên nền nhấn: nút chính và khi rê
+--c-accent-t     --c-accent    4.5
+--c-accent-t     --c-accent-hi 4.5
+
+# Chữ trên nền có alpha (rê, nhấn, hàng chọn, ghi chú) phủ lên --c-base
+--c-text         --c-hover         --c-base  4.5
+--c-text         --c-press         --c-base  4.5
+--c-text         --c-accent-soft   --c-base  4.5
+--c-accent       --c-accent-soft   --c-base  4.5
+--c-on           --c-on-bg         --c-base  4.5
+--c-text         --c-warn-soft     --c-base  4.5
+--c-warn         --c-warn-soft     --c-base  4.5
+--c-ok           --c-ok-soft       --c-base  4.5
+--c-text         --c-info-soft     --c-base  4.5
+--c-info         --c-info-soft     --c-base  4.5
+--c-danger       --c-danger-soft   --c-base  4.5
+
+# Viền điều khiển và viền tiêu điểm (thành phần không phải chữ, 3:1)
+--c-border-ctl   --c-base      3
+--c-focus        --c-base      3
+
+# Huy hiệu phiên bản
+--c-ed-viewer-t  --c-ed-viewer 4.5
+--c-ed-vp-t      --c-ed-vp     4.5
+--c-ed-pro-t     --c-ed-pro    4.5
+--c-ed-ent-t     --c-ed-ent    4.5
+--c-ed-edu-t     --c-ed-edu    4.5
+--c-ed-trial-t   --c-ed-trial  4.5
+
+# Tooltip trên vùng vẽ
+--c-dyn-t        --c-dyn-bg      4.5
+--c-snap-tip-t   --c-snap-tip-bg 4.5
+
+# Không đạt nếu đặt trên bề mặt khác --c-base; chưa xác nhận prototype có đặt như vậy (nền dưới tùy bố cục),
+# chờ nhà thiết kế xem:
+# --c-border-ctl  --c-raised   3    Tối 2,79:1
+# --c-border-ctl  --c-sunken   3    Sáng 2,85:1
+# --c-border-ctl  --c-chrome   3    Sáng 2,70:1
+# --c-accent      --c-accent-soft  --c-sunken  4.5   Sáng 4,35:1 (hàng chọn trong danh sách nền lõm?)
+# --c-on          --c-on-bg        --c-sunken  4.5   Sáng 4,28:1
+# --c-danger      --c-danger-soft  --c-raised  4.5   Tối 4,16:1
+# --c-text-3      --c-hover        --c-raised  4.5   Tối 4,00:1
