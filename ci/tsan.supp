@@ -1,0 +1,5 @@
+# Qt bản cài sẵn không được biên dịch với TSan: nguyên tử bên trong Qt không hiện với TSan.
+# Chỉ chặn báo cáo nằm trọn trong thư viện Qt; race trong mã TrionCAD vẫn bị bắt.
+called_from_lib:libQt6Core.so.6
+called_from_lib:libQt6Gui.so.6
+called_from_lib:libQt6Widgets.so.6
