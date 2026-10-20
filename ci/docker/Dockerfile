@@ -10,4 +10,5 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
  && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100 \
  && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100 \
  && update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-18 100
-ENV LANG=C.UTF-8 CC=clang CXX=clang++ CMAKE_PREFIX_PATH=/opt/qt LD_LIBRARY_PATH=/opt/qt/lib QT_QPA_PLATFORM=offscreen
+ENV LANG=C.UTF-8 CC=clang CXX=clang++ CMAKE_PREFIX_PATH=/opt/qt LD_LIBRARY_PATH=/opt/qt/lib QT_QPA_PLATFORM=offscreen \
+    QT_HOST_DIR=/opt/qt QT_WIN_DIR=/opt/qt-win LLVM_MINGW_DIR=/opt/llvm-mingw

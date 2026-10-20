@@ -1,6 +1,10 @@
 {
   "version": 6,
-  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "base",
@@ -8,37 +12,113 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}"
     },
-    { "name": "dev", "inherits": "base", "displayName": "Debug", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
     {
-      "name": "release", "inherits": "base", "displayName": "Release + LTO",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON" }
+      "name": "dev",
+      "inherits": "base",
+      "displayName": "Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
-      "name": "asan-ubsan", "inherits": "base", "displayName": "ASan + UBSan",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "TRION_SANITIZE": "address,undefined" }
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release + LTO",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
+      }
     },
     {
-      "name": "tsan", "inherits": "base", "displayName": "TSan",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "TRION_SANITIZE": "thread" }
+      "name": "asan-ubsan",
+      "inherits": "base",
+      "displayName": "ASan + UBSan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "TRION_SANITIZE": "address,undefined"
+      }
+    },
+    {
+      "name": "tsan",
+      "inherits": "base",
+      "displayName": "TSan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "TRION_SANITIZE": "thread"
+      }
+    },
+    {
+      "name": "win",
+      "inherits": "base",
+      "displayName": "Windows x64 (llvm-mingw, build chéo; test chạy trên Windows, kể cả từ WSL)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_SYSTEM_NAME": "Windows",
+        "CMAKE_CXX_COMPILER": "$env{LLVM_MINGW_DIR}/bin/x86_64-w64-mingw32-clang++",
+        "CMAKE_PREFIX_PATH": "$env{QT_WIN_DIR}",
+        "QT_HOST_PATH": "$env{QT_HOST_DIR}"
+      }
     }
   ],
   "buildPresets": [
-    { "name": "dev", "configurePreset": "dev" },
-    { "name": "release", "configurePreset": "release" },
-    { "name": "asan-ubsan", "configurePreset": "asan-ubsan" },
-    { "name": "tsan", "configurePreset": "tsan" }
-  ],
-  "testPresets": [
-    { "name": "base", "hidden": true, "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } },
-    { "name": "dev", "inherits": "base", "configurePreset": "dev" },
-    { "name": "release", "inherits": "base", "configurePreset": "release" },
     {
-      "name": "asan-ubsan", "inherits": "base", "configurePreset": "asan-ubsan",
-      "environment": { "ASAN_OPTIONS": "detect_leaks=1", "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1" }
+      "name": "dev",
+      "configurePreset": "dev"
     },
     {
-      "name": "tsan", "inherits": "base", "configurePreset": "tsan",
-      "environment": { "TSAN_OPTIONS": "halt_on_error=1:suppressions=${sourceDir}/ci/tsan.supp" }
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "asan-ubsan",
+      "configurePreset": "asan-ubsan"
+    },
+    {
+      "name": "tsan",
+      "configurePreset": "tsan"
+    },
+    {
+      "name": "win",
+      "configurePreset": "win"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "dev",
+      "inherits": "base",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "configurePreset": "release"
+    },
+    {
+      "name": "asan-ubsan",
+      "inherits": "base",
+      "configurePreset": "asan-ubsan",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+      }
+    },
+    {
+      "name": "tsan",
+      "inherits": "base",
+      "configurePreset": "tsan",
+      "environment": {
+        "TSAN_OPTIONS": "halt_on_error=1:suppressions=${sourceDir}/ci/tsan.supp"
+      }
     }
   ]
 }

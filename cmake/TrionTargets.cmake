@@ -2,6 +2,32 @@
 # trion_add_test(<tên> SOURCES ... LIBS ... [LABELS ...] [TIMEOUT s])
 #   Test dùng Qt Test (có sẵn trong Qt, 05 §2). Chạy với QT_QPA_PLATFORM=offscreen.
 #   DoD-C 2: bộ test của một module chạy dưới 60 s, nên TIMEOUT mặc định 60.
+# Bản Windows (preset win): mọi .exe vào <build>/bin cạnh DLL của Qt (trion_deploy_qt_runtime), nên
+# chạy được ngay, kể cả từ WSL (ctest trên WSL gọi .exe; biến môi trường qua WSLENV).
+
+if(WIN32)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
+
+# Chép DLL và plugin Qt cần cho test và ứng dụng vào <build>/bin. Gọi sau find_package(Qt6).
+function(trion_deploy_qt_runtime)
+  if(NOT WIN32)
+    return()
+  endif()
+  set(qt ${QT6_INSTALL_PREFIX})
+  set(bin ${CMAKE_BINARY_DIR}/bin)
+  foreach(dll Qt6Core Qt6Gui Qt6Widgets Qt6Svg Qt6Test libc++ libunwind)
+    if(EXISTS ${qt}/bin/${dll}.dll)
+      file(COPY ${qt}/bin/${dll}.dll DESTINATION ${bin})
+    endif()
+  endforeach()
+  foreach(plugin platforms/qwindows platforms/qoffscreen iconengines/qsvgicon imageformats/qsvg styles/qmodernwindowsstyle)
+    if(EXISTS ${qt}/plugins/${plugin}.dll)
+      get_filename_component(dir ${plugin} DIRECTORY)
+      file(COPY ${qt}/plugins/${plugin}.dll DESTINATION ${bin}/${dir})
+    endif()
+  endforeach()
+endfunction()
 
 function(trion_add_library name)
   cmake_parse_arguments(A "" "" "SOURCES;LIBS" ${ARGN})
@@ -24,5 +50,5 @@ function(trion_add_test name)
   set_tests_properties(${name} PROPERTIES
     TIMEOUT ${A_TIMEOUT}
     LABELS "${A_LABELS}"
-    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_ENABLE_HIGHDPI_SCALING=0")
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_ENABLE_HIGHDPI_SCALING=0;WSLENV=QT_QPA_PLATFORM:QT_ENABLE_HIGHDPI_SCALING")
 endfunction()

@@ -21,6 +21,13 @@ ci/docker/run.sh cmake --preset dev -B build/theme -DTRION_COMPONENTS="core/base
 ci/docker/run.sh cmake --build build/theme && ci/docker/run.sh ctest --test-dir build/theme -L theme --output-on-failure
 ```
 
+Bản Windows (build chéo bằng llvm-mingw, như snapone; test chạy thật trên Windows, gọi từ WSL):
+
+```sh
+ci/docker/run.sh cmake --preset win && ci/docker/run.sh cmake --build --preset win
+ctest --test-dir build/win --output-on-failure        # chạy trên máy, không qua Docker
+```
+
 ## Bố cục
 
 - **Thành phần** = một thư mục có `CMakeLists.txt`, khai báo ở `CMakeLists.txt` gốc bằng `trion_component(<thư mục>)`.
