@@ -1,0 +1,6 @@
+/* mẫu QSS sai: mọi dòng trừ dòng này */
+QMenu { background: #23272C; }
+QMenu::item { padding: 0 8px 0 6px; }
+QToolTip { color: white; }
+QToolTip { font-size: 11px; }
+QTabBar::tab:selected { border-bottom: 2px solid rgb(60, 200, 192); }

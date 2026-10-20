@@ -1,0 +1,31 @@
+/* TrionCAD · QSS nền (UI0-002). ThemeManager thay var(--token) bằng giá trị của chế độ đang dùng (chủ đề, mật độ)
+   lúc chạy. Chỉ dùng chỗ giữ token (lint no-literal-style); 1px, 2px là độ dày nét, không phải khoảng cách.
+
+   Chỉ gắn vào lớp ít thể hiện: đầu cột, thanh tiến trình (TrionStyle::polish). Nút, ô nhập, ô chọn, menu, tab,
+   tooltip, dòng bảng do TrionStyle vẽ bằng token: QSS toàn ứng dụng phải polish lại mọi widget mỗi lần đổi chủ đề
+   (~1 s với 2.000 widget), QSS trên QMenu tốn ~50 ms mỗi lần đổi (mỗi QComboBox dựng một QMenu tạm), trên QTabBar
+   làm QTabWidget cha thôi nhận palette; xem tests/theme_test.cpp và ThemeManager.cpp.
+   Theo design/prototype/css/app.css; ghi chú "≈" là chỗ prototype dùng số ngoài thang token. */
+
+/* đầu cột bảng: .tbl th (≈ cao 24px = --h-ctl gọn) */
+QHeaderView { background: var(--c-sunken); border: none; }
+QHeaderView::section {
+    min-height: var(--h-ctl);
+    padding: 0 var(--sp-4);
+    background: var(--c-sunken);
+    color: var(--c-text-2);
+    border: none;
+    border-bottom: 1px solid var(--c-border);
+    font-weight: var(--fw-m);
+}
+QHeaderView::section:hover { color: var(--c-text); }
+
+/* thanh tiến trình: .prog; bản mảnh có nút hủy là UI0-112 */
+QProgressBar {
+    background: var(--c-active);
+    color: var(--c-text);
+    border: none;
+    border-radius: var(--r);
+    text-align: center;
+}
+QProgressBar::chunk { background: var(--c-accent); border-radius: var(--r); }
