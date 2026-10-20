@@ -45,4 +45,211 @@
         </translation>
     </message>
 </context>
+<context>
+    <name>keymap</name>
+    <message>
+        <source>Lệnh khác</source>
+        <translation>Other commands</translation>
+    </message>
+    <message>
+        <source>Chung</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Trợ giúp theo ngữ cảnh</source>
+        <translation>Context help</translation>
+    </message>
+    <message>
+        <source>Lịch sử dòng lệnh đầy đủ</source>
+        <translation>Full command history</translation>
+    </message>
+    <message>
+        <source>Hỗ trợ vẽ</source>
+        <translation>Drafting aids</translation>
+    </message>
+    <message>
+        <source>Bật/tắt bắt điểm</source>
+        <translation>Toggle object snap</translation>
+    </message>
+    <message>
+        <source>Đổi mặt isometric</source>
+        <translation>Switch isometric plane</translation>
+    </message>
+    <message>
+        <source>Lưới</source>
+        <translation>Grid</translation>
+    </message>
+    <message>
+        <source>Ortho</source>
+        <translation>Ortho</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Snap</translation>
+    </message>
+    <message>
+        <source>Polar</source>
+        <translation>Polar</translation>
+    </message>
+    <message>
+        <source>Theo dõi bắt điểm</source>
+        <translation>Object snap tracking</translation>
+    </message>
+    <message>
+        <source>Nhập động</source>
+        <translation>Dynamic input</translation>
+    </message>
+    <message>
+        <source>Thuộc tính nhanh</source>
+        <translation>Quick properties</translation>
+    </message>
+    <message>
+        <source>Suy luận ràng buộc</source>
+        <translation>Infer constraints</translation>
+    </message>
+    <message>
+        <source>Chọn luân phiên</source>
+        <translation>Selection cycling</translation>
+    </message>
+    <message>
+        <source>Tệp</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <source>Bản vẽ mới</source>
+        <translation>New drawing</translation>
+    </message>
+    <message>
+        <source>Mở bản vẽ</source>
+        <translation>Open drawing</translation>
+    </message>
+    <message>
+        <source>Lưu</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Lưu thành</source>
+        <translation>Save as</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Plot</translation>
+    </message>
+    <message>
+        <source>Đóng bản vẽ</source>
+        <translation>Close drawing</translation>
+    </message>
+    <message>
+        <source>Thoát TrionCAD</source>
+        <translation>Exit TrionCAD</translation>
+    </message>
+    <message>
+        <source>Sửa</source>
+        <translation>Edit</translation>
+    </message>
+    <message>
+        <source>Hoàn tác</source>
+        <translation>Undo</translation>
+    </message>
+    <message>
+        <source>Làm lại</source>
+        <translation>Redo</translation>
+    </message>
+    <message>
+        <source>Cắt</source>
+        <translation>Cut</translation>
+    </message>
+    <message>
+        <source>Sao chép</source>
+        <translation>Copy</translation>
+    </message>
+    <message>
+        <source>Sao chép có điểm gốc</source>
+        <translation>Copy with base point</translation>
+    </message>
+    <message>
+        <source>Dán</source>
+        <translation>Paste</translation>
+    </message>
+    <message>
+        <source>Dán dạng block</source>
+        <translation>Paste as block</translation>
+    </message>
+    <message>
+        <source>Chọn tất cả</source>
+        <translation>Select all</translation>
+    </message>
+    <message>
+        <source>Xóa đối tượng đã chọn</source>
+        <translation>Delete selected objects</translation>
+    </message>
+    <message>
+        <source>Palette, hiển thị</source>
+        <translation>Palettes and display</translation>
+    </message>
+    <message>
+        <source>Palette Thuộc tính</source>
+        <translation>Properties palette</translation>
+    </message>
+    <message>
+        <source>DesignCenter</source>
+        <translation>DesignCenter</translation>
+    </message>
+    <message>
+        <source>Tool Palettes</source>
+        <translation>Tool Palettes</translation>
+    </message>
+    <message>
+        <source>Sheet Set Manager</source>
+        <translation>Sheet Set Manager</translation>
+    </message>
+    <message>
+        <source>Máy tính nhanh</source>
+        <translation>QuickCalc</translation>
+    </message>
+    <message>
+        <source>Bật/tắt dòng lệnh</source>
+        <translation>Toggle command line</translation>
+    </message>
+    <message>
+        <source>Clean Screen</source>
+        <translation>Clean Screen</translation>
+    </message>
+    <message>
+        <source>Kiểu hiển thị tọa độ</source>
+        <translation>Coordinate display mode</translation>
+    </message>
+    <message>
+        <source>Tab tệp kế / trước</source>
+        <translation>Next / previous file tab</translation>
+    </message>
+    <message>
+        <source>Layout kế / trước</source>
+        <translation>Next / previous layout</translation>
+    </message>
+    <message>
+        <source>Chuyển viewport kích hoạt</source>
+        <translation>Switch active viewport</translation>
+    </message>
+    <message>
+        <source>Windows</source>
+        <translation>Windows</translation>
+    </message>
+    <message>
+        <source>bộ gõ (đổi kiểu gõ tiếng Việt)</source>
+        <translation>input method (switch Vietnamese typing mode)</translation>
+    </message>
+    <message>
+        <source>macOS (chụp màn hình)</source>
+        <translation>macOS (screenshot)</translation>
+    </message>
+    <message>
+        <source>macOS (ẩn ứng dụng)</source>
+        <translation>macOS (hide application)</translation>
+    </message>
+    <message>
+        <source>macOS (thu nhỏ cửa sổ)</source>
+        <translation>macOS (minimize window)</translation>
+    </message>
+</context>
 </TS>
