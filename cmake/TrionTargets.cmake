@@ -65,8 +65,14 @@ function(trion_add_test name)
   if(NOT A_TIMEOUT)
     set(A_TIMEOUT 60)
   endif()
+  set(env "QT_QPA_PLATFORM=offscreen;QT_ENABLE_HIGHDPI_SCALING=0")
+  set(wslenv "QT_QPA_PLATFORM:QT_ENABLE_HIGHDPI_SCALING")
+  if(WIN32) # offscreen trên Windows tìm font ở <Qt>/lib/fonts (trống): không có font nào, đo chữ sai
+    string(APPEND env ";QT_QPA_FONTDIR=C:/Windows/Fonts")
+    string(APPEND wslenv ":QT_QPA_FONTDIR")
+  endif()
   set_tests_properties(${name} PROPERTIES
     TIMEOUT ${A_TIMEOUT}
     LABELS "${A_LABELS};cpp"
-    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_ENABLE_HIGHDPI_SCALING=0;WSLENV=QT_QPA_PLATFORM:QT_ENABLE_HIGHDPI_SCALING")
+    ENVIRONMENT "${env};WSLENV=${wslenv}")
 endfunction()
