@@ -8,7 +8,10 @@
 #    khác, bản dịch còn nguyên, chạy lại trên build đủ thành phần là dùng lại.
 #  - Mỗi lần build: lrelease → .qm nhúng vào trion_i18n tại :/i18n/trion_<mã>.qm (Translator nạp).
 #  - ctest -L i18n: i18n_lint (chuỗi viết thẳng, ghép bằng + trong app/), i18n_ts (.ts đủ bản dịch, khớp
-#    nguồn), i18n_lint_selftest (test của ci/lint/i18n).
+#    nguồn), i18n_lint_glossary (nhãn đúng bảng thuật ngữ glossary.tsv, UI0-005), i18n_lint_selftest (test của
+#    ci/lint/i18n).
+#  - qtbase_vi.ts (chuỗi có sẵn của Qt bằng tiếng Việt) viết tay, không qua lupdate: lrelease ở
+#    app/core/i18n/CMakeLists.txt.
 
 qt_collect_translation_source_targets(trion_i18n_targets)
 
@@ -38,7 +41,10 @@ file(WRITE ${CMAKE_BINARY_DIR}/i18n/lint.lst "${lint_lst}")
 set(lint_dir ${CMAKE_SOURCE_DIR}/ci/lint/i18n)
 add_test(NAME i18n_lint COMMAND ${Python3_EXECUTABLE} ${lint_dir}/lint.py @${CMAKE_BINARY_DIR}/i18n/lint.lst)
 add_test(NAME i18n_lint_selftest COMMAND ${Python3_EXECUTABLE} -m unittest discover -s ${lint_dir}/tests)
-set_tests_properties(i18n_lint i18n_lint_selftest PROPERTIES LABELS i18n
+file(GLOB all_ts ${app_dir}/i18n/*.ts)
+add_test(NAME i18n_lint_glossary
+  COMMAND ${Python3_EXECUTABLE} ${lint_dir}/glossary.py ${app_dir}/i18n/glossary.tsv ${all_ts})
+set_tests_properties(i18n_lint i18n_lint_selftest i18n_lint_glossary PROPERTIES LABELS i18n
   ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1;LUPDATE=$<TARGET_FILE:Qt6::lupdate>")
 
 if(TARGET trion_i18n)

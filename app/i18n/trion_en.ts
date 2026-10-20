@@ -32,6 +32,101 @@
     </message>
 </context>
 <context>
+    <name>ProbeScreen</name>
+    <message>
+        <source>Độ dày nét theo layer</source>
+        <translation>Lineweight by layer</translation>
+    </message>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Kiểu đường</source>
+        <translation>Linetype</translation>
+    </message>
+    <message>
+        <source>Xuất ra tệp PDF</source>
+        <translation>Export to PDF file</translation>
+    </message>
+    <message>
+        <source>Áp dụng</source>
+        <translation>Apply</translation>
+    </message>
+    <message>
+        <source>Hiện độ dày nét</source>
+        <translation>Show lineweight</translation>
+    </message>
+    <message>
+        <source>Khóa layer</source>
+        <translation>Lock layer</translation>
+    </message>
+    <message>
+        <source>Thiết lập trang</source>
+        <translation>Page setup</translation>
+    </message>
+    <message>
+        <source>Bắt điểm</source>
+        <translation>Object snap</translation>
+    </message>
+    <message>
+        <source>Mặt bằng tầng 1</source>
+        <translation>Floor plan, level 1</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Bản vẽ</source>
+        <translation>Drawing</translation>
+    </message>
+    <message>
+        <source>Độ dày nét</source>
+        <translation>Lineweight</translation>
+    </message>
+    <message>
+        <source>Mô tả</source>
+        <translation>Description</translation>
+    </message>
+    <message>
+        <source>Ghi chú</source>
+        <translation>Notes</translation>
+    </message>
+    <message>
+        <source>Nét liền mảnh cho đường bao</source>
+        <translation>Thin continuous line for outlines</translation>
+    </message>
+    <message>
+        <source>Nét đứt</source>
+        <translation>Dashed line</translation>
+    </message>
+    <message>
+        <source>Mở</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>Lưu bản vẽ thành tệp mới</source>
+        <translation>Save drawing as a new file</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>Sao chép</source>
+        <translation>Copy</translation>
+    </message>
+    <message>
+        <source>Dán</source>
+        <translation>Paste</translation>
+    </message>
+    <message>
+        <source>Chọn tất cả</source>
+        <translation>Select all</translation>
+    </message>
+</context>
+<context>
     <name>TranslatorTest</name>
     <message>
         <source>Đã lưu %1 vào %2</source>
@@ -43,6 +138,44 @@
             <numerusform>%n object selected</numerusform>
             <numerusform>%n objects selected</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Bản vẽ (*.dwg)</source>
+        <translation>Drawings (*.dwg)</translation>
+    </message>
+</context>
+<context>
+    <name>TruncationTest</name>
+    <message>
+        <source>Chú thích</source>
+        <translation>Note</translation>
+    </message>
+    <message>
+        <source>Bản vẽ này có nhiều layer đang khóa</source>
+        <translation>This drawing has many locked layers</translation>
+    </message>
+</context>
+<context>
+    <name>UiFormat</name>
+    <message>
+        <source>%1 giây</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>%1 phút %2 giây</source>
+        <translation>%1 min %2 s</translation>
+    </message>
+    <message>
+        <source>%1 phút</source>
+        <translation>%1 min</translation>
+    </message>
+    <message>
+        <source>%1 giờ %2 phút</source>
+        <translation>%1 h %2 min</translation>
+    </message>
+    <message>
+        <source>%1 giờ</source>
+        <translation>%1 h</translation>
     </message>
 </context>
 <context>

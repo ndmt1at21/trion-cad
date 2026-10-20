@@ -1,14 +1,21 @@
 #include "app/core/i18n/Translator.h"
 
+#include "core/base/sched/Scheduler.h"
 #include "core/base/settings/Settings.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QElapsedTimer>
+#include <QErrorMessage>
 #include <QHBoxLayout>
 #include <QHash>
+#include <QKeySequence>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -18,6 +25,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <memory>
 
 using namespace Qt::StringLiterals;
 using trion::i18n::Translator;
@@ -123,6 +131,94 @@ private slots:
         QCOMPARE(tr("Đã lưu %1 vào %2").arg(u"A.dwg"_s, u"D:"_s), u"Saved A.dwg to D:"_s);
         QVERIFY(t.setLanguage(u"vi"_s));
         QCOMPARE(tr("%n đối tượng được chọn", nullptr, 1), u"1 đối tượng được chọn"_s);
+    }
+
+    // UI0-005 tiêu chí 5: chuỗi có sẵn của Qt (menu chuột phải ô nhập, nút chuẩn) hiện tiếng Việt ở vi, đổi
+    // theo ngôn ngữ khi đang chạy.
+    void qtStringsInVietnamese()
+    {
+        QTemporaryDir dir;
+        Store s(dir.filePath(u"user.json"_s));
+        Store::setInstance(&s);
+        Translator t;
+        QLineEdit edit;
+        QDialogButtonBox box(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply
+                             | QDialogButtonBox::RestoreDefaults);
+        QMessageBox ask;
+        ask.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard);
+        const auto menu = [&] {
+            const std::unique_ptr<QMenu> m(edit.createStandardContextMenu());
+            QStringList texts;
+            for (const QAction* a : m->actions())
+                if (!a->isSeparator())
+                    texts << a->text().section(u'\t', 0, 0); // bỏ phím tắt sau tab
+            return texts;
+        };
+        const auto button = [&](QDialogButtonBox::StandardButton b) { return box.button(b)->text(); };
+
+        QCOMPARE(menu(), (QStringList{u"&Hoàn tác"_s, u"&Làm lại"_s, u"Cắ&t"_s, u"Sao &chép"_s, u"&Dán"_s, u"Xóa"_s,
+                                      u"Chọn tất cả"_s}));
+        QCOMPARE(button(QDialogButtonBox::Ok), u"OK"_s);
+        QCOMPARE(button(QDialogButtonBox::Cancel), u"Hủy"_s);
+        QCOMPARE(button(QDialogButtonBox::Apply), u"Áp dụng"_s);
+        QCOMPARE(button(QDialogButtonBox::RestoreDefaults), u"Khôi phục mặc định"_s);
+        QCOMPARE(ask.button(QMessageBox::Yes)->text(), u"&Có"_s);
+        QCOMPARE(ask.button(QMessageBox::No)->text(), u"&Không"_s);
+        QCOMPARE(ask.button(QMessageBox::Discard)->text(), u"Không lưu"_s);
+
+        QVERIFY(t.setLanguage(u"en"_s));
+        QCoreApplication::processEvents(); // LanguageChange → QDialogButtonBox, QMessageBox dịch lại nút
+        QCOMPARE(menu().constFirst(), u"&Undo"_s);
+        QCOMPARE(button(QDialogButtonBox::Cancel), u"Cancel"_s);
+        QCOMPARE(ask.button(QMessageBox::Yes)->text(), u"&Yes"_s);
+        QVERIFY(t.setLanguage(u"vi"_s));
+        QCoreApplication::processEvents();
+        QCOMPARE(button(QDialogButtonBox::Cancel), u"Hủy"_s);
+        QCOMPARE(menu().constFirst(), u"&Hoàn tác"_s);
+        trion::sched::waitIdle(); // Store ghi nền xong trước khi xóa thư mục tạm
+    }
+
+    // UI0-005: vi-XL kéo dài bản vi ⌈40%⌉ ký tự (ít nhất 2) bằng chữ có dấu chồng tầng; không lưu vào Store;
+    // tên phím (QShortcut) giữ nguyên.
+    void pseudoLanguage()
+    {
+        QTemporaryDir dir;
+        Store s(dir.filePath(u"user.json"_s));
+        Store::setInstance(&s);
+        const QString xl = trion::i18n::kPseudoLanguage.toString();
+        QLineEdit edit;
+        QDialogButtonBox box(QDialogButtonBox::Cancel);
+        QErrorMessage err; // chuỗi Qt không có trong qtbase_vi: kéo dài chính chuỗi tiếng Anh
+        {
+            Translator t;
+            const QString keys = QKeySequence(Qt::CTRL | Qt::Key_S).toString(QKeySequence::NativeText);
+            QSignalSpy changed(&t, &Translator::languageChanged);
+            QVERIFY(!Translator::languages().contains(xl));
+            QVERIFY(t.setLanguage(xl));
+            QCOMPARE(changed.count(), 1);
+            QCOMPARE(t.language(), xl);
+            QCOMPARE(s.get(trion::i18n::kLanguage), u"vi"_s); // không lưu
+            QCoreApplication::processEvents();
+
+            // ca vàng: placeholder và số nhiều còn nguyên; cụm "Ẫễỗậ" ngăn bằng dấu cách, không kết thúc bằng dấu cách
+            QCOMPARE(tr("Đã lưu %1 vào %2").arg(u"A.dwg"_s, u"D:"_s), u"Đã lưu A.dwg vào D: Ẫễỗậ Ẫ"_s);
+            QCOMPARE(tr("%n đối tượng được chọn", nullptr, 3), u"3 đối tượng được chọn Ẫễỗậ Ẫễỗ"_s);
+            QCOMPARE(tr("Bản vẽ (*.dwg)"), u"Bản vẽ Ẫễỗậ Ẫ (*.dwg)"_s); // bộ lọc tệp còn dùng được
+            QCOMPARE(box.button(QDialogButtonBox::Cancel)->text(), u"Hủy Ẫ"_s); // qtbase_vi rồi kéo dài
+            const std::unique_ptr<QMenu> menu(edit.createStandardContextMenu());
+            QCOMPARE(menu->actions().constFirst()->text().section(u'\t', 0, 0), u"&Hoàn tác Ẫễỗ"_s);
+            const QString again = err.findChild<QCheckBox*>()->text();
+            const QString english = u"&Show this message again"_s;
+            QVERIFY2(again.startsWith(english + u" Ẫễỗậ"_s) && again.size() >= english.size() * 14 / 10,
+                     qPrintable(again));
+            QCOMPARE(QKeySequence(Qt::CTRL | Qt::Key_S).toString(QKeySequence::NativeText), keys);
+
+            QVERIFY(t.setLanguage(u"vi"_s));
+            QCOMPARE(tr("%n đối tượng được chọn", nullptr, 3), u"3 đối tượng được chọn"_s);
+        }
+        s.set(trion::i18n::kLanguage, xl); // QA mở thẳng ở vi-XL: sửa tay tệp cài đặt
+        Translator t;
+        QCOMPARE(t.language(), xl);
     }
 
     // Tiêu chí 1: 2.000 widget mang chữ đang hiện đổi vi ↔ en ≤ 300 ms, giữ trạng thái.

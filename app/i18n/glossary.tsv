@@ -1,0 +1,39 @@
+# Bảng thuật ngữ vi/en (UI0-005, 07.1 §13.4) cho ci/lint/i18n/glossary.py (ctest i18n_lint_glossary); cột cách bằng tab.
+# term: thuật ngữ CAD gốc · label: nhãn tiếng Việt đúng · vi: regex nhận ra nhãn đúng trong chuỗi tiếng Việt
+# (trống: không kiểm bản en) · wrong_vi: regex nhãn sai trong chuỗi tiếng Việt · en: regex bản English phải có
+# khi chuỗi tiếng Việt có nhãn đúng · note: ghi chú. Regex Python, không phân biệt hoa/thường, tự thêm ranh giới
+# từ hai đầu; (?<!\() = được phép khi đứng ngay sau dấu mở ngoặc (giải nghĩa: "Kiểu đường (Linetype)").
+# Ngoại lệ có lý do: dòng `//: glossary-ok: <lý do>` ngay trước tr() trong mã (hoặc chú thích người dịch trong .ts).
+term	label	vi	wrong_vi	en	note
+Layer	Layer	layers?	lớp	layers?	giữ tiếng Anh; "lớp" nghĩa khác (lớp phủ…) thì ghi glossary-ok
+Properties	Thuộc tính	thuộc tính(?! block)	đặc tính|properties	propert(?:y|ies)	"thuộc tính block" là Attribute
+Block	Block	blocks?	khối	blocks?	"khối" của vật thể 3D (solid) thì ghi glossary-ok
+Attribute	Attribute (thuộc tính block)	attributes?	(?<!\()thuộc tính block	attributes?	giải nghĩa trong ngoặc được phép
+Layout	Layout	layouts?	bố cục	layouts?	"bố cục" của cửa sổ/palette (không phải Layout bản vẽ) thì ghi glossary-ok
+Model space	Model	model	không gian mô hình	model	
+Paper space	Paper	paper	không gian giấy	paper	
+Viewport	Viewport	viewports?	khung nhìn|cổng nhìn|cửa sổ nhìn	viewports?	
+Linetype	Kiểu đường (Linetype)	kiểu đường	loại đường|kiểu nét|dạng đường|(?<!\()linetypes?	linetypes?	
+Lineweight	Độ dày nét	độ dày nét	độ rộng nét|bề dày nét|độ dày đường|trọng lượng nét|độ đậm nét|(?<!\()lineweights?	lineweights?	
+Hatch	Hatch (tô vật liệu)	hatch	mẫu tô|(?<!\()tô vật liệu	hatch(?:es|ing)?	
+Dimension	Kích thước		(?<!\()dimensions?		"kích thước" cũng là cỡ: không kiểm bản en
+Leader	Đường dẫn		đường chú thích|(?<!\()leaders?		"đường dẫn" cũng là đường dẫn tệp: không kiểm bản en
+Multileader	Multileader	multileaders?	đa đường dẫn|nhiều đường dẫn	m(?:ulti)?leaders?	
+Text style	Kiểu chữ		kiểu văn bản|kiểu text		"kiểu chữ" cũng là kiểu phông: không kiểm bản en
+Dim style	Kiểu kích thước	kiểu kích thước	kiểu ghi kích thước|kiểu dim	dim(?:ension)? styles?	
+Plot	In		(?<!\()plot		"in" quá ngắn, "máy in" là printer: không kiểm bản en
+Plot style	Kiểu in (Plot style)	kiểu in	kiểu plot	plot styles?	
+Page setup	Thiết lập trang	thiết lập trang	cài đặt trang|thiết đặt trang|định dạng trang|(?<!\()page setups?	page setups?	
+Xref	Tham chiếu ngoài (Xref)	tham chiếu ngoài	tham khảo ngoài|tham chiếu bên ngoài|(?<!\()xrefs?	xrefs?|external references?	
+Snap	Snap	snap	bắt dính	snap	
+Object snap	Bắt điểm (OSNAP)	bắt điểm	truy bắt|(?<!\()object snap|osnap	snap	OSNAP viết hoa là tên lệnh, được phép
+Tracking	Theo dõi		truy vết|bám đuổi|(?<!\()tracking		"theo dõi" nghĩa chung: không kiểm bản en
+Grip	Grip	grips?	điểm nắm|tay nắm|điểm kéo|nút kéo	grips?	
+Purge	Dọn dẹp		xóa rác|thanh lọc|(?<!\()purge		"dọn dẹp" nghĩa chung: không kiểm bản en
+Audit	Kiểm tra lỗi		kiểm toán|(?<!\()audit		"kiểm tra lỗi" nghĩa chung: không kiểm bản en
+Recover	Phục hồi		(?<!\()recover		"khôi phục" là Restore, được phép
+Annotative	Chú thích theo tỉ lệ	chú thích theo tỉ lệ	chú thích theo tỷ lệ|(?<!\()annotative	annotative	
+Annotation scale	Tỉ lệ chú thích	tỉ lệ chú thích	tỷ lệ chú thích|(?<!\()annotation scales?	annotation scales?	
+Template	Mẫu bản vẽ	mẫu bản vẽ	bản mẫu|khuôn mẫu|(?<!\()templates?	templates?	
+Workspace	Không gian làm việc	không gian làm việc	vùng làm việc|khu vực làm việc|(?<!\()workspaces?	workspaces?	
+Command line	Dòng lệnh	dòng lệnh	thanh lệnh|(?<!\()command line	command	"lịch sử dòng lệnh" = command history: chỉ đòi "command"

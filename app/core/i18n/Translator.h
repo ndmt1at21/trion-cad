@@ -40,21 +40,33 @@
 // - Đối tượng không phải widget (model, delegate) không nhận LanguageChange: nối languageChanged() rồi phát
 //   headerDataChanged() / dataChanged().
 // - Chuỗi mới: `cmake --build <build> --target update_translations` cập nhật app/i18n/*.ts, dịch bằng Qt
-//   Linguist; `ctest -L i18n` báo chuỗi thiếu bản dịch.
+//   Linguist; `ctest -L i18n` báo chuỗi thiếu bản dịch và nhãn sai bảng thuật ngữ (app/i18n/glossary.tsv).
+//
+// UI0-005: ở "vi" còn nạp app/i18n/qtbase_vi.ts (chuỗi có sẵn của Qt: menu chuột phải ô nhập, nút chuẩn của
+// QDialogButtonBox/QMessageBox…; Qt 6.11 không có bản tiếng Việt). Số, ngày, dung lượng: UiFormat.h. Ngôn ngữ giả
+// kPseudoLanguage cho QA tìm chữ bị cắt: TruncationProbe.h.
 
 #include "core/base/settings/Settings.h"
 
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QStringView>
 #include <QTranslator>
 
 #include <memory>
+#include <vector>
 
 namespace trion::i18n {
 
 // Lựa chọn ngôn ngữ (NT-010): mã ISO 639-1. Giá trị lạ trong tệp cài đặt coi như "vi".
 inline const settings::Setting<QString> kLanguage{"ui/language", QStringLiteral("vi")};
+
+// Ngôn ngữ giả cho QA (UI0-005, 07.3 Phụ lục C): bản tiếng Việt kéo dài thêm ⌈40%⌉ ký tự (ít nhất 2) bằng chữ có
+// dấu chồng tầng ("Thuộc tính" → "Thuộc tính Ẫễỗ"), để lộ chỗ bị cắt ngang và dọc. Tên phím (ngữ cảnh QShortcut)
+// giữ nguyên như ở vi. Không nằm trong languages(), setLanguage không lưu nó vào Store; muốn mở ứng dụng thẳng ở
+// vi-XL thì sửa tay "ui/language" trong tệp cài đặt. Số, ngày (UiFormat) theo vi.
+inline constexpr QStringView kPseudoLanguage = u"vi-XL";
 
 class Translator : public QObject {
     Q_OBJECT
@@ -65,12 +77,13 @@ public:
     ~Translator() override; // gỡ bản dịch
 
     static Translator* instance();  // bộ dịch đang sống (main tạo), nullptr nếu chưa có
-    static QStringList languages(); // {"vi", "en"}
+    static QStringList languages(); // {"vi", "en"}: ngôn ngữ người dùng chọn được (không gồm kPseudoLanguage)
 
     QString language() const { return lang_; }
 
     // Đổi ngay: thay QTranslator nên Qt gửi QEvent::LanguageChange tới mọi widget ở lượt xử lý sự kiện kế
-    // tiếp (mỗi widget một lần), lưu lựa chọn vào Store, phát languageChanged. Mã lạ: trả false, giữ nguyên.
+    // tiếp (mỗi widget một lần), lưu lựa chọn vào Store, phát languageChanged. Nhận cả kPseudoLanguage (không
+    // lưu). Mã lạ: trả false, giữ nguyên.
     bool setLanguage(const QString& lang);
 
 signals:
@@ -79,7 +92,7 @@ signals:
 private:
     bool install(const QString& lang);
 
-    std::unique_ptr<QTranslator> qm_;
+    std::vector<std::unique_ptr<QTranslator>> qm_; // trion_<mã>, với vi thêm qtbase_vi
     QString lang_;
 };
 
