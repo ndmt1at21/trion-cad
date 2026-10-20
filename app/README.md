@@ -34,6 +34,8 @@ ctest --test-dir build/win --output-on-failure        # chạy trên máy, khôn
   Mỗi thành phần là một thư viện tĩnh `trion_<tên>` (`trion_add_library`) cùng test của nó.
 - Test: Qt Test, tệp `<thành phần>/tests/<tên>_test.cpp`, đăng ký bằng `trion_add_test(<tên>_test SOURCES … LIBS … LABELS <tên>)`.
   Test chạy với `QT_QPA_PLATFORM=offscreen`; mỗi bộ test < 60 s (DoD-C 2). Tool Python test bằng `unittest`.
+  Dọn dẹp (Store, cửa sổ, ThemeManager) trong `cleanupTestCase()`, không để hàm hủy của lớp test: chạy sau `qExec`
+  thì TSan báo race giả với luồng watchdog của Qt Test.
 - Include theo đường dẫn từ gốc kho: `#include "core/base/settings/Settings.h"`.
 - Mã sinh tự động nằm trong thư mục build, include bằng cùng đường dẫn như ở kho (`app/theme/generated/Tokens.h`).
 
@@ -58,7 +60,13 @@ Không sửa `core/base` khi đang làm task UI; cần thêm thì ghi vào báo 
 - Kết quả việc nền về luồng UI qua `trion::ui::post`/`postLatest` (`app/core/UiExecutor.h`, UI0-101), không qua
   `QMetaObject::invokeMethod`/`postEvent`: Qt bản cài sẵn không biên dịch với TSan nên TSan không thấy đồng bộ
   bên trong Qt và báo race giả.
+- Màu, cỡ, khoảng cách, thời gian chuyển động đọc qua `trion::theme::ThemeManager::instance()` (`app/theme/ThemeManager.h`)
+  ngay trong `paintEvent`/`sizeHint`, không cache; test tự tạo `ThemeManager` với `Store` tạm.
 - **Ngôn ngữ nguồn của chuỗi là tiếng Việt** (giống prototype); bản English nằm trong `app/i18n/trion_en.ts`.
+- Số đếm, dung lượng, ngày giờ, thời lượng của giao diện qua `UiFormat` (`app/core/i18n/UiFormat.h`), không qua locale
+  máy; số của bản vẽ (tọa độ, kích thước, góc) chỉ qua RGN-013 (`core/regen/numfmt`), luôn dấu chấm thập phân.
+- Màn hình mới chạy thử với ngôn ngữ giả vi-XL (chuỗi dài hơn 40%) và `findTruncations` (`app/core/i18n/TruncationProbe.h`):
+  0 chữ bị cắt.
 - Chú thích trong mã viết tiếng Việt, tên định danh tiếng Anh. Chỗ cố ý làm đơn giản ghi `ponytail:` kèm giới hạn và
   task sẽ nâng cấp.
 - Không thêm thư viện ngoài 05 §2. Mã của chính chủ dự án trong `~/snapone` (C++/Qt, cùng tác giả) được phép tái dùng:
