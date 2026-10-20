@@ -1,6 +1,14 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
-ColumnLimit: 110
+ColumnLimit: 120
+AccessModifierOffset: -4
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
 AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
 PointerAlignment: Left
 SortIncludes: CaseInsensitive
+IncludeBlocks: Preserve
+SpacesBeforeTrailingComments: 1
+AlwaysBreakTemplateDeclarations: Yes
