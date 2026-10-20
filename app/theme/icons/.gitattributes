@@ -1,0 +1,3 @@
+# Tệp sinh bởi tools/iconconv; test so từng byte với kết quả chạy lại, nên giữ LF trên mọi hệ điều hành.
+*.svg text eol=lf
+*.json text eol=lf
