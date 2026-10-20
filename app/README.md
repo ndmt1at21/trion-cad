@@ -55,6 +55,9 @@ Không sửa `core/base` khi đang làm task UI; cần thêm thì ghi vào báo 
 
 - Theo DoD-U (README task §3): chỉ dùng token (sau UI0-002), mọi chuỗi qua `tr()`, không chặn luồng UI quá 2 ms,
   danh sách > 200 dòng phải ảo hóa, rảnh không timer định kỳ.
+- Kết quả việc nền về luồng UI qua `trion::ui::post`/`postLatest` (`app/core/UiExecutor.h`, UI0-101), không qua
+  `QMetaObject::invokeMethod`/`postEvent`: Qt bản cài sẵn không biên dịch với TSan nên TSan không thấy đồng bộ
+  bên trong Qt và báo race giả.
 - **Ngôn ngữ nguồn của chuỗi là tiếng Việt** (giống prototype); bản English nằm trong `app/i18n/trion_en.ts`.
 - Chú thích trong mã viết tiếng Việt, tên định danh tiếng Anh. Chỗ cố ý làm đơn giản ghi `ponytail:` kèm giới hạn và
   task sẽ nâng cấp.
