@@ -38,3 +38,7 @@ trion_component(app/core/perf)
 trion_component(app/core/keymap)
 trion_component(app/widgets/numeric)
 trion_component(tests/integration)
+
+# Bước dịch (UI0-104): lupdate/lrelease cho mọi target đã cấu hình và test i18n. Phải đứng sau mọi
+# trion_component(); xem app/i18n/i18n.cmake.
+include(app/i18n/i18n.cmake)
