@@ -8,6 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Sanitizer theo preset: "address,undefined" hoặc "thread". Rỗng là tắt.
 set(TRION_SANITIZE "" CACHE STRING "Sanitizer bật cho mọi target (address,undefined | thread)")
+# Preset fuzz: mọi target được đo phủ cho libFuzzer; target fuzz tạo bằng trion_add_fuzz (DoD-C 7).
+option(TRION_FUZZ "Build target fuzz (clang, libFuzzer)" OFF)
 
 function(trion_apply_flags target)
   if(MSVC)
@@ -23,5 +25,8 @@ function(trion_apply_flags target)
   if(TRION_SANITIZE)
     target_compile_options(${target} PRIVATE -fsanitize=${TRION_SANITIZE} -fno-omit-frame-pointer -fno-sanitize-recover=all)
     target_link_options(${target} PRIVATE -fsanitize=${TRION_SANITIZE})
+  endif()
+  if(TRION_FUZZ)
+    target_compile_options(${target} PRIVATE -fsanitize=fuzzer-no-link)
   endif()
 endfunction()

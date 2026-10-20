@@ -48,6 +48,16 @@
       }
     },
     {
+      "name": "fuzz",
+      "inherits": "base",
+      "displayName": "libFuzzer + ASan + UBSan (clang)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "TRION_SANITIZE": "address,undefined",
+        "TRION_FUZZ": "ON"
+      }
+    },
+    {
       "name": "win",
       "inherits": "base",
       "displayName": "Windows x64 (llvm-mingw, build chéo; test chạy trên Windows, kể cả từ WSL)",
@@ -76,6 +86,10 @@
     {
       "name": "tsan",
       "configurePreset": "tsan"
+    },
+    {
+      "name": "fuzz",
+      "configurePreset": "fuzz"
     },
     {
       "name": "win",
@@ -118,6 +132,16 @@
       "configurePreset": "tsan",
       "environment": {
         "TSAN_OPTIONS": "halt_on_error=1:suppressions=${sourceDir}/ci/tsan.supp"
+      }
+    },
+    {
+      "name": "fuzz",
+      "inherits": "base",
+      "configurePreset": "fuzz",
+      "filter": {
+        "include": {
+          "label": "fuzz"
+        }
       }
     }
   ]

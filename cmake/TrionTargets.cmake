@@ -1,5 +1,7 @@
 # trion_add_library(<tên> [STATIC] SOURCES ... LIBS ...)
 # trion_add_test(<tên> SOURCES ... LIBS ... [LABELS ...] [TIMEOUT s])
+# trion_add_fuzz(<tên> SOURCES ... LIBS ... [CORPUS thư mục]): chỉ build ở preset fuzz. ctest chạy
+#   khói 20 s (nhãn fuzz); chạy dài: build/fuzz/bin/<tên> -max_total_time=3600 <corpus>.
 #   Test dùng Qt Test (có sẵn trong Qt, 05 §2). Chạy với QT_QPA_PLATFORM=offscreen.
 #   DoD-C 2: bộ test của một module chạy dưới 60 s, nên TIMEOUT mặc định 60.
 # Bản Windows (preset win): mọi .exe vào <build>/bin cạnh DLL của Qt (trion_deploy_qt_runtime), nên
@@ -35,6 +37,21 @@ function(trion_add_library name)
   target_link_libraries(${name} PUBLIC ${A_LIBS})
   target_include_directories(${name} PUBLIC ${CMAKE_SOURCE_DIR})
   trion_apply_flags(${name})
+endfunction()
+
+function(trion_add_fuzz name)
+  cmake_parse_arguments(A "" "CORPUS" "SOURCES;LIBS" ${ARGN})
+  if(NOT TRION_FUZZ)
+    return()
+  endif()
+  add_executable(${name} ${A_SOURCES})
+  target_link_libraries(${name} PRIVATE ${A_LIBS})
+  target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR})
+  trion_apply_flags(${name})
+  target_link_options(${name} PRIVATE -fsanitize=fuzzer)
+  set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  add_test(NAME ${name} COMMAND ${name} -max_total_time=20 ${A_CORPUS})
+  set_tests_properties(${name} PROPERTIES LABELS fuzz TIMEOUT 60)
 endfunction()
 
 function(trion_add_test name)
