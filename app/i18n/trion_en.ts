@@ -544,6 +544,25 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::DialogFrame</name>
+    <message>
+        <source>Trợ giúp (F1)</source>
+        <translation>Help (F1)</translation>
+    </message>
+    <message>
+        <source>Đóng (Esc)</source>
+        <translation>Close (Esc)</translation>
+    </message>
+    <message>
+        <source>Hủy</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Đang tải…</source>
+        <translation>Loading…</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::Menu</name>
     <message>
         <source>Khóa, cần bản %1</source>
