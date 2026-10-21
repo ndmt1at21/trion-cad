@@ -20,17 +20,32 @@
 //   host->showPalette(u"layers"_s);                         // lệnh LAYER, phím Ctrl+1… (UI0-015)
 // Bố cục lưu khi cửa sổ nhận QEvent::Close, hoặc khi gọi saveLayout().
 //
-// Cho UI0-010 (tự ẩn thành dải, quy tắc theo màn hình, đổi DPI): dock(id) là QDockWidget thường (tín hiệu
-// topLevelChanged, dockLocationChanged, visibilityChanged); ghim là trạng thái của host (isPinned, setPinned,
-// pinnedChanged), nút ghim trên đầu palette đã nối, lưu cùng bố cục.
-// ponytail: bỏ ghim chỉ đổi trạng thái và phát pinnedChanged; thu thành dải 22 px là UI0-010.
+// UI0-010 · Tự ẩn, quy tắc theo màn hình, đổi DPI:
+//   - Ghim là trạng thái của từng palette (isPinned, setPinned, pinnedChanged; nút ghim trên đầu palette), độc lập
+//     với mở/đóng. Bỏ ghim palette đang mở: thu vào dải 22 px ở cạnh của nó (AutoHideStrip, strip(cạnh)); ghim lại:
+//     về đúng chỗ dock cũ. showPalette() palette bỏ ghim: vào dải nếu đang đóng, trượt ra không lấy focus. Đóng
+//     palette tự ẩn: ra khỏi dải, vẫn bỏ ghim (mở lại thì lại trượt ra). moveTo() ghim palette. Lưu cả palette
+//     trong dải ("ui/palettes/strip").
+//   - Bố cục mặc định theo lớp màn hình (restoreLayout(screen), DisplayContext::classify): Wide (≥ 1600 px) theo
+//     PaletteSpec (visible, pinned); hẹp hơn: mọi palette bỏ ghim, palette mặc định mở nằm ở dải.
+//   - Palette nổi (một palette hoặc nhóm tab nổi) được DisplayContext::track sau trackDisplay(); đổi DPI hoặc màn
+//     hình (không đang kéo) thì về trọn vùng làm việc; rút màn hình lúc đang chạy thì về màn hình còn lại
+//     (fitToScreens). Palette đang trượt ra theo dải (đổi cỡ, đổi chỗ khi cửa sổ đổi màn hình, DPI).
+//   Dùng (UIA-001): host->restoreLayout(DisplayContext::classify(window.screen()->geometry().width())) trước
+//   window.show(); tạo DisplayContext display(&window) xong thì host->trackDisplay(display).
+// ponytail: quy tắc theo màn hình chỉ cho bố cục mặc định (chưa lưu); đổi lớp màn hình lúc chạy (kéo cửa sổ sang
+// màn hình hẹp) không tự bỏ ghim — nối DisplayContext::screenClassChanged nếu UIA-001 cần. Bật/tắt dock bằng
+// toggleViewAction() của Qt bỏ qua dải: dùng showPalette()/close().
 // ponytail: F6 / Shift+F6 đặt thẳng ở đây (QAction của cửa sổ); chuyển vào bảng phím một nguồn khi UI0-015 nối hành
 // động, lúc đó gọi focusNextPalette().
+#include "app/core/display/DisplayContext.h"
 #include "core/base/settings/Settings.h"
 
 #include <QHash>
 #include <QList>
+#include <QMap>
 #include <QObject>
+#include <QPointer>
 #include <QRect>
 #include <QSet>
 #include <QStringList>
@@ -43,6 +58,7 @@ class QWidget;
 
 namespace trion::ui {
 
+class AutoHideStrip;
 class PaletteHeader;
 
 struct PaletteSpec {
@@ -51,6 +67,7 @@ struct PaletteSpec {
     std::function<QWidget*()> create; // dựng nội dung ở lần hiện đầu; dock sở hữu widget trả về
     Qt::DockWidgetArea area = Qt::RightDockWidgetArea; // chỗ mặc định: trái, phải, dưới; trùng chỗ thì gộp tab
     bool visible = false;                              // hiện trong bố cục mặc định
+    bool pinned = true; // ghim trong bố cục mặc định ở màn hình rộng; false: palette mở nằm ở dải tự ẩn
 };
 
 class PaletteHost : public QObject {
@@ -68,16 +85,28 @@ public:
     QStringList ids() const { return order_; }      // theo thứ tự đăng ký
 
     // Hiện palette, đưa lên đầu nhóm tab, dựng nội dung nếu chưa. Không lấy focus (vùng vẽ vẫn nhận phím gõ).
+    // Palette bỏ ghim: trượt ra từ dải (vào dải trước nếu đang đóng).
     void showPalette(const QString& id);
-    // Chuyển palette sang dock trái/phải/dưới (gộp tab với palette đang ở đó) hoặc nổi (Qt::NoDockWidgetArea), và hiện.
+    // Ghim rồi chuyển palette sang dock trái/phải/dưới (gộp tab với palette đang ở đó) hoặc nổi
+    // (Qt::NoDockWidgetArea), và hiện.
     void moveTo(const QString& id, Qt::DockWidgetArea area);
 
     bool isPinned(const QString& id) const { return !unpinned_.contains(id); }
+    // Bỏ ghim palette đang mở: thu vào dải ở cạnh của nó (nổi thì về dock mặc định trước); ghim palette đang ở dải:
+    // về dock cũ và mở. Palette đang đóng chỉ đổi trạng thái.
     void setPinned(const QString& id, bool pinned);
+    // Dải tự ẩn ở cạnh side (trái, phải, dưới); nullptr nếu chưa palette nào tự ẩn ở đó.
+    AutoHideStrip* strip(Qt::DockWidgetArea side) const { return strips_.value(side); }
 
     void saveLayout();
-    // Khôi phục bố cục đã lưu, kéo palette nổi về vùng làm việc. false: chưa lưu hoặc không đọc được (giữ mặc định).
-    bool restoreLayout();
+    // Khôi phục bố cục đã lưu (dock, ghim, dải), kéo palette nổi về vùng làm việc. false: chưa lưu hoặc không đọc
+    // được: bố cục mặc định theo screen (hẹp hơn Wide: mọi palette bỏ ghim, palette đang mở vào dải). screen cũng
+    // là mặc định cho palette đăng ký sau mà bản lưu không có.
+    bool restoreLayout(ScreenClass screen = ScreenClass::Wide);
+
+    // Theo dõi DPI, màn hình của palette nổi (đang có và về sau) qua display; display sống lâu hơn host hoặc hủy
+    // trước (QPointer).
+    void trackDisplay(DisplayContext& display);
 
     // Focus vào palette đang hiện kế tiếp (trước đó) theo thứ tự đăng ký; sau palette cuối là vùng vẽ.
     void focusNextPalette(bool backward = false);
@@ -92,7 +121,8 @@ signals:
     void pinnedChanged(const QString& id, bool pinned);
 
 protected:
-    bool eventFilter(QObject* watched, QEvent* e) override; // Close của window → saveLayout
+    // Close của window → saveLayout; ChildPolished của nhóm tab nổi → DisplayContext::track.
+    bool eventFilter(QObject* watched, QEvent* e) override;
 
 private:
     class Dock;
@@ -100,13 +130,23 @@ private:
     void ensureContent(Dock* d);
     void focusInto(Dock* d);
     void showMenu(Dock* d);
+    void dockAt(Dock* d, Qt::DockWidgetArea area);
+    void applyPin(Dock* d, bool pinned); // trạng thái, nút ghim, tín hiệu; không chuyển palette
+    void toStrip(Dock* d);
+    AutoHideStrip* stripOf(const Dock* d) const;
+    QStringList stripped() const; // mã palette trong các dải, theo cạnh rồi theo tab
+    QList<QWidget*> floatingWindows() const;
 
     QMainWindow* window_;
     settings::Store& store_;
     QHash<QString, Dock*> docks_;
     QStringList order_;
     QSet<QString> unpinned_;
+    QMap<Qt::DockWidgetArea, AutoHideStrip*> strips_;
+    QStringList stripIds_; // dải đã lưu: cho palette đăng ký sau restoreLayout
+    QPointer<DisplayContext> display_;
     bool restored_ = false;
+    bool narrow_ = false; // bố cục mặc định của màn hình hẹp hơn Wide
 };
 
 } // namespace trion::ui

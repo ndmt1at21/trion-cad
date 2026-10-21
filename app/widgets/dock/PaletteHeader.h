@@ -8,7 +8,7 @@
 // "Tùy chọn palette", "Đóng palette"; tiêu đề lấy từ windowTitle của dock (đổi theo ngôn ngữ ở PaletteHost).
 //
 // ponytail: nhóm tab dùng dải tab của QMainWindow (phía trên đầu palette) nên nhóm cao thêm một dải; prototype gộp tab
-// vào chính đầu palette. Gộp lại nếu ảnh chụp QA-011 đòi (UI0-010).
+// vào chính đầu palette. Gộp lại nếu ảnh chụp QA-011 đòi (UI0-010 không cần cho tiêu chí nên giữ).
 #include <QWidget>
 
 class QDockWidget;

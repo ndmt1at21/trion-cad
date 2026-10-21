@@ -2404,6 +2404,13 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::ui::AutoHideStrip</name>
+    <message>
+        <source>Palette tự ẩn</source>
+        <translation>Auto-hidden palettes</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ComboBox</name>
     <message>
         <source>Lọc…</source>
