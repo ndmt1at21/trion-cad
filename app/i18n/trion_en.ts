@@ -2371,6 +2371,39 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::edition::EditionGate</name>
+    <message>
+        <source>Có trong TrionCAD %1</source>
+        <translation>Available in TrionCAD %1</translation>
+    </message>
+    <message>
+        <source>Lệnh %1 có trong TrionCAD %2.</source>
+        <translation>The %1 command is available in TrionCAD %2.</translation>
+    </message>
+    <message>
+        <source>Dùng thử 30 ngày</source>
+        <translation>30-day free trial</translation>
+    </message>
+    <message>
+        <source>Tìm hiểu</source>
+        <translation>Learn more</translation>
+    </message>
+</context>
+<context>
+    <name>trion::edition::LockBadge</name>
+    <message>
+        <source>VP</source>
+        <translation>VP</translation>
+    </message>
+</context>
+<context>
+    <name>trion::edition::UpgradeRouter</name>
+    <message>
+        <source>%1 có trong TrionCAD %2.</source>
+        <translation>%1 is available in TrionCAD %2.</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ComboBox</name>
     <message>
         <source>Lọc…</source>
