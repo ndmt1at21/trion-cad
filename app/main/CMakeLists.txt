@@ -2,7 +2,8 @@
 # Thư viện trion_application cho exe và test; exe trion chỉ có main.cpp.
 trion_add_library(trion_application
   SOURCES Application.h Application.cpp SingleInstance.h SingleInstance.cpp StartupTrace.h StartupTrace.cpp
-  LIBS trion_display trion_keymap trion_i18n trion_fonts trion_icons trion_perf trion_appcore Qt6::Widgets Qt6::Network)
+  LIBS trion_gallery trion_tooltip trion_display trion_keymap trion_i18n trion_fonts trion_icons trion_perf trion_appcore
+    Qt6::Widgets Qt6::Network)
 
 add_executable(trion WIN32 main.cpp)
 target_link_libraries(trion PRIVATE trion_application)

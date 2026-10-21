@@ -79,6 +79,307 @@
     </message>
 </context>
 <context>
+    <name>Gallery</name>
+    <message>
+        <source>Mặc định</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>Rê</source>
+        <translation>Hover</translation>
+    </message>
+    <message>
+        <source>Nhấn</source>
+        <translation>Pressed</translation>
+    </message>
+    <message>
+        <source>Focus</source>
+        <translation>Focus</translation>
+    </message>
+    <message>
+        <source>Vô hiệu</source>
+        <translation>Disabled</translation>
+    </message>
+    <message>
+        <source>Bật</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Khóa</source>
+        <translation>Locked</translation>
+    </message>
+    <message>
+        <source>Lỗi</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <source>Nút</source>
+        <translation>Button</translation>
+    </message>
+    <message>
+        <source>Xem trước…</source>
+        <translation>Preview…</translation>
+    </message>
+    <message>
+        <source>Nút chính</source>
+        <translation>Primary button</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Print</translation>
+    </message>
+    <message>
+        <source>Nút nguy hiểm</source>
+        <translation>Danger button</translation>
+    </message>
+    <message>
+        <source>Xóa 3 layout</source>
+        <translation>Delete 3 layouts</translation>
+    </message>
+    <message>
+        <source>Nút phụ</source>
+        <translation>Ghost button</translation>
+    </message>
+    <message>
+        <source>Hủy</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Nút biểu tượng</source>
+        <translation>Icon button</translation>
+    </message>
+    <message>
+        <source>Bắt điểm</source>
+        <translation>Object snap</translation>
+    </message>
+    <message>
+        <source>Bắt vào điểm cuối, trung điểm, tâm… của đối tượng khi vẽ.</source>
+        <translation>Snap to endpoints, midpoints, centers… of objects while drawing.</translation>
+    </message>
+    <message>
+        <source>Nút bật/tắt</source>
+        <translation>Toggle button</translation>
+    </message>
+    <message>
+        <source>Lưới</source>
+        <translation>Grid</translation>
+    </message>
+    <message>
+        <source>Hiện lưới nền trong vùng vẽ.</source>
+        <translation>Show the background grid in the drawing area.</translation>
+    </message>
+    <message>
+        <source>Nút tách</source>
+        <translation>Split button</translation>
+    </message>
+    <message>
+        <source>In hàng loạt</source>
+        <translation>Batch Plot</translation>
+    </message>
+    <message>
+        <source>Xuất PDF</source>
+        <translation>Export PDF</translation>
+    </message>
+    <message>
+        <source>Nhóm phân đoạn</source>
+        <translation>Segmented group</translation>
+    </message>
+    <message>
+        <source>Danh sách thả xuống</source>
+        <translation>Drop-down list</translation>
+    </message>
+    <message>
+        <source>Combo có ô lọc</source>
+        <translation>Filterable combo box</translation>
+    </message>
+    <message>
+        <source>Ô tìm kiếm</source>
+        <translation>Search field</translation>
+    </message>
+    <message>
+        <source>Tìm layer</source>
+        <translation>Search layers</translation>
+    </message>
+    <message>
+        <source>Tab</source>
+        <translation>Tabs</translation>
+    </message>
+    <message>
+        <source>Chung</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Thống kê</source>
+        <translation>Statistics</translation>
+    </message>
+    <message>
+        <source>Thanh trượt</source>
+        <translation>Slider</translation>
+    </message>
+    <message>
+        <source>Độ mờ</source>
+        <translation>Transparency</translation>
+    </message>
+    <message>
+        <source>Không có trạng thái này</source>
+        <translation>State not applicable</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Số</source>
+        <translation>Count</translation>
+    </message>
+    <message>
+        <source>Bảng mẫu thành phần</source>
+        <translation>Component Gallery</translation>
+    </message>
+    <message>
+        <source>Thành phần cơ bản ở 8 trạng thái của 07.3 Phụ lục C. Ô trạng thái là ảnh chụp từ chính widget; mục Dùng thử là widget thật.</source>
+        <translation>Basic components in the 8 states of 07.3 Appendix C. State cells are snapshots of the widgets themselves; the Try It section holds live widgets.</translation>
+    </message>
+    <message>
+        <source>Xem ở</source>
+        <translation>View in</translation>
+    </message>
+    <message>
+        <source>Chủ đề</source>
+        <translation>Theme</translation>
+    </message>
+    <message>
+        <source>Theo hệ thống</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <source>Tối</source>
+        <translation>Dark</translation>
+    </message>
+    <message>
+        <source>Sáng</source>
+        <translation>Light</translation>
+    </message>
+    <message>
+        <source>Mật độ</source>
+        <translation>Density</translation>
+    </message>
+    <message>
+        <source>Gọn</source>
+        <translation>Compact</translation>
+    </message>
+    <message>
+        <source>Thoáng</source>
+        <translation>Comfortable</translation>
+    </message>
+    <message>
+        <source>Giao diện nhẹ</source>
+        <translation>Lite UI</translation>
+    </message>
+    <message>
+        <source>Ngôn ngữ</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <source>Dùng thử</source>
+        <translation>Try It</translation>
+    </message>
+    <message>
+        <source>Nhỏ</source>
+        <translation>Small</translation>
+    </message>
+    <message>
+        <source>Lớn</source>
+        <translation>Large</translation>
+    </message>
+    <message>
+        <source>Trạng thái</source>
+        <translation>States</translation>
+    </message>
+    <message>
+        <source>— thành phần không có trạng thái này. Khóa: tính năng ngoài phiên bản hiện hành, có ổ khóa, không chỉ đổi màu.</source>
+        <translation>— the component has no such state. Locked: a feature outside the current edition, shown with a lock, not by color alone.</translation>
+    </message>
+    <message>
+        <source>Menu, tooltip</source>
+        <translation>Menus, Tooltips</translation>
+    </message>
+    <message>
+        <source>Menu: mục đang trỏ (rê; nhấn và phím mũi tên như rê), dấu chọn (bật), huy hiệu Pro (khóa), mục vô hiệu. Lỗi: không có.
+Tooltip: mức 1 sau 0,45 s; rê thêm 1,5 s ra mức 2 có mô tả và F1. Thử ở mục Dùng thử.</source>
+        <translation>Menu: highlighted item (hover; press and arrow keys look the same), check mark (on), Pro badge (locked), disabled item. Error: none.
+Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and F1. Try it in the Try It section.</translation>
+    </message>
+    <message>
+        <source>Bảng, cây</source>
+        <translation>Tables, Trees</translation>
+    </message>
+    <message>
+        <source>Dòng 2 rê, dòng 3 chọn (bật), dòng 4 focus</source>
+        <translation>Row 2 hovered, row 3 selected (on), row 4 focused</translation>
+    </message>
+    <message>
+        <source>Rỗng</source>
+        <translation>Empty</translation>
+    </message>
+    <message>
+        <source>Bảng mẫu</source>
+        <translation>Sample table</translation>
+    </message>
+    <message>
+        <source>Cây mẫu</source>
+        <translation>Sample tree</translation>
+    </message>
+    <message>
+        <source>Dùng thử: bấm đầu cột để sắp, gõ chữ để nhảy dòng, ← → đóng/mở nhóm.</source>
+        <translation>Try it: click a column header to sort, type to jump to a row, ← → collapse/expand groups.</translation>
+    </message>
+    <message>
+        <source>Có vùng chọn</source>
+        <translation>With Selection</translation>
+    </message>
+    <message>
+        <source>Lặp lệnh %1</source>
+        <translation>Repeat %1</translation>
+    </message>
+    <message>
+        <source>Lệnh gần đây</source>
+        <translation>Recent Commands</translation>
+    </message>
+    <message>
+        <source>Điểm cuối</source>
+        <translation>Endpoint</translation>
+    </message>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Chọn tương tự</source>
+        <translation>Select Similar</translation>
+    </message>
+    <message>
+        <source>Dán</source>
+        <translation>Paste</translation>
+    </message>
+    <message>
+        <source>Đường tròn</source>
+        <translation>Circle</translation>
+    </message>
+    <message>
+        <source>Vẽ đường tròn theo tâm và bán kính.</source>
+        <translation>Draw a circle from its center and radius.</translation>
+    </message>
+    <message>
+        <source>Máy tính nhanh</source>
+        <translation>QuickCalc</translation>
+    </message>
+    <message>
+        <source>Tính biểu thức, lấy số đo từ bản vẽ.</source>
+        <translation>Evaluate expressions and take measurements from the drawing.</translation>
+    </message>
+</context>
+<context>
     <name>MenuSample</name>
     <message>
         <source>Có vùng chọn</source>
@@ -2063,6 +2364,10 @@
     <message>
         <source>Thoát ngay sau khung hình đầu của cửa sổ chính (cho test và đo khởi động).</source>
         <translation>Quit right after the main window&apos;s first frame (for tests and startup measurement).</translation>
+    </message>
+    <message>
+        <source>Mở bảng mẫu thành phần giao diện thay cho cửa sổ chính.</source>
+        <translation>Open the UI component gallery instead of the main window.</translation>
     </message>
 </context>
 <context>

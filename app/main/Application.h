@@ -32,6 +32,7 @@ class Store;
 }
 namespace trion::ui {
 class DisplayContext;
+class RichTooltip;
 class UiExecutor;
 } // namespace trion::ui
 namespace trion::i18n {
@@ -55,6 +56,7 @@ struct Options {
     QString settingsPath; // --settings <tệp>; mặc định settings::Store::defaultFilePath(). Tuyệt đối
     QString tracePath;    // --startup-trace <tệp.json>
     bool quitAfterFirstFrame = false; // --quit-after-first-frame: thoát ngay sau khung đầu (test, đo khởi động)
+    bool gallery = false;             // --gallery: bảng mẫu thành phần (UI0-006) thay cửa sổ chính, cho QA-011 chụp
 };
 
 class Application : public QObject {
@@ -100,6 +102,7 @@ private:
     std::unique_ptr<theme::ThemeManager> theme_;
     std::unique_ptr<theme::IconProvider> icons_;
     std::unique_ptr<keymap::Keymap> keymap_;
+    std::unique_ptr<ui::RichTooltip> tips_;
     std::unique_ptr<QMainWindow> window_;
     std::unique_ptr<ui::DisplayContext> display_;
 };

@@ -5,6 +5,8 @@
 #include "app/core/keymap/Keymap.h"
 #include "app/core/UiExecutor.h"
 #include "app/main/StartupTrace.h"
+#include "app/widgets/gallery/Gallery.h"
+#include "app/widgets/tooltip/RichTooltip.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -47,6 +49,7 @@ void Application::addOptions(QCommandLineParser& parser)
     parser.addOption({u"ui-probe"_s, tr("Đo độ trễ giao diện; --ui-probe=<tệp.json> ghi số đo ra tệp khi thoát.")});
     parser.addOption({u"quit-after-first-frame"_s,
                       tr("Thoát ngay sau khung hình đầu của cửa sổ chính (cho test và đo khởi động).")});
+    parser.addOption({u"gallery"_s, tr("Mở bảng mẫu thành phần giao diện thay cho cửa sổ chính.")});
 }
 
 Options Application::parseOptions(const QStringList& arguments)
@@ -74,6 +77,7 @@ Options Application::parseOptions(const QStringList& arguments)
         o.paths << absolute(path);
     o.tracePath = parser.value(u"startup-trace"_s);
     o.quitAfterFirstFrame = parser.isSet(u"quit-after-first-frame"_s);
+    o.gallery = parser.isSet(u"gallery"_s);
     return o;
 }
 
@@ -98,10 +102,15 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
     icons_ = std::make_unique<theme::IconProvider>();
     trace_.mark(u"icons"_s);
     keymap_ = std::make_unique<keymap::Keymap>(*store_);
+    tips_ = std::make_unique<ui::RichTooltip>(); // tooltip 2 mức cho mọi widget (UI0-107): sau ThemeManager và Keymap
+    tips_->setKeymap(keymap_.get());
     trace_.mark(u"keymap"_s);
     trace_.mark(u"ready"_s);
 
-    window_ = std::make_unique<QMainWindow>();
+    if (options.gallery)
+        window_ = std::make_unique<ui::GalleryWindow>();
+    else
+        window_ = std::make_unique<QMainWindow>();
     // Raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình (IconProvider::prewarm). Không gọi prewarm riêng ở
     // pha icons: DisplayContext gọi lại cho cùng DPR thì 236 mặt nạ bị raster hai lần.
     display_ = std::make_unique<ui::DisplayContext>(window_.get());
@@ -122,6 +131,7 @@ Application::~Application()
     cancel_.cancel();
     display_.reset();
     window_.reset();
+    tips_.reset();
     icons_.reset(); // hủy việc raster trước còn chờ
     sched::waitIdle();
     trace_.mark(u"tasks_stopped"_s);
