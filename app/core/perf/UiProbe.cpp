@@ -1,6 +1,7 @@
 #include "app/core/perf/UiProbe.h"
 
 #include "app/core/UiExecutor.h"
+#include "core/base/tsan.h"
 
 #include <QAbstractEventDispatcher>
 #include <QCoreApplication>
@@ -278,6 +279,7 @@ bool Probe::eventFilter(QObject* o, QEvent* e)
     if (e == redispatching_ || this != g_probe)
         return false;
     const auto now = Clock::now();
+    TRION_TSAN_ACQUIRE(e); // sự kiện đánh thức của UiExecutor dựng ở luồng nền (core/base/tsan.h)
     const auto type = e->type();
     ++events_;
     g_events.store(g_events.load(std::memory_order_relaxed) + 1, std::memory_order_relaxed);

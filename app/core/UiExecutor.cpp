@@ -1,4 +1,5 @@
 #include "app/core/UiExecutor.h"
+#include "core/base/tsan.h"
 
 #include "core/base/sched/Scheduler.h"
 
@@ -58,7 +59,9 @@ std::atomic<std::uint64_t> g_nextKey{1}; // khóa Receiver, không dùng lại
 void wakeLocked(QObject* target) // giữ g.m: target không thể bị hủy giữa chừng
 {
     ++g.wakeups;
-    QCoreApplication::postEvent(target, new QEvent(wakeType()));
+    auto* ev = new QEvent(wakeType());
+    TRION_TSAN_RELEASE(ev); // hàng đợi sự kiện của Qt chuyển ev sang luồng UI (bộ lọc UiProbe đọc nó)
+    QCoreApplication::postEvent(target, ev);
 }
 
 void enqueue(Item item)
