@@ -51,7 +51,7 @@ public:
     void setDensity(Density d);
     bool lite() const { return store_.get(kLite); }
     void setLite(bool on) { store_.set(kLite, on); }
-    // Hệ điều hành bật giảm chuyển động (UI0-013 nối); không lưu.
+    // Hệ điều hành bật giảm chuyển động (DisplayContext::systemReducedMotion của UI0-012 nối vào); không lưu.
     bool reducedMotion() const { return reducedMotion_; }
     void setReducedMotion(bool on);
 
