@@ -39,6 +39,8 @@ trion_component(app/core/i18n)
 trion_component(app/core/perf)
 trion_component(app/core/display)
 trion_component(app/core/keymap)
+trion_component(app/widgets/model)
+trion_component(app/widgets/bench)
 trion_component(app/widgets/numeric)
 trion_component(tests/integration)
 
