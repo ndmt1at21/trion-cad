@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 enable_testing()
 
 find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Widgets Svg Test LinguistTools)
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Widgets Svg Network Test LinguistTools)
 qt_standard_project_setup(I18N_SOURCE_LANGUAGE vi I18N_TRANSLATED_LANGUAGES en)
 trion_deploy_qt_runtime()
 
