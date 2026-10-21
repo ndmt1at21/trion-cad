@@ -15,3 +15,7 @@ trion_integration_test(it_nen_ui_test trion_base trion_appcore trion_tokens trio
 # Nhóm 2: UI0-002 chủ đề, UI0-005 bản địa hóa, UI0-105 đo độ trễ, UI0-003 font, UI0-004 biểu tượng (+ RGN-013).
 trion_integration_test(it_giao_dien_test
   trion_base trion_appcore trion_theme trion_fonts trion_icons trion_i18n trion_perf trion_regen)
+# Nhóm 3: INT-105 parser giá trị, UI0-014 model nền, UI0-012 High-DPI, UI0-106 điều khiển, UI0-109 parser ô số.
+trion_integration_test(it_dieu_khien_test
+  trion_base trion_appcore trion_theme trion_fonts trion_icons trion_i18n trion_perf trion_display trion_model
+  trion_controls trion_numeric)
