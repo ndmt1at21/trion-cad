@@ -653,19 +653,23 @@ private slots:
               ops["autocomplete"]["count"].toInt());
         QVERIFY(ops["autocomplete"]["count"].toInt() >= 1);
 
-        // Model đổi khi popup đang mở: khóa gấp dựng lại ở phím kế tiếp.
+        // Model đổi khi popup đang mở: lọc lại ở lượt vòng sự kiện kế, không chờ phím (integration nhóm 3 bắt lỗi
+        // danh sách giữ số dòng nguồn cũ tới phím kế tiếp).
         edit->clear();
         QTest::keyClicks(edit, u"zz"_s);
         QVERIFY(popup->isVisible());
         QCOMPARE(list->model()->rowCount(), 0);
         QVERIFY(popup->findChild<QLabel*>()->isVisible()); // "Không có mục khớp"
         combo->setItemText(3, u"Lớp ZZ mới"_s);            // i18n-ok: dữ liệu thử
-        QTest::keyClick(edit, Qt::Key_Backspace);
-        QTest::keyClick(edit, 'z');
-        QCOMPARE(list->model()->rowCount(), 1);
+        QTRY_COMPARE(list->model()->rowCount(), 1);
+        QVERIFY(list->isVisible());
+        combo->insertItem(0, u"ZZ đầu"_s); // i18n-ok: dữ liệu thử; mục trên dời xuống dòng nguồn 4
+        QTRY_COMPARE(list->model()->rowCount(), 2);
+        QCOMPARE(list->model()->index(1, 0).data().toString(), u"Lớp ZZ mới"_s);
+        QTest::keyClick(edit, Qt::Key_Down);
         QTest::keyClick(edit, Qt::Key_Return);
         QVERIFY(!popup->isVisible());
-        QCOMPARE(combo->currentIndex(), 3);
+        QCOMPARE(combo->currentIndex(), 4);
     }
 
     // Tiêu chí 3.

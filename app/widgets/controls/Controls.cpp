@@ -567,7 +567,14 @@ public:
         keys_.clear();
         if (!source)
             return;
-        const auto dirty = [this] { keys_.clear(); };
+        // Nguồn đổi: rows_ trỏ số dòng cũ → lọc lại một lần ở lượt vòng sự kiện kế (model nền phát nhiều thao tác mỗi lô).
+        const auto dirty = [this] {
+            keys_.clear();
+            if (refilter && !pending_) {
+                pending_ = true;
+                QMetaObject::invokeMethod(this, [this] { pending_ = false; refilter(); }, Qt::QueuedConnection);
+            }
+        };
         connect(source, &QAbstractItemModel::dataChanged, this, dirty);
         connect(source, &QAbstractItemModel::rowsInserted, this, dirty);
         connect(source, &QAbstractItemModel::rowsRemoved, this, dirty);
@@ -601,6 +608,8 @@ public:
 
     int sourceRow(int row) const { return row >= 0 && row < int(rows_.size()) ? rows_[row] : -1; }
 
+    std::function<void()> refilter; // ComboBox đặt: lọc lại theo chuỗi đang gõ khi popup đang mở
+
     int rowCount(const QModelIndex& parent = {}) const override { return parent.isValid() ? 0 : int(rows_.size()); }
 
     QVariant data(const QModelIndex& index, int role) const override
@@ -620,6 +629,7 @@ private:
     int column_ = 0;
     std::vector<QString> keys_; // foldForSearch của từng dòng nguồn; lệch số dòng = cần dựng lại
     std::vector<int> rows_;     // dòng nguồn khớp chuỗi lọc
+    bool pending_ = false;      // đã hẹn lọc lại
 };
 
 // Popup: ô lọc (SearchField), danh sách, dòng "không có mục khớp"; nền --c-raised viền --c-border-ctl như .menu.
@@ -678,6 +688,12 @@ void ComboBox::showPopup()
         connect(popup_->filter, &QLineEdit::textChanged, this, &ComboBox::applyFilter);
         connect(popup_->filter, &QLineEdit::returnPressed, this, [this] { activate(popup_->list->currentIndex()); });
         connect(popup_->list, &QListView::clicked, this, &ComboBox::activate);
+        // ponytail: lọc lại đưa dòng chọn về mục khớp đầu tiên (không giữ mục đang trỏ bằng ↑↓); giữ được bằng
+        // QPersistentModelIndex của nguồn nếu người dùng thấy phiền.
+        model_->refilter = [this] {
+            if (popup_->isVisible())
+                applyFilter(popup_->filter->text());
+        };
         retranslate();
     }
     model_->setSource(model(), modelColumn());
