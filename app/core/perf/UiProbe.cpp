@@ -136,8 +136,14 @@ void stallEnded(Ns start, Clock::duration d, int type, const char* cls, const ch
         std::lock_guard lk(g_stalls.m);
         if (g_stalls.lastStart == start) { // watchdog đã báo khi đang khựng: chốt độ dài
             if (!g_stalls.items.empty() && g_stalls.items.back().start == start) {
-                g_stalls.items.back().duration = d;
-                where = g_stalls.items.back().where;
+                StallRec& rec = g_stalls.items.back();
+                rec.duration = d;
+                // Watchdog chỉ thấy vùng đo đang mở lúc nó thức: vùng vừa đóng mà luồng UI chưa tới mốc tiến triển (máy
+                // tải, watchdog thức trễ) thì mô tả lúc bắt thiếu vùng. Khi đó lấy mô tả lúc chốt, có vùng đã đi qua.
+                if (zone && rec.where.find(" [") == std::string::npos)
+                    rec.where = where;
+                else
+                    where = rec.where;
             }
         } else {
             g_stalls.lastStart = start;
