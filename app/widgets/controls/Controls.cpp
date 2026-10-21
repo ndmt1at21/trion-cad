@@ -397,6 +397,16 @@ ToggleButton::ToggleButton(const QString& text, Kind kind, QWidget* parent) : Bu
 
 // ---------------------------------------------------------------------------------------------------- SegmentedGroup
 
+// Tab dừng ở đoạn đang bật: Qt chỉ dời TabFocus khi một đoạn nhận focus (QAbstractButtonPrivate::fixFocusPolicy), nên
+// đoạn đổi bằng mã trước lần focus đầu hoặc lúc focus ở ngoài nhóm thì Tab vào nhầm đoạn. Làm cùng việc đó mỗi khi đoạn
+// bật đổi; trạng thái giống hệt sau khi Qt tự làm, nên mũi tên trong nhóm không đổi.
+static void fixTabStop(QButtonGroup* group)
+{
+    for (QAbstractButton* b : group->buttons())
+        b->setFocusPolicy(Qt::FocusPolicy(b->isChecked() ? b->focusPolicy() | Qt::TabFocus
+                                                         : b->focusPolicy() & ~Qt::TabFocus));
+}
+
 SegmentedGroup::SegmentedGroup(QWidget* parent) : QWidget(parent), group_(new QButtonGroup(this))
 {
     auto* row = new QHBoxLayout(this);
@@ -404,8 +414,10 @@ SegmentedGroup::SegmentedGroup(QWidget* parent) : QWidget(parent), group_(new QB
     row->setSpacing(kBorder);                                    // khe 1 px: nét chia --c-border
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(group_, &QButtonGroup::idToggled, this, [this](int id, bool on) {
-        if (on)
-            emit currentIndexChanged(id);
+        if (!on)
+            return;
+        fixTabStop(group_);
+        emit currentIndexChanged(id);
     });
 }
 
@@ -419,7 +431,9 @@ Button* SegmentedGroup::addSegment(const QString& text, const QString& iconName)
     group_->addButton(b, id);
     layout()->addWidget(b);
     if (id == 0)
-        b->setChecked(true);
+        b->setChecked(true); // → fixTabStop
+    else
+        fixTabStop(group_);
     return b;
 }
 

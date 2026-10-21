@@ -729,6 +729,24 @@ private slots:
         QCOMPARE(QApplication::focusWidget(), after);
         QTest::keyClick(after, Qt::Key_Backtab);
         QCOMPARE(QApplication::focusWidget(), g->segment(1));
+        // Đoạn đổi bằng mã lúc focus ở ngoài nhóm, và nhóm mới chưa từng nhận focus: Tab vẫn dừng ở đoạn đang bật
+        // (bảng mẫu UI0-006 bắt: Qt chỉ dời điểm dừng khi một đoạn nhận focus).
+        after->setFocus();
+        g->setCurrentIndex(0);
+        QTest::keyClick(after, Qt::Key_Backtab);
+        QCOMPARE(QApplication::focusWidget(), g->segment(0));
+        auto* beforeFresh = new QPushButton(host_.get());
+        auto* fresh = new SegmentedGroup(host_.get()); // ngay sau beforeFresh trong chuỗi focus (tạo sau)
+        for (const QString& s : {u"mm"_s, u"m"_s, u"in"_s})
+            fresh->addSegment(s);
+        fresh->setCurrentIndex(2);
+        for (QWidget* w : std::initializer_list<QWidget*>{beforeFresh, fresh}) {
+            row->addWidget(w);
+            w->show();
+        }
+        beforeFresh->setFocus();
+        QTest::keyClick(beforeFresh, Qt::Key_Tab);
+        QCOMPARE(QApplication::focusWidget(), fresh->segment(2));
 
         tabs->setFocus();
         QTest::keyClick(tabs, Qt::Key_Right);
