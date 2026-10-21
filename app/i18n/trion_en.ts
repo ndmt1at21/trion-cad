@@ -2411,6 +2411,20 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::ui::CanvasBanner</name>
+    <message>
+        <source>Đóng banner</source>
+        <translation>Close banner</translation>
+    </message>
+    <message numerus="yes">
+        <source>+%n thông báo khác</source>
+        <translation>
+            <numerusform>+%n more notice</numerusform>
+            <numerusform>+%n more notices</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ComboBox</name>
     <message>
         <source>Lọc…</source>
@@ -2765,6 +2779,28 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     <message>
         <source>Xóa chữ đã gõ</source>
         <translation>Clear text</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::Toast</name>
+    <message>
+        <source>Đóng thông báo</source>
+        <translation>Close notification</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::ToastHost</name>
+    <message>
+        <source>%1 — lỗi</source>
+        <translation>%1 — failed</translation>
+    </message>
+    <message>
+        <source>%1 — lỗi: %2</source>
+        <translation>%1 — failed: %2</translation>
+    </message>
+    <message>
+        <source>%1 — xong</source>
+        <translation>%1 — done</translation>
     </message>
 </context>
 </TS>
