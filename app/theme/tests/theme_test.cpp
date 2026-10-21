@@ -1,6 +1,7 @@
 // UI0-002 tiêu chí 1, 5 và Theo hệ thống: đổi chủ đề, mật độ, Giao diện nhẹ khi đang chạy với 2.000 widget, đo đến
 // khung đầu đã đổi, quét cây widget không còn màu/kích thước cũ; nhẹ: bóng thành viền 1 px, chuyển động 0 ms.
 #include "app/theme/ThemeManager.h"
+#include "tests/timing.h"
 
 #include <QtTest>
 #include <QtWidgets>
@@ -16,14 +17,7 @@ using namespace trion::theme;
 namespace {
 
 constexpr double kBudgetMs = 100; // DoD-L: đổi trạng thái giao diện ≤ 100 ms đến khung đầu
-// Sanitizer thay malloc của cả tiến trình (kể cả Qt): thời gian đo được chỉ để báo, không kiểm.
-#if defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_THREAD__)
-constexpr bool kSanitized = true;
-#elif defined(__has_feature)
-constexpr bool kSanitized = __has_feature(address_sanitizer) || __has_feature(thread_sanitizer);
-#else
-constexpr bool kSanitized = false;
-#endif
+using trion::test::kTimed;        // ngưỡng thời gian chỉ kiểm ở bản release (tests/timing.h)
 
 QColor tokColor(tok::ColorId id, tok::Mode m) { return toQColor(tok::color(id, m)); }
 
@@ -350,7 +344,7 @@ private slots:
         qInfo("đổi mật độ:  %s", qPrintable(stats(density)));
         qInfo("đổi nhẹ:     %s", qPrintable(stats(lite)));
         for (const QList<double>* v : {&theme, &density, &lite})
-            QVERIFY2(kSanitized || (*std::min_element(v->begin(), v->end()) <= budget && median(*v) <= 2 * budget),
+            QVERIFY2(!kTimed || (*std::min_element(v->begin(), v->end()) <= budget && median(*v) <= 2 * budget),
                      qPrintable(stats(*v)));
     }
 
