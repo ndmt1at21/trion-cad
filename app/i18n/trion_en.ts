@@ -2084,6 +2084,13 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::ConfirmDialog</name>
+    <message>
+        <source>Không hỏi lại</source>
+        <translation>Don&apos;t ask again</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::DialogFrame</name>
     <message>
         <source>Trợ giúp (F1)</source>
@@ -2100,6 +2107,56 @@
     <message>
         <source>Đang tải…</source>
         <translation>Loading…</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::ErrorDialog</name>
+    <message>
+        <source>Mã lỗi: %1</source>
+        <translation>Error code: %1</translation>
+    </message>
+    <message>
+        <source>Thông điệp: %1</source>
+        <translation>Message: %1</translation>
+    </message>
+    <message>
+        <source>Phiên bản: %1</source>
+        <translation>Version: %1</translation>
+    </message>
+    <message>
+        <source>Hệ điều hành: %1 · %2</source>
+        <translation>Operating system: %1 · %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n dòng log cuối:</source>
+        <translation>
+            <numerusform>Last %n log line:</numerusform>
+            <numerusform>Last %n log lines:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Chưa có log.</source>
+        <translation>No log yet.</translation>
+    </message>
+    <message>
+        <source>Chi tiết kỹ thuật</source>
+        <translation>Technical details</translation>
+    </message>
+    <message>
+        <source>Sao chép chi tiết</source>
+        <translation>Copy details</translation>
+    </message>
+    <message>
+        <source>Đã sao chép</source>
+        <translation>Copied</translation>
+    </message>
+    <message>
+        <source>Gửi báo lỗi</source>
+        <translation>Send error report</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
     </message>
 </context>
 <context>

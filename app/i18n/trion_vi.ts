@@ -20,6 +20,15 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::ErrorDialog</name>
+    <message numerus="yes">
+        <source>%n dòng log cuối:</source>
+        <translation>
+            <numerusform>%n dòng log cuối:</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::InlineProgress</name>
     <message numerus="yes">
         <source>%1 · %n tác vụ khác</source>
