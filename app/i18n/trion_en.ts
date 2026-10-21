@@ -64,6 +64,21 @@
     </message>
 </context>
 <context>
+    <name>FieldSample</name>
+    <message>
+        <source>Bán kính</source>
+        <translation>Radius</translation>
+    </message>
+    <message>
+        <source>Góc xoay</source>
+        <translation>Rotation</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ</source>
+        <translation>Scale</translation>
+    </message>
+</context>
+<context>
     <name>MenuSample</name>
     <message>
         <source>Có vùng chọn</source>
@@ -2110,6 +2125,157 @@
     <message>
         <source>Khóa, cần bản %1</source>
         <translation>Locked, requires %1</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::NumericField</name>
+    <message>
+        <source>*Khác nhau*</source>
+        <translation>*Varies*</translation>
+    </message>
+    <message>
+        <source>Phải lớn hơn %1.</source>
+        <translation>Must be greater than %1.</translation>
+    </message>
+    <message>
+        <source>%1 phải lớn hơn %2.</source>
+        <translation>%1 must be greater than %2.</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation>inches</translation>
+    </message>
+    <message>
+        <source>feet</source>
+        <translation>feet</translation>
+    </message>
+    <message>
+        <source>dặm</source>
+        <translation>miles</translation>
+    </message>
+    <message>
+        <source>milimét</source>
+        <translation>millimeters</translation>
+    </message>
+    <message>
+        <source>xentimét</source>
+        <translation>centimeters</translation>
+    </message>
+    <message>
+        <source>mét</source>
+        <translation>meters</translation>
+    </message>
+    <message>
+        <source>kilômét</source>
+        <translation>kilometers</translation>
+    </message>
+    <message>
+        <source>microinch</source>
+        <translation>microinches</translation>
+    </message>
+    <message>
+        <source>mil</source>
+        <translation>mils</translation>
+    </message>
+    <message>
+        <source>yard</source>
+        <translation>yards</translation>
+    </message>
+    <message>
+        <source>angstrom</source>
+        <translation>angstroms</translation>
+    </message>
+    <message>
+        <source>nanômét</source>
+        <translation>nanometers</translation>
+    </message>
+    <message>
+        <source>micrômét</source>
+        <translation>microns</translation>
+    </message>
+    <message>
+        <source>đềximét</source>
+        <translation>decimeters</translation>
+    </message>
+    <message>
+        <source>đềcamét</source>
+        <translation>decameters</translation>
+    </message>
+    <message>
+        <source>héctômét</source>
+        <translation>hectometers</translation>
+    </message>
+    <message>
+        <source>gigamét</source>
+        <translation>gigameters</translation>
+    </message>
+    <message>
+        <source>đơn vị thiên văn</source>
+        <translation>astronomical units</translation>
+    </message>
+    <message>
+        <source>năm ánh sáng</source>
+        <translation>light years</translation>
+    </message>
+    <message>
+        <source>parsec</source>
+        <translation>parsecs</translation>
+    </message>
+    <message>
+        <source>feet khảo sát Mỹ</source>
+        <translation>US survey feet</translation>
+    </message>
+    <message>
+        <source>inch khảo sát Mỹ</source>
+        <translation>US survey inches</translation>
+    </message>
+    <message>
+        <source>yard khảo sát Mỹ</source>
+        <translation>US survey yards</translation>
+    </message>
+    <message>
+        <source>dặm khảo sát Mỹ</source>
+        <translation>US survey miles</translation>
+    </message>
+    <message>
+        <source>độ</source>
+        <translation>degrees</translation>
+    </message>
+    <message>
+        <source>độ phút giây</source>
+        <translation>degrees/minutes/seconds</translation>
+    </message>
+    <message>
+        <source>grad</source>
+        <translation>grads</translation>
+    </message>
+    <message>
+        <source>radian</source>
+        <translation>radians</translation>
+    </message>
+    <message>
+        <source>phương vị</source>
+        <translation>surveyor&apos;s units</translation>
+    </message>
+    <message>
+        <source>feet và inch</source>
+        <translation>feet and inches</translation>
+    </message>
+    <message>
+        <source>Lấy từ bản vẽ</source>
+        <translation>Pick from drawing</translation>
+    </message>
+    <message>
+        <source>Tăng</source>
+        <translation>Increase</translation>
+    </message>
+    <message>
+        <source>Giảm</source>
+        <translation>Decrease</translation>
+    </message>
+    <message>
+        <source>%1 (%2)</source>
+        <translation>%1 (%2)</translation>
     </message>
 </context>
 <context>
