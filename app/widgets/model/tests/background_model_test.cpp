@@ -173,6 +173,77 @@ private slots:
     }
     void cleanupTestCase() { exec_.reset(); }
 
+    // Lần dựng đầu (model rỗng): một đoạn chèn, đúng nội dung và thứ tự (khóa không theo thứ tự hiển thị). Refresh ngay
+    // khi dòng vào model (việc nền của lần dựng đầu thường còn đang dựng chỉ mục khóa): diff vẫn đúng, không reset,
+    // persistent index đi theo dòng.
+    void firstBuildInsertsDirectly()
+    {
+        constexpr int n = 5'000; // không gắn QAbstractItemModelTester: nó duyệt mọi dòng ở mỗi tín hiệu
+        Model model;
+        std::mt19937 rng(21);
+        auto first = std::make_shared<Snapshot>(*numbered(n));
+        std::shuffle(first->begin(), first->end(), rng);
+        for (Row& r : *first)
+            r.value = int(rng() % 100);
+        std::uint64_t nextKey = n;
+        const auto next = std::make_shared<const Snapshot>(mutate(*first, rng, 100, nextKey));
+        QSignalSpy inserted(&model, &QAbstractItemModel::rowsInserted);
+        Snapshot firstShown;
+        std::vector<std::pair<std::uint64_t, QPersistentModelIndex>> tracked;
+        connect(
+            &model, &QAbstractItemModel::rowsInserted, this,
+            [&] {
+                firstShown = shown(model);
+                for (int r = 0; r < model.rowCount(); r += 7)
+                    tracked.push_back({model.row(r).key, QPersistentModelIndex(model.index(r, r % 2))});
+                model.refresh(next, 2, copyRows());
+            },
+            Qt::SingleShotConnection);
+        model.refresh(std::shared_ptr<const Snapshot>(first), 1, copyRows());
+        QVERIFY(settle(model));
+        QCOMPARE(firstShown, *first);
+        QCOMPARE(inserted[0][1].toInt(), 0);
+        QCOMPARE(inserted[0][2].toInt(), n - 1);
+        QCOMPARE(shown(model), *next);
+        QCOMPARE(model.stats().resets, 0u);
+        std::set<std::uint64_t> alive;
+        for (const Row& r : *next)
+            alive.insert(r.key);
+        for (const auto& [key, index] : tracked) {
+            QCOMPARE(index.isValid(), alive.count(key) > 0);
+            if (index.isValid())
+                QCOMPARE(model.row(index.row()).key, key);
+        }
+    }
+
+    // Hủy giữa lần dựng đầu: việc đang dựng thấy hủy; kết quả đã gửi mà luồng UI chưa nhận thì bị bỏ. Chỉ kết quả mới
+    // nhất hiện.
+    void firstBuildCancelled()
+    {
+        Model model;
+        QAbstractItemModelTester tester(&model, QAbstractItemModelTester::FailureReportingMode::QtTest);
+        std::vector<quint64> settled;
+        connect(&model, &Model::settled, this, [&](quint64 v) { settled.push_back(v); });
+        std::atomic<bool> started{false};
+        model.refresh(numbered(1000), 1, [&](const Snapshot& s, const CancelToken& cancel) {
+            started = true;
+            for (const auto end = Clock::now() + 10s; !cancel.cancelled() && Clock::now() < end;) {
+            }
+            return s;
+        });
+        while (!started)
+            std::this_thread::yield();
+        model.refresh(numbered(2000), 2, copyRows()); // hủy việc 1 đang dựng
+        trion::sched::waitIdle();                     // kết quả 2 đã gửi, luồng UI chưa nhận
+        auto last = std::make_shared<Snapshot>(*numbered(500));
+        std::reverse(last->begin(), last->end());
+        model.refresh(std::shared_ptr<const Snapshot>(last), 3, copyRows());
+        QVERIFY(settle(model));
+        QCOMPARE(shown(model), *last);
+        QCOMPARE(settled, std::vector<quint64>{3});
+        QCOMPARE(model.stats().stale, 1u); // kết quả 2
+    }
+
     // Diff theo khóa: đúng nhóm tín hiệu cho xóa, dời, chèn, đổi; persistent index đi theo dòng.
     void diffEmitsGranularSignals()
     {
@@ -508,13 +579,16 @@ private slots:
         QCOMPARE(view->visualRect(model.index(row, 0)).top(), anchor->second);
     }
 
-    // Hàm dựng trả khóa trùng (lỗi lập trình): assert ở debug; vẫn hiện đúng nhờ reset, lần sau diff lại bình thường.
+    // Hàm dựng trả khóa trùng (lỗi lập trình): assert ở debug; vẫn hiện đúng nhờ reset (model rỗng: chèn thẳng), lần
+    // sau diff lại bình thường.
     void duplicateKeysFallBackToReset()
     {
-        Model model;
+        Model model, empty;
         const auto old = trion::setAssertHandler(&countAssert);
         g_asserts = 0;
         const auto dup = std::make_shared<const Snapshot>(Snapshot{{1, 0}, {2, 0}, {1, 5}});
+        model.refresh(numbered(1), 0, copyRows()); // model có dòng: bảng mới qua diff
+        QVERIFY(settle(model));
         model.refresh(dup, 1, copyRows());
         QVERIFY(settle(model));
         QCOMPARE(shown(model), *dup);
@@ -522,11 +596,20 @@ private slots:
         QVERIFY(settle(model));
         model.refresh(numbered(6), 3, copyRows()); // gốc sạch: diff
         QVERIFY(settle(model));
-        trion::setAssertHandler(old);
         QCOMPARE(shown(model), *numbered(6));
         QCOMPARE(model.stats().resets, 2u);
+
+        empty.refresh(dup, 1, copyRows());
+        QVERIFY(settle(empty));
+        QCOMPARE(shown(empty), *dup);
+        QCOMPARE(empty.stats().resets, 0u);
+        empty.refresh(numbered(4), 2, copyRows()); // chỉ mục khóa dựng lười thấy khóa trùng: reset
+        QVERIFY(settle(empty));
+        trion::setAssertHandler(old);
+        QCOMPARE(shown(empty), *numbered(4));
+        QCOMPARE(empty.stats().resets, 1u);
 #ifndef NDEBUG
-        QCOMPARE(g_asserts.load(), 1);
+        QCOMPARE(g_asserts.load(), 2);
 #endif
     }
 

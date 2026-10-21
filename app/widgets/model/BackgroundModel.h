@@ -31,7 +31,8 @@
 //  - Diff theo khóa, thứ tự áp: xóa (từng đoạn liên tiếp, từ cuối lên), hoán vị dòng còn lại (một
 //    layoutChanged, persistent index đi theo), chèn (từng đoạn liên tiếp), rồi dataChanged theo đoạn ≤ 4.096 dòng
 //    (từ dòng đổi đầu đến dòng đổi cuối của đoạn). Không reset, trừ khi hàm dựng trả khóa trùng (lỗi lập trình:
-//    assert ở debug, bản release reset để vẫn hiện đúng).
+//    assert ở debug, bản release reset để vẫn hiện đúng). Model rỗng (lần dựng đầu): chèn thẳng một đoạn, không diff;
+//    chỉ mục khóa (sắp, O(n log n)) dựng ở nền sau khi đã gửi kết quả, nên khung đầu không chờ nó.
 //  - Áp theo lô: mỗi lô áp thao tác đến gần hết hạn mức (4 ms, chừa 1/8 cho sai số dự đoán; hoán vị và Settle của
 //    danh sách ≥ 16.384 dòng luôn đứng đầu lô) rồi nhường vòng sự kiện; lô kế tiếp bắt đầu sớm nhất
 //    một khung (16 ms) sau lô trước, nên mỗi khung có tối đa 4 ms việc áp dù view vẽ theo timer hay theo sự
@@ -58,6 +59,7 @@
 #include <deque>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -89,6 +91,8 @@ public:
         std::uint64_t resets = 0;                 // reset model (chỉ khi khóa trùng)
         std::chrono::nanoseconds applyTotal{0};   // tổng thời gian áp thao tác
         std::chrono::nanoseconds longestApply{0}; // lô áp thao tác lâu nhất
+        // Như trên, tính theo thời gian CPU của luồng UI: không tăng khi máy cho việc khác chạy. -1: nền tảng chưa đo.
+        std::chrono::nanoseconds longestApplyCpu{-1};
         std::chrono::nanoseconds longestBatch{0}; // lô lâu nhất kể cả giữ vị trí cuộn (view bố trí lại)
         std::chrono::nanoseconds shortestGap = std::chrono::nanoseconds::max(); // giữa hai lô liền nhau (đầu-đầu)
         std::chrono::steady_clock::time_point lastBatch{};                     // lúc lô gần nhất bắt đầu
@@ -112,18 +116,29 @@ protected:
     using Key = std::uint64_t;
     // Dòng của một lần dựng, đã xóa kiểu; bất biến sau khi dựng xong (luồng nền và luồng UI cùng đọc).
     struct Table {
-        std::shared_ptr<const void> owner;      // giữ std::vector<Row> sống
-        const void* data = nullptr;             // dòng 0
-        std::size_t stride = 0;                 // sizeof(Row)
+        std::shared_ptr<const void> owner; // giữ std::vector<Row> sống
+        const void* data = nullptr;        // dòng 0
+        std::size_t stride = 0;            // sizeof(Row)
         int size = 0;
-        std::vector<std::pair<Key, int>> byKey; // (khóa, dòng); việc nền sắp theo khóa
-        bool unique = true;                     // không có khóa trùng
+        Key (*key)(const void*) = nullptr; // khóa của một dòng
         const void* at(int i) const { return static_cast<const char*>(data) + std::size_t(i) * stride; }
+
+        struct Index {
+            std::vector<std::pair<Key, int>> byKey; // (khóa, dòng), sắp theo khóa
+            bool unique = true;                     // không có khóa trùng
+        };
+        // Chỉ mục khóa cho diff, chỉ luồng nền dùng: dựng lười một lần, việc nền gọi cùng lúc thì chờ lần dựng ấy.
+        const Index& index() const;
+
+    private:
+        mutable std::once_flag indexed_;
+        mutable Index index_;
     };
     using Same = bool (*)(const void*, const void*);
 
-    // Luồng UI. make chạy ở nền, trả bảng (byKey chưa sắp); same so nội dung hai dòng cùng khóa.
-    void request(std::uint64_t version, Same same, std::function<Table(const sched::CancelToken&)> make);
+    // Luồng UI. make chạy ở nền, trả bảng; same so nội dung hai dòng cùng khóa.
+    void request(std::uint64_t version, Same same,
+                 std::function<std::shared_ptr<const Table>(const sched::CancelToken&)> make);
     const void* rowAt(int row) const
     {
         const auto i = std::size_t(row);
@@ -206,15 +221,13 @@ public:
                 [snapshot = std::move(snapshot), build = std::move(build)](const sched::CancelToken& cancel) {
                     std::shared_ptr<const std::vector<Row>> rows(new std::vector<Row>(build(*snapshot, cancel)),
                                                                  &dispose);
-                    Table t;
-                    t.byKey.reserve(rows->size());
-                    for (std::size_t i = 0; i < rows->size(); ++i)
-                        t.byKey.emplace_back(Key((*rows)[i].key), int(i));
-                    t.data = rows->data();
-                    t.stride = sizeof(Row);
-                    t.size = int(rows->size());
-                    t.owner = std::move(rows);
-                    return t;
+                    auto t = std::make_shared<Table>();
+                    t->data = rows->data();
+                    t->stride = sizeof(Row);
+                    t->size = int(rows->size());
+                    t->key = &keyOf;
+                    t->owner = std::move(rows);
+                    return std::shared_ptr<const Table>(std::move(t));
                 });
     }
 
@@ -223,6 +236,7 @@ private:
     {
         return *static_cast<const Row*>(a) == *static_cast<const Row*>(b);
     }
+    static Key keyOf(const void* row) { return Key(static_cast<const Row*>(row)->key); }
     // Hủy dòng ở worker: 100.000 dòng có chuỗi mất 5–9 ms để giải phóng, mà người thả bảng cuối cùng thường là luồng
     // UI (Settle thay bảng đang hiện, kết quả cũ, kết quả trùng nội dung).
     static void dispose(const std::vector<Row>* rows)

@@ -9,6 +9,7 @@
 #include <QTimer>
 
 #include <algorithm>
+#include <ctime>
 
 namespace trion::ui {
 namespace {
@@ -20,6 +21,19 @@ constexpr auto kFrame = std::chrono::milliseconds(16);
 constexpr int kChangeChunk = 4096; // dòng tối đa của một dataChanged
 constexpr int kAnchorRows = 8; // dòng nhìn thấy ghi lại mỗi view; cả 8 bị xóa thì để Qt giữ giá trị thanh cuộn
 constexpr int kHeavyRows = 16'384; // từ cỡ này hoán vị, Settle (O(n)) tốn ≳ 0,2 ms: chỉ chạy đầu lô
+
+// Thời gian CPU của luồng gọi. Linux: CLOCK_THREAD_CPUTIME_ID; nơi khác chưa có (GetThreadTimes của Windows nhảy theo
+// nhịp 15,6 ms): -1.
+std::chrono::nanoseconds threadCpu()
+{
+#if defined(__linux__)
+    timespec t{};
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
+    return std::chrono::seconds(t.tv_sec) + std::chrono::nanoseconds(t.tv_nsec);
+#else
+    return std::chrono::nanoseconds(-1);
+#endif
+}
 
 } // namespace
 
@@ -34,7 +48,7 @@ BackgroundModelBase::~BackgroundModelBase()
 }
 
 void BackgroundModelBase::request(std::uint64_t version, Same same,
-                                  std::function<Table(const sched::CancelToken&)> make)
+                                  std::function<std::shared_ptr<const Table>(const sched::CancelToken&)> make)
 {
     TRION_ASSERT_UI_THREAD();
     if (wanted_ == version)
@@ -51,26 +65,38 @@ void BackgroundModelBase::request(std::uint64_t version, Same same,
                                             make = std::move(make), same, generation = generation_, version] {
         if (cancel.cancelled())
             return;
-        auto next = std::make_shared<Table>(make(cancel));
+        std::shared_ptr<const Table> table = make(cancel);
         if (cancel.cancelled())
             return;
-        std::sort(next->byKey.begin(), next->byKey.end());
-        next->unique = std::adjacent_find(next->byKey.begin(), next->byKey.end(), [](const auto& a, const auto& b) {
-                           return a.first == b.first;
-                       }) == next->byKey.end();
-        TRION_ASSERT(next->unique); // hàm dựng trả khóa trùng
-        std::shared_ptr<const Table> table = std::move(next);
         auto ops = plan(*base, table, same, cancel);
         if (cancel.cancelled())
             return;
-        post(rx, [self, generation, version, table = std::move(table), ops = std::move(ops)]() mutable {
+        post(rx, [self, generation, version, table, ops = std::move(ops)]() mutable {
             self->accept(generation, version, std::move(table), std::move(ops));
         });
+        if (!cancel.cancelled())
+            table->index(); // lần dựng đầu chưa cần: dựng sau khi gửi, sẵn cho lần diff kế
     });
 }
 
+const BackgroundModelBase::Table::Index& BackgroundModelBase::Table::index() const
+{
+    std::call_once(indexed_, [this] {
+        index_.byKey.reserve(std::size_t(size));
+        for (int i = 0; i < size; ++i)
+            index_.byKey.emplace_back(key(at(i)), i);
+        std::sort(index_.byKey.begin(), index_.byKey.end());
+        index_.unique = std::adjacent_find(index_.byKey.begin(), index_.byKey.end(), [](const auto& a, const auto& b) {
+                            return a.first == b.first;
+                        }) == index_.byKey.end();
+        TRION_ASSERT(index_.unique); // hàm dựng trả khóa trùng
+    });
+    return index_;
+}
+
 // Nền: thao tác biến base thành next. Xóa từ cuối lên (chỉ số phía trước không đổi); hoán vị dòng còn lại theo
-// thứ tự mới; chèn từ đầu xuống (chỗ chèn chính là vị trí cuối cùng); Settle trỏ mọi dòng vào next.
+// thứ tự mới; chèn từ đầu xuống (chỗ chèn chính là vị trí cuối cùng); Settle trỏ mọi dòng vào next. Base rỗng: chèn
+// thẳng, không cần chỉ mục khóa.
 std::deque<BackgroundModelBase::Op> BackgroundModelBase::plan(const Table& base, std::shared_ptr<const Table> next,
                                                               Same same, const sched::CancelToken& cancel)
 {
@@ -79,15 +105,23 @@ std::deque<BackgroundModelBase::Op> BackgroundModelBase::plan(const Table& base,
                             std::vector<int> perm = {}, std::shared_ptr<const Table> owner = {}) {
         ops.push_back({kind, first, count, table, std::move(perm), std::move(owner)});
     };
-    if (!base.unique || !next->unique) {
+    const int m = base.size, n = next->size;
+    if (m == 0) {
+        if (n > 0) {
+            add(Op::Insert, 0, n, next.get());
+            add(Op::Settle, 0, 0, nullptr, {}, std::move(next));
+        }
+        return ops;
+    }
+    const Table::Index &from = base.index(), &to = next->index();
+    if (!from.unique || !to.unique) {
         add(Op::Reset, 0, 0, nullptr, {}, std::move(next));
         return ops;
     }
-    const int m = base.size, n = next->size;
     std::vector<int> toNew(std::size_t(m), -1), fromOld(std::size_t(n), -1);
-    for (std::size_t a = 0, b = 0; a < base.byKey.size() && b < next->byKey.size();) {
-        const auto [ka, ia] = base.byKey[a];
-        const auto [kb, ib] = next->byKey[b];
+    for (std::size_t a = 0, b = 0; a < from.byKey.size() && b < to.byKey.size();) {
+        const auto [ka, ia] = from.byKey[a];
+        const auto [kb, ib] = to.byKey[b];
         if (ka != kb) {
             ka < kb ? ++a : ++b;
             continue;
@@ -208,6 +242,7 @@ void BackgroundModelBase::customEvent(QEvent* event)
 void BackgroundModelBase::applyBatch()
 {
     const auto start = Clock::now();
+    const auto cpu = threadCpu();
     if (stats_.batches > 0)
         stats_.shortestGap = std::min<std::chrono::nanoseconds>(stats_.shortestGap, start - stats_.lastBatch);
     stats_.lastBatch = start;
@@ -229,6 +264,8 @@ void BackgroundModelBase::applyBatch()
         longest = std::max(longest, Clock::now() - t);
     }
     const auto applied = Clock::now();
+    if (cpu.count() >= 0)
+        stats_.longestApplyCpu = std::max(stats_.longestApplyCpu, threadCpu() - cpu);
     restoreAnchors();
     const auto end = Clock::now();
     ++stats_.batches;
