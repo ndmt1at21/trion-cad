@@ -632,6 +632,24 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::InlineProgress</name>
+    <message>
+        <source>Đang hủy…</source>
+        <translation>Cancelling…</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · %n tác vụ khác</source>
+        <translation>
+            <numerusform>%1 · %n other task</numerusform>
+            <numerusform>%1 · %n other tasks</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Hủy</source>
+        <translation>Cancel</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::Menu</name>
     <message>
         <source>Khóa, cần bản %1</source>
@@ -694,6 +712,13 @@
     <message>
         <source>Mật độ thoáng</source>
         <translation>Comfortable density</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::ProgressPresenter</name>
+    <message>
+        <source>%1 · %2%</source>
+        <translation>%1 · %2%</translation>
     </message>
 </context>
 <context>

@@ -19,4 +19,13 @@
         </translation>
     </message>
 </context>
+<context>
+    <name>trion::ui::InlineProgress</name>
+    <message numerus="yes">
+        <source>%1 · %n tác vụ khác</source>
+        <translation>
+            <numerusform>%1 · %n tác vụ khác</numerusform>
+        </translation>
+    </message>
+</context>
 </TS>
