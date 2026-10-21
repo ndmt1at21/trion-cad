@@ -1,0 +1,723 @@
+# Ca vàng UI0-109 (app/widgets/numeric/ValueParser). Cột cách nhau bởi TAB:
+#   loại      dist | ang | scale | int | real (ValueKind Distance, Angle, Scale, Integer, Real)
+#   ngữ cảnh  "-" hoặc các mục cách nhau bởi dấu cách: L<n> LUNITS, P<n> LUPREC, A<n> AUNITS, Q<n> AUPREC,
+#             U<n> INSUNITS, Z<n> DIMZIN, um UNITMODE 1, base=<độ> ANGBASE, cw ANGDIR 1, dir useAngbase.
+#             Mặc định: LUNITS 2, LUPREC 4, AUNITS 0, AUPREC 0, INSUNITS 0
+#   chuỗi     nguyên văn, giữ khoảng trắng; thoát: \t (TAB), \xHH (byte), \\ (gạch chéo)
+#   kỳ vọng   dist: đơn vị bản vẽ (LUNITS 3, 4: inch); ang: độ, hậu tố r là radian (góc tuyệt đối như
+#             INT-105); còn lại: số. "!mã" là lỗi (errorCode)
+#   hiển thị  formatValue của giá trị kỳ vọng: chuỗi RGN-013 phải khớp từng ký tự; "-" khi lỗi
+# Giá trị kỳ vọng tính bằng phân số chính xác (Python fractions, bảng mét/đơn vị SI-NIST), không lấy từ parser;
+# cột hiển thị do RGN-013 tính trên giá trị kỳ vọng. Cú pháp: docs/specs/input-values.md §10.
+
+dist	L2 P2 U4	1250	1250.0	1250.00
+dist	L2 P2 U4	12.5	12.5	12.50
+dist	L2 P2 U4	12.5m	12500.0	12500.00
+dist	L2 P2 U4	250cm	2500.0	2500.00
+dist	L2 P2 U4	3'6"	1066.8	1066.80
+dist	L2 P2 U4	=1200/2+50	650.0	650.00
+dist	L2 P2 U4	=(1200+300)/2	750.0	750.00
+dist	L2 P2 U4	=1200/(2+50)	23.076923076923077	23.08
+dist	L2 P2 U4	12,5	!comma	-
+dist	L2 P2 U4	 12.5 m 	12500.0	12500.00
+dist	L2 P2 U4	12.5 M	12500.0	12500.00
+dist	L2 P2 U4	12.5M	12500.0	12500.00
+dist	L2 P2 U4	0.5km	500000.0	500000.00
+dist	L2 P2 U4	25.4mm	25.4	25.40
+dist	L2 P2 U4	1in	25.4	25.40
+dist	L2 P2 U4	1ft	304.8	304.80
+dist	L2 P2 U4	2"	50.8	50.80
+dist	L2 P2 U4	1'	304.8	304.80
+dist	L2 P2 U4	-12.5m	-12500.0	-12500.00
+dist	L2 P2 U4	+250cm	2500.0	2500.00
+dist	L2 P2 U4	1/2m	500.0	500.00
+dist	L2 P2 U4	1 1/2m	1500.0	1500.00
+dist	L2 P2 U4	5-1/2cm	55.0	55.00
+dist	L2 P2 U4	1e3mm	1000.0	1000.00
+dist	L2 P2 U4	1.5e-3km	1500.0	1500.00
+dist	L2 P2 U4	12.5mm	12.5	12.50
+dist	L2 P2 U4	12.5 mm	12.5	12.50
+dist	L2 P2 U4	12.5\tmm	12.5	12.50
+dist	L2 P2 U4	12.5mmm	!syntax	-
+dist	L2 P2 U4	12.5 x	!syntax	-
+dist	L2 P2 U4	12.5m2	!syntax	-
+dist	L2 P2 U4	m	!syntax	-
+dist	L2 P2 U4	12.5dm	!syntax	-
+dist	L2 P2 U4	12.5 m m	!syntax	-
+dist	L2 P2 U4	3'6"m	!syntax	-
+dist	L2 P2 U4	3' 6"	1066.8	1066.80
+dist	L2 P2 U4	3'-6"	1066.8	1066.80
+dist	L2 P2 U4	3'-6 1/2"	1079.5	1079.50
+dist	L2 P2 U4	6"	152.4	152.40
+dist	L2 P2 U4	1'14"	660.4	660.40
+dist	L2 P2 U4	.5m	500.0	500.00
+dist	L2 P2 U4	5.m	5000.0	5000.00
+dist	L2 P2 U4	1,5m	!comma	-
+dist	L2 P2 U4	1.000,5	!comma	-
+dist	L2 P2 U4		!empty	-
+dist	L2 P2 U4	   	!empty	-
+dist	L2 P2 U4	\t	!empty	-
+dist	L2 P2 U4	=	!syntax	-
+dist	L2 P2 U4	= 	!syntax	-
+dist	L2 P2 U4	1e999m	!range	-
+dist	L2 P2 U4	1e308m	!range	-
+dist	L2 P2 U4	1e-307mm	1e-307	0.00
+dist	L2 P2 U4	1/0	!zero-denominator	-
+dist	L2 P2 U4	1/0m	!zero-denominator	-
+dist	L2 P2 U4	12.5 m.	!syntax	-
+dist	L2 P2 U4	m12	!syntax	-
+dist	L2 P2 U4	12.5km2	!syntax	-
+dist	L2 P2 U4	-.5cm	-5.0	-5.00
+dist	L2 P2 U4	1E1M	10000.0	10000.00
+dist	L2 P2 U4	3 '	!syntax	-
+dist	L2 P2 U4	12.5 inch	!syntax	-
+dist	L2 P2 U4	1/2"	12.7	12.70
+dist	L2 P2 U4	1/2'	152.4	152.40
+dist	L2 P2 U4	1.5'	457.2	457.20
+dist	L2 P4 U1	2.5mm	0.0984251968503937	0.0984
+dist	L2 P4 U1	2.5cm	0.984251968503937	0.9843
+dist	L2 P4 U1	2.5m	98.4251968503937	98.4252
+dist	L2 P4 U1	2.5km	98425.1968503937	98425.1969
+dist	L2 P4 U1	2.5in	2.5	2.5000
+dist	L2 P4 U1	2.5ft	30.0	30.0000
+dist	L2 P4 U1	2.5'	30.0	30.0000
+dist	L2 P4 U1	2.5"	2.5	2.5000
+dist	L2 P4 U2	2.5mm	0.008202099737532808	0.0082
+dist	L2 P4 U2	2.5cm	0.08202099737532809	0.0820
+dist	L2 P4 U2	2.5m	8.202099737532809	8.2021
+dist	L2 P4 U2	2.5km	8202.099737532808	8202.0997
+dist	L2 P4 U2	2.5in	0.20833333333333334	0.2083
+dist	L2 P4 U2	2.5ft	2.5	2.5000
+dist	L2 P4 U2	2.5'	2.5	2.5000
+dist	L2 P4 U2	2.5"	0.20833333333333334	0.2083
+dist	L2 P4 U3	2.5mm	1.553427980593335e-06	0.0000
+dist	L2 P4 U3	2.5cm	1.553427980593335e-05	0.0000
+dist	L2 P4 U3	2.5m	0.0015534279805933348	0.0016
+dist	L2 P4 U3	2.5km	1.5534279805933349	1.5534
+dist	L2 P4 U3	2.5in	3.945707070707071e-05	0.0000
+dist	L2 P4 U3	2.5ft	0.0004734848484848485	0.0005
+dist	L2 P4 U3	2.5'	0.0004734848484848485	0.0005
+dist	L2 P4 U3	2.5"	3.945707070707071e-05	0.0000
+dist	L2 P4 U4	2.5mm	2.5	2.5000
+dist	L2 P4 U4	2.5cm	25.0	25.0000
+dist	L2 P4 U4	2.5m	2500.0	2500.0000
+dist	L2 P4 U4	2.5km	2500000.0	2500000.0000
+dist	L2 P4 U4	2.5in	63.5	63.5000
+dist	L2 P4 U4	2.5ft	762.0	762.0000
+dist	L2 P4 U4	2.5'	762.0	762.0000
+dist	L2 P4 U4	2.5"	63.5	63.5000
+dist	L2 P4 U5	2.5mm	0.25	0.2500
+dist	L2 P4 U5	2.5cm	2.5	2.5000
+dist	L2 P4 U5	2.5m	250.0	250.0000
+dist	L2 P4 U5	2.5km	250000.0	250000.0000
+dist	L2 P4 U5	2.5in	6.35	6.3500
+dist	L2 P4 U5	2.5ft	76.2	76.2000
+dist	L2 P4 U5	2.5'	76.2	76.2000
+dist	L2 P4 U5	2.5"	6.35	6.3500
+dist	L2 P4 U6	2.5mm	0.0025	0.0025
+dist	L2 P4 U6	2.5cm	0.025	0.0250
+dist	L2 P4 U6	2.5m	2.5	2.5000
+dist	L2 P4 U6	2.5km	2500.0	2500.0000
+dist	L2 P4 U6	2.5in	0.0635	0.0635
+dist	L2 P4 U6	2.5ft	0.762	0.7620
+dist	L2 P4 U6	2.5'	0.762	0.7620
+dist	L2 P4 U6	2.5"	0.0635	0.0635
+dist	L2 P4 U7	2.5mm	2.5e-06	0.0000
+dist	L2 P4 U7	2.5cm	2.5e-05	0.0000
+dist	L2 P4 U7	2.5m	0.0025	0.0025
+dist	L2 P4 U7	2.5km	2.5	2.5000
+dist	L2 P4 U7	2.5in	6.35e-05	0.0001
+dist	L2 P4 U7	2.5ft	0.000762	0.0008
+dist	L2 P4 U7	2.5'	0.000762	0.0008
+dist	L2 P4 U7	2.5"	6.35e-05	0.0001
+dist	L2 P4 U10	2.5mm	0.0027340332458442693	0.0027
+dist	L2 P4 U10	2.5cm	0.027340332458442695	0.0273
+dist	L2 P4 U10	2.5m	2.7340332458442695	2.7340
+dist	L2 P4 U10	2.5km	2734.0332458442695	2734.0332
+dist	L2 P4 U10	2.5in	0.06944444444444445	0.0694
+dist	L2 P4 U10	2.5ft	0.8333333333333334	0.8333
+dist	L2 P4 U10	2.5'	0.8333333333333334	0.8333
+dist	L2 P4 U10	2.5"	0.06944444444444445	0.0694
+dist	L2 P4 U14	2.5mm	0.025	0.0250
+dist	L2 P4 U14	2.5cm	0.25	0.2500
+dist	L2 P4 U14	2.5m	25.0	25.0000
+dist	L2 P4 U14	2.5km	25000.0	25000.0000
+dist	L2 P4 U14	2.5in	0.635	0.6350
+dist	L2 P4 U14	2.5ft	7.62	7.6200
+dist	L2 P4 U14	2.5'	7.62	7.6200
+dist	L2 P4 U14	2.5"	0.635	0.6350
+dist	L2 P4 U21	2.5mm	0.008202083333333334	0.0082
+dist	L2 P4 U21	2.5cm	0.08202083333333333	0.0820
+dist	L2 P4 U21	2.5m	8.202083333333333	8.2021
+dist	L2 P4 U21	2.5km	8202.083333333334	8202.0833
+dist	L2 P4 U21	2.5in	0.20833291666666667	0.2083
+dist	L2 P4 U21	2.5ft	2.499995	2.5000
+dist	L2 P4 U21	2.5'	2.499995	2.5000
+dist	L2 P4 U21	2.5"	0.20833291666666667	0.2083
+dist	L2 P4 U8	1mm	39370.07874015748	39370.0787
+dist	L2 P4 U9	1mm	39.37007874015748	39.3701
+dist	L2 P4 U11	1mm	10000000.0	10000000.0000
+dist	L2 P4 U12	1mm	1000000.0	1000000.0000
+dist	L2 P4 U13	1mm	1000.0	1000.0000
+dist	L2 P4 U15	1km	100.0	100.0000
+dist	L2 P4 U16	1km	10.0	10.0000
+dist	L2 P4 U17	1km	1e-06	0.0000
+dist	L2 P4 U18	1km	6.684587122268446e-09	0.0000
+dist	L2 P4 U19	1km	1.0570008340246155e-13	0.0000
+dist	L2 P4 U20	1km	3.240779289444365e-14	0.0000
+dist	L2 P4 U22	1mm	0.03937	0.0394
+dist	L2 P4 U23	1km	1093.611111111111	1093.6111
+dist	L2 P4 U24	1km	0.6213699494949495	0.6214
+dist	L2 P4 U0	12.5	12.5	12.5000
+dist	L2 P4 U1	12.5	12.5	12.5000
+dist	L2 P4 U2	12.5	12.5	12.5000
+dist	L2 P4 U4	12.5	12.5	12.5000
+dist	L2 P4 U6	12.5	12.5	12.5000
+dist	L2 P4 U21	12.5	12.5	12.5000
+dist	L2 P4 U25	12.5	12.5	12.5000
+dist	L2 P4 U99	12.5	12.5	12.5000
+dist	L2 P4 U-1	12.5	12.5	12.5000
+dist	L2 P4 U0	12.5m	!units	-
+dist	L2 P4 U0	3'6"	!units	-
+dist	L2 P4 U0	1in	!units	-
+dist	L2 P4 U0	=12+1m	!units	-
+dist	L2 P4 U0	=2*3"	!units	-
+dist	L2 P4 U25	12.5m	!units	-
+dist	L2 P4 U25	3'6"	!units	-
+dist	L2 P4 U25	1in	!units	-
+dist	L2 P4 U25	=12+1m	!units	-
+dist	L2 P4 U25	=2*3"	!units	-
+dist	L2 P4 U99	12.5m	!units	-
+dist	L2 P4 U99	3'6"	!units	-
+dist	L2 P4 U99	1in	!units	-
+dist	L2 P4 U99	=12+1m	!units	-
+dist	L2 P4 U99	=2*3"	!units	-
+dist	L2 P4 U-1	12.5m	!units	-
+dist	L2 P4 U-1	3'6"	!units	-
+dist	L2 P4 U-1	1in	!units	-
+dist	L2 P4 U-1	=12+1m	!units	-
+dist	L2 P4 U-1	=2*3"	!units	-
+dist	L2 P4 U0	=1200/2+50	650.0	650.0000
+dist	L2 P4 U6	1e-307mm	!range	-
+dist	L2 P4 U6	1e-300mm	1e-303	0.0000
+dist	L1 P4 U0	1.5E+03	1500.0	1.5000E+03
+dist	L1 P4 U4	1.5E+00m	1500.0	1.5000E+03
+dist	L5 P4 U0	17 1/2	17.5	17 1/2
+dist	L5 P4 U0	17 1/2m	!units	-
+dist	L6 P4 U4	1m	1000.0	1000.0000
+dist	L0 P4 U4	1m	1000.0	1000.0000
+dist	L4 P4 U1	3'6"	42.0	3'-6"
+dist	L4 P4 U1	4'-1 1/2"	49.5	4'-1 1/2"
+dist	L4 P4 U1	4'1-1/2"	49.5	4'-1 1/2"
+dist	L4 P4 U1	49.5	49.5	4'-1 1/2"
+dist	L4 P4 U1	1'	12.0	1'
+dist	L4 P4 U1	6"	6.0	6"
+dist	L4 P4 U1	1/2"	0.5	1/2"
+dist	L4 P4 U1	1m	39.37007874015748	3'-3 3/8"
+dist	L4 P4 U1	25.4mm	1.0	1"
+dist	L4 P4 U1	1ft	12.0	1'
+dist	L4 P4 U1	2in	2.0	2"
+dist	L4 P4 U1	3.5ft	42.0	3'-6"
+dist	L4 P4 U1	-1'-6"	-18.0	-1'-6"
+dist	L4 P4 U1	1'-0 1/2"	12.5	1'-0 1/2"
+dist	L4 P4 U1	1'0-1/2"	12.5	1'-0 1/2"
+dist	L4 P4 U1	0'-6"	6.0	6"
+dist	L4 P4 U1	2'-0"	24.0	2'
+dist	L4 P4 U1	1'6	18.0	1'-6"
+dist	L4 P4 U1	1' 6"	18.0	1'-6"
+dist	L4 P4 U1	1'- 6"	18.0	1'-6"
+dist	L4 P4 U1	1'-5-1/2"	17.5	1'-5 1/2"
+dist	L4 P4 U1	1'1/2"	12.5	1'-0 1/2"
+dist	L4 P4 U1	1 1/2'	18.0	1'-6"
+dist	L4 P4 U1	1E1'	120.0	10'
+dist	L4 P4 U1	1'14"	26.0	2'-2"
+dist	L4 P4 U1	1'-	!syntax	-
+dist	L4 P4 U1	1''	!syntax	-
+dist	L4 P4 U1	'6	!syntax	-
+dist	L4 P4 U1	1'6'	!syntax	-
+dist	L4 P4 U1	6"1'	!syntax	-
+dist	L4 P4 U1	1'6""	!syntax	-
+dist	L4 P4 U1	1'--6"	!syntax	-
+dist	L4 P4 U1	1'-6.5 1/2"	!syntax	-
+dist	L4 P4 U1	1'6,5"	!comma	-
+dist	L4 P4 U1	17 1/2	17.5	1'-5 1/2"
+dist	L4 P4 U1	17-1/2	17.5	1'-5 1/2"
+dist	L4 P4 U1	1/2	0.5	1/2"
+dist	L4 P4 U1	255/256	0.99609375	1"
+dist	L4 P4 U1	-17 1/2	-17.5	-1'-5 1/2"
+dist	L4 P4 U1	1 1/2"	1.5	1 1/2"
+dist	L4 P4 U1	1.5m	59.05511811023622	4'-11 1/16"
+dist	L4 P4 U1	=3'6"+2	44.0	3'-8"
+dist	L4 P4 U1	=10'-2'	96.0	8'
+dist	L4 P4 U1	=2' - 6"	18.0	1'-6"
+dist	L4 P4 U1	=3'-6"*2	84.0	7'
+dist	L4 P4 U1	=(3'+6")/2	21.0	1'-9"
+dist	L4 P4 U1	=2'-1"	25.0	2'-1"
+dist	L4 P4 U1	=2' - 1"	23.0	1'-11"
+dist	L4 P4 U1	=2'- 1"	25.0	2'-1"
+dist	L4 P4 U1	=3' 6"	!syntax	-
+dist	L4 P4 U1	=3'6	42.0	3'-6"
+dist	L4 P4 U1	=3'6-1/2"	42.5	3'-6 1/2"
+dist	L4 P4 U1	=1'1/2"	12.5	1'-0 1/2"
+dist	L4 P4 U1	=1'-0 1/2"	12.5	1'-0 1/2"
+dist	L4 P4 U1	=4'-1 1/2"+1/2"	50.0	4'-2"
+dist	L4 P4 U1	=3'-(2)	34.0	2'-10"
+dist	L4 P4 U1	=3'/2	18.0	1'-6"
+dist	L4 P4 U1	=1'+1m	51.37007874015748	4'-3 3/8"
+dist	L4 P4 U1	=6"*2	12.0	1'
+dist	L4 P4 U1	=1/2'	6.0	6"
+dist	L4 P4 U1	6-1/2"	6.5	6 1/2"
+dist	L4 P4 U1	1/2'	6.0	6"
+dist	L4 P4 U1	=6 1/2"*2	13.0	1'-1"
+dist	L4 P4 U1	=6-1/2"*2	13.0	1'-1"
+dist	L4 P4 U1	=6 - 1/2"	5.5	5 1/2"
+dist	L4 P4 U1	=1/2'+3"	9.0	9"
+dist	L4 P4 U1	=1 1/2'	18.0	1'-6"
+dist	L4 P4 U1	=5'-1/2"	60.5	5'-0 1/2"
+dist	L4 P4 U1	=5' - 1/2"	59.5	4'-11 1/2"
+dist	L4 P4 U1	=3/4"+1/8"	0.875	7/8"
+dist	L4 P4 U1	=1/0"	!zero-denominator	-
+dist	L4 P4 U1	=1e308'	!range	-
+dist	L4 P4 U1	=10/2'	60.0	5'
+dist	L4 P4 U1	=1/2 '	!syntax	-
+dist	L4 P4 U1	=0'-6 1/2"*2	13.0	1'-1"
+dist	L4 P4 U1	=5'0-1/2"+1"	61.5	5'-1 1/2"
+dist	L4 P4 U1	=5-1/2	4.5	4 1/2"
+dist	L4 P4 U1	=5 1/2	!syntax	-
+dist	L4 P4 U1	=1/2	0.5	1/2"
+dist	L4 P4 U1	=-1'	-12.0	-1'
+dist	L4 P4 U1	=-(1'-6")	-18.0	-1'-6"
+dist	L4 P4 U1	=1'6"6"	!syntax	-
+dist	L4 P4 U1	=1'm	!syntax	-
+dist	L4 P4 U1	=12'3	147.0	12'-3"
+dist	L4 P4 U1	=12' + 3	147.0	12'-3"
+dist	L4 P4 U1	=1e1'	120.0	10'
+dist	L4 P4 U1	=(2'-6")*(1'+0")/12	30.0	2'-6"
+dist	L4 P4 U1	=1in+1ft	13.0	1'-1"
+dist	L4 P4 U1	=1'+	!syntax	-
+dist	L4 P4 U1	=10'-2'-1'	84.0	7'
+dist	L4 P4 U4	3'6"	42.0	3'-6"
+dist	L3 P2 U0	3'6"	42.0	3'-6.00"
+dist	L4 P4 U4	1m	39.37007874015748	3'-3 3/8"
+dist	L3 P2 U0	1m	39.37007874015748	3'-3.37"
+dist	L4 P4 U4	=1m-1"	38.37007874015748	3'-2 3/8"
+dist	L3 P2 U0	=1m-1"	38.37007874015748	3'-2.37"
+dist	L4 P4 U4	12	12.0	1'
+dist	L3 P2 U0	12	12.0	1'
+dist	L3 P2 U1	1'-5.50"	17.5	1'-5.50"
+dist	L3 P2 U1	1'5.50"	17.5	1'-5.50"
+dist	L3 P2 U1	17.5	17.5	1'-5.50"
+dist	L3 P2 U1	=1'+0.5"	12.5	1'-0.50"
+dist	L3 P2 U1	2'-0.25"	24.25	2'-0.25"
+dist	L3 P2 U1	=3'6"/7	6.0	6.00"
+dist	L4 P0 U1	4'-1 1/2"	49.5	4'-2"
+dist	L4 P0 U1 um	4'1-1/2"	49.5	4'2"
+dist	L5 P0 U1	17 1/2	17.5	18
+dist	L5 P0 U1 um	17-1/2	17.5	18
+dist	L4 P2 U1	4'-1 1/2"	49.5	4'-1 1/2"
+dist	L4 P2 U1 um	4'1-1/2"	49.5	4'1-1/2"
+dist	L5 P2 U1	17 1/2	17.5	17 1/2
+dist	L5 P2 U1 um	17-1/2	17.5	17-1/2
+dist	L4 P8 U1	4'-1 1/2"	49.5	4'-1 1/2"
+dist	L4 P8 U1 um	4'1-1/2"	49.5	4'1-1/2"
+dist	L5 P8 U1	17 1/2	17.5	17 1/2
+dist	L5 P8 U1 um	17-1/2	17.5	17-1/2
+dist	L4 P4 U1 Z3	4'-1 1/2"	49.5	4'-1 1/2"
+dist	L4 P4 U1 Z3	6"	6.0	6"
+dist	L5 P4 U1	1/2	0.5	1/2
+dist	L5 P4 U1	5 1/2	5.5	5 1/2
+dist	L5 P4 U1	5-1/2	5.5	5 1/2
+dist	L5 P4 U1	5  1/2	5.5	5 1/2
+dist	L5 P4 U1	=5-1/2	4.5	4 1/2
+dist	L5 P4 U1	=5+1/2	5.5	5 1/2
+dist	L5 P4 U1	=5-1/2*2	4.0	4
+dist	L5 P4 U1	=(5+1/2)*2	11.0	11
+dist	L5 P4 U1	=5 1/2*2	!syntax	-
+dist	L5 P4 U1	=5 1/2"*2	11.0	11
+dist	L5 P4 U1	=1/3	0.3333333333333333	5/16
+dist	L5 P4 U1	=-1/2	-0.5	-1/2
+dist	L5 P4 U1	=12/2/3	2.0	2
+dist	L5 P4 U1	=2*3/4	1.5	1 1/2
+dist	L5 P4 U1	=1/(2-2)	!zero-denominator	-
+dist	L5 P4 U1	=1/0	!zero-denominator	-
+dist	L5 P4 U1	1/0	!zero-denominator	-
+dist	L5 P4 U1	1/2/3	!syntax	-
+dist	L5 P4 U1	1 /2	!syntax	-
+dist	L5 P4 U1	1/ 2	!syntax	-
+dist	L5 P4 U1	1.5/2	!syntax	-
+dist	L5 P4 U1	1/2.5	!syntax	-
+dist	L5 P4 U1	1 - 1/2	!syntax	-
+dist	L5 P4 U1	001/002	0.5	1/2
+dist	L5 P4 U1	-17 1/2	-17.5	-17 1/2
+dist	L5 P4 U1	=17 1/2	!syntax	-
+dist	L5 P4 U1	=(1/2)	0.5	1/2
+dist	L5 P4 U1	=1/2/0	!zero-denominator	-
+dist	L5 P4 U1	=0/5	0.0	0
+dist	L5 P4 U1	=7/8*8	7.0	7
+dist	L5 P4 U1	=1/2in	0.5	1/2
+dist	L5 P4 U1	=1/2"	0.5	1/2
+dist	L5 P4 U1	1/2in	0.5	1/2
+dist	L5 P4 U1	1/0in	!zero-denominator	-
+dist	L5 P4 U1	5/2	2.5	2 1/2
+dist	L5 P4 U1	=1-1/16	0.9375	15/16
+dist	L5 P4 U1	255/256	0.99609375	1
+dist	L5 P4 U1	=255/256	0.99609375	1
+dist	L2 P4 U4	1/2	0.5	0.5000
+dist	L2 P4 U4	17 1/2	17.5	17.5000
+dist	L2 P4 U4	=17 1/2	!syntax	-
+dist	L2 P4 U4	=17+1/2	17.5	17.5000
+dist	L2 P4 U4	5-1/2	5.5	5.5000
+dist	L2 P4 U4	=5-1/2	4.5	4.5000
+dist	L2 P4 U4	1/2m	500.0	500.0000
+dist	L2 P4 U4	=1/2m	500.0	500.0000
+dist	L2 P4 U4	=1/2"	12.7	12.7000
+dist	L2 P4 U4	=3/8"+1/4"	15.875	15.8750
+dist	L2 P4 U4	=1/2 m	500.0	500.0000
+dist	L2 P4 U4	=5 1/2m	5500.0	5500.0000
+dist	L2 P4 U4	=5-1/2m	5500.0	5500.0000
+dist	L2 P4 U4	=5 - 1/2m	-495.0	-495.0000
+dist	L2 P4 U4	=10/2m	5000.0	5000.0000
+dist	L2 P4 U4	=1/2/2m	0.001	0.0010
+dist	L2 P4 U4	=1/0m	!zero-denominator	-
+dist	L2 P4 U4	=1/2*2m	1000.0	1000.0000
+dist	L2 P4 U4	=1200/2m	600000.0	600000.0000
+dist	L2 P4 U4	=2*(3+4)	14.0	14.0000
+dist	L2 P4 U4	=2×(3+4)	14.0	14.0000
+dist	L2 P4 U4	=10÷4	2.5	2.5000
+dist	L2 P4 U4	=10−4	6.0	6.0000
+dist	L2 P4 U4	=−4	-4.0	-4.0000
+dist	L2 P4 U4	=-5+3	-2.0	-2.0000
+dist	L2 P4 U4	=--5	5.0	5.0000
+dist	L2 P4 U4	=-(2+3)	-5.0	-5.0000
+dist	L2 P4 U4	=+5	5.0	5.0000
+dist	L2 P4 U4	=2*-3	-6.0	-6.0000
+dist	L2 P4 U4	=2--3	5.0	5.0000
+dist	L2 P4 U4	=2-−3	5.0	5.0000
+dist	L2 P4 U4	= 1 + 2 	3.0	3.0000
+dist	L2 P4 U4	=\t1\t+\t2	3.0	3.0000
+dist	L2 P4 U4	  =1+2	3.0	3.0000
+dist	L2 P4 U4	=((((1))))	1.0	1.0000
+dist	L2 P4 U4	=(1+2	!paren	-
+dist	L2 P4 U4	=1+2)	!paren	-
+dist	L2 P4 U4	=((1+2)	!paren	-
+dist	L2 P4 U4	=(1+2))	!paren	-
+dist	L2 P4 U4	=()	!syntax	-
+dist	L2 P4 U4	=(	!syntax	-
+dist	L2 P4 U4	=)	!syntax	-
+dist	L2 P4 U4	=1+	!syntax	-
+dist	L2 P4 U4	=*2	!syntax	-
+dist	L2 P4 U4	=1**2	!syntax	-
+dist	L2 P4 U4	=1 2	!syntax	-
+dist	L2 P4 U4	=2(3)	!syntax	-
+dist	L2 P4 U4	=(2)(3)	!syntax	-
+dist	L2 P4 U4	=1e3+1	1001.0	1001.0000
+dist	L2 P4 U4	=1.5e3/3	500.0	500.0000
+dist	L2 P4 U4	=.5+.5	1.0	1.0000
+dist	L2 P4 U4	=5.+5.	10.0	10.0000
+dist	L2 P4 U4	=1e308*10	!range	-
+dist	L2 P4 U4	=1e308+1e308	!range	-
+dist	L2 P4 U4	=-1e308-1e308	!range	-
+dist	L2 P4 U4	=1e-200*1e-200	!range	-
+dist	L2 P4 U4	=1e-300/1e300	!range	-
+dist	L2 P4 U4	=1e-307/10	!range	-
+dist	L2 P4 U4	=1e-307	1e-307	0.0000
+dist	L2 P4 U4	=1e999	!range	-
+dist	L2 P4 U4	=1e-400	!range	-
+dist	L2 P4 U4	=12.5m+250cm	15000.0	15000.0000
+dist	L2 P4 U4	=3'6"+100	1166.8	1166.8000
+dist	L2 P4 U4	=1m/3	333.3333333333333	333.3333
+dist	L2 P4 U4	=1200mm/2	600.0	600.0000
+dist	L2 P4 U4	=2*1.5m	3000.0	3000.0000
+dist	L2 P4 U4	=1m*1m	1000000.0	1000000.0000
+dist	L2 P4 U4	=1 m + 2 cm	1020.0	1020.0000
+dist	L2 P4 U4	=1m+	!syntax	-
+dist	L2 P4 U4	=1x	!syntax	-
+dist	L2 P4 U4	=1mm2	!syntax	-
+dist	L2 P4 U4	=1'+1"	330.2	330.2000
+dist	L2 P4 U4	=6"*2	304.8	304.8000
+dist	L2 P4 U4	=2km-1500m	500000.0	500000.0000
+dist	L2 P4 U4	=(1m+1ft)*(2)	2609.6	2609.6000
+dist	L2 P4 U4	=1,5+2	!comma	-
+dist	L2 P4 U4	=1 ,5	!comma	-
+dist	L2 P4 U4	=a	!syntax	-
+dist	L2 P4 U4	=1+a	!syntax	-
+dist	L2 P4 U4	==1	!syntax	-
+dist	L2 P4 U4	=1=	!syntax	-
+dist	L2 P4 U4	=1^2	!syntax	-
+dist	L2 P4 U4	=1%	!syntax	-
+dist	L2 P4 U4	=(1+2)*(3+4)/(5-6)	-21.0	-21.0000
+dist	L2 P4 U4	=100-10-1	89.0	89.0000
+dist	L2 P4 U4	=100/10/2	5.0	5.0000
+dist	L2 P4 U4	=2+3*4	14.0	14.0000
+dist	L2 P4 U4	=(2+3)*4	20.0	20.0000
+dist	L2 P4 U4	=2*3+4*5	26.0	26.0000
+dist	L2 P4 U4	=-2*-2	4.0	4.0000
+dist	L2 P4 U4	=-(-(-1))	-1.0	-1.0000
+dist	L2 P4 U4	=1-(-1)	2.0	2.0000
+dist	L2 P4 U4	=0*1e308	0.0	0.0000
+dist	L2 P4 U4	=1/3*3	1.0	1.0000
+dist	L2 P4 U4	=0.1+0.2	0.3	0.3000
+dist	L2 P4 U4	=1 m	1000.0	1000.0000
+dist	L2 P4 U4	=1M+1CM	1010.0	1010.0000
+dist	L2 P4 U4	=1KM	1000000.0	1000000.0000
+dist	L2 P4 U4	=1Mm	1.0	1.0000
+dist	L2 P4 U4	=(1/2)m	!syntax	-
+dist	L2 P4 U4	=1e3 mm	1000.0	1000.0000
+dist	L2 P4 U4	=1e	!syntax	-
+dist	L2 P4 U4	=1e+	!syntax	-
+dist	L2 P4 U4	=1.	1.0	1.0000
+dist	L2 P4 U4	=.	!syntax	-
+dist	L2 P4 U4	=-	!syntax	-
+dist	L2 P4 U4	=+	!syntax	-
+dist	L2 P4 U4	=1,	!comma	-
+dist	L2 P4 U4	=1\xC3	!syntax	-
+dist	L2 P4 U4	=1×	!syntax	-
+dist	L2 P4 U4	=2\xE2\x88	!syntax	-
+
+ang	A0 Q4	45	45.0	45.0000
+ang	A0 Q4	45.5	45.5	45.5000
+ang	A0 Q4	-45	-45.0	315.0000
+ang	A0 Q4	45d	45.0	45.0000
+ang	A0 Q4	45D	45.0	45.0000
+ang	A0 Q4	45d30'	45.5	45.5000
+ang	A0 Q4	45d30'15"	45.50416666666667	45.5042
+ang	A0 Q4	45°	45.0	45.0000
+ang	A0 Q4	45°30'	45.5	45.5000
+ang	A0 Q4	45d30'15.5"	45.504305555555554	45.5043
+ang	A0 Q4	45d30	45.5	45.5000
+ang	A0 Q4	45d30'15	45.50416666666667	45.5042
+ang	A0 Q4	-45d30'	-45.5	314.5000
+ang	A0 Q4	50g	45.0	45.0000
+ang	A0 Q4	50G	45.0	45.0000
+ang	A0 Q4	-50g	-45.0	315.0000
+ang	A0 Q4	0.7853981633974483r	0.7853981633974483r	45.0000
+ang	A0 Q4	1r	1.0r	57.2958
+ang	A0 Q4	1R	1.0r	57.2958
+ang	A0 Q4	N45dE	45.0	45.0000
+ang	A0 Q4	N45dW	135.0	135.0000
+ang	A0 Q4	S45dE	315.0	315.0000
+ang	A0 Q4	S45dW	225.0	225.0000
+ang	A0 Q4	N	90.0	90.0000
+ang	A0 Q4	E	0.0	0.0000
+ang	A0 Q4	W	180.0	180.0000
+ang	A0 Q4	S	270.0	270.0000
+ang	A0 Q4	N 45d30' E	44.5	44.5000
+ang	A0 Q4	n45de	45.0	45.0000
+ang	A0 Q4	N45E	45.0	45.0000
+ang	A0 Q4	N45.5E	44.5	44.5000
+ang	A0 Q4	720	720.0	0.0000
+ang	A0 Q4	0	0.0	0.0000
+ang	A0 Q4	45d60'	!range	-
+ang	A0 Q4	45d30'60"	!range	-
+ang	A0 Q4	N91dE	!range	-
+ang	A0 Q4	45,5	!comma	-
+ang	A0 Q4		!empty	-
+ang	A0 Q4	45x	!syntax	-
+ang	A0 Q4	45 d	!syntax	-
+ang	A0 Q4	45.5d30'	!syntax	-
+ang	A0 Q4	1e999	!range	-
+ang	A0 Q4	45m	!syntax	-
+ang	A0 Q4	=180/4	45.0	45.0000
+ang	A0 Q4	=90-30	60.0	60.0000
+ang	A0 Q4	=45d30'+0d30'	46.0	46.0000
+ang	A0 Q4	=2*45d	90.0	90.0000
+ang	A0 Q4	=100g/2	45.0	45.0000
+ang	A0 Q4	=1r*2	2.0r	114.5916
+ang	A0 Q4	=360/7	51.42857142857143	51.4286
+ang	A0 Q4	=45°+45°	90.0	90.0000
+ang	A0 Q4	=N45dE+1	!syntax	-
+ang	A0 Q4	=-45	-45.0	315.0000
+ang	A0 Q4	=(30+15)*2	90.0	90.0000
+ang	A0 Q4	=45d30	45.5	45.5000
+ang	A0 Q4	=45d-30'	!syntax	-
+ang	A0 Q4	=1/0	!zero-denominator	-
+ang	A0 Q4	=45d60'	!range	-
+ang	A0 Q4	=45d+0.5r	73.64788975654116	73.6479
+ang	A0 Q4	=10d+10d10'10"	20.169444444444444	20.1694
+ang	A0 Q4	=90d/2+0g	45.0	45.0000
+ang	A0 Q4	=2*(45)	90.0	90.0000
+ang	A0 Q4	=1e999d	!range	-
+ang	A0 Q4	=45 d	!syntax	-
+ang	A0 Q4	=0.5R	0.5r	28.6479
+ang	A0 Q4	=1D	1.0	1.0000
+ang	A0 Q4	=45g	40.5	40.5000
+ang	A0 Q4	=-50g	-45.0	315.0000
+ang	A0 Q4	=(1+2	!paren	-
+ang	A0 Q4	=45d30'15"*2	91.00833333333334	91.0083
+ang	A0 Q4	=360d-0d0'1"	359.9997222222222	359.9997
+ang	A1 Q4	45d30'15"	45.50416666666667	45d30'15"
+ang	A1 Q8	45d30'15"	45.50416666666667	45d30'15.0000"
+ang	A1 Q4	45.5	45.5	45d30'0"
+ang	A1 Q8	45.5	45.5	45d30'0.0000"
+ang	A1 Q4	=90/4	22.5	22d30'0"
+ang	A1 Q8	=90/4	22.5	22d30'0.0000"
+ang	A1 Q4	N45dE	45.0	45d0'0"
+ang	A1 Q8	N45dE	45.0	45d0'0.0000"
+ang	A1 Q4	50g	45.0	45d0'0"
+ang	A1 Q8	50g	45.0	45d0'0.0000"
+ang	A2 Q2	50	45.0	50.00g
+ang	A2 Q2	50g	45.0	50.00g
+ang	A2 Q2	45d	45.0	50.00g
+ang	A2 Q2	=100/2	45.0	50.00g
+ang	A2 Q2	=45d+50	90.0	100.00g
+ang	A2 Q2	1r	1.0r	63.66g
+ang	A2 Q2	=200	180.0	200.00g
+ang	A2 Q2	-100	-90.0	300.00g
+ang	A3 Q4	1	1.0r	1.0000r
+ang	A3 Q4	=1/2	0.5r	0.5000r
+ang	A3 Q4	45d	45.0	0.7854r
+ang	A3 Q4	=3.14159/2	1.570795r	1.5708r
+ang	A3 Q4	100g	90.0	1.5708r
+ang	A3 Q4	=45d*2	90.0	1.5708r
+ang	A3 Q4	0.5r	0.5r	0.5000r
+ang	A3 Q4	-1	-1.0r	5.2832r
+ang	A4 Q2	N45dE	45.0	N 45d0' E
+ang	A4 Q4 um	N45dE	45.0	N45d0'0"E
+ang	A4 Q2	S30d15'W	239.75	S 30d15' W
+ang	A4 Q4 um	S30d15'W	239.75	S30d15'0"W
+ang	A4 Q2	45	45.0	N 45d0' E
+ang	A4 Q4 um	45	45.0	N45d0'0"E
+ang	A4 Q2	=30+15	45.0	N 45d0' E
+ang	A4 Q4 um	=30+15	45.0	N45d0'0"E
+ang	A4 Q2	W	180.0	W
+ang	A4 Q4 um	W	180.0	W
+ang	A4 Q2	N45d30'15"E	44.49583333333333	N 45d30' E
+ang	A4 Q4 um	N45d30'15"E	44.49583333333333	N45d30'15"E
+ang	A0 Q2 base=90 cw dir	0	90.0	0.00
+ang	A0 Q2 base=90 cw dir	90	0.0	90.00
+ang	A0 Q2 base=90 cw dir	-90	180.0	270.00
+ang	A0 Q2 base=90 cw dir	180	-90.0	180.00
+ang	A0 Q2 base=90 cw dir	=45+45	0.0	90.00
+ang	A0 Q2 base=90 cw dir	=0	90.0	0.00
+ang	A0 Q2 base=90 cw dir	N	90.0	0.00
+ang	A0 Q2 base=90 cw dir	E	0.0	90.00
+ang	A0 Q2 base=90 cw dir	=-90	180.0	270.00
+ang	A0 Q2 base=90 cw dir	45d	45.0	45.00
+ang	A0 Q2 base=90 dir	0	90.0	0.00
+ang	A0 Q2 base=90 dir	90	180.0	90.00
+ang	A0 Q2 base=90 dir	=45*2	180.0	90.00
+ang	A0 Q2 base=90 dir	N45dE	45.0	315.00
+ang	A0 Q2 base=90 dir	=-90	0.0	270.00
+ang	A0 Q2 base=90 cw	30	30.0	30.00
+ang	A0 Q2 base=90 cw	=30*2	60.0	60.00
+
+scale	P4	0.5	0.5	0.5000
+scale	P4	1/4	0.25	0.2500
+scale	P4	1:50	0.02	0.0200
+scale	P4	1:100	0.01	0.0100
+scale	P4	2:1	2.0	2.0000
+scale	P4	1 : 50	0.02	0.0200
+scale	P4	1:0	!zero-denominator	-
+scale	P4	1:	!syntax	-
+scale	P4	:5	!syntax	-
+scale	P4	1:2:3	!syntax	-
+scale	P4	1/2:1	0.5	0.5000
+scale	P4	1 1/2	1.5	1.5000
+scale	P4	5-1/2	5.5	5.5000
+scale	P4	=1/3	0.3333333333333333	0.3333
+scale	P4	=1:50	!syntax	-
+scale	P4	2'	!syntax	-
+scale	P4	1m	!syntax	-
+scale	P4	-1	-1.0	-1.0000
+scale	P4	1e3	1000.0	1000.0000
+scale	P4	1,5	!comma	-
+scale	P4	0	0.0	0.0000
+scale	P4	1:1e-400	!range	-
+scale	P4	1e300:1e-300	!range	-
+scale	P4	1:2.5	0.4	0.4000
+scale	P4	2.5:1	2.5	2.5000
+scale	P4	1:3	0.3333333333333333	0.3333
+scale	P4	-1:50	-0.02	-0.0200
+scale	P4	1:-50	-0.02	-0.0200
+scale	P4	1 :	!syntax	-
+scale	P4	1:x	!syntax	-
+scale	P4	1;50	!syntax	-
+scale	P4	=2*0.5	1.0	1.0000
+scale	P4	=1/0	!zero-denominator	-
+scale	P4		!empty	-
+scale	P4	1:0.0	!zero-denominator	-
+scale	P4	0:5	0.0	0.0000
+scale	P4	3/4:1/2	1.5	1.5000
+scale	P4	1:1/0	!zero-denominator	-
+scale	P4	1/0:1	!zero-denominator	-
+scale	P4	1:50 	0.02	0.0200
+scale	P4	 1:50	0.02	0.0200
+scale	P0	0.5	0.5	1
+scale	P0	1:3	0.3333333333333333	0
+scale	P8	1:3	0.3333333333333333	0.33333333
+scale	P2	2.345	2.345	2.35
+scale	P4 Z8	0.5	0.5	0.5
+scale	L4 P4	0.5	0.5	0.5000
+
+int	P4	12	12.0	12
+int	P4	-5	-5.0	-5
+int	P4	+7	7.0	7
+int	P4	007	7.0	7
+int	P4	-32768	-32768.0	-32768
+int	P4	32767	32767.0	32767
+int	P4	32768	!range	-
+int	P4	-32769	!range	-
+int	P4	1.5	!not-integer	-
+int	P4	2.0	!not-integer	-
+int	P4	1e3	!not-integer	-
+int	P4	=3*4	12.0	12
+int	P4	=7/2	!not-integer	-
+int	P4	=10/2	5.0	5
+int	P4	=32767+1	!range	-
+int	P4	=-32768	-32768.0	-32768
+int	P4	=2.5*2	5.0	5
+int	P4	=1e5	!range	-
+int	P4	=(1+2)*3	9.0	9
+int	P4	12m	!syntax	-
+int	P4	1/2	!syntax	-
+int	P4	,5	!comma	-
+int	P4		!empty	-
+int	P4	=-0	0.0	0
+int	P4	-0	0.0	0
+int	P4	=1e3	1000.0	1000
+int	P4	=0.1*10	1.0	1
+int	P4	=1/3*3	1.0	1
+int	P4	=32767.5	!not-integer	-
+int	P4	=-32768.5	!not-integer	-
+int	P4	=1e999	!range	-
+int	P4	99999999999	!range	-
+int	P4	12 	12.0	12
+int	P4	1 2	!syntax	-
+
+real	P4	12.5	12.5	12.5000
+real	P4	-3	-3.0	-3.0000
+real	P4	1.5e3	1500.0	1500.0000
+real	P4	.5	0.5	0.5000
+real	P4	5.	5.0	5.0000
+real	P4	1/2	!syntax	-
+real	P4	=1/2	0.5	0.5000
+real	P4	12,5	!comma	-
+real	P4	1e999	!range	-
+real	P4	1e-308	!range	-
+real	P4	abc	!syntax	-
+real	P4	12.5m	!syntax	-
+real	P4	=(1+2)*3.5	10.5	10.5000
+real	P4	inf	!syntax	-
+real	P4	nan	!syntax	-
+real	P4	0x10	!syntax	-
+real	P4	1.7500E+01	17.5	17.5000
+real	P4	=1.7500E+01*2	35.0	35.0000
+real	P4	=1m	!syntax	-
+real	P4	=1'	!syntax	-
+real	P4	=45d	!syntax	-
+real	P4	-0	0.0	0.0000
+real	P4	=-.5	-0.5	-0.5000
+real	P4	1e-307	1e-307	0.0000
+real	P4	\t12.5\t	12.5	12.5000
+real	P4	12.5\x00	!syntax	-
+real	P4	12 5	!syntax	-
+real	P4	１	!syntax	-
+real	P4	1 000	!syntax	-
+real	P4	=2÷0	!zero-denominator	-
+real	P4	=10×10	100.0	100.0000
+real	P8	0.123456789	0.123456789	0.12345679
+real	P0	0.123456789	0.123456789	0
+real	P4 Z8	0.123456789	0.123456789	0.1235
+real	P8	=2/3	0.6666666666666666	0.66666667
+real	P0	=2/3	0.6666666666666666	1
+real	P4 Z8	=2/3	0.6666666666666666	0.6667

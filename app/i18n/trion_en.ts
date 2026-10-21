@@ -222,6 +222,69 @@
     </message>
 </context>
 <context>
+    <name>ValueParser</name>
+    <message>
+        <source>Nhập một giá trị.</source>
+        <translation>Enter a value.</translation>
+    </message>
+    <message>
+        <source>Biểu thức chưa đúng. Biểu thức gồm số, đơn vị, + − × ÷ và ngoặc, ví dụ =1200/2+50.</source>
+        <translation>Invalid expression. Use numbers, units, + − × ÷ and parentheses, e.g. =1200/2+50.</translation>
+    </message>
+    <message>
+        <source>Chưa đọc được độ dài. Ví dụ: 1250, 12.5m, 250cm, 3&apos;6&quot;, =1200/2+50.</source>
+        <translation>Cannot read the length. Examples: 1250, 12.5m, 250cm, 3&apos;6&quot;, =1200/2+50.</translation>
+    </message>
+    <message>
+        <source>Chưa đọc được góc. Ví dụ: 45, 45d30&apos;, 50g, 0.785r, N45dE.</source>
+        <translation>Cannot read the angle. Examples: 45, 45d30&apos;, 50g, 0.785r, N45dE.</translation>
+    </message>
+    <message>
+        <source>Chưa đọc được tỉ lệ. Ví dụ: 0.5, 1/4, 1:50.</source>
+        <translation>Cannot read the scale. Examples: 0.5, 1/4, 1:50.</translation>
+    </message>
+    <message>
+        <source>Chưa đọc được số nguyên. Ví dụ: 12, -3.</source>
+        <translation>Cannot read the integer. Examples: 12, -3.</translation>
+    </message>
+    <message>
+        <source>Chưa đọc được số. Ví dụ: 12.5, -3, 1.5e3.</source>
+        <translation>Cannot read the number. Examples: 12.5, -3, 1.5e3.</translation>
+    </message>
+    <message>
+        <source>Dấu thập phân là dấu chấm: gõ %1</source>
+        <translation>The decimal separator is a period: type %1</translation>
+    </message>
+    <message>
+        <source>Số nguyên phải từ -32768 đến 32767.</source>
+        <translation>The integer must be between -32768 and 32767.</translation>
+    </message>
+    <message>
+        <source>Góc vượt giới hạn: quá lớn, phút hoặc giây từ 60 trở lên, hoặc phương vị quá 90°.</source>
+        <translation>Angle out of range: too large, minutes or seconds of 60 or more, or a bearing over 90°.</translation>
+    </message>
+    <message>
+        <source>Giá trị quá lớn hoặc quá gần 0.</source>
+        <translation>The value is too large or too close to 0.</translation>
+    </message>
+    <message>
+        <source>Nhập số nguyên, ví dụ 12.</source>
+        <translation>Enter a whole number, e.g. 12.</translation>
+    </message>
+    <message>
+        <source>Không chia được cho 0.</source>
+        <translation>Cannot divide by 0.</translation>
+    </message>
+    <message>
+        <source>Ngoặc chưa khớp hoặc lồng quá 32 tầng.</source>
+        <translation>Parentheses do not match or are nested more than 32 levels.</translation>
+    </message>
+    <message>
+        <source>Bản vẽ chưa đặt đơn vị nên không quy đổi được đơn vị gõ kèm. Gõ số theo đơn vị bản vẽ.</source>
+        <translation>The drawing has no units, so typed units cannot be converted. Enter the number in drawing units.</translation>
+    </message>
+</context>
+<context>
     <name>keymap</name>
     <message>
         <source>Lệnh khác</source>

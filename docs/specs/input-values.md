@@ -162,3 +162,135 @@ prompt INT-106 xét điểm trước khi gọi parser); nhận `°`; |x| < 1e-30
   là số 30 chữ số có nghĩa (đường số nguyên lớn) p99 166 ns, kiến trúc p8 131 ns, khảo sát 116 ns, số nguyên 52 ns.
   Load ≈ 24–27: p99 179–330 ns tùy luồng đo rơi vào nhân P hay E. Ngưỡng p99 ≤ 300 ns chỉ chặn khi
   `trion::test::kTimed` (release không sanitizer); máy quá tải có thể làm hỏng giả.
+
+## 10. Cú pháp ô số (UI0-109)
+
+`app/widgets/numeric/ValueParser.h` (`trion_numeric`, namespace `trion::ui`): bộ phân tích của ô số UI-C09, dùng
+cho ô số UI0-007 và bảng Properties. Hàm thuần, không widget; mọi số đọc qua INT-105 (§1–§6), hiển thị lại qua
+RGN-013. `parseValue`, `formatValue`, `errorCode`: không cấp phát, không locale, `noexcept`, an toàn đa luồng.
+
+```cpp
+#include "app/widgets/numeric/ValueParser.h"
+using namespace trion::ui;
+ValueSpec spec{ValueKind::Distance, units, insunits};       // units: UnitContext của bản vẽ; insunits: INSUNITS 0–24
+ValueResult r = parseValue("=1200/2+50", spec);             // r.value (đơn vị bản vẽ; góc: radian), r.error, bool(r)
+char b[trion::regen::kMaxNumText];
+std::string_view shown(b, formatValue(r.value, spec, b));   // chuỗi hiện lại trong ô (RGN-013)
+QString why = errorText(r.error, text, spec);               // câu dưới ô (tr), rỗng khi không lỗi
+std::string_view code = errorCode(r.error);                 // "comma", "paren"… cho log, trion::Error::code
+```
+
+### 10.1 Loại ô và dạng nhận (không `=`)
+
+Bỏ ' ' và '\t' hai đầu. Cả chuỗi là một giá trị:
+
+| `ValueKind` | Nhận | Kết quả |
+|---|---|---|
+| `Distance` | `parseDistance` với feet-inch ở **mọi** LUNITS (`1250`, `1/2`, `5-1/2`, `17 1/2`, `3'6"`, `1'-6 1/2"`, `6"`, `1/2'`), rồi [khoảng trắng] hậu tố đơn vị §10.2 khi không có `'` `"` (`12.5m`, `250 cm`, `1/2in`, `5 1/2m`) | đơn vị bản vẽ |
+| `Angle` | `parseAngle` với `spec.units` (cả `useAngbase`): `45`, `45d30'15"`, `45°30'`, `50g`, `0.785r`, `N45dE` | radian |
+| `Scale` | số, phân số, hỗn số (`parseDistance` thập phân), hoặc tỉ số `a:b` (`1:50` = 0.02; `1:0` là `zero-denominator`) | số |
+| `Integer` | `parseInt`: −32768…32767 | số |
+| `Real` | `parseReal` | số |
+
+Chuỗi không `=` mà INT-105 đọc được (cùng `UnitContext`) cho đúng double đó từng bit; phần mở rộng của ô số là hậu tố
+đơn vị, feet-inch ở LUNITS 1, 2, 5 (INT-105: `feet-inch`) và tỉ số. Kết quả theo cùng phạm vi §2 (hữu hạn, 0 hoặc
+|x| ≥ 1e-307), kể cả sau quy đổi đơn vị và phép tính, nên mọi kết quả hiển thị lại rồi đọc lại được.
+
+### 10.2 Đơn vị (ô độ dài)
+
+- Hậu tố `mm`, `cm`, `m`, `km`, `in`, `ft` (không phân biệt hoa thường, cho phép khoảng trắng trước), `'` feet, `"`
+  inch. Số không hậu tố theo đơn vị bản vẽ.
+- Đơn vị bản vẽ = `spec.insunits` (mã INSUNITS 1–24); LUNITS 3, 4 luôn là inch như RGN-013 (bỏ qua INSUNITS).
+  INSUNITS 0 hoặc ngoài 0–24 (LUNITS khác 3, 4): bản vẽ không đơn vị, gõ kèm đơn vị là lỗi `units`.
+- Quy đổi qua tỉ số mét/đơn vị nguyên của từng mã (inch = 127/5000 m, foot khảo sát = 1200/3937 m…), một phép nhân
+  và một phép chia: `42"` → 1066.8 mm là double gần nhất.
+- Không xét thứ nguyên: mọi số quy về đơn vị bản vẽ rồi mới tính (`=1m*1m` ở bản vẽ mm là 1000000).
+
+### 10.3 Biểu thức (chuỗi bắt đầu bằng `=`)
+
+```
+biểu_thức := tích ( ('+' | '-' | '−') tích )*
+tích      := một_ngôi ( ('*' | '×' | '/' | '÷') một_ngôi )*
+một_ngôi  := ('+' | '-' | '−')* ( '(' biểu_thức ')' | toán_hạng )
+```
+
+- Ưu tiên: dấu một ngôi > nhân, chia > cộng, trừ; cùng bậc tính từ trái sang (`=12/2/3` = 2). Ngoặc lồng tối đa 32
+  tầng. Khoảng trắng (' ', '\t') giữa các phần tùy ý; không nhân ngầm (`=2(3)`, `=(2)(3)`, `=1 2` là `syntax`).
+  Toán tử Unicode − × ÷ (UTF-8) như - * /.
+- Toán hạng ô độ dài: §10.4. Ô góc: số trần theo đơn vị của ô (độ khi AUNITS 0, 1, 4; grad 2; radian 3), có hậu tố
+  `d` `°` `g` `r` thì đọc bằng `parseAngle` rồi đổi về đơn vị ô (`=180/4` là 45°, `=45d30'+0d30'`, `=100g/2`); phương vị
+  (`N45dE`) không nhận. Kết quả đổi sang radian một lần ở cuối rồi mới áp ANGBASE/ANGDIR khi `useAngbase`. Ô tỉ lệ,
+  số, số nguyên: số thực §2; ô số nguyên đòi kết quả nguyên (`not-integer`) trong −32768…32767 (`range`).
+- Mỗi phép tính kiểm phạm vi §2: tràn, tích/thương khác 0 mà dưới 1e-307 là `range`; chia cho 0 là `zero-denominator`.
+- Ngoài phạm vi: biến, hàm, vector của `'CAL` (INT-022).
+
+### 10.4 Phân số và phép chia, phép trừ
+
+Phân số `1/2`, hỗn số `5-1/2`, `5 1/2` của INT-105 trùng phép chia, phép trừ và hai số cạnh nhau. Quy tắc:
+
+1. **Không `=`**: theo INT-105, `5-1/2` = 5.5, `1/2` = 0.5, `17 1/2` = 17.5.
+2. **Có `=`, số trần** (không đơn vị) là số thực §2: `/` là phép chia, `-` là phép trừ; hai số cạnh nhau là lỗi
+   (không đoán): `=5-1/2` = 4.5, `=1/2` = 0.5, `=5 1/2` `syntax`; viết `=5+1/2`.
+3. **Có `=`, số có đơn vị** (`'`, `"`, hậu tố chữ) đọc như khi không `=`: đơn vị áp cho cả phân số, hỗn số, feet-inch
+   viết liền trước nó. `=1/2"` là nửa inch, `=1/2'` = 6", `=3/8"+1/4"`, `=1/2m` = 500 mm, `=6 1/2"*2` = 13",
+   `=10/2m` = 5 m. Khác gợi ý "trong biểu thức `/` luôn là phép chia" vì: (a) chuỗi RGN-013 hiển thị trong ô
+   (`6 1/2"`, `6-1/2"` UNITMODE 1, `0'-6 1/2"`, `5'0-1/2"`) phải dùng được làm toán hạng khi người dùng thêm `=` và
+   phép tính; (b) chia cho một độ dài không có nghĩa ở ô độ dài: cách đọc "1 chia 2 inch" luôn sai ý (`=1/2'` sẽ
+   là 1/24", `=3/8"` ở bản vẽ mm là 0.0148); (c) cùng nghĩa với khi gõ không `=`.
+4. **Feet-inch**: phần inch viết liền sau `'` thuộc cùng số (`=3'-6 1/2"`, `=2'-1"` = 25, `=5'-1/2"` = 60.5);
+   khoảng trắng ngay sau `'` kết thúc số (`=2' - 1"` = 23, `=3' 6"` `syntax`); gặp `'` thứ hai thì là phép trừ
+   (`=10'-2'` = 96). RGN-013 không bao giờ in khoảng trắng sau `'`.
+5. Còn lại nhập nhằng (đã chọn, có ca vàng): LUNITS 5 UNITMODE 1 hiển thị `5-1/2` không đơn vị, đặt vào biểu thức là
+   phép trừ (`=5-1/2*2` = 4; viết `=(5+1/2)*2` hoặc `=5-1/2"*2`); `=1/2/2m` = 1 chia 1 m; góc không có phân số nên
+   `/` luôn là phép chia (`=1/2r` là 1 chia 2 rad).
+
+| Chuỗi (ô độ dài, kiến trúc, bản vẽ inch) | Giá trị | Chuỗi (bản vẽ mm, LUNITS 2) | Giá trị |
+|---|---|---|---|
+| `5-1/2` | 5.5 | `5-1/2` | 5.5 |
+| `=5-1/2` | 4.5 | `=5-1/2` | 4.5 |
+| `=5 1/2` | `syntax` | `=5 1/2m` | 5500 |
+| `=6-1/2"*2` | 13 | `=5-1/2m` | 5500 |
+| `=6 - 1/2"` | 5.5 | `=5 - 1/2m` | −495 |
+| `=1/2'+3"` | 9 | `=1/2"` | 12.7 |
+| `=3'6-1/2"` | 42.5 | `=1/2m`, `=1/2 m` | 500 |
+| `=2'-1"` / `=2' - 1"` | 25 / 23 | `=1200/2m` | 600000 |
+
+### 10.5 Mã lỗi và câu giải thích
+
+Thứ tự: `empty`, rồi `comma` (`,` kề chữ số ở bất kỳ đâu, cả trong biểu thức), rồi lỗi đầu tiên gặp khi đọc từ trái
+sang. Lỗi: `value` = 0. Câu qua `tr()` (ngữ cảnh `ValueParser`), hiện dưới ô.
+
+| `ValueError` | `errorCode` | Khi | Câu |
+|---|---|---|---|
+| `Empty` | `empty` | rỗng, chỉ khoảng trắng | Nhập một giá trị. |
+| `Syntax` | `syntax` | sai cú pháp, thừa ký tự, hậu tố lạ, `=` rỗng | biểu thức: "Biểu thức chưa đúng. Biểu thức gồm số, đơn vị, + − × ÷ và ngoặc, ví dụ =1200/2+50."; còn lại theo loại ô: "Chưa đọc được độ dài. Ví dụ: 1250, 12.5m, 250cm, 3'6", =1200/2+50." (góc, tỉ lệ, số nguyên, số: ví dụ riêng) |
+| `Comma` | `comma` | `,` kề chữ số | "Dấu thập phân là dấu chấm: gõ 12.5": chuỗi đã đổi các `,` kề chữ số thành `.`; đổi rồi vẫn sai (`1,000.5`) thì mẫu `12.5` |
+| `OutOfRange` | `range` | §2, phép tính tràn, số nguyên ngoài −32768…32767, phút/giây ≥ 60, phương vị > 90° | "Số nguyên phải từ -32768 đến 32767." / "Góc vượt giới hạn: …" / "Giá trị quá lớn hoặc quá gần 0." |
+| `NotInteger` | `not-integer` | ô số nguyên nhận số lẻ | Nhập số nguyên, ví dụ 12. |
+| `DivideByZero` | `zero-denominator` | phân số mẫu 0, chia cho 0 (`=1/(2-2)`), tỉ số `x:0` | Không chia được cho 0. |
+| `Paren` | `paren` | thiếu `)` ở cuối, thừa `)`, lồng quá 32 tầng | Ngoặc chưa khớp hoặc lồng quá 32 tầng. |
+| `Units` | `units` | gõ kèm đơn vị khi bản vẽ không đơn vị | Bản vẽ chưa đặt đơn vị nên không quy đổi được đơn vị gõ kèm. Gõ số theo đơn vị bản vẽ. |
+
+`*Khác nhau*` (nhiều đối tượng khác giá trị) là trạng thái của ô UI0-007, không phải chuỗi gõ: ô không gọi parser khi
+chuỗi chưa đổi.
+
+### 10.6 Định dạng lại
+
+`formatValue`: `Distance` → `regen::formatLinear(value, spec.units)` (`1250.00`, `4'-1 1/2"`), `Angle` →
+`formatAngle`, `Scale` và `Real` → thập phân theo LUPREC, `Integer` → thập phân LUPREC 0. Luôn dấu chấm, không locale;
+bộ đệm `regen::kMaxNumText` luôn đủ. Chuỗi hiển thị đọc lại (không `=`) lệch ≤ nửa đơn vị hiển thị.
+
+### 10.7 Kiểm thử (`app/widgets/numeric/tests/value_parser_test.cpp`, nhãn `numeric`)
+
+- Ca vàng `tests/golden.tsv` (nhúng resource): mọi dạng UI-C09, kiến trúc, kỹ thuật, phân số, khoa học, góc độ/DMS/
+  grad/radian/khảo sát, ANGBASE/ANGDIR, 25 mã INSUNITS, biểu thức, lỗi. Giá trị kỳ vọng tính bằng phân số chính xác
+  (Python `fractions`), không lấy từ parser; cột hiển thị do RGN-013 tính trên giá trị kỳ vọng, so từng ký tự.
+- Chuỗi không `=` mà INT-105 đọc được: so từng bit với INT-105. Hash FNV-1a (giá trị, mã lỗi, chuỗi hiển thị) mọi ca
+  vàng trùng nhau ở Linux và Windows.
+- Kiểm vòng hiển thị → đọc lại: 20 nghìn giá trị ngẫu nhiên tất định (ASan 2 nghìn) × loại ô × LUNITS/LUPREC/AUNITS/
+  AUPREC/INSUNITS/ANGBASE. Ngoặc lồng 32/33 tầng, 1 triệu `(`, 1 triệu dấu một ngôi, tổng 200 nghìn ký tự.
+- Không cấp phát (đếm `operator new`; preset dev, release, win). Ngưỡng ≤ 20 µs/giá trị chặn khi
+  `trion::test::kTimed` (release).
+- Fuzz `fuzz/value_parser_fuzz.cpp` (preset fuzz, hạt giống `fuzz/corpus`): ngoài ASan/UBSan kiểm kết quả hữu hạn
+  trong phạm vi, gọi lại cùng kết quả, hiển thị rồi đọc lại, `=` + chuỗi cho cùng giá trị (ô số; ô độ dài khi có đơn
+  vị hoặc không có phân số).
