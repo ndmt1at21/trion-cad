@@ -45,6 +45,29 @@
     </message>
 </context>
 <context>
+    <name>MenuSample</name>
+    <message>
+        <source>Có vùng chọn</source>
+        <translation>With Selection</translation>
+    </message>
+    <message>
+        <source>&amp;Thuộc tính</source>
+        <translation>&amp;Properties</translation>
+    </message>
+    <message>
+        <source>Chọn tương tự</source>
+        <translation>Select Similar</translation>
+    </message>
+    <message>
+        <source>Lệnh &amp;gần đây</source>
+        <translation>&amp;Recent Commands</translation>
+    </message>
+    <message>
+        <source>Dán</source>
+        <translation>Paste</translation>
+    </message>
+</context>
+<context>
     <name>Panel</name>
     <message>
         <source>Hàng %1</source>
@@ -167,6 +190,17 @@
     <message>
         <source>Chọn tất cả</source>
         <translation>Select all</translation>
+    </message>
+</context>
+<context>
+    <name>TooltipTest</name>
+    <message>
+        <source>Máy tính nhanh</source>
+        <translation>QuickCalc</translation>
+    </message>
+    <message>
+        <source>Tính biểu thức, lấy số đo từ bản vẽ rồi dán kết quả vào lệnh đang chạy.</source>
+        <translation>Evaluate expressions, take measurements from the drawing and paste the result into the running command.</translation>
     </message>
 </context>
 <context>
@@ -507,6 +541,28 @@
     <message>
         <source>Dòng lệnh</source>
         <translation>Command line</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::Menu</name>
+    <message>
+        <source>Khóa, cần bản %1</source>
+        <translation>Locked, requires %1</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::RichTooltip</name>
+    <message>
+        <source>Nhấn F1 để xem trợ giúp</source>
+        <translation>Press F1 for help</translation>
+    </message>
+    <message>
+        <source>Pro</source>
+        <translation>Pro</translation>
+    </message>
+    <message>
+        <source>Viewer Pro</source>
+        <translation>Viewer Pro</translation>
     </message>
 </context>
 <context>
