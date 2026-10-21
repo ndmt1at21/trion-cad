@@ -545,6 +545,41 @@
     </message>
 </context>
 <context>
+    <name>trion::app::Application</name>
+    <message>
+        <source>tệp</source>
+        <translation>file</translation>
+    </message>
+    <message>
+        <source>Bản vẽ cần mở; đã có phiên TrionCAD đang chạy thì chuyển cho phiên đó.</source>
+        <translation>Drawings to open; if a TrionCAD session is already running, they are passed to it.</translation>
+    </message>
+    <message>
+        <source>[tệp...]</source>
+        <translation>[file...]</translation>
+    </message>
+    <message>
+        <source>Dùng tệp cài đặt này thay cho tệp của người dùng (mỗi tệp cài đặt một phiên).</source>
+        <translation>Use this settings file instead of the user&apos;s (one session per settings file).</translation>
+    </message>
+    <message>
+        <source>Ghi mốc các pha khởi động ra tệp JSON.</source>
+        <translation>Write startup phase timings to a JSON file.</translation>
+    </message>
+    <message>
+        <source>tệp.json</source>
+        <translation>file.json</translation>
+    </message>
+    <message>
+        <source>Đo độ trễ giao diện; --ui-probe=&lt;tệp.json&gt; ghi số đo ra tệp khi thoát.</source>
+        <translation>Measure UI latency; --ui-probe=&lt;file.json&gt; writes the measurements on exit.</translation>
+    </message>
+    <message>
+        <source>Thoát ngay sau khung hình đầu của cửa sổ chính (cho test và đo khởi động).</source>
+        <translation>Quit right after the main window&apos;s first frame (for tests and startup measurement).</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ComboBox</name>
     <message>
         <source>Lọc…</source>

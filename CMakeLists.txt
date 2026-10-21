@@ -49,6 +49,7 @@ trion_component(app/widgets/model)
 trion_component(app/widgets/bench)
 trion_component(app/widgets/numeric)
 trion_component(app/widgets/tooltip)
+trion_component(app/main)
 trion_component(tests/integration)
 
 # Bước dịch (UI0-104): lupdate/lrelease cho mọi target đã cấu hình và test i18n. Phải đứng sau mọi
