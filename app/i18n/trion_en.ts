@@ -45,6 +45,25 @@
     </message>
 </context>
 <context>
+    <name>DockTest</name>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Layer</source>
+        <translation>Layers</translation>
+    </message>
+    <message>
+        <source>Thư viện TCVN</source>
+        <translation>TCVN library</translation>
+    </message>
+    <message>
+        <source>Đếm</source>
+        <translation>Count</translation>
+    </message>
+</context>
+<context>
     <name>MenuSample</name>
     <message>
         <source>Có vùng chọn</source>
@@ -567,6 +586,64 @@
     <message>
         <source>Khóa, cần bản %1</source>
         <translation>Locked, requires %1</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::PaletteHeader</name>
+    <message>
+        <source>Tự ẩn palette</source>
+        <translation>Auto-hide palette</translation>
+    </message>
+    <message>
+        <source>Ghim palette</source>
+        <translation>Pin palette</translation>
+    </message>
+    <message>
+        <source>Tự ẩn</source>
+        <translation>Auto-hide</translation>
+    </message>
+    <message>
+        <source>Ghim</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <source>Tùy chọn palette</source>
+        <translation>Palette options</translation>
+    </message>
+    <message>
+        <source>Đóng palette</source>
+        <translation>Close palette</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::PaletteHost</name>
+    <message>
+        <source>Ghim</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <source>Chuyển sang dock trái</source>
+        <translation>Dock left</translation>
+    </message>
+    <message>
+        <source>Chuyển sang dock phải</source>
+        <translation>Dock right</translation>
+    </message>
+    <message>
+        <source>Chuyển sang dock dưới</source>
+        <translation>Dock bottom</translation>
+    </message>
+    <message>
+        <source>Nổi</source>
+        <translation>Float</translation>
+    </message>
+    <message>
+        <source>Mật độ thoáng</source>
+        <translation>Comfortable density</translation>
     </message>
 </context>
 <context>
