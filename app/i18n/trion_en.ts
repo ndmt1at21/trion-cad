@@ -503,6 +503,13 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::CommandInput</name>
+    <message>
+        <source>Dòng lệnh</source>
+        <translation>Command line</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::SearchField</name>
     <message>
         <source>Xóa chữ đã gõ</source>
