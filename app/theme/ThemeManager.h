@@ -61,7 +61,8 @@ public:
     double px(tok::PxId id) const { return tok::px(id, mode_); }
     int ms(tok::MsId id) const { return tok::ms(id, mode_); }
     tok::Shadow shadow(tok::ShadowId id) const { return tok::shadow(id, mode_); }
-    // Font giao diện (--f-ui) cỡ theo token; cỡ lẻ (--fs-s 11,5 px) giữ đúng qua pointSizeF.
+    // Font giao diện (--f-ui) cỡ theo token; pointSizeF giữ cỡ lẻ (--fs-s 11,5 px) nhưng Qt dựng chữ ở cỡ pixel nguyên
+    // (11,5 → 12 px ở 100%); vai trò chữ và font Mono: app/theme/fonts/FontRegistry.h.
     QFont font(tok::PxId size) const;
 
     // Màu ngữ nghĩa 07.1 §13.2 theo chế độ hiện tại, kể cả ghi đè của người dùng.
