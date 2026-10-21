@@ -2,6 +2,49 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en" sourcelanguage="vi">
 <context>
+    <name>ControlsSample</name>
+    <message>
+        <source>In</source>
+        <translation>Print</translation>
+    </message>
+    <message>
+        <source>Xóa 3 layout</source>
+        <translation>Delete 3 layouts</translation>
+    </message>
+    <message>
+        <source>Hủy</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>In hàng loạt</source>
+        <translation>Batch Plot</translation>
+    </message>
+    <message>
+        <source>Lưới</source>
+        <translation>Grid</translation>
+    </message>
+    <message>
+        <source>Mét</source>
+        <translation>Meters</translation>
+    </message>
+    <message>
+        <source>Milimét</source>
+        <translation>Millimeters</translation>
+    </message>
+    <message>
+        <source>Chung</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Thống kê</source>
+        <translation>Statistics</translation>
+    </message>
+    <message>
+        <source>Tìm layer</source>
+        <translation>Search layers</translation>
+    </message>
+</context>
+<context>
     <name>Panel</name>
     <message>
         <source>Hàng %1</source>
@@ -383,6 +426,24 @@
     <message>
         <source>macOS (thu nhỏ cửa sổ)</source>
         <translation>macOS (minimize window)</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::ComboBox</name>
+    <message>
+        <source>Lọc…</source>
+        <translation>Filter…</translation>
+    </message>
+    <message>
+        <source>Không có mục khớp</source>
+        <translation>No matching items</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::SearchField</name>
+    <message>
+        <source>Xóa chữ đã gõ</source>
+        <translation>Clear text</translation>
     </message>
 </context>
 </TS>
