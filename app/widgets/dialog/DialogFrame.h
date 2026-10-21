@@ -159,6 +159,7 @@ private:
     QMargins shadow_;             // lề bóng quanh thẻ
     QPointer<QWidget> prevFocus_; // focus lúc mở, trả lại khi đóng
     QPointer<QWidget> pickFocus_; // focus lúc ẩn tạm
+    QRect pickGeometry_;          // hình học lúc ẩn tạm: hiện lại đúng chỗ, đúng cỡ
     sched::CancelSource load_;
     struct Drag {
         bool on = false;

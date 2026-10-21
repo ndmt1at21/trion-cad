@@ -366,12 +366,16 @@ void DialogFrame::hideForPick(bool hidden)
     if (hidden) {
         QWidget* f = QApplication::focusWidget();
         pickFocus_ = f && isAncestorOf(f) ? f : nullptr;
+        pickGeometry_ = geometry();
         hide();
         if (QWidget* p = parentWidget())
             p->activateWindow(); // phím, chuột về cửa sổ mở nó (vùng vẽ); hiện lại thì active đổi về đây
         return;
     }
     reshowing_ = true;
+    // Hộp thoại chưa từng move/resize tường minh thì show() của QDialog co theo sizeHint và đặt lại giữa cửa sổ cha
+    // (integration nhóm 4 bắt: lệch 16 px, cao thêm 15 px sau khi dòng lỗi của ô số hiện): đặt lại hình học lúc ẩn.
+    setGeometry(pickGeometry_);
     show();
     raise();
     activateWindow();

@@ -809,8 +809,16 @@ private slots:
         QPointer<Sample> f = static_cast<Sample*>(host.open(u"pick"_s));
         QVERIFY(waitActive(f));
         f->plain->setFocus();
+        // Thân cao thêm lúc đang mở (như dòng lỗi của ô số hiện ra): hộp thoại tự lớn theo bố cục, chưa từng
+        // move/resize tường minh, nên show() của QDialog từng co lại và canh giữa lại (integration nhóm 4 bắt).
+        const int h0 = f->height();
+        auto* extra = new QWidget;
+        extra->setFixedHeight(40);
+        f->plain->parentWidget()->layout()->addWidget(extra);
+        QTRY_VERIFY(f->height() >= h0 + 40);
         QSignalSpy finished(f.data(), &QDialog::finished);
         const QRect card = f->cardGeometry();
+        const QRect frame = f->geometry();
         f->hideForPick(true);
         QVERIFY(!f->isVisible() && f->isHiddenForPick());
         QVERIFY(!QApplication::activeModalWidget());
@@ -822,6 +830,7 @@ private slots:
         f->hideForPick(false);
         QVERIFY(f->isVisible() && !f->isHiddenForPick());
         QCOMPARE(f->cardGeometry(), card);
+        QCOMPARE(f->geometry(), frame);
         QVERIFY(waitActive(f));
         QTRY_COMPARE(QApplication::focusWidget(), f->plain);
         QCOMPARE(QApplication::activeModalWidget(), f.data());
