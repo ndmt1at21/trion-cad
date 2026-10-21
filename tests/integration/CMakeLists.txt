@@ -19,3 +19,10 @@ trion_integration_test(it_giao_dien_test
 trion_integration_test(it_dieu_khien_test
   trion_base trion_appcore trion_theme trion_fonts trion_icons trion_i18n trion_perf trion_display trion_model
   trion_controls trion_numeric)
+# Nhóm 4 (khung): UI0-001 ứng dụng, UI0-015 hành động, UI0-011 phiên bản, UI0-107 menu/tooltip, UI0-110 + UI0-008 hộp
+# thoại, UI0-113 + UI0-010 palette, NT-013 + UI0-112 tiến trình, UI0-009 thông điệp, UI0-007 ô số, UIA-106 dòng lệnh,
+# UI0-108 bảng ảo.
+trion_integration_test(it_khung_test
+  trion_base trion_appcore trion_theme trion_fonts trion_icons trion_i18n trion_perf trion_display trion_keymap
+  trion_tooltip trion_menu trion_actions trion_edition trion_controls trion_dialog trion_dock trion_jobs trion_progress
+  trion_message trion_numeric_field trion_cmdline trion_views)
