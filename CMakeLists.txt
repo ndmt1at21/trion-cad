@@ -26,6 +26,7 @@ endmacro()
 
 trion_component(ci)
 trion_component(core/base)
+trion_component(core/base/jobs)
 trion_component(core/regen)
 trion_component(cmd)
 trion_component(tools/tokengen)
