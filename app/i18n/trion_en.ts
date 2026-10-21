@@ -338,6 +338,21 @@
     </message>
 </context>
 <context>
+    <name>ViewsSample</name>
+    <message>
+        <source>Giá trị</source>
+        <translation>Value</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Mã</source>
+        <translation>ID</translation>
+    </message>
+</context>
+<context>
     <name>keymap</name>
     <message>
         <source>Lệnh khác</source>
