@@ -12,6 +12,8 @@
 #include "app/shell/CommandRouter.h"
 #include "app/shell/filetabs/FileTabBar.h"
 #include "app/shell/MainWindow.h"
+#include "app/shell/start/RecentFiles.h"
+#include "app/shell/start/StartPage.h"
 #include "app/shell/Workspace.h"
 #include "app/widgets/dock/PaletteHost.h"
 #include "app/widgets/gallery/Gallery.h"
@@ -124,20 +126,23 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
     } else {
         // Hành động → chuỗi lệnh → bộ định tuyến tạm (INT-002 thay); cổng phiên bản chặn lệnh bị khóa (UI0-011).
         sysvars_ = std::make_unique<actions::Sysvars>();
+        sysvars_->set(u"COORDS"_s, 1); // tọa độ tuyệt đối như AutoCAD. ponytail: INT-005 (mặc định của sysvar) thay
         actions_ = std::make_unique<actions::ActionRegistry>(*keymap_, *sysvars_);
         gate_ = std::make_unique<edition::EditionGate>();
         gate_->bind(*actions_);
         router_ = std::make_unique<shell::CommandRouter>(*sysvars_);
         actions_->setSink([router = router_.get()](const QString& macro) { router->submit(macro); });
+        recent_ = std::make_unique<shell::RecentFiles>(*store_); // nạp từ Store; trang Start kiểm lại tệp khi hiện
         auto window = std::make_unique<shell::MainWindow>(*store_);
         main = window.get();
         auto* clean = new shell::CleanScreen(*main, *sysvars_, *router_); // con của cửa sổ; CLEANSCREENON/OFF, Ctrl+0
         actions_->install(main);
         actions_->addViewport(main->region(shell::MainWindow::Region::Canvas));
         // Vùng thật trước khi khôi phục: hình học, bố cục áp lên widget thật.
-        shell_ =
-            std::make_unique<ShellAssembly>(*main, *keymap_, *actions_, *sysvars_, *gate_, *router_, *clean, *jobs_);
+        shell_ = std::make_unique<ShellAssembly>(*main, *keymap_, *actions_, *sysvars_, *gate_, *router_, *clean, *jobs_,
+                                                 *recent_);
         connect(shell_->fileTabs, &shell::FileTabBar::openRequested, this, &Application::requestOpen);
+        connect(shell_->start, &shell::StartPage::openRequested, this, &Application::requestOpen);
         // Hồ sơ trước khi khôi phục: bố cục của workspace đang dùng áp một lần.
         main->workspace().setProfile(gate_->profile());
         connect(gate_.get(), &edition::EditionGate::profileChanged, &main->workspace(), &shell::Workspace::setProfile);
@@ -174,6 +179,7 @@ Application::~Application()
     display_.reset();
     window_.reset();
     shell_.reset(); // sau widget: RibbonControls sống lâu hơn nút ribbon, NotificationCenter lâu hơn ToastHost
+    recent_.reset(); // sau trang Start; hủy lần kiểm tệp đang chạy (kết quả về sau bị bỏ)
     router_.reset();
     gate_.reset(); // gỡ cổng khỏi ActionRegistry
     actions_.reset();

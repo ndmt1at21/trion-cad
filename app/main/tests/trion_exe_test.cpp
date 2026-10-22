@@ -329,9 +329,11 @@ private slots:
     }
 
     // Tiêu chí 5: rảnh sau khởi động, CPU trung bình ≤ 0,5%; Linux: luồng UI không thức lần nào (0 timer định kỳ).
-    // Khoảng đo 30 s ở bản release (bộ test vẫn < 60 s), 5 s ở bản khác; không tính 3 s đầu: raster trước biểu tượng,
+    // Khoảng đo 25 s ở bản release (bộ test vẫn < 60 s), 5 s ở bản khác; không tính 3 s đầu: raster trước biểu tượng,
     // và tooltip 2 mức (450 ms + 1,5 s, timer một lần) của nút menu ứng dụng nằm dưới con trỏ offscreen (10, 10) lúc
-    // cửa sổ hiện (integration nhóm 5: thanh tiêu đề thật).
+    // cửa sổ hiện (integration nhóm 5: thanh tiêu đề thật). Kết thúc trước mốc 30 s sau lần vẽ đầu: QPixmapCache của Qt
+    // dọn pixmap 30 s sau lần chèn đầu (style Fusion, thanh cuộn của trang Start) — timer một lần, tự tắt khi không còn
+    // gì để dọn (integration nhóm 6 đo: thức đúng một lần ở 30,5 s rồi im).
     void idleUsesNoCpu()
     {
         const QString trace = path(u"idle.trace.json"_s);
@@ -342,7 +344,7 @@ private slots:
         const double cpu0 = cpuSeconds(pid);
         const qint64 switches0 = mainThreadSwitches(pid);
         const Clock::time_point t0 = Clock::now();
-        spinFor(trion::test::kTimed ? 30s : 5s);
+        spinFor(trion::test::kTimed ? 25s : 5s);
         const double cpu1 = cpuSeconds(pid);
         const qint64 switches1 = mainThreadSwitches(pid);
         const double seconds = std::chrono::duration<double>(Clock::now() - t0).count();

@@ -7,19 +7,20 @@
 // trong StartupTrace:
 //   Store (tệp cài đặt của --settings) → UiExecutor → Translator → loadFonts → ThemeManager → IconProvider → Keymap →
 //   [ready] → BackgroundJobs (NT-013) → cửa sổ chính (UIA-001: Sysvars, ActionRegistry, EditionGate, CommandRouter,
-//   MainWindow + CleanScreen; ShellAssembly lắp vùng thật của đợt 5 và nối lệnh; khôi phục hình học, palette,
-//   workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình; lớp màn hình cho
-//   MainWindow) → hiện cửa sổ.
+//   RecentFiles (UIA-004), MainWindow + CleanScreen; ShellAssembly lắp vùng thật của đợt 5, 6 và nối lệnh; khôi phục
+//   hình học, palette, workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình; lớp
+//   màn hình cho MainWindow) → hiện cửa sổ (tab Start).
 // Thoát (hàm hủy): hủy token toàn ứng dụng, lưu hình học và bố cục của cửa sổ chính, hủy cửa sổ (widget trước
-// ShellAssembly, ActionRegistry, Sysvars, EditionGate), hủy BackgroundJobs (yêu cầu hủy mọi tác vụ) và IconProvider
-// (hủy việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự ngược;
-// UiExecutor và Store (ghi nốt cài đặt) cuối cùng.
+// ShellAssembly, ActionRegistry, Sysvars, EditionGate, RecentFiles), hủy BackgroundJobs (yêu cầu hủy mọi tác vụ) và
+// IconProvider (hủy việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự
+// ngược; UiExecutor và Store (ghi nốt cài đặt) cuối cùng.
 //
 // Luồng UI sở hữu document (UiExecutor.h: kết quả nền về luồng UI, requireUiThread chặn API ghi gọi sai luồng).
 // ponytail: chưa có phiên nhiều bản vẽ DOC-018 và input pipeline INT-002, nên chưa có CoreSession; đường dẫn cần mở
-// (dòng lệnh, lần chạy sau, thả tệp lên tab tệp) chỉ tới openRequested(), DOC-018/UIB-002 nối. Lệnh từ hành động
-// (ActionRegistry), ribbon, dòng lệnh, tab tệp, nút chế độ tới bộ định tuyến tạm shell::CommandRouter (Clean Screen,
-// COMMANDLINE/HIDE, sysvar trong suốt chạy; lệnh khác ghi log); vùng vẽ, tab layout còn là ô giữ chỗ (ShellAssembly.h).
+// (dòng lệnh, lần chạy sau, thả tệp lên tab tệp, tệp gần đây của trang Start) chỉ tới openRequested(), DOC-018/UIB-002
+// nối (rồi RecentFiles::add). Lệnh từ hành động (ActionRegistry), ribbon, dòng lệnh, tab tệp, trang Start, thanh
+// trạng thái tới bộ định tuyến tạm shell::CommandRouter (Clean Screen, COMMANDLINE/HIDE, RIBBON/RIBBONCLOSE, NEWTAB,
+// sysvar trong suốt chạy; lệnh khác ghi log); vùng vẽ, tab layout còn là ô giữ chỗ (ShellAssembly.h).
 
 #include "core/base/sched/Scheduler.h"
 
@@ -62,7 +63,8 @@ class BackgroundJobs;
 }
 namespace trion::shell {
 class CommandRouter;
-}
+class RecentFiles;
+} // namespace trion::shell
 
 namespace trion::app {
 
@@ -129,7 +131,8 @@ private:
     std::unique_ptr<actions::ActionRegistry> actions_;
     std::unique_ptr<edition::EditionGate> gate_;
     std::unique_ptr<shell::CommandRouter> router_;
-    std::unique_ptr<ShellAssembly> shell_; // ribbon, thông báo; widget của nó thuộc window_ (hủy trước)
+    std::unique_ptr<shell::RecentFiles> recent_; // tệp gần đây: trang Start, menu ứng dụng (UIA-003); lâu hơn cửa sổ
+    std::unique_ptr<ShellAssembly> shell_;       // ribbon, thông báo; widget của nó thuộc window_ (hủy trước)
     std::unique_ptr<QMainWindow> window_;  // shell::MainWindow, hoặc GalleryWindow với --gallery
     std::unique_ptr<ui::DisplayContext> display_;
 };

@@ -1,18 +1,29 @@
-// Integration test nhóm 5 (khung ứng dụng đợt 5): UIA-001 (cửa sổ chính, Clean Screen, workspace), UIA-002 (thanh tiêu
-// đề, ô Tìm lệnh), UIA-010 (tab tệp), UIA-102 (ribbon JSON, điều khiển), UIA-107 (dòng lệnh), UIA-112 (nút chế độ),
-// UI0-013 (trợ năng) lắp vào cửa sổ chính bằng chính Application của exe trion (app/main/ShellAssembly): Store tạm,
-// phiên bản đặt tường minh, hai màn hình giả của plugin offscreen (1920×1080 Wide, 1366×768 Small). Lệnh đi tới bộ
-// định tuyến tạm (CommandRouter): lệnh chưa có xử lý tới tín hiệu unhandled, test ghi lại cùng tài liệu đang chọn.
-//   1 regions1920       vùng là widget thật (trừ vùng vẽ, tab layout), tỉ lệ vùng vẽ, a11y::audit
-//   2 cleanScreen       Ctrl+0 bật/tắt: hình học từng vùng, ảnh cửa sổ từng pixel, dòng lịch sử
-//   3 commandLineModes  Ctrl+9 ẩn/hiện dòng lệnh (CLISTATE); F8, nút trạng thái, toggle ribbon cùng đổi trong lượt
-//   4 commandSearch     "đường tròn" → CIRCLE, vị trí ribbon; Enter → ^C^C_CIRCLE
-//   5 commandLineInput  "LINE" + Enter; chip và chữ tắt cho cùng token; Esc bỏ prompt
-//   6 fileTabs          chuột giữa → CLOSE cho đúng tài liệu; Ctrl+Tab; thả .dwg/.pdf
-//   7 languages         vi → en → vi mọi vùng dịch lại; vi-XL ở 1366×768 không cắt chữ, dòng lệnh compact
-//   8 viewer            workspace viewer, 3 nút chế độ, lệnh Pro khóa trong ô Tìm lệnh
-//   9 jobFailureToast   tác vụ nền lỗi → toast lỗi trên cửa sổ chính (ProgressPresenter, followJobs)
-//  10 idle              rảnh 2 s: không timer nào chạy
+// Integration test nhóm 5, 6 (khung ứng dụng đợt 5, 6): UIA-001 (cửa sổ chính, Clean Screen, workspace), UIA-002 (thanh
+// tiêu đề, ô Tìm lệnh), UIA-010 (tab tệp), UIA-102 (ribbon JSON, điều khiển), UIA-005 (khung ribbon RibbonBar), UIA-107
+// (dòng lệnh), UIA-108 (tự hoàn thành, "Ý bạn là"), UIA-112 (nút chế độ), UIA-009 (thanh trạng thái), UIA-004 (tab
+// Start), UI0-013 (trợ năng) lắp vào cửa sổ chính bằng chính Application của exe trion (app/main/ShellAssembly): Store
+// tạm có sẵn 3 tệp gần đây, phiên bản đặt tường minh, hai màn hình giả của plugin offscreen (1920×1080 Wide, 1366×768
+// Small). Lệnh đi tới bộ định tuyến tạm (CommandRouter): lệnh chưa có xử lý tới tín hiệu unhandled, test ghi lại cùng
+// tài liệu đang chọn. Mỗi kịch bản bắt đầu ở tab Start như lúc mở app; cần vùng vẽ thì mở tài liệu giả qua chỗ nối của
+// tab tệp (DOC-018 chưa có).
+//   1 startup           tab Start chọn, trang Start hiện trong vùng Canvas, 3 tệp gần đây; rảnh 2 s khi ảnh đã xong
+//   2 regions           Pro/Viewer, trang Start/vùng vẽ: vùng là widget thật, tỉ lệ vùng vẽ, a11y::audit
+//   3 cleanScreen       Ctrl+0 bật/tắt: hình học từng vùng, ảnh cửa sổ từng pixel, dòng lịch sử
+//   4 ribbon            3 mức thu gọn (cao, tỉ lệ vùng vẽ); Alt/Esc; RIBBONCLOSE/RIBBON gõ ở dòng lệnh, Clean Screen;
+//                       chuột phải "Thêm vào thanh truy cập nhanh" → addToQatRequested, nút mới trên QAT (UIA-101);
+//                       F1 → '_HELP
+//   5 commandLineModes  Ctrl+9 (CLISTATE); F8 và nút ORTHO của thanh trạng thái; LWDISPLAY ribbon/thanh trạng thái;
+//                       bấm ô tọa độ → 'COORDS n
+//   6 commandSearch     "đường tròn" → CIRCLE, vị trí ribbon; Enter → ^C^C_CIRCLE
+//   7 commandLineInput  "LINE" + Enter; chip và chữ tắt cho cùng token; Esc bỏ prompt
+//   8 unknownCommand    "LNE" → "Ý bạn là" bấm LINE; Viewer: dòng tự hoàn thành của lệnh Pro có huy hiệu khóa
+//   9 fileTabs          chuột giữa → CLOSE cho đúng tài liệu; Ctrl+Tab; thả .dwg/.pdf
+//  10 startPage         chọn tài liệu → trang ẩn; NEWTAB → trang hiện; đóng tab cuối; bấm tệp gần đây → requestOpen
+//  11 languages         vi → en → vi mọi vùng dịch lại; vi-XL ở 1366×768 không cắt chữ (ribbon đầy đủ, thanh trạng
+//                       thái tràn vào menu), dòng lệnh compact
+//  12 viewer            workspace viewer, nút của thanh trạng thái theo hồ sơ, lệnh Pro khóa trong ô Tìm lệnh
+//  13 jobFailureToast   tác vụ nền lỗi → toast lỗi trên cửa sổ chính (ProgressPresenter, followJobs)
+//  14 idle              rảnh 2 s sau mọi kịch bản, trang Start hiện: không timer nào chạy
 
 #include "app/core/a11y/AccessibilityAudit.h"
 #include "app/core/actions/ActionRegistry.h"
@@ -24,15 +35,22 @@
 #include "app/main/ShellAssembly.h"
 #include "app/main/StartupTrace.h"
 #include "app/shell/CleanScreen.h"
+#include "app/shell/cmdline/Autocomplete.h"
 #include "app/shell/cmdline/CommandLine.h"
 #include "app/shell/CommandRouter.h"
 #include "app/shell/filetabs/FileTabBar.h"
 #include "app/shell/MainWindow.h"
 #include "app/shell/ribbon/controls/RibbonControls.h"
+#include "app/shell/ribbon/RibbonBar.h"
+#include "app/shell/start/RecentFiles.h"
+#include "app/shell/start/StartPage.h"
 #include "app/shell/status/ModeToggles.h"
+#include "app/shell/status/StatusBar.h"
 #include "app/shell/titlebar/CommandSearch.h"
+#include "app/shell/titlebar/Qat.h"
 #include "app/shell/titlebar/TitleBar.h"
 #include "app/shell/Workspace.h"
+#include "app/theme/generated/Tokens.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/cmdline/CommandInput.h"
 #include "app/widgets/controls/Controls.h"
@@ -47,8 +65,10 @@
 #include "core/base/settings/Settings.h"
 
 #include <QAbstractItemView>
+#include <QAbstractScrollArea>
 #include <QAccessible>
 #include <QApplication>
+#include <QContextMenuEvent>
 #include <QDir>
 #include <QDockWidget>
 #include <QEventLoop>
@@ -56,11 +76,15 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLineEdit>
+#include <QMenu>
 #include <QMetaEnum>
 #include <QMimeData>
 #include <QPainter>
 #include <QScreen>
 #include <QSignalSpy>
+#include <QStackedWidget>
+#include <QTabBar>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
@@ -78,6 +102,7 @@ using trion::app::Application;
 using trion::app::ShellAssembly;
 using trion::app::StartupTrace;
 using trion::edition::Edition;
+using trion::ribbon::RibbonBar;
 using trion::shell::MainWindow;
 using Region = trion::shell::MainWindow::Region;
 namespace i18n = trion::i18n;
@@ -91,6 +116,7 @@ QString g_cwd; // thư mục chạy test; initMain đổi sang thư mục chứa
 
 constexpr QRect kWide(0, 0, 1920, 1080);    // màn hình chính (Wide)
 constexpr QRect kSmall(2000, 0, 1366, 768); // màn hình thứ hai (Small, ≤ 1366)
+constexpr int kLine = 1;                    // nét dưới ribbon (prototype viết thẳng, như RibbonBar.cpp)
 
 // Prompt giả như lệnh CIRCLE hỏi (INT-003 chưa có): chữ qua bộ dịch đang cài, đọc qua biến nên lupdate không thu.
 constexpr const char* kRadiusPrompt = "Chỉ định bán kính hoặc"; // i18n-ok: chữ mẫu của test
@@ -140,16 +166,19 @@ void settle()
     QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
 }
 
-// Focus vào w trên cửa sổ đã kích hoạt. Plugin offscreen kích hoạt cả cửa sổ popup lúc hiện và không trả lại khi
-// popup đóng: cửa sổ focus còn là popup QCompleter đã ẩn, lần kích hoạt cửa sổ chính sau đó đưa focus về proxy của
-// popup (ô Tìm lệnh). Nền tảng thật không kích hoạt popup.
+// Focus vào w trên cửa sổ đã kích hoạt (w có focus proxy, như vùng Canvas: proxy nhận). Plugin offscreen kích hoạt cả
+// cửa sổ popup lúc hiện và không trả lại khi popup đóng: cửa sổ focus còn là popup QCompleter đã ẩn, lần kích hoạt cửa
+// sổ chính sau đó đưa focus về proxy của popup (ô Tìm lệnh). Nền tảng thật không kích hoạt popup.
 bool focusOn(QWidget* w)
 {
     w->window()->activateWindow();
     if (!spinUntil([w] { return QGuiApplication::focusWindow() == w->window()->windowHandle(); }))
         return false;
     w->setFocus(Qt::OtherFocusReason);
-    return spinUntil([w] { return QApplication::focusWidget() == w; });
+    QWidget* to = w;
+    while (to->focusProxy())
+        to = to->focusProxy();
+    return spinUntil([to] { return QApplication::focusWidget() == to; });
 }
 
 // Gõ chữ vào ô (hoặc popup đang mở của nó) như bàn phím: mỗi ký tự một cặp phím có chữ.
@@ -202,6 +231,27 @@ QString regionKey(Region r)
     return QString::fromLatin1(QMetaEnum::fromType<Region>().valueToKey(int(r)));
 }
 
+int px(tok::PxId id)
+{
+    return qRound(trion::theme::ThemeManager::instance().px(id));
+}
+
+// Cao vùng Ribbon theo mức thu gọn, tính từ token độc lập với RibbonBar.cpp: dải tab, thân (3 hàng nút, --sp-4, tên
+// panel; tên panel, --sp-4; không có), nét dưới.
+int ribbonHeight(RibbonBar::Collapse c)
+{
+    const int tabs = px(tok::h_tab) + kLine;
+    switch (c) {
+    case RibbonBar::Collapse::Full:
+        return tabs + 3 * px(tok::h_btn) + px(tok::sp_4) + px(tok::h_lbl);
+    case RibbonBar::Collapse::PanelTitles:
+        return tabs + px(tok::h_lbl) + px(tok::sp_4);
+    case RibbonBar::Collapse::TabNames:
+        break;
+    }
+    return tabs;
+}
+
 // Đếm QTimerEvent tới mọi đối tượng trong tiến trình, trừ timer đo của test.
 class TimerLog final : public QObject {
 public:
@@ -222,6 +272,21 @@ protected:
 private:
     const QObject* ignore_;
 };
+
+// Rảnh d: QTimerEvent tới bất kỳ đối tượng nào (timer định kỳ, polling, tooltip, toast).
+QStringList timersDuring(std::chrono::milliseconds d)
+{
+    QTimer end;
+    end.setSingleShot(true);
+    TimerLog log(&end);
+    qApp->installEventFilter(&log);
+    QEventLoop loop;
+    QObject::connect(&end, &QTimer::timeout, &loop, &QEventLoop::quit);
+    end.start(d);
+    loop.exec();
+    qApp->removeEventFilter(&log);
+    return log.seen;
+}
 
 } // namespace
 
@@ -266,6 +331,7 @@ private:
     std::unique_ptr<Application> app_;
     ShellAssembly* shell_ = nullptr;
     MainWindow* window_ = nullptr;
+    QStringList recent_;  // 3 tệp gần đây có sẵn trong Store (DWG 2018 thật trên đĩa)
     QStringList sent_;    // chuỗi lệnh tới router chưa có xử lý (INT-002 sẽ nhận)
     QList<quint64> docs_; // tài liệu đang chọn ở tab tệp lúc router nhận từng chuỗi
     QList<QUrl> opened_;  // trang nâng cấp đã mở (thay QDesktopServices)
@@ -276,8 +342,27 @@ private:
         return std::exchange(sent_, {});
     }
     QWidget* region(Region r) const { return window_->region(r); }
-    QWidget* canvas() const { return region(Region::Canvas); }
+    QWidget* canvas() const { return region(Region::Canvas); } // ngăn xếp {vùng vẽ giữ chỗ, trang Start}
     ui::PaletteHost& palettes() const { return window_->palettes(); }
+
+    // Tài liệu giả qua chỗ nối của tab tệp (DOC-018 chưa có), chọn nó: vùng vẽ thay trang Start.
+    void openDocument(quint64 id = 100)
+    {
+        shell_->fileTabs->addDocument({.id = id,
+                                       .name = u"Ban-ve-%1.dwg"_s.arg(id),
+                                       .path = dir_->filePath(u"Ban-ve-%1.dwg"_s.arg(id)),
+                                       .dirty = false,
+                                       .readOnly = false,
+                                       .layouts = {}});
+        shell_->fileTabs->setCurrent(id);
+        settle();
+    }
+    void closeDocuments()
+    {
+        for (const quint64 id : shell_->fileTabs->documents())
+            shell_->fileTabs->removeDocument(id);
+        shell_->fileTabs->setCurrent(shell::FileTabBar::kStart);
+    }
 
     double canvasShare() const
     {
@@ -318,12 +403,29 @@ private:
         return img;
     }
 
-    int visibleModes() const
+    // Nút chế độ đang hiện của thanh trạng thái, theo thứ tự (id hành động của registry).
+    QStringList visibleModes() const
     {
-        int n = 0;
+        QStringList ids;
         for (const QToolButton* b : shell_->modes->findChildren<QToolButton*>(Qt::FindDirectChildrenOnly))
-            n += b->isVisibleTo(shell_->modes);
-        return n;
+            if (b->isVisibleTo(shell_->modes))
+                ids << b->defaultAction()->objectName();
+        return ids;
+    }
+
+    // Nút ribbon đang hiện có id điều khiển id (objectName), trong tab đang mở.
+    trion::ribbon::RibbonButton* ribbonButton(const QString& id) const
+    {
+        for (auto* b : shell_->ribbon->pages()->currentWidget()->findChildren<trion::ribbon::RibbonButton*>(id))
+            if (b->isVisible())
+                return b;
+        return nullptr;
+    }
+
+    // Trang Start đã kiểm lại tệp ở nền và ảnh xem trước của thẻ đang thấy đã xong (có ảnh hoặc lỗi).
+    bool startSettled() const
+    {
+        return !shell_->start->recent().refreshing() && !shell_->start->thumbnails().busy();
     }
 
 private slots:
@@ -338,9 +440,24 @@ private slots:
         QVERIFY(QDir(dir_->path()).mkpath(u"config"_s));
         qputenv("XDG_CONFIG_HOME", QFile::encodeName(dir_->filePath(u"config"_s)));
 
-        // Như main.cpp: Application dựng mọi phần theo thứ tự khởi động, cửa sổ chính phóng to trên màn hình chính.
+        // Phiên trước để lại 3 tệp gần đây (DWG 2018 thật trên đĩa), như RecentFiles ghi vào Store.
         trion::app::Options options;
         options.settingsPath = dir_->filePath(u"user.json"_s);
+        {
+            QJsonArray list;
+            for (const char* name : {"Nha-pho-A.dwg", "Ket-cau-T2.dwg", "Mat-bang.dwg"}) {
+                const QString path = dir_->filePath(QString::fromLatin1(name));
+                QFile f(path);
+                QVERIFY(f.open(QIODevice::WriteOnly) && f.write(QByteArray("AC1032") + QByteArray(122, '\0')) == 128);
+                recent_ << path;
+                list.append(QJsonObject{{u"path"_s, path}});
+            }
+            trion::settings::Store seed(options.settingsPath);
+            seed.setValue(u"recent/files"_s, list);
+            seed.flush();
+        }
+
+        // Như main.cpp: Application dựng mọi phần theo thứ tự khởi động, cửa sổ chính phóng to trên màn hình chính.
         trace_ = std::make_unique<StartupTrace>();
         app_ = std::make_unique<Application>(options, *trace_);
         shell_ = app_->shell();
@@ -364,7 +481,7 @@ private slots:
     void cleanupTestCase()
     {
         // Thoát như exe trion: Application hủy cửa sổ (widget) trước ShellAssembly, ActionRegistry, Sysvars,
-        // EditionGate, rồi chờ việc nền và ghi cài đặt.
+        // EditionGate, RecentFiles, rồi chờ việc nền và ghi cài đặt.
         app_.reset();
         trace_.reset();
         sched::waitIdle();
@@ -378,7 +495,8 @@ private slots:
         take();
     }
 
-    // Sau mỗi kịch bản, kể cả khi trượt giữa chừng: đóng popup, toast, trả focus về vùng vẽ.
+    // Sau mỗi kịch bản, kể cả khi trượt giữa chừng: đóng popup, toast, bỏ prompt, về tab Start như lúc mở app, focus
+    // về vùng Canvas (trang đang hiện).
     void cleanup()
     {
         while (QWidget* popup = QApplication::activePopupWidget())
@@ -388,24 +506,98 @@ private slots:
         spinUntil([&] { return shell_->toasts->toasts().isEmpty(); }, 5s);
         if (shell_->commandLine->hasPrompt())
             shell_->commandLine->clearPrompt();
+        shell_->commandLine->input()->clear();
+        closeDocuments();
         focusOn(canvas());
     }
 
-    // Kịch bản 1 — 1920×1080, Pro: mọi vùng là widget thật trừ vùng vẽ và tab layout (UIA-109, UIA-011 chưa có), tỉ
-    // lệ vùng vẽ, a11y::audit của cả cửa sổ (tên, vai trò, thứ tự Tab, bẫy focus, viền focus).
-    void regions1920()
+    // Kịch bản 1 — mở app: tab Start chọn, trang Start hiện trong vùng Canvas thay vùng vẽ và nhận focus của vùng (không
+    // ô nhập: con trỏ chữ nhấp nháy là timer); 3 tệp gần đây của Store hiện, kiểm lại ở nền (phiên bản đọc từ tệp); ảnh
+    // xem trước từ nguồn ảnh nhúng giả (DWG-026 chưa có) điền vào thẻ; xong thì rảnh 2 s không timer nào chạy.
+    void startup()
     {
+        const double ready = trace_->at(u"ready"_s).value_or(0), frame = trace_->at(u"first_frame"_s).value_or(0);
+        qInfo("dựng cửa sổ chính có trang Start, 3 tệp gần đây → khung đầu: %.1f ms (mốc ready → first_frame)",
+              frame - ready);
+        shell::StartPage* start = shell_->start;
+        QCOMPARE(shell_->fileTabs->current(), shell::FileTabBar::kStart);
+        auto* stack = qobject_cast<QStackedWidget*>(canvas());
+        QVERIFY(stack);
+        QCOMPARE(stack->currentWidget(), start);
+        QVERIFY(start->isVisible() && !shell_->canvas->isVisible());
+        QCOMPARE(start->geometry(), stack->rect());
+        QWidget* focus = QApplication::focusWidget();
+        QVERIFY2(start->isAncestorOf(focus) && !qobject_cast<QLineEdit*>(focus),
+                 focus ? focus->metaObject()->className() : "null");
+        QCOMPARE(start->recent().size(), 3);
+        QCOMPARE(start->filter().rowCount(), 3);
+        QVERIFY(spinUntil([&] { return startSettled(); }));
+        for (const QString& path : std::as_const(recent_)) {
+            const int row = start->recent().indexOf(path);
+            QVERIFY2(row >= 0, qPrintable(path));
+            QCOMPARE(start->recent().entry(row).version, u"DWG 2018"_s); // kiểm tệp ở nền đã áp
+        }
+
+        start->thumbnails().setEmbeddedSource([](const QString&, sched::CancelToken) {
+            QImage image(160, 100, QImage::Format_RGB32);
+            image.fill(Qt::darkGray);
+            return image;
+        });
+        openDocument(); // rời tab Start rồi về: trang xin ảnh cho thẻ đang thấy
+        closeDocuments();
+        QVERIFY(spinUntil([&] {
+            return startSettled() && std::ranges::all_of(recent_, [&](const QString& path) {
+                       return start->thumbnails().image(path, start->thumbnailSize()) != nullptr;
+                   });
+        }));
+
+        QVERIFY(focusOn(canvas()));
+        QTest::mouseMove(canvas(), canvas()->rect().center());
+        if (ui::RichTooltip* tips = ui::RichTooltip::instance())
+            tips->leave();
+        sched::waitIdle();
+        spinFor(3s); // vẽ, bố cục, timer một lần của lần di chuột cuối (tooltip 700 ms, "ngủ" 2 s) đã chạy
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+        const QStringList timers = timersDuring(2s);
+        QVERIFY2(timers.isEmpty(), qPrintable(timers.join(u", "_s)));
+    }
+
+    // Kịch bản 2 — 1920×1080, Pro và Viewer, trang Start hoặc vùng vẽ: mọi vùng là widget thật trừ vùng vẽ và tab layout
+    // (UIA-109, UIA-011 chưa có), xếp liền nhau, tỉ lệ vùng vẽ, a11y::audit của cả cửa sổ (tên, vai trò, thứ tự Tab, bẫy
+    // focus, viền focus).
+    void regions_data()
+    {
+        QTest::addColumn<bool>("viewer");
+        QTest::addColumn<bool>("start");
+        QTest::addRow("pro-start") << false << true;
+        QTest::addRow("pro-canvas") << false << false;
+        QTest::addRow("viewer-start") << true << true;
+        QTest::addRow("viewer-canvas") << true << false;
+    }
+
+    void regions()
+    {
+        QFETCH(bool, viewer);
+        QFETCH(bool, start);
+        if (viewer)
+            shell_->gate.setEdition(Edition::Viewer);
+        if (!start)
+            openDocument();
         QVERIFY(window_->isMaximized());
         QCOMPARE(window_->frameGeometry(), kWide); // offscreen có khung 2 px
         QCOMPARE(window_->screenClass(), ui::ScreenClass::Wide);
+        QCOMPARE(window_->workspace().current(), viewer ? u"viewer"_s : u"2d"_s);
         QVERIFY(qobject_cast<shell::TitleBar*>(region(Region::TitleBar)));
-        QVERIFY(region(Region::Ribbon)->findChild<trion::ribbon::RibbonPages*>());
-        QVERIFY(region(Region::Ribbon)->findChild<ui::TabBar*>());
+        QCOMPARE(region(Region::Ribbon), shell_->ribbon);
         QVERIFY(qobject_cast<shell::FileTabBar*>(region(Region::FileTabs)));
+        auto* stack = qobject_cast<QStackedWidget*>(canvas());
+        QVERIFY(stack && stack->count() == 2 && stack->widget(0) == shell_->canvas && stack->widget(1) == shell_->start);
+        QCOMPARE(stack->currentWidget(), start ? static_cast<QWidget*>(shell_->start) : shell_->canvas);
         QVERIFY(qobject_cast<ui::CommandLine*>(region(Region::CommandLine)));
-        QVERIFY(region(Region::StatusBar)->findChild<shell::ModeToggles*>());
-        for (const Region r : {Region::Canvas, Region::LayoutTabs}) // ô giữ chỗ của MainWindow
-            QCOMPARE(region(r)->metaObject(), &QWidget::staticMetaObject);
+        QCOMPARE(region(Region::StatusBar), shell_->statusBar);
+        QVERIFY(shell_->modes && shell_->statusBar->isAncestorOf(shell_->modes));
+        for (const QWidget* w : {shell_->canvas, region(Region::LayoutTabs)}) // ô giữ chỗ của MainWindow
+            QCOMPARE(w->metaObject(), &QWidget::staticMetaObject);
         int y = 0; // xếp liền nhau từ trên xuống, vùng thật có chiều cao
         for (int i = 0; i < MainWindow::kRegionCount; ++i) {
             const QWidget* w = Region(i) == Region::Canvas ? window_->dockHost() : region(Region(i));
@@ -414,16 +606,16 @@ private slots:
             y += g.height();
         }
         QCOMPARE(y, window_->height());
-        QVERIFY(shell_->modes->button(u"ortho"_s)->isVisible());
-        QVERIFY(shell_->ribbonPages->isBuilt(0) && !shell_->ribbonPages->isBuilt(1)); // tab khác dựng khi mở
+        QCOMPARE(shell_->modes->button(u"ortho"_s)->isVisible(), !viewer);
+        QVERIFY(shell_->ribbon->pages()->isBuilt(0) && !shell_->ribbon->pages()->isBuilt(1)); // tab khác dựng khi mở
 
         const double share = canvasShare();
         QStringList heights;
         for (int i = 0; i < MainWindow::kRegionCount; ++i)
             if (Region(i) != Region::Canvas)
                 heights << u"%1 %2"_s.arg(regionKey(Region(i))).arg(region(Region(i))->height());
-        qInfo("1920×1080 Pro: vùng vẽ %d×%d = %.1f%% diện tích cửa sổ (%s)", canvas()->width(), canvas()->height(),
-              share * 100, qPrintable(heights.join(u", "_s)));
+        qInfo("1920×1080 %s: vùng vẽ %d×%d = %.1f%% diện tích cửa sổ (%s)", QTest::currentDataTag(), canvas()->width(),
+              canvas()->height(), share * 100, qPrintable(heights.join(u", "_s)));
         QVERIFY2(share >= 0.55, qPrintable(QString::number(share)));
 
         // Phần tử nhận Tab chưa có objectName: tên tạm là chuỗi lớp#tên của nó và các cha, để vi phạm chỉ ra thành phần
@@ -442,14 +634,15 @@ private slots:
         const QStringList issues = trion::a11y::checkNames(window_) + trion::a11y::checkFocus(window_, &order);
         for (QWidget* w : std::as_const(named))
             w->setObjectName(QString());
-        qInfo("a11y: %lld điểm dừng Tab", qlonglong(order.size()));
+        qInfo("a11y %s: %lld điểm dừng Tab", QTest::currentDataTag(), qlonglong(order.size()));
         QVERIFY2(issues.isEmpty(), qPrintable(issues.join(u'\n')));
     }
 
-    // Kịch bản 2 — Ctrl+0 với widget thật: bật ẩn thanh tiêu đề, ribbon, tab tệp, tab layout, palette; tắt trả đúng
-    // hình học từng vùng, palette, dải và ảnh cửa sổ từng pixel (trừ dòng lệnh); mỗi lần một dòng lịch sử.
+    // Kịch bản 3 — Ctrl+0 với widget thật, vùng vẽ hiện: bật ẩn thanh tiêu đề, ribbon, tab tệp, tab layout, palette;
+    // tắt trả đúng hình học từng vùng, palette, dải và ảnh cửa sổ từng pixel (trừ dòng lệnh); mỗi lần một dòng lịch sử.
     void cleanScreen()
     {
+        openDocument();
         shell::CleanScreen& clean = shell_->clean;
         ui::CommandLine* cmd = shell_->commandLine;
         const QString key = ui::Menu::keyText(shell_->actions.action(u"CLEANSCREENON"_s));
@@ -485,11 +678,102 @@ private slots:
         QCOMPARE(take(), QStringList()); // CLEANSCREENON/OFF do giao diện chạy, không tới chỗ nối INT-002
     }
 
-    // Kịch bản 3 — Ctrl+9 ẩn/hiện dòng lệnh (CLISTATE theo vùng, vùng vẽ giãn ra phần đó, hiện lại thì focus ở ô
-    // nhập); F8 đổi ORTHOMODE và nút ORTHO ngay trong lượt phím; LWDISPLAY: nút thanh trạng thái và toggle ribbon
-    // (tab Hiển thị) cùng đổi trong lượt bấm của nhau.
+    // Kịch bản 4 — ribbon (RibbonBar) trong cửa sổ thật: 3 mức thu gọn → cao vùng Ribbon đúng token, tỉ lệ vùng vẽ;
+    // Alt vào dải tab, Esc trả focus về vùng vẽ; RIBBONCLOSE gõ ở dòng lệnh ẩn vùng (RIBBONSTATE 0, Alt không vào ribbon
+    // ẩn), RIBBON hiện lại đúng mức thu gọn cũ; Clean Screen độc lập; chuột phải trên nút LINE → "Thêm vào thanh truy cập
+    // nhanh" phát addToQatRequested("LINE"), QAT (UIA-101) có nút LINE.
+    void ribbon()
+    {
+        RibbonBar* bar = shell_->ribbon;
+        QCOMPARE(bar->collapse(), RibbonBar::Collapse::Full);
+        openDocument();
+        for (const auto& [c, name] : {std::pair{RibbonBar::Collapse::Full, "đầy đủ"},
+                                      std::pair{RibbonBar::Collapse::PanelTitles, "chỉ tên panel"},
+                                      std::pair{RibbonBar::Collapse::TabNames, "chỉ tên tab"}}) {
+            bar->setCollapse(c);
+            settle();
+            QCOMPARE(region(Region::Ribbon)->height(), ribbonHeight(c));
+            qInfo("1920×1080 ribbon %s: %d px, vùng vẽ %.1f%%", name, region(Region::Ribbon)->height(),
+                  canvasShare() * 100);
+        }
+        bar->setCollapse(RibbonBar::Collapse::Full);
+
+        QVERIFY(focusOn(shell_->canvas));
+        QTest::keyClick(shell_->canvas, Qt::Key_Alt);
+        QCOMPARE(QApplication::focusWidget(), bar->tabBar());
+        key(Qt::Key_Escape);
+        QCOMPARE(QApplication::focusWidget(), shell_->canvas);
+
+        bar->setCollapse(RibbonBar::Collapse::PanelTitles);
+        settle();
+        const int height = canvas()->height();
+        ui::CommandLine* cmd = shell_->commandLine;
+        QVERIFY(focusOn(cmd->input()));
+        type(cmd->input(), u"RIBBONCLOSE"_s);
+        key(Qt::Key_Return);
+        QVERIFY(!window_->isRegionVisible(Region::Ribbon));
+        QCOMPARE(shell_->sysvars.get(u"RIBBONSTATE"_s), 0);
+        settle();
+        QCOMPARE(canvas()->height(), height + ribbonHeight(RibbonBar::Collapse::PanelTitles));
+        QVERIFY(focusOn(shell_->canvas));
+        QTest::keyClick(shell_->canvas, Qt::Key_Alt); // ribbon ẩn: Alt không vào
+        QCOMPARE(QApplication::focusWidget(), shell_->canvas);
+        QVERIFY(focusOn(cmd->input()));
+        type(cmd->input(), u"RIBBON"_s);
+        key(Qt::Key_Return);
+        QVERIFY(window_->isRegionVisible(Region::Ribbon));
+        QCOMPARE(shell_->sysvars.get(u"RIBBONSTATE"_s), 1);
+        QCOMPARE(bar->collapse(), RibbonBar::Collapse::PanelTitles);
+        settle();
+        QCOMPARE(region(Region::Ribbon)->height(), ribbonHeight(RibbonBar::Collapse::PanelTitles));
+        QCOMPARE(canvas()->height(), height);
+
+        // Clean Screen độc lập (RIBBONCLOSE.md): đóng lúc đang bật thì tắt Clean Screen ribbon vẫn ẩn; RIBBON lúc đang
+        // bật chỉ ghi nhận, tắt thì hiện.
+        QTest::keyClick(window_, Qt::Key_0, Qt::ControlModifier);
+        shell_->router.submit(u"RIBBONCLOSE"_s);
+        QTest::keyClick(window_, Qt::Key_0, Qt::ControlModifier);
+        QVERIFY(!shell_->clean.isOn() && !window_->isRegionVisible(Region::Ribbon));
+        QTest::keyClick(window_, Qt::Key_0, Qt::ControlModifier);
+        shell_->router.submit(u"'_RIBBON"_s); // macro trong suốt của menu
+        QVERIFY(!window_->isRegionVisible(Region::Ribbon));
+        QTest::keyClick(window_, Qt::Key_0, Qt::ControlModifier);
+        QVERIFY(!shell_->clean.isOn() && window_->isRegionVisible(Region::Ribbon));
+        bar->setCollapse(RibbonBar::Collapse::Full);
+        settle();
+        QCOMPARE(take(), QStringList()); // RIBBON, RIBBONCLOSE do giao diện chạy
+
+        QSignalSpy qat(bar, &RibbonBar::addToQatRequested);
+        trion::ribbon::RibbonButton* line = ribbonButton(u"LINE"_s);
+        QVERIFY(line);
+        QContextMenuEvent e(QContextMenuEvent::Mouse, line->rect().center(), line->mapToGlobal(line->rect().center()));
+        QApplication::sendEvent(line, &e);
+        auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+        QVERIFY(menu);
+        QAction* add = menu->actions().value(0);
+        QVERIFY(add);
+        QCOMPARE(add->text(), QCoreApplication::translate("trion::ribbon::RibbonBar", "Thêm vào thanh truy cập nhanh"));
+        QTest::mouseClick(menu, Qt::LeftButton, {}, menu->actionGeometry(add).center());
+        QCOMPARE(qat.count(), 1);
+        QCOMPARE(qat[0][0].toString(), u"LINE"_s);
+        const ui::Button* added = shell_->titleBar->qat()->button(u"LINE"_s); // nút mới trên QAT (UIA-101)
+        QVERIFY(added);
+        QVERIFY(spinUntil([&] { return added->isVisible(); }));
+        QVERIFY(spinUntil([] { return !QApplication::activePopupWidget(); }));
+        QCOMPARE(take(), QStringList());
+
+        // F1 khi rê nút (RichTooltip phát helpRequested, test của nó kiểm phím) → '_HELP <lệnh> tới router (UIL-009).
+        QVERIFY(ui::RichTooltip::instance());
+        emit ui::RichTooltip::instance()->helpRequested(u"LINE"_s);
+        QCOMPARE(take(), QStringList{u"'_HELP LINE"_s});
+    }
+
+    // Kịch bản 5 — Ctrl+9 ẩn/hiện dòng lệnh (CLISTATE theo vùng, vùng vẽ giãn ra phần đó, hiện lại thì focus ở ô
+    // nhập); F8 đổi ORTHOMODE và nút ORTHO của thanh trạng thái ngay trong lượt phím; LWDISPLAY: nút thanh trạng thái và
+    // toggle ribbon (tab Hiển thị) cùng đổi trong lượt bấm của nhau; bấm ô tọa độ: 'COORDS n qua QAction tới router.
     void commandLineModes()
     {
+        openDocument();
         trion::actions::Sysvars& vars = shell_->sysvars;
         QCOMPARE(vars.get(u"CLISTATE"_s), 1);
         QCOMPARE(shell_->actions.macro(u"COMMANDLINE"_s), u"'_COMMANDLINEHIDE"_s);
@@ -508,14 +792,14 @@ private slots:
         QCOMPARE(canvas()->height(), height);
         // Ẩn khi focus ở ô nhập: focus về vùng vẽ (phím gõ vào ô nhập động, COMMANDLINEHIDE.md)
         QTest::keyClick(window_, Qt::Key_9, Qt::ControlModifier);
-        QCOMPARE(QApplication::focusWidget(), canvas());
+        QCOMPARE(QApplication::focusWidget(), shell_->canvas);
         QTest::keyClick(window_, Qt::Key_9, Qt::ControlModifier);
         QVERIFY(window_->isRegionVisible(Region::CommandLine));
         QCOMPARE(take(), QStringList());
         QVERIFY(focusOn(canvas()));
 
         QToolButton* ortho = shell_->modes->button(u"ortho"_s);
-        QVERIFY(ortho);
+        QVERIFY(ortho && shell_->statusBar->isAncestorOf(ortho) && ortho->isVisible());
         for (const bool on : {true, false}) {
             QTest::keyClick(window_, Qt::Key_F8); // không chạy vòng sự kiện giữa phím và lúc kiểm
             QCOMPARE(vars.get(u"ORTHOMODE"_s), on ? 1 : 0);
@@ -525,11 +809,11 @@ private slots:
         const auto& tabs = shell_->ribbonModel.tabs();
         const auto view = std::ranges::find(tabs, u"view"_s, &trion::ribbon::Tab::id);
         QVERIFY(view != tabs.end());
-        shell_->ribbonTabs->setCurrentIndex(int(view - tabs.begin()));
+        shell_->ribbon->setCurrentTab(int(view - tabs.begin()));
         settle();
-        auto* ribbonLw = region(Region::Ribbon)->findChild<trion::ribbon::RibbonButton*>(u"lwtgl"_s);
+        trion::ribbon::RibbonButton* ribbonLw = ribbonButton(u"lwtgl"_s);
         QToolButton* modeLw = shell_->modes->button(u"LWDISPLAY"_s);
-        QVERIFY(ribbonLw && ribbonLw->isVisible() && modeLw);
+        QVERIFY(ribbonLw && modeLw);
         const bool lw = ribbonLw->isChecked();
         QCOMPARE(modeLw->isChecked(), lw);
         QTest::mouseClick(modeLw, Qt::LeftButton);
@@ -539,10 +823,27 @@ private slots:
         QCOMPARE(ribbonLw->isChecked(), lw);
         QCOMPARE(modeLw->isChecked(), lw);
         QCOMPARE(take(), QStringList()); // 'ORTHOMODE 1, 'LWDISPLAY … là sysvar trong suốt: router đặt Sysvars
-        shell_->ribbonTabs->setCurrentIndex(0);
+        shell_->ribbon->setCurrentTab(0);
+
+        // Ô tọa độ: Application đặt COORDS 1 (tuyệt đối, như AutoCAD); bấm = QAction "coord" (như Ctrl+I) → sink →
+        // router: 'COORDS n là sysvar trong suốt, router đặt Sysvars, thanh đổi chữ theo nó.
+        auto* coord = shell_->statusBar->findChild<QAbstractButton*>(u"coord"_s);
+        QVERIFY(coord && coord->isVisible());
+        QCOMPARE(vars.get(u"COORDS"_s), 1);
+        for (const int next : {2, 0, 1}) {
+            QCOMPARE(shell_->actions.macro(u"coord"_s), u"'COORDS %1"_s.arg(next));
+            QTest::mouseClick(coord, Qt::LeftButton);
+            QCOMPARE(vars.get(u"COORDS"_s), next);
+            if (next == 0) // ô vẽ lại ở khung kế tiếp (tối đa một lần mỗi khung)
+                QVERIFY(spinUntil([&] {
+                    return shell_->statusBar->shownCoord() ==
+                           QCoreApplication::translate("trion::shell::StatusBar", "Tọa độ tắt");
+                }));
+        }
+        QCOMPARE(take(), QStringList());
     }
 
-    // Kịch bản 4 — ô Tìm lệnh: "đường tròn" → CIRCLE đầu danh sách, dòng có vị trí ribbon từ RibbonModel; Enter chạy
+    // Kịch bản 6 — ô Tìm lệnh: "đường tròn" → CIRCLE đầu danh sách, dòng có vị trí ribbon từ RibbonModel; Enter chạy
     // qua QAction của ActionRegistry tới router.
     void commandSearch()
     {
@@ -564,8 +865,9 @@ private slots:
         QVERIFY(!search->popup()->isVisible());
     }
 
-    // Kịch bản 5 — dòng lệnh: gõ tên lệnh rồi Enter tới router; prompt giả có chip: bấm chip và gõ chữ tắt (cả "_" +
-    // tên toàn cục) cho cùng token; Esc khi có prompt bỏ prompt (cancelRequested → clearPrompt).
+    // Kịch bản 7 — dòng lệnh: gõ tên lệnh rồi Enter tới router (lệnh có thật: không "Ý bạn là"); prompt giả có chip:
+    // bấm chip và gõ chữ tắt (cả "_" + tên toàn cục) cho cùng token; Esc khi có prompt bỏ prompt (cancelRequested →
+    // clearPrompt).
     void commandLineInput()
     {
         ui::CommandLine* cmd = shell_->commandLine;
@@ -574,6 +876,8 @@ private slots:
         key(Qt::Key_Return);
         QCOMPARE(take(), QStringList{u"LINE"_s});
         QVERIFY(cmd->input()->text().isEmpty());
+        QCOMPARE(cmd->historyLine(cmd->historyCount() - 1),
+                 QCoreApplication::translate("trion::ui::CommandLine", "Lệnh: %1").arg(u"LINE"_s));
 
         cmd->setPrompt({.command = u"CIRCLE"_s,
                         .text = tx(kRadiusPrompt),
@@ -592,12 +896,70 @@ private slots:
             QCOMPARE(take(), QStringList{u"D"_s});
         }
         QVERIFY(cmd->hasPrompt());
+        const int lines = cmd->historyCount();
+        type(cmd->input(), u"Q"_s); // trả lời prompt không phải tên lệnh: không "Ý bạn là"
+        key(Qt::Key_Return);
+        QCOMPARE(take(), QStringList{u"Q"_s});
+        QCOMPARE(cmd->historyCount(), lines + 1);
         key(Qt::Key_Escape);
         QVERIFY(!cmd->hasPrompt());
         QCOMPARE(take(), QStringList());
     }
 
-    // Kịch bản 6 — tab tệp: 3 tài liệu qua chỗ nối (DOC-018 chưa có); chuột giữa trên tab thứ hai: tài liệu đó thành
+    // Kịch bản 8 — tên lệnh gõ sai: "LNE" + Enter tới router (chưa có lệnh), lịch sử có "Không có lệnh “LNE”. Ý bạn là:
+    // LINE…" với LINE bấm được; bấm → router nhận ^C^CLINE. Viewer: gõ tên lệnh Pro, dòng tự hoàn thành có huy hiệu
+    // khóa (Pro: không).
+    void unknownCommand()
+    {
+        ui::CommandLine* cmd = shell_->commandLine;
+        QVERIFY(focusOn(cmd->input()));
+        type(cmd->input(), u"LNE"_s);
+        key(Qt::Key_Return);
+        QCOMPARE(take(), QStringList{u"LNE"_s});
+        const QString line = cmd->historyLine(cmd->historyCount() - 1);
+        const QString head =
+            QCoreApplication::translate("trion::ui::CommandLine", "Không có lệnh “%1”.").arg(u"LNE"_s);
+        QVERIFY2(line.startsWith(head) && line.contains(u"LINE"_s), qPrintable(line));
+
+        // Gợi ý là chip trong dòng lịch sử mới nhất: tìm chỗ con trỏ thành bàn tay (như autocomplete_test), bấm.
+        auto* history = cmd->findChild<QAbstractScrollArea*>(u"history"_s);
+        QVERIFY(history);
+        QWidget* port = history->viewport();
+        port->repaint(); // chỗ của chip có sau lần vẽ
+        const int h = px(tok::h_cmdl), count = cmd->historyCount();
+        const int y = (count - 1 - std::max(0, count - port->height() / h)) * h + h / 2;
+        const auto hover = [&](QPoint at) { QTest::mouseMove(window_->windowHandle(), port->mapTo(window_, at)); };
+        int x = 0;
+        for (; x < port->width(); x += 2) {
+            hover({x, y});
+            if (port->cursor().shape() == Qt::PointingHandCursor)
+                break;
+        }
+        QVERIFY2(x < port->width(), "không thấy chip gợi ý");
+        QTest::mouseClick(port, Qt::LeftButton, {}, {x + 4, y});
+        QCOMPARE(take(), QStringList{u"^C^CLINE"_s});
+        hover({1, 1});
+
+        // Huy hiệu khóa của tự hoàn thành theo phiên bản (setLockQuery → RichTooltip::info(QAction).need).
+        ui::Autocomplete* list = cmd->autocomplete();
+        for (const Edition e : {Edition::Pro, Edition::Viewer}) {
+            shell_->gate.setEdition(e);
+            QVERIFY(focusOn(cmd->input()));
+            cmd->input()->clear();
+            type(cmd->input(), u"CIRCLE"_s);
+            QVERIFY(spinUntil([&] { return list->isVisible(); }));
+            const QModelIndex first = list->view()->model()->index(0, 0);
+            QCOMPARE(first.data(Qt::DisplayRole).toString(), u"CIRCLE"_s);
+            const QString said = first.data(Qt::AccessibleTextRole).toString();
+            const QString badge = ui::RichTooltip::editionName(ui::Edition::Pro);
+            QVERIFY2(said.endsWith(u", "_s + badge) == (e == Edition::Viewer), qPrintable(said));
+            key(Qt::Key_Escape); // đóng danh sách, giữ chữ
+            QVERIFY(!list->isVisible());
+        }
+        QCOMPARE(take(), QStringList());
+    }
+
+    // Kịch bản 9 — tab tệp: 3 tài liệu qua chỗ nối (DOC-018 chưa có); chuột giữa trên tab thứ hai: tài liệu đó thành
     // hiện hành rồi router nhận ^C^C_CLOSE; Ctrl+Tab / Ctrl+Shift+Tab đổi tab; thả .dwg và .pdf: .dwg tới
     // Application::openRequested, .pdf bị từ chối bằng toast lỗi nêu tên.
     void fileTabs()
@@ -625,6 +987,7 @@ private slots:
         QCOMPARE(tabs->current(), quint64(2));
 
         QSignalSpy open(app_.get(), &Application::openRequested);
+        const int notes = shell_->notes.rowCount();
         const QString dwg = dir_->filePath(u"Nha-pho.dwg"_s), pdf = dir_->filePath(u"Ho-so.pdf"_s);
         QMimeData mime;
         mime.setUrls({QUrl::fromLocalFile(dwg), QUrl::fromLocalFile(pdf)});
@@ -640,18 +1003,65 @@ private slots:
         QCOMPARE(toasts.size(), 1);
         QCOMPARE(toasts[0]->severity(), ui::Severity::Error);
         QVERIFY2(toasts[0]->text().contains(u"Ho-so.pdf"_s), qPrintable(toasts[0]->text()));
-        QCOMPARE(shell_->notes.rowCount(), 1);
+        QCOMPARE(shell_->notes.rowCount(), notes + 1);
         QCOMPARE(take(), QStringList());
-
-        for (const quint64 id : {1, 2, 3})
-            tabs->removeDocument(id);
-        tabs->setCurrent(shell::FileTabBar::kStart);
     }
 
-    // Kịch bản 7 — đổi ngôn ngữ khi đang chạy: mọi vùng dịch lại (chữ trình đọc màn hình đọc được của vùng đổi ở en, về
-    // đúng như cũ ở vi); kéo cửa sổ sang màn hình 1366×768: dòng lệnh compact, ở vi-XL không vùng nào cắt chữ.
+    // Kịch bản 10 — tab Start (NEWTAB.md): chọn tài liệu (chỗ nối) → trang ẩn, vùng vẽ hiện và nhận focus của vùng; gõ
+    // NEWTAB → tab Start, trang hiện, tài liệu giữ tab; hành động NEWTAB (^C^C_NEWTAB của menu, ribbon) như gõ; đóng tab
+    // bản vẽ cuối → tab Start; bấm thẻ tệp gần đây → Application::requestOpen → openRequested đúng đường dẫn.
+    void startPage()
+    {
+        shell::StartPage* start = shell_->start;
+        shell::FileTabBar* tabs = shell_->fileTabs;
+        QVERIFY(start->isVisible());
+        openDocument(7);
+        QVERIFY(!start->isVisible() && shell_->canvas->isVisible());
+        QVERIFY(focusOn(canvas()));
+        QCOMPARE(QApplication::focusWidget(), shell_->canvas);
+
+        ui::CommandLine* cmd = shell_->commandLine;
+        QVERIFY(focusOn(cmd->input()));
+        type(cmd->input(), u"NEWTAB"_s);
+        key(Qt::Key_Return);
+        QCOMPARE(tabs->current(), shell::FileTabBar::kStart);
+        QVERIFY(start->isVisible() && !shell_->canvas->isVisible());
+        QCOMPARE(tabs->documents(), QList<quint64>{7});
+        tabs->setCurrent(7);
+        QVERIFY(!start->isVisible());
+        QAction* newTab = shell_->actions.action(u"NEWTAB"_s); // ^C^C_NEWTAB của menu, ribbon
+        QVERIFY(newTab);
+        newTab->trigger();
+        QCOMPARE(tabs->current(), shell::FileTabBar::kStart);
+        QVERIFY(start->isVisible());
+        tabs->setCurrent(7);
+        tabs->removeDocument(7); // tab bản vẽ cuối đóng: tab Start
+        QCOMPARE(tabs->current(), shell::FileTabBar::kStart);
+        QVERIFY(start->isVisible());
+        QCOMPARE(take(), QStringList()); // NEWTAB do giao diện chạy
+        auto* openFile = start->findChild<QAbstractButton*>(u"openFile"_s); // Mở tệp…: macroRequested → router
+        QVERIFY(openFile);
+        QTest::mouseClick(openFile, Qt::LeftButton);
+        QCOMPARE(take(), QStringList{u"^C^C_OPEN"_s});
+
+        QVERIFY(spinUntil([&] { return startSettled(); }));
+        QSignalSpy open(app_.get(), &Application::openRequested);
+        QAbstractItemView* view = start->recentView();
+        QVERIFY(view && view->isVisible());
+        const QString path = start->filter().entry(1).path;
+        QVERIFY(recent_.contains(path));
+        QTest::mouseClick(view->viewport(), Qt::LeftButton, {}, view->visualRect(view->model()->index(1, 0)).center());
+        QCOMPARE(open.count(), 1);
+        QCOMPARE(open[0][0].toStringList(), QStringList{path});
+        QCOMPARE(take(), QStringList());
+    }
+
+    // Kịch bản 11 — đổi ngôn ngữ khi đang chạy (trang Start hiện): mọi vùng dịch lại (chữ trình đọc màn hình đọc được của
+    // vùng đổi ở en, về đúng như cũ ở vi); kéo cửa sổ sang màn hình 1366×768: dòng lệnh compact, ở vi-XL không vùng nào
+    // cắt chữ, kể cả ribbon mức đầy đủ (panel co theo ưu tiên) và thanh trạng thái (mục tràn vào menu »).
     void languages()
     {
+        QVERIFY(shell_->start->isVisible());
         i18n::Translator* translator = i18n::Translator::instance();
         QHash<int, QStringList> vi;
         for (int i = 0; i < MainWindow::kRegionCount; ++i)
@@ -680,7 +1090,9 @@ private slots:
         QCoreApplication::processEvents();
         settle();
         QCOMPARE(window_->size(), kSmall.size());
-        qInfo("1366×768 vi-XL: vùng vẽ %.1f%%", canvasShare() * 100);
+        QCOMPARE(shell_->ribbon->collapse(), RibbonBar::Collapse::Full);
+        qInfo("1366×768 vi-XL: vùng vẽ %.1f%%, thanh trạng thái tràn vào menu: %s", canvasShare() * 100,
+              qPrintable(shell_->statusBar->overflowed().join(u", "_s)));
         QVERIFY2(i18n::findTruncations(window_).isEmpty(), qPrintable(truncations(window_)));
 
         QVERIFY(translator->setLanguage(u"vi"_s));
@@ -692,15 +1104,18 @@ private slots:
         settle();
     }
 
-    // Kịch bản 8 — Viewer: workspace viewer, ModeToggles còn 3 nút (OSNAP, lineweight, độ trong suốt), lệnh Pro
-    // trong ô Tìm lệnh có huy hiệu khóa, Enter mở trang nâng cấp thay vì gửi lệnh.
+    // Kịch bản 12 — Viewer: workspace viewer, thanh trạng thái còn đúng 3 nút chế độ của hồ sơ (OSNAP, lineweight, độ
+    // trong suốt) và huy hiệu Viewer, lệnh Pro trong ô Tìm lệnh có huy hiệu khóa, Enter mở trang nâng cấp thay vì gửi
+    // lệnh.
     void viewer()
     {
         shell_->gate.setEdition(Edition::Viewer);
         QCOMPARE(window_->workspace().current(), u"viewer"_s);
-        QCOMPARE(visibleModes(), 3);
-        for (const char* id : {"osnap", "LWDISPLAY", "TRANSPARENCYDISPLAY"})
-            QVERIFY2(shell_->modes->button(QString::fromLatin1(id))->isVisibleTo(shell_->modes), id);
+        settle();
+        QCOMPARE(visibleModes(), (QStringList{u"osnap"_s, u"LWDISPLAY"_s, u"TRANSPARENCYDISPLAY"_s}));
+        auto* badge = shell_->statusBar->findChild<QToolButton*>(u"edition"_s);
+        QVERIFY(badge);
+        QCOMPARE(badge->text(), QCoreApplication::translate("trion::shell::TitleBar", "Viewer"));
 
         shell::CommandSearch* search = shell_->titleBar->search();
         QVERIFY(focusOn(search));
@@ -718,10 +1133,12 @@ private slots:
 
         shell_->gate.setEdition(Edition::Pro);
         QCOMPARE(window_->workspace().current(), u"2d"_s);
-        QCOMPARE(visibleModes(), 10); // 9 nút EA + Isometric (P1, hành động "iso" gắn SNAPSTYL)
+        settle();
+        QCOMPARE(visibleModes().size(), qsizetype(10)); // 9 nút EA + Isometric (P1, hành động "iso" gắn SNAPSTYL)
+        QCOMPARE(badge->text(), QCoreApplication::translate("trion::shell::TitleBar", "Pro"));
     }
 
-    // Kịch bản 9 — tác vụ nền lỗi trên registry của ứng dụng (BackgroundJobs::instance()): ProgressPresenter (cha là
+    // Kịch bản 13 — tác vụ nền lỗi trên registry của ứng dụng (BackgroundJobs::instance()): ProgressPresenter (cha là
     // cửa sổ chính) báo xong, ToastHost::followJobs hiện toast lỗi nêu lý do trên cửa sổ chính, có mục trong
     // NotificationCenter (trình đọc màn hình đọc qua toast, UI0-013).
     void jobFailureToast()
@@ -744,31 +1161,23 @@ private slots:
         QVERIFY(spinUntil([&] { return jobs->size() == 0; }));
     }
 
-    // Kịch bản 10 — rảnh sau mọi kịch bản trên, focus ở vùng vẽ, chuột trên vùng vẽ: 2 s không QTimerEvent nào tới
-    // bất kỳ đối tượng nào (timer định kỳ, polling, tooltip, toast), không việc nền nào.
+    // Kịch bản 14 — rảnh sau mọi kịch bản trên, trang Start hiện (ảnh tệp gần đây xong), focus ở vùng Canvas, chuột trên
+    // vùng: 2 s không QTimerEvent nào tới bất kỳ đối tượng nào (timer định kỳ, polling, tooltip, toast), không việc nền.
     void idle()
     {
+        QVERIFY(shell_->start->isVisible());
         QTest::mouseMove(canvas(), canvas()->rect().center());
         if (ui::RichTooltip* tips = ui::RichTooltip::instance())
             tips->leave();
         QVERIFY(focusOn(canvas()));
-        QVERIFY(spinUntil([&] { return trion::jobs::BackgroundJobs::instance()->size() == 0; }));
+        QVERIFY(spinUntil([&] { return trion::jobs::BackgroundJobs::instance()->size() == 0 && startSettled(); }));
         sched::waitIdle();
-        // Việc còn chờ (vẽ, bố cục, raster trước) xong; timer một lần của Qt sau lần di chuột cuối (tooltip, 700 ms)
-        // đã chạy.
-        spinFor(1s);
+        // Việc còn chờ (vẽ, bố cục, raster trước) xong; timer một lần của Qt sau lần di chuột cuối (tooltip 700 ms, rồi
+        // tooltip "ngủ" 2 s của QApplication khi chuột trên thẻ của trang Start) đã chạy.
+        spinFor(3s);
         QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
-
-        QTimer end;
-        end.setSingleShot(true);
-        TimerLog log(&end);
-        qApp->installEventFilter(&log);
-        QEventLoop loop;
-        connect(&end, &QTimer::timeout, &loop, &QEventLoop::quit);
-        end.start(2s);
-        loop.exec();
-        qApp->removeEventFilter(&log);
-        QVERIFY2(log.seen.isEmpty(), qPrintable(log.seen.join(u", "_s)));
+        const QStringList timers = timersDuring(2s);
+        QVERIFY2(timers.isEmpty(), qPrintable(timers.join(u", "_s)));
     }
 };
 

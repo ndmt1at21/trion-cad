@@ -3,8 +3,9 @@
 // (offscreen, như autohide_test): p100 1920×1080 100% (chính), p150 1920×1080 150% (1280×720 logic, Small), p200
 // 1920×1080 200% (960×540), s1366 1366×768 100% (Small).
 //   1  canvasShare: 1920×1080 Wide → ribbon đầy đủ, Thuộc tính dock mở, vùng vẽ ≈ 60% ±3%; 1366×768 (lớp truyền vào,
-//      và cửa sổ trên màn hình 1366 thật) → palette ở dải tự ẩn, dòng lệnh 1 dòng; ≥ 70% [đề xuất] không đạt với ribbon
-//      đầy đủ của prototype (QEXPECT_FAIL, số in ra).
+//      và cửa sổ trên màn hình 1366 thật) → palette ở dải tự ẩn, dòng lệnh 1 dòng. Ribbon giữ chỗ cao theo 3 mức thu gọn
+//      của RibbonBar (số in ra): ≥ 70% [đề xuất] ở 1366×768 chỉ đạt ở mức chỉ tên tab; đầy đủ, chỉ tên panel
+//      QEXPECT_FAIL kèm số (mức mặc định cho màn Small chờ chủ dự án quyết).
 //   2  cleanScreen: Ctrl+0 và CommandRouter ('_CLEANSCREENON, ^C^C_CLEANSCREENOFF) cho cùng kết quả: ẩn tiêu đề,
 //      ribbon, tab tệp, tab layout, palette (dock, nổi, dải, khung trượt), giữ dòng lệnh và thanh trạng thái; vùng vẽ
 //      ≥ 75%; tắt thì hình học từng vùng, từng palette và ảnh chụp cửa sổ giống từng pixel. Thời gian bật/tắt.
@@ -61,6 +62,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <utility>
 
 #if defined(__linux__)
 #include <time.h>
@@ -461,23 +463,41 @@ private slots:
             for (const QString& id : host().ids())
                 QVERIFY2(!onScreen(host().dock(id)) && !host().isPinned(id), qPrintable(id));
         }
-        const double s = share();
         int top = 0, bottom = 0;
-        for (const Region r : {Region::TitleBar, Region::Ribbon, Region::FileTabs})
+        for (const Region r : {Region::TitleBar, Region::FileTabs})
             top += expectedHeight(r);
         for (const Region r : {Region::LayoutTabs, Region::CommandLine, Region::StatusBar})
             bottom += expectedHeight(r, !wide);
-        qInfo("%dx%d %s: khung trên %d px, dưới %d px, vùng vẽ %dx%d = %.1f%% diện tích cửa sổ", win_->width(),
-              win_->height(), wide ? "Wide" : "Small", top, bottom, canvas()->width(), canvas()->height(), s * 100);
-        if (wide) {
-            QVERIFY2(s >= 0.57 && s <= 0.63, qPrintable(QString::number(s)));
-            return;
+        // Ribbon giữ chỗ cao theo 3 mức thu gọn của RibbonBar (UIA-005, bodyHeight trong RibbonBar.cpp): dải tab, thân
+        // (đầy đủ: 3 hàng nút, --sp-4, tên panel; chỉ tên panel: tên panel, --sp-4; chỉ tên tab: không có), nét dưới.
+        const int tabs = px(tok::h_tab) + kLine;
+        const std::pair<const char*, int> levels[] = {
+            {"Full", tabs + 3 * px(tok::h_btn) + px(tok::sp_4) + px(tok::h_lbl)},
+            {"PanelTitles", tabs + px(tok::h_lbl) + px(tok::sp_4)},
+            {"TabNames", tabs}};
+        QCOMPARE(levels[0].second, expectedHeight(Region::Ribbon)); // ô giữ chỗ của MainWindow: mức đầy đủ
+        for (const auto& [level, ribbon] : levels) {
+            win_->region(Region::Ribbon)->setFixedHeight(ribbon);
+            const double s = share();
+            qInfo("%dx%d %s, ribbon %s %d px: khung trên %d px, dưới %d px, vùng vẽ %dx%d = %.1f%% diện tích cửa sổ",
+                  win_->width(), win_->height(), wide ? "Wide" : "Small", level, ribbon, top + ribbon, bottom,
+                  canvas()->width(), canvas()->height(), s * 100);
+            const bool full = ribbon == levels[0].second;
+            if (wide) {
+                if (full)
+                    QVERIFY2(s >= 0.57 && s <= 0.63, qPrintable(QString::number(s)));
+                continue;
+            }
+            if (full)
+                QVERIFY2(s >= 0.61, qPrintable(QString::number(s))); // số của bố cục prototype: không lùi
+            // ≥ 70% [đề xuất] chỉ đạt khi ribbon còn tên tab. Mức thu gọn mặc định của màn Small chờ chủ dự án quyết
+            // (không tự chọn): báo lệch tiêu chí kèm số, không giả kết quả.
+            const QByteArray why = QByteArray("1366x768, ribbon ") + level + ": " + QByteArray::number(s * 100, 'f', 1) +
+                                   "% < 70% (Small chưa có mức thu gọn mặc định)";
+            if (ribbon != tabs)
+                QEXPECT_FAIL("", why.constData(), Continue);
+            QVERIFY2(s >= 0.70, why.constData());
         }
-        QVERIFY2(s >= 0.61, qPrintable(QString::number(s))); // số của bố cục prototype: không lùi
-        // 1366×768 với ribbon đầy đủ (114 px) và hai dải tự ẩn của prototype: vùng vẽ ~61,4%; ≥ 70% cần thêm ribbon
-        // thu gọn còn tên panel. Báo lệch tiêu chí [đề xuất], không giả kết quả.
-        QEXPECT_FAIL("", "1366×768 ribbon đầy đủ: ~61,4% (≥ 70% khi ribbon thu gọn còn tên panel)", Continue);
-        QVERIFY(s >= 0.70);
     }
 
     // Tiêu chí 2.
@@ -964,10 +984,8 @@ private slots:
             host().showPalette(id);
             QVERIFY(spinUntil([&] { return onScreen(host().content(id)); }));
             settle();
-            // ponytail của TruncationProbe: chưa bỏ widget có visibleRegion rỗng (trang tab nền của nhóm dock)
             for (const i18n::Truncation& t : i18n::findTruncations(win_.get()))
-                if (!t.widget->visibleRegion().isEmpty())
-                    cut << id + u": "_s + t.toString();
+                cut << id + u": "_s + t.toString();
         }
         QVERIFY2(cut.isEmpty(), qPrintable(cut.join(u"\n"_s)));
     }
