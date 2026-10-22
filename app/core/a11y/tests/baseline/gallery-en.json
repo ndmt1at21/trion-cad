@@ -1,0 +1,1022 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "name": "Component Gallery",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "name": "Basic components in the 8 states of 07.3 Appendix C. State cells are snapshots of the widgets themselves; the Try It section holds live widgets.",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "name": "View in",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "System",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Dark",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Light",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Theme",
+                                    "role": "Client"
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Compact",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Comfortable",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Density",
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Lite UI",
+                                    "role": "CheckBox",
+                                    "state": [
+                                        "checkable",
+                                        "focusable"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Tiếng Việt",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "English",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "vi-XL",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Language",
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Try It",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Preview…",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Print",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Delete 3 layouts",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Cancel",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Object snap",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Grid",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Print",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Small",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Large",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "mm",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "checked",
+                                                        "focusable"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "m",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "focusable"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "in",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "focusable"
+                                                    ]
+                                                }
+                                            ],
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Paper size",
+                                            "role": "ComboBox",
+                                            "state": [
+                                                "focusable",
+                                                "expandable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Current layer",
+                                            "role": "ComboBox",
+                                            "state": [
+                                                "focusable",
+                                                "expandable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "role": "Button"
+                                                }
+                                            ],
+                                            "description": "Search layers",
+                                            "name": "Search layers",
+                                            "role": "EditableText",
+                                            "state": [
+                                                "focusable",
+                                                "editable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "General",
+                                                    "role": "PageTab",
+                                                    "state": [
+                                                        "focusable",
+                                                        "selectable",
+                                                        "selected"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "Statistics",
+                                                    "role": "PageTab",
+                                                    "state": [
+                                                        "focusable",
+                                                        "selectable"
+                                                    ]
+                                                }
+                                            ],
+                                            "name": "General",
+                                            "role": "PageTabList",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Transparency",
+                                            "role": "Slider",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "States",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Default",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Hover",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Pressed",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Focus",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Disabled",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "On",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Locked",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Error",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Primary button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Primary button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Primary button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Danger button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Danger button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danger button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Ghost button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ghost button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Icon button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Icon button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Toggle button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Toggle button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Split button, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Split button, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Segmented group, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Segmented group, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Drop-down list, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Drop-down list, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Drop-down list, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Filterable combo box, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Filterable combo box, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Search field, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Search field, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Search field, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Tabs, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Tabs, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tabs, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Slider, Default",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Hover",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Pressed",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Disabled",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "State not applicable",
+                                            "name": "Slider, On",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Locked",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Slider, Error",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "— the component has no such state. Locked: a feature outside the current edition, shown with a lock, not by color alone.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Menus, Tooltips",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Menu: highlighted item (hover; press and arrow keys look the same), check mark (on), Pro badge (locked), disabled item. Error: none.\nTooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and F1. Try it in the Try It section.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Tables, Trees",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Row 2 hovered, row 3 selected (on), row 4 focused",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Disabled",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Empty",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Row 2 hovered, row 3 selected (on), row 4 focused",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Disabled",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Empty",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Sample table",
+                                            "role": "Table",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Sample tree",
+                                            "role": "Tree",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Try it: click a column header to sort, type to jump to a row, ← → collapse/expand groups.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                }
+                            ],
+                            "role": "Client"
+                        }
+                    ],
+                    "role": "Client"
+                },
+                {
+                    "children": [
+                        {
+                            "role": "ScrollBar"
+                        }
+                    ],
+                    "role": "Client"
+                }
+            ],
+            "role": "Client"
+        }
+    ],
+    "name": "Component Gallery",
+    "role": "Window"
+}

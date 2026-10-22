@@ -34,7 +34,8 @@
 //  - Rảnh: không timer, không vẽ lại.
 //
 // ponytail: không hỗ trợ rootIndex con, ô gộp, dòng cao khác nhau, kéo thả (palette cần thì thêm). QAccessible chỉ thấy
-// widget view (Qt chỉ có bảng truy cập cho QTableView/QTreeView/QListView): ô cho trình đọc màn hình thuộc UI0-013.
+// widget view với vai trò Table/Tree (UI0-013; Qt chỉ có bảng truy cập cho QTableView/QTreeView/QListView): ô cho trình
+// đọc màn hình (QAccessibleTableInterface theo dòng của model) chưa có, cần task riêng.
 // Thanh cuộn tính bằng int: tối đa ~8·10⁷ dòng ở 26 px.
 
 #include <QAbstractItemView>

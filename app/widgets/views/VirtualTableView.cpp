@@ -5,6 +5,7 @@
 #include "core/base/settings/Settings.h"
 #include "core/base/text/Fold.h"
 
+#include <QAccessibleWidget>
 #include <QApplication>
 #include <QHeaderView>
 #include <QHoverEvent>
@@ -32,6 +33,19 @@ int px(tok::PxId id)
     return qRound(ThemeManager::instance().px(id));
 }
 
+// Vai trò cho trình đọc màn hình (UI0-013): Qt chỉ dựng giao diện bảng truy cập cho QTableView/QTreeView/QListView, view
+// tự viết thành Client. Gọi theo lớp con trước (QAccessible::queryAccessibleInterface đi từ lớp dẫn xuất nhất).
+// ponytail: chỉ vai trò, chưa có ô (QAccessibleTableInterface): trình đọc màn hình đọc tên view, chưa đọc dòng hiện
+// hành khi đi bằng mũi tên. Cần task riêng: bảng truy cập theo dòng của model, sự kiện Focus cho ô hiện hành.
+QAccessibleInterface* accessibleView(const QString& className, QObject* o)
+{
+    if (className == "trion::ui::VirtualTreeView"_L1)
+        return new QAccessibleWidget(static_cast<QWidget*>(o), QAccessible::Tree);
+    if (className == "trion::ui::VirtualTableView"_L1)
+        return new QAccessibleWidget(static_cast<QWidget*>(o), QAccessible::Table);
+    return nullptr;
+}
+
 // Lề chữ style tự chừa mỗi bên ô (QCommonStyle: PM_FocusFrameHMargin + 1).
 int textMargin(const QWidget* w)
 {
@@ -52,6 +66,8 @@ constexpr auto kSearchSlice = std::chrono::milliseconds(2);
 VirtualTableView::VirtualTableView(QWidget* parent)
     : QAbstractItemView(parent), header_(new QHeaderView(Qt::Horizontal, this))
 {
+    static const bool accessible = (QAccessible::installFactory(accessibleView), true);
+    Q_UNUSED(accessible);
     setSelectionBehavior(SelectRows);
     setSelectionMode(ExtendedSelection);
     setVerticalScrollMode(ScrollPerItem); // giá trị thanh cuộn dọc = dòng trên cùng

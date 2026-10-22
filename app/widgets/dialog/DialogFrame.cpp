@@ -87,7 +87,7 @@ protected:
     }
 
 private:
-    QVariantAnimation anim_;
+    QVariantAnimation anim_{this}; // có cha: ThemeManager tìm thấy để dừng khi bật giảm chuyển động
 };
 
 // Làm mờ Gauss độ lệch sigma (px thiết bị) cho kênh alpha w×h, ngoài ảnh là 0: 3 lượt box blur mỗi chiều, bề rộng

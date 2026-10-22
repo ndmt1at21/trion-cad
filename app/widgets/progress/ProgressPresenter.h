@@ -12,6 +12,8 @@
 // thoại chặn); từ 2 s việc vào model (thanh %, nút hủy). Lúc qua mốc hỏi lại NT-013 (info()) nên việc vừa xong mà
 // lô báo xong chưa tới không làm con trỏ nháy. Mọi thay đổi hiện ra (model, changed()) gộp tối đa một lần mỗi
 // khung hình theo tần số màn hình; rảnh: không timer, không cập nhật.
+// Trình đọc màn hình (UI0-013): lúc qua mốc 2 s đọc tên việc (a11y::announce, Polite, nguồn là widget cha), không đọc
+// từng phần trăm; xong, lỗi đọc qua toast của ToastHost::followJobs (cửa sổ chính nối).
 //
 // Luồng: chỉ luồng UI. Ngưỡng 0,5 s/2 s lấy từ BackgroundJobs::timing() (test rút ngắn). Tạo trước khi có việc
 // (presenter chỉ biết việc qua lô của NT-013).

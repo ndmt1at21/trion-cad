@@ -1,5 +1,6 @@
 #include "app/widgets/progress/ProgressPresenter.h"
 
+#include "app/core/a11y/Announce.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/UiFormat.h"
 
@@ -226,7 +227,12 @@ void ProgressPresenter::apply()
         if (e.ended)
             continue;
         e.busy = e.busy || elapsed >= t.busyCursor;
-        e.shown = e.shown || elapsed >= t.showProgress;
+        if (!e.shown && elapsed >= t.showProgress) {
+            e.shown = true;
+            // Trình đọc màn hình: đọc tên việc lúc tiến trình hiện, không đọc từng phần trăm; xong, lỗi đọc qua toast
+            // (ToastHost::followJobs). Nguồn: widget cha (cửa sổ chính), không có thì ứng dụng.
+            a11y::announce(parent() && parent()->isWidgetType() ? parent() : nullptr, e.info.name);
+        }
         busy = busy || e.busy;
         if (e.shown)
             rows.push_back(e.info.id);

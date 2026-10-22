@@ -189,8 +189,16 @@
         <translation>Drop-down list</translation>
     </message>
     <message>
+        <source>Khổ giấy</source>
+        <translation>Paper size</translation>
+    </message>
+    <message>
         <source>Combo có ô lọc</source>
         <translation>Filterable combo box</translation>
+    </message>
+    <message>
+        <source>Layer hiện hành</source>
+        <translation>Current layer</translation>
     </message>
     <message>
         <source>Ô tìm kiếm</source>

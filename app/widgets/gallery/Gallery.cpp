@@ -324,6 +324,7 @@ constexpr Row kRows[] = {
      [](QWidget* p) -> QWidget* {
          auto* d = new DropDown(p);
          d->addItems({u"ISO A1"_s, u"ISO A3"_s, u"ISO A4"_s}); // i18n-ok: khổ giấy
+         d->setAccessibleName(QCoreApplication::translate("Gallery", "Khổ giấy")); // không có nhãn buddy
          return d;
      },
      applyDropDown, nullptr, Pressed},
@@ -331,6 +332,7 @@ constexpr Row kRows[] = {
      [](QWidget* p) -> QWidget* {
          auto* c = new ComboBox(p);
          c->addItems({u"KT-CỬA"_s, u"KT-TƯỜNG"_s, u"KT-NỘITHẤT"_s, u"KC-DẦM"_s}); // i18n-ok: tên layer mẫu
+         c->setAccessibleName(QCoreApplication::translate("Gallery", "Layer hiện hành"));
          return c;
      },
      applyDropDown, nullptr, Pressed},
@@ -338,6 +340,7 @@ constexpr Row kRows[] = {
      [](QWidget* p) -> QWidget* {
          auto* f = new SearchField(p);
          f->setPlaceholderText(QCoreApplication::translate("Gallery", "Tìm layer"));
+         f->setAccessibleName(f->placeholderText()); // chữ gợi ý không phải tên cho trình đọc màn hình
          return f;
      },
      applySearch},
@@ -1069,7 +1072,10 @@ void GalleryWindow::stage(qreal dpr)
     setAttribute(Qt::WA_KeyboardFocusChange, keyboard);
     if (had)
         had->setFocus(Qt::OtherFocusReason);
-    activateWindow(); // popup vừa đóng (offscreen: popup lấy cửa sổ active); đang active thì không đổi gì
+    // Popup vừa đóng (offscreen: popup lấy cửa sổ active) thì lấy lại; cửa sổ thường khác được kích hoạt giữa lúc chụp
+    // thì để yên (không giành active của nó).
+    if (const QWidget* a = QApplication::activeWindow(); !a || a == this || a->windowType() == Qt::Popup)
+        activateWindow();
     if (rebuilding_) // ngôn ngữ đổi giữa lúc chụp
         QMetaObject::invokeMethod(this, &GalleryWindow::rebuild, Qt::QueuedConnection);
     else if (dirty_) // chủ đề, mật độ đổi giữa lúc chụp

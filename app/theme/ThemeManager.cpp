@@ -2,11 +2,15 @@
 
 #include "core/base/assert.h"
 
+#include <QAbstractAnimation>
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QFile>
+#include <QFocusFrame>
 #include <QHeaderView>
 #include <QPainter>
+#include <QPlainTextEdit>
+#include <QPointer>
 #include <QProgressBar>
 #include <QProxyStyle>
 #include <QRegularExpression>
@@ -14,6 +18,7 @@
 #include <QStyleFactory>
 #include <QStyleHints>
 #include <QStyleOption>
+#include <QTextEdit>
 #include <QToolTip>
 
 #include <atomic>
@@ -76,6 +81,9 @@ public:
         case PM_MenuHMargin:
         case PM_MenuVMargin:
             return px(tok::sp_2);
+        case PM_FocusFrameHMargin: // viền focus của ô nhiều dòng (QFocusFrame): 1 px ngoài mép như .inp:focus
+        case PM_FocusFrameVMargin:
+            return qobject_cast<const QFocusFrame*>(w) ? 1 : QProxyStyle::pixelMetric(m, o, w);
         default:
             return QProxyStyle::pixelMetric(m, o, w);
         }
@@ -85,6 +93,13 @@ public:
     {
         if (h == SH_Widget_Animation_Duration)
             return tok::ms(tok::t, mode);
+        if (h == SH_FocusFrame_AboveWidget) // vùng nhìn của ô nhiều dòng phủ kín ô: viền vẽ đè lên
+            return true;
+        if (h == SH_FocusFrame_Mask) { // vòng 2 px
+            if (auto* mask = qstyleoption_cast<QStyleHintReturnMask*>(r); mask && o)
+                mask->region = QRegion(o->rect) - QRegion(o->rect.adjusted(2, 2, -2, -2));
+            return true;
+        }
         return QProxyStyle::styleHint(h, o, w, r);
     }
 
@@ -124,6 +139,10 @@ public:
 
     void drawControl(ControlElement ce, const QStyleOption* o, QPainter* p, const QWidget* w) const override
     {
+        if (ce == CE_FocusFrame) { // QFocusFrame của ô nhiều dòng; hình vòng do mặt nạ SH_FocusFrame_Mask
+            p->fillRect(o->rect, c(tok::c_focus));
+            return;
+        }
         const auto* tab = qstyleoption_cast<const QStyleOptionTab*>(o);
         if (ce == CE_TabBarTabShape && tab) { // phẳng; tab đang mở gạch chân 2 px --c-accent, lùi --sp-4 hai bên
             if (o->state & State_Selected)
@@ -189,10 +208,15 @@ public:
         p->save();
         p->setRenderHint(QPainter::Antialiasing);
         switch (pe) {
-        case PE_PanelButtonCommand: // .btn
+        case PE_PanelButtonCommand: // .btn; Fusion báo focus qua viền của panel (CE_PushButton không vẽ khung focus)
             p->setPen(ctl);
             p->setBrush(o->state & (State_Sunken | State_On) ? c(tok::c_active) : c(tok::c_raised));
             p->drawRoundedRect(box, r, r);
+            if ((o->state & State_HasFocus) && (o->state & State_KeyboardFocusChange)) { // :focus-visible
+                p->setPen(QPen(c(tok::c_focus), 2));
+                p->setBrush(Qt::NoBrush);
+                p->drawRoundedRect(QRectF(o->rect).adjusted(1, 1, -1, -1), r, r);
+            }
             break;
         case PE_PanelButtonTool: // .ib: phẳng; rê, nhấn, bật có nền
             if ((o->state & (State_On | State_Sunken)) || hover) {
@@ -283,8 +307,35 @@ public:
             v->viewport()->setBackgroundRole(QPalette::Window); // bảng, cây nằm trên --c-base; ô nhập trên --c-raised
         if (isPopup(w) && w->windowFlags().testFlag(Qt::NoDropShadowWindowHint) != mode.lite)
             w->setWindowFlag(Qt::NoDropShadowWindowHint, mode.lite); // Giao diện nhẹ: popup không bóng hệ thống
+        if (qobject_cast<QPlainTextEdit*>(w) || qobject_cast<QTextEdit*>(w))
+            w->installEventFilter(this); // viền focus: eventFilter
+    }
+    void unpolish(QWidget* w) override
+    {
+        w->removeEventFilter(this);
+        QProxyStyle::unpolish(w);
     }
     using QProxyStyle::polish;
+    using QProxyStyle::unpolish;
+
+    // Ô nhiều dòng (QPlainTextEdit, QTextEdit): vùng nhìn phủ kín ô nên viền focus (.inp:focus, 2 px --c-focus: 1 px
+    // ngoài, 1 px trong mép) vẽ trên một QFocusFrame đặt trên ô, như QMacStyle; một cái cho cả ứng dụng, theo ô có focus.
+    // ponytail: góc vuông (mặt nạ chữ nhật), ô bo --r; bo theo khi QA-011 so ảnh đòi.
+    bool eventFilter(QObject* o, QEvent* e) override
+    {
+        if (e->type() == QEvent::FocusIn) {
+            auto* w = static_cast<QWidget*>(o);
+            if (!ring_)
+                ring_ = new QFocusFrame(w); // setWidget chuyển nó sang cha của ô
+            ring_->setWidget(w);
+        } else if (e->type() == QEvent::FocusOut && ring_ && ring_->widget() == o) {
+            ring_->setWidget(nullptr);
+        }
+        return QProxyStyle::eventFilter(o, e);
+    }
+
+private:
+    QPointer<QFocusFrame> ring_;
 };
 
 ThemeManager::ThemeManager(settings::Store& store, QObject* parent)
@@ -501,6 +552,18 @@ void ThemeManager::apply(tok::Mode m)
             }
         }
         QApplication::setEffectEnabled(Qt::UI_General, tok::ms(tok::t, m) > 0); // menu, combobox, tooltip trượt/mờ
+        // Giảm chuyển động, Giao diện nhẹ vừa bật (--t về 0): animation đang chạy tới cuối ngay (vô hạn thì dừng), không
+        // chờ hết thời gian cũ; animation mới đọc ms() nên chạy 0 ms. Chỉ thấy animation có cha trong cây QObject của
+        // cửa sổ cấp cao (QPropertyAnimation(…, cha), thành viên tạo với cha); con của nhóm chạy theo nhóm.
+        if (tok::ms(tok::t, was) > 0 && tok::ms(tok::t, m) == 0)
+            for (QWidget* top : QApplication::topLevelWidgets())
+                for (QAbstractAnimation* a : top->findChildren<QAbstractAnimation*>())
+                    if (!a->group() && a->state() != QAbstractAnimation::Stopped) {
+                        if (a->totalDuration() < 0)
+                            a->stop();
+                        else
+                            a->setCurrentTime(a->direction() == QAbstractAnimation::Forward ? a->totalDuration() : 0);
+                    }
         if (was.lite != m.lite) { // popup đang mở giữ nguyên tới lần đổi sau: đổi cờ cửa sổ sẽ ẩn nó
             for (QWidget* w : all)
                 if (isPopup(w) && !w->isVisible() && w->windowFlags().testFlag(Qt::NoDropShadowWindowHint) != m.lite)

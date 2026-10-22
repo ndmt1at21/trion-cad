@@ -1,5 +1,6 @@
 #include "app/widgets/message/Messages.h"
 
+#include "app/core/a11y/Announce.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -125,16 +126,11 @@ void setRole(QWidget* w, QAccessible::Role role)
 // Như role="alert" (urgent: QAccessible::Alert rồi thông báo Assertive) hoặc role="status" (thông báo Polite).
 void announce(QWidget* w, const QString& text, bool urgent)
 {
-    if (!QAccessible::isActive())
-        return; // không có trình đọc màn hình: khỏi dựng giao diện tiếp cận cho mỗi thông điệp
-    if (urgent) {
+    if (urgent && QAccessible::isActive()) { // không có trình đọc màn hình: khỏi dựng giao diện tiếp cận
         QAccessibleEvent alert(w, QAccessible::Alert);
         QAccessible::updateAccessibility(&alert);
     }
-    QAccessibleAnnouncementEvent say(w, text);
-    say.setPoliteness(urgent ? QAccessible::AnnouncementPoliteness::Assertive
-                             : QAccessible::AnnouncementPoliteness::Polite);
-    QAccessible::updateAccessibility(&say);
+    a11y::announce(w, text, urgent ? a11y::Politeness::Assertive : a11y::Politeness::Polite);
 }
 
 // Focus vào thông điệp (Tab tới nút của toast, banner): nhớ widget có focus trước đó vào back, để khi thông điệp đóng

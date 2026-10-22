@@ -50,6 +50,19 @@
 # Viền điều khiển và viền tiêu điểm (thành phần không phải chữ, 3:1)
 --c-border-ctl   --c-base      3
 --c-focus        --c-base      3
+# Viền tiêu điểm trên các nền thật (UI0-013): khung, ô nhập, danh sách, nhấn, banner, vùng vẽ, layout, ô nhập động,
+# hàng chọn, rê, toggle bật
+--c-focus        --c-chrome    3
+--c-focus        --c-raised    3
+--c-focus        --c-sunken    3
+--c-focus        --c-active    3
+--c-focus        --c-banner    3
+--c-focus        --c-canvas    3
+--c-focus        --c-layout-bg 3
+--c-focus        --c-dyn-bg    3
+--c-focus        --c-accent-soft   --c-base    3
+--c-focus        --c-hover         --c-raised  3
+--c-focus        --c-on-bg         --c-chrome  3
 
 # Huy hiệu phiên bản
 --c-ed-viewer-t  --c-ed-viewer 4.5
@@ -72,3 +85,8 @@
 # --c-on          --c-on-bg        --c-sunken  4.5   Sáng 4,28:1
 # --c-danger      --c-danger-soft  --c-raised  4.5   Tối 4,16:1
 # --c-text-3      --c-hover        --c-raised  4.5   Tối 4,00:1
+# Viền tiêu điểm trên nền nút chính, nút nguy hiểm (UI0-013): không đạt, Controls vẽ thêm nét trong 1 px màu chữ của nút.
+# Đề nghị nhà thiết kế: token viền focus trên nền nhấn (vd. --c-focus-on-accent), hoặc --c-focus khác --c-accent.
+# --c-focus  --c-accent     3    Tối 1,00:1, Sáng 1,00:1
+# --c-focus  --c-accent-hi  3    Tối 1,27:1
+# --c-focus  --c-danger     3    Tối 1,47:1, Sáng 1,04:1

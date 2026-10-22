@@ -1,0 +1,1022 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "name": "Bảng mẫu thành phần",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "name": "Thành phần cơ bản ở 8 trạng thái của 07.3 Phụ lục C. Ô trạng thái là ảnh chụp từ chính widget; mục Dùng thử là widget thật.",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "name": "Xem ở",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Theo hệ thống",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Tối",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Sáng",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Chủ đề",
+                                    "role": "Client"
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Gọn",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Thoáng",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Mật độ",
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Giao diện nhẹ",
+                                    "role": "CheckBox",
+                                    "state": [
+                                        "checkable",
+                                        "focusable"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Tiếng Việt",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "checked",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "English",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "vi-XL",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "name": "Ngôn ngữ",
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Dùng thử",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Xem trước…",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "In",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Xóa 3 layout",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Hủy",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Bắt điểm",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Lưới",
+                                            "role": "CheckBox",
+                                            "state": [
+                                                "checkable",
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "In",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nhỏ",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Lớn",
+                                            "role": "Button",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "mm",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "checked",
+                                                        "focusable"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "m",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "focusable"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "in",
+                                                    "role": "CheckBox",
+                                                    "state": [
+                                                        "checkable",
+                                                        "focusable"
+                                                    ]
+                                                }
+                                            ],
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Khổ giấy",
+                                            "role": "ComboBox",
+                                            "state": [
+                                                "focusable",
+                                                "expandable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Layer hiện hành",
+                                            "role": "ComboBox",
+                                            "state": [
+                                                "focusable",
+                                                "expandable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "role": "Button"
+                                                }
+                                            ],
+                                            "description": "Tìm layer",
+                                            "name": "Tìm layer",
+                                            "role": "EditableText",
+                                            "state": [
+                                                "focusable",
+                                                "editable"
+                                            ]
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "Chung",
+                                                    "role": "PageTab",
+                                                    "state": [
+                                                        "focusable",
+                                                        "selectable",
+                                                        "selected"
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "Thống kê",
+                                                    "role": "PageTab",
+                                                    "state": [
+                                                        "focusable",
+                                                        "selectable"
+                                                    ]
+                                                }
+                                            ],
+                                            "name": "Chung",
+                                            "role": "PageTabList",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Độ mờ",
+                                            "role": "Slider",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Trạng thái",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "Mặc định",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Rê",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nhấn",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Focus",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Vô hiệu",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Bật",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Khóa",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Lỗi",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút chính, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Nút chính, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút chính, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Nút nguy hiểm, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút nguy hiểm, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút phụ, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút phụ, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút biểu tượng, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút bật/tắt, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nút tách, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nút tách, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Nhóm phân đoạn, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Danh sách thả xuống, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Danh sách thả xuống, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Combo có ô lọc, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Combo có ô lọc, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Ô tìm kiếm, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Ô tìm kiếm, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Tab, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Tab, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Tab, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Mặc định",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Rê",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Nhấn",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Focus",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Vô hiệu",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "description": "Không có trạng thái này",
+                                            "name": "Thanh trượt, Bật",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Khóa",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Thanh trượt, Lỗi",
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "— thành phần không có trạng thái này. Khóa: tính năng ngoài phiên bản hiện hành, có ổ khóa, không chỉ đổi màu.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Menu, tooltip",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Menu: mục đang trỏ (rê; nhấn và phím mũi tên như rê), dấu chọn (bật), huy hiệu Pro (khóa), mục vô hiệu. Lỗi: không có.\nTooltip: mức 1 sau 0,45 s; rê thêm 1,5 s ra mức 2 có mô tả và F1. Thử ở mục Dùng thử.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                },
+                                {
+                                    "name": "Bảng, cây",
+                                    "role": "StaticText",
+                                    "state": [
+                                        "readOnly"
+                                    ]
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Dòng 2 rê, dòng 3 chọn (bật), dòng 4 focus",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Vô hiệu",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Rỗng",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Dòng 2 rê, dòng 3 chọn (bật), dòng 4 focus",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Vô hiệu",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "role": "Client"
+                                        },
+                                        {
+                                            "name": "Rỗng",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Bảng mẫu",
+                                            "role": "Table",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Cây mẫu",
+                                            "role": "Tree",
+                                            "state": [
+                                                "focusable"
+                                            ]
+                                        },
+                                        {
+                                            "name": "Dùng thử: bấm đầu cột để sắp, gõ chữ để nhảy dòng, ← → đóng/mở nhóm.",
+                                            "role": "StaticText",
+                                            "state": [
+                                                "readOnly"
+                                            ]
+                                        }
+                                    ],
+                                    "role": "Client"
+                                }
+                            ],
+                            "role": "Client"
+                        }
+                    ],
+                    "role": "Client"
+                },
+                {
+                    "children": [
+                        {
+                            "role": "ScrollBar"
+                        }
+                    ],
+                    "role": "Client"
+                }
+            ],
+            "role": "Client"
+        }
+    ],
+    "name": "Bảng mẫu thành phần",
+    "role": "Window"
+}
