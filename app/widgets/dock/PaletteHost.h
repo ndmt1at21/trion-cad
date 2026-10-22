@@ -8,8 +8,8 @@
 //   - đầu palette theo prototype (PaletteHeader); tên cho trình đọc màn hình là tiêu đề (windowTitle của dock);
 //   - lưu, khôi phục bố cục qua Store (NT-010); palette nổi trên màn hình không còn thì về màn hình chính, nằm trọn
 //     trong vùng làm việc (fitToScreens);
-//   - F6 / Shift+F6 đưa focus lần lượt qua các palette đang hiện rồi về vùng vẽ; Esc trong palette trả focus về
-//     widget trung tâm (vùng vẽ).
+//   - F6 / Shift+F6 (hành động "pane" của Keymap sau setKeymap) đưa focus lần lượt qua các palette đang hiện rồi về
+//     vùng vẽ; Esc trong palette trả focus về widget trung tâm (vùng vẽ).
 //   - trợ năng của nhóm tab (DoD-U 7): dải tab Qt tạo khi gộp (QMainWindowTabBar; tên cho trình đọc màn hình là chữ
 //     của tab đang mở) có viền focus --c-focus quanh tab đang mở khi Tab tới. Qt cất palette ở tab nền và dải của
 //     nhóm còn dưới hai palette mở ra tọa độ âm mà vẫn isVisible(): palette cất bị vô hiệu, dải cất không nhận focus
@@ -40,8 +40,6 @@
 // ponytail: quy tắc theo màn hình chỉ cho bố cục mặc định (chưa lưu); đổi lớp màn hình lúc chạy (kéo cửa sổ sang
 // màn hình hẹp) không tự bỏ ghim — nối DisplayContext::screenClassChanged nếu UIA-001 cần. Bật/tắt dock bằng
 // toggleViewAction() của Qt bỏ qua dải: dùng showPalette()/close().
-// ponytail: F6 / Shift+F6 đặt thẳng ở đây (QAction của cửa sổ); chuyển vào bảng phím một nguồn khi UI0-015 nối hành
-// động, lúc đó gọi focusNextPalette().
 #include "app/core/display/DisplayContext.h"
 #include "core/base/settings/Settings.h"
 
@@ -56,9 +54,14 @@
 
 #include <functional>
 
+class QAction;
 class QDockWidget;
 class QMainWindow;
 class QWidget;
+
+namespace trion::keymap {
+class Keymap;
+}
 
 namespace trion::ui {
 
@@ -114,6 +117,9 @@ public:
 
     // Focus vào palette đang hiện kế tiếp (trước đó) theo thứ tự đăng ký; sau palette cuối là vùng vẽ.
     void focusNextPalette(bool backward = false);
+    // Phím của focusNextPalette theo hành động "pane" của Keymap (bảng phím một nguồn, người dùng đổi được; tổ hợp có
+    // Shift là lùi), đổi theo Keymap::changed. Chưa gọi: F6, Shift+F6. keymap sống lâu hơn host.
+    void setKeymap(const keymap::Keymap& keymap);
     void focusCanvas(); // widget trung tâm của window (hoặc focusProxy của nó)
 
     // Hàm thuần: chỗ của cửa sổ nổi r khi màn hình hiện có vùng làm việc workAreas (availableGeometry, tọa độ ảo).
@@ -153,6 +159,8 @@ private:
     QMap<Qt::DockWidgetArea, AutoHideStrip*> strips_;
     QStringList stripIds_; // dải đã lưu: cho palette đăng ký sau restoreLayout
     QPointer<DisplayContext> display_;
+    QAction* nextPane_;     // phím focusNextPalette()
+    QAction* previousPane_; // phím focusNextPalette(true)
     bool restored_ = false;
     bool narrow_ = false; // bố cục mặc định của màn hình hẹp hơn Wide
 };

@@ -22,7 +22,7 @@
 //   đang chờ là ô giữ chỗ màu nền vùng vẽ/layout, luồng UI không chờ. Chưa có nguồn: không hiện, tab có tooltip là
 //   đường dẫn.
 // - Thả tệp lên dải: DWG, DXF, DWT (như prototype) → openRequested(đường dẫn theo thứ tự thả); tệp khác bị từ chối kèm
-//   toast lỗi nêu tên (ToastHost::instance()).
+//   toast lỗi nêu tên (ToastHost::instance()). Quy tắc lọc và câu từ chối dùng chung với trang Start: readDrop().
 // Màu, cỡ đọc token mỗi lần vẽ, đo. Rảnh không timer: timer chỉ chạy từ lúc rê tới khi ảnh hiện hoặc ẩn. Luồng UI.
 //
 // Dùng (bước integration, sau ThemeManager, IconProvider, RichTooltip, ToastHost; EditionGate tạo trước dải để dải
@@ -51,6 +51,8 @@
 
 #include <chrono>
 #include <functional>
+
+class QMimeData;
 
 namespace trion::ui {
 class Menu;
@@ -102,6 +104,16 @@ public:
     // ponytail: RND-021 (render ngoài màn hình) thay nguồn ảnh; rỗng: không có ảnh khi rê.
     void setThumbnailSource(ThumbnailSource source);
     void setFolderOpener(FolderOpener opener); // test thay hàm giả; rỗng: QDesktopServices::openUrl(thư mục)
+
+    // Tệp thả từ ngoài (dải tab, trang Start): bản vẽ DWG, DXF, DWT theo thứ tự thả; câu từ chối nêu tên các tệp khác
+    // ("TrionCAD mở được tệp DWG, DXF, DWT. “a.pdf” không phải bản vẽ.", rỗng nếu không có). URL web bỏ qua: không có
+    // tệp trên máy thì empty() (không nhận kéo).
+    struct Drop {
+        QStringList drawings;
+        QString rejection;
+        bool empty() const { return drawings.isEmpty() && rejection.isEmpty(); }
+    };
+    static Drop readDrop(const QMimeData& data);
 
     QTabBar* tabBar() const;         // test, trợ năng
     QWidget* thumbnailPopup() const;          // nullptr khi chưa hiện lần nào; ô ảnh là QAbstractButton có icon khi xong

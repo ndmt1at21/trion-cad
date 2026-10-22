@@ -233,7 +233,7 @@ private slots:
         static const QRegularExpression fKey(u"^F([3-9]|1[0-2])$"_s);
         int toggles = 0;
         for (const Action& a : mac.actions()) {
-            if (!a.defaultKeys.filter(fKey).isEmpty()) {
+            if (a.command != u"—"_s && !a.defaultKeys.filter(fKey).isEmpty()) { // toggle; "—" (F6 pane) là điều hướng
                 ++toggles;
                 QVERIFY2(!a.macAlt.isEmpty(), qPrintable(a.id));
             }

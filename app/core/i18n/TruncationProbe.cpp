@@ -27,6 +27,14 @@ struct TabBarAccess : QTabBar {
     static QSize hint(const QTabBar* bar, int i) { return (bar->*&TabBarAccess::tabSizeHint)(i); }
 };
 
+// Không ai thấy dù isVisible(): cha cắt hết hoặc anh em đục che hết (trang tab nền của nhóm dock: Qt dời ra ngoài cửa
+// sổ với cỡ cũ). Vùng cuộn (view, đầu cột) xét viewport: viewport đục phủ khung nên visibleRegion của khung rỗng.
+bool unseen(const QWidget* w)
+{
+    const auto* area = qobject_cast<const QAbstractScrollArea*>(w);
+    return (area ? area->viewport() : w)->visibleRegion().isEmpty();
+}
+
 void add(QList<Truncation>& out, QWidget* w, const QString& text, QSize need, QSize have)
 {
     if (!text.isEmpty() && (need.width() > have.width() || need.height() > have.height()))
@@ -162,7 +170,7 @@ QList<Truncation> findTruncations(QWidget* root)
     for (QWidget* w : std::as_const(all)) {
         if (auto* m = qobject_cast<QMenu*>(w))
             menu(out, m); // menu đóng vẫn đo: sẽ mở ra với đúng cỡ này
-        else if (!w->isVisible())
+        else if (!w->isVisible() || unseen(w))
             continue;
         else if (auto* l = qobject_cast<QLabel*>(w))
             add(out, l, l->text(), l->wordWrap() ? QSize(l->width(), l->heightForWidth(l->width())) : l->sizeHint(),

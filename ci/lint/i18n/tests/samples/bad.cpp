@@ -23,4 +23,5 @@ void Sample::build(int n, const QString& name)
     tip += tr("Xong"); // lỗi (b)
     status->showMessage(tr("Lưu %1").arg(name) % u"…"_s); // lỗi (b)
     tip = QObject::tr("Kích thước") + name; // lỗi (b)
+    frame->setConfirm("Xóa", Button::Kind::Danger); // lỗi (a): DialogFrame::setConfirm
 }

@@ -125,6 +125,14 @@ public:
     // phiên bản hiện tại: không làm gì.
     void setEdition(Edition e);
 
+    // ponytail: trạng thái giấy phép cho giao diện, tạm thay PLF-001 (LicenseManager: số ngày còn): ngày dùng thử còn
+    // lại; ngày còn dùng offline khi lâu chưa xác minh giấy phép (< 0: không cảnh báo). Đổi thì phát statusChanged.
+    // EditionBadge đọc ở đây; TitleBar, StartPage còn setter riêng tới khi chuyển sang đây.
+    int trialDays() const { return trialDays_; }
+    void setTrialDays(int days);
+    int offlineDays() const { return offlineDays_; }
+    void setOfflineDays(int days);
+
     bool has(Capability c) const { return has(edition_, c); }
     static bool has(Edition e, Capability c);
     // Bản thấp nhất có c theo Viewer < Viewer Pro < Pro < Doanh nghiệp (câu "… có trong TrionCAD Pro").
@@ -160,12 +168,15 @@ public:
 signals:
     void editionChanged(trion::edition::Edition edition);
     void profileChanged(trion::edition::UiProfile profile);
+    void statusChanged(); // trialDays hoặc offlineDays đổi
 
 private:
     bool allow(const QString& id); // cổng của ActionRegistry
     void applyLocks();
 
     Edition edition_ = Edition::Viewer;
+    int trialDays_ = 0;
+    int offlineDays_ = -1;
     QPointer<actions::ActionRegistry> registry_;
     UpgradeRouter upgrade_;
 };

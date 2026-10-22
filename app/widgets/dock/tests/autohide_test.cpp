@@ -954,9 +954,8 @@ private slots:
         QCoreApplication::processEvents(); // LanguageChange → tiêu đề, tab của dải; bố cục lại
         QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
         QStringList cut;
-        for (const i18n::Truncation& t : i18n::findTruncations(win_.get()))
-            if (!t.widget->visibleRegion().isEmpty()) // tab nền của nhóm dock: Qt dời ra ngoài cửa sổ
-                cut << t.toString();
+        for (const i18n::Truncation& t : i18n::findTruncations(win_.get())) // bỏ qua tab nền Qt dời ra ngoài cửa sổ
+            cut << t.toString();
         const bool translated = dock("props")->windowTitle() != u"Thuộc tính"_s;
         const QAbstractButton* tab = right()->tab(dock("props"));
         const bool fits = tab->size() == tab->sizeHint(); // dải xếp lại theo chữ dài hơn

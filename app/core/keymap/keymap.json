@@ -39,7 +39,8 @@
     {"id":"coord","group":"Palette, hiển thị","name":"Kiểu hiển thị tọa độ","command":"COORDS","keys":["Ctrl+I"],"scope":"global"},
     {"id":"ntab","group":"Palette, hiển thị","name":"Tab tệp kế / trước","command":"—","keys":["Ctrl+Tab","Ctrl+Shift+Tab"],"scope":"global"},
     {"id":"nlay","group":"Palette, hiển thị","name":"Layout kế / trước","command":"—","keys":["Ctrl+PgDn","Ctrl+PgUp"],"scope":"global"},
-    {"id":"vpnext","group":"Palette, hiển thị","name":"Chuyển viewport kích hoạt","command":"VPNEXT","keys":["Ctrl+R"],"scope":"viewport"}
+    {"id":"vpnext","group":"Palette, hiển thị","name":"Chuyển viewport kích hoạt","command":"VPNEXT","keys":["Ctrl+R"],"scope":"viewport"},
+    {"id":"pane","group":"Palette, hiển thị","name":"Palette kế / trước","command":"—","keys":["F6","Shift+F6"],"scope":"global"}
   ],
   "reserved": {"Ctrl+Alt+Delete":"Windows","Alt+F4":"Windows","Alt+Tab":"Windows","Ctrl+Shift+Esc":"Windows","Ctrl+Space":"bộ gõ (đổi kiểu gõ tiếng Việt)","Ctrl+Shift+3":"macOS (chụp màn hình)","Ctrl+Shift+4":"macOS (chụp màn hình)","Ctrl+H":"macOS (ẩn ứng dụng)","Ctrl+M":"macOS (thu nhỏ cửa sổ)"},
   "macSystem": {"Ctrl+Y":"⇧⌘Z","Ctrl+F4":"⌘W","Ctrl+Tab":"⌃Tab","Ctrl+Shift+Tab":"⌃⇧Tab","Ctrl+PgDn":"⌥⌘→","Ctrl+PgUp":"⌥⌘←","Delete":"⌫","Del":"⌫"},

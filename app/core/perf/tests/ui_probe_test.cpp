@@ -23,6 +23,11 @@
 #include <thread>
 #include <utility>
 
+#if defined(__linux__)
+#include <sched.h>
+#include <time.h>
+#endif
+
 // Đếm cấp phát của cả tiến trình (thay operator new toàn cục) để kiểm "khi tắt không cấp phát". Dưới ASan, TSan
 // không thay (runtime sanitizer tự định nghĩa new/delete, như numfmt_test); preset dev, release, win vẫn kiểm.
 #if defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_THREAD__)
@@ -192,6 +197,26 @@ public:
         spinFor(5ms); // mốc tiến triển kế tiếp chốt độ dài
         const auto all = probe::stalls();
         return std::vector<probe::Stall>(all.begin() + std::ptrdiff_t(before), all.end());
+    }
+};
+
+// Handler chạy `work` trong một sự kiện User (đo đồng hồ thật của nó).
+class BusyTarget : public QObject {
+    Q_OBJECT
+public:
+    std::function<void()> work;
+    Clock::duration took{};
+    bool done = false;
+
+    bool event(QEvent* e) override
+    {
+        if (e->type() != QEvent::User)
+            return QObject::event(e);
+        const auto t0 = Clock::now();
+        work();
+        took = Clock::now() - t0;
+        done = true;
+        return true;
     }
 };
 
@@ -393,12 +418,11 @@ private slots:
         int expected = 0, caught = 0, live = 0;
         for (const Case& c : cases) {
             const auto got = t.run(std::chrono::milliseconds(c.ms), c.zone);
-            // Không báo nhầm: mọi bản ghi là một khoảng ≥ ngưỡng thật (máy tải cao có thể dừng luồng UI quá ngưỡng
-            // cả khi handler ngắn; khi đó báo là đúng).
+            // Không báo nhầm: mọi bản ghi là một khoảng ≥ ngưỡng (không tính lúc luồng UI chờ CPU khi máy tải).
             for (const probe::Stall& s : got)
                 QVERIFY2(s.duration >= 50ms, s.where.c_str());
             const double took = ms(t.took);
-            if (took < 50)
+            if (c.ms < 50) // sleep ngắn: máy tải kéo dài đồng hồ thật bằng thời gian chờ CPU, không thành khựng
                 continue;
             ++expected;
             const auto it = std::find_if(got.begin(), got.end(), [](const probe::Stall& s) {
@@ -407,7 +431,9 @@ private slots:
             QVERIFY2(it != got.end(), got.empty() ? "không có bản ghi" : got.front().where.c_str());
             if (c.zone)
                 QVERIFY2(it->where.find(c.zone) != std::string::npos, it->where.c_str());
-            QVERIFY(it->duration >= t.took);
+            // sleep là chờ, không phải chờ CPU: vẫn tính; mẫu chờ CPU cũ tối đa 1 ms (kWaitSample của UiProbe.cpp)
+            const QString recorded = QString::number(ms(it->duration));
+            QVERIFY2(it->duration + 1ms >= std::chrono::milliseconds(c.ms), qPrintable(recorded));
             if (c.ms >= 300)
                 QVERIFY2(it->live, "luồng watchdog không bắt được lần khựng 300 ms khi đang khựng");
             ++caught;
@@ -420,6 +446,55 @@ private slots:
         qInfo("bắt %d/%d lần khựng ≥ 50 ms, %d lần ngay khi đang khựng", caught, expected, live);
     }
 
+    // Máy tải: luồng UI nằm hàng chờ CPU không tính vào khựng. Handler chạy 30 ms CPU trong khi hai luồng khác giành
+    // cùng một CPU: đồng hồ thật ≥ 50 ms mà không có bản ghi (Linux; nơi khác chưa tách thời gian chờ CPU).
+    void waitingForCpuIsNotStall()
+    {
+#if defined(__linux__)
+        cpu_set_t one, saved;
+        CPU_ZERO(&one);
+        CPU_SET(sched_getcpu(), &one);
+        QCOMPARE(sched_getaffinity(0, sizeof saved, &saved), 0);
+        QCOMPARE(sched_setaffinity(0, sizeof one, &one), 0); // 0: luồng gọi
+        std::atomic<bool> stop{false};
+        std::vector<std::thread> hogs;
+        for (int i = 0; i < 2; ++i)
+            hogs.emplace_back([&] {
+                sched_setaffinity(0, sizeof one, &one);
+                while (!stop.load(std::memory_order_relaxed)) {
+                }
+            });
+        const auto cpuNow = [] {
+            timespec t{};
+            clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
+            return std::chrono::seconds(t.tv_sec) + std::chrono::nanoseconds(t.tv_nsec);
+        };
+        probe::enable();
+        BusyTarget t;
+        t.work = [&] {
+            const auto end = cpuNow() + 30ms;
+            while (cpuNow() < end) {
+            }
+        };
+        const auto before = probe::stalls().size();
+        QCoreApplication::postEvent(&t, new QEvent(QEvent::User));
+        spinUntil([&] { return t.done; });
+        spinFor(5ms);
+        stop = true;
+        for (std::thread& h : hogs)
+            h.join();
+        sched_setaffinity(0, sizeof saved, &saved);
+        const auto all = probe::stalls();
+        const std::vector<probe::Stall> got(all.begin() + std::ptrdiff_t(before), all.end());
+        qInfo("30 ms CPU chia một CPU với 2 luồng: đồng hồ thật %.1f ms, %zu bản ghi", ms(t.took), got.size());
+        QVERIFY2(t.took >= 50ms, "không tạo được tranh chấp CPU"); // không thì ca này không chứng minh gì
+        for (const probe::Stall& s : got)
+            QVERIFY2(s.where.find("BusyTarget") == std::string::npos, s.where.c_str());
+#else
+        QSKIP("thời gian chờ CPU chỉ đọc được trên Linux (/proc/thread-self/schedstat)");
+#endif
+    }
+
     // Ngưỡng đặt được.
     void watchdogThreshold()
     {
@@ -429,7 +504,7 @@ private slots:
         for (const probe::Stall& s : t.run(100ms)) // dưới ngưỡng mới: chỉ được báo nếu luồng UI thật sự dừng ≥ 200 ms
             QVERIFY2(s.duration >= 200ms, s.where.c_str());
         const auto got = t.run(260ms);
-        QVERIFY(!got.empty() && got.back().duration >= 260ms);
+        QVERIFY(!got.empty() && got.back().duration + 1ms >= 260ms); // mẫu chờ CPU cũ tối đa 1 ms
         QCOMPARE(json()["stalls"]["threshold_ms"].toDouble(), 200.0);
     }
 

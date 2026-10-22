@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Sinh keymap.json và ca vàng test từ prototype (UI0-114). Nguồn: design/prototype/js/screens14.js
-// (MACSYS, CMDKEYS, TC.keyLabel, KDEF, RESERVED); đoạn mã đó được chạy nguyên văn, không chép tay.
+// (MACSYS, CMDKEYS, TC.keyLabel, KDEF, RESERVED); đoạn mã đó được chạy nguyên văn, không chép tay. Thêm EXTRA dưới đây:
+// hành động của khung chưa có dòng KDEF trong prototype, nối sau KDEF (cùng dạng dòng).
 //   node app/core/keymap/keymap_gen.mjs          ghi lại keymap.json, keymap_strings.cpp, tests/golden.json
 //   node app/core/keymap/keymap_gen.mjs --check  so từng dòng KDEF, từng trường với tệp trong kho (ctest)
 import fs from 'node:fs';
@@ -13,10 +14,13 @@ const begin = src.indexOf('var MACSYS'), end = src.indexOf('\n', src.indexOf('va
 if (begin < 0 || end < begin) throw new Error('screens14.js: không thấy đoạn MACSYS … RESERVED');
 const TC = { S: { platform: 'mac' } }; // TC giả: keyLabel chỉ cần nền tảng
 const P = new Function('TC', src.slice(begin, end) + '\nreturn { MACSYS, CMDKEYS, KDEF, RESERVED };')(TC);
+// Không phải lệnh ("—"); tổ hợp có Shift là chiều lùi. pane: F6 qua các palette đang hiện rồi về vùng vẽ (PaletteHost).
+const EXTRA = [['pane', 'Palette, hiển thị', 'Palette kế / trước', '—', 'F6 · Shift+F6', 'Toàn cục']];
+const KDEF = [...P.KDEF, ...EXTRA];
 
 // KDEF [id, nhóm, tên, lệnh, phím " · ", phạm vi, phím thay thế macOS] → bản ghi; lệnh "—" giữ nguyên.
 const SCOPE = { 'Toàn cục': 'global', 'Vùng vẽ': 'viewport' };
-const actions = P.KDEF.map(([id, group, name, command, keys, scope, macAlt, ...rest]) => {
+const actions = KDEF.map(([id, group, name, command, keys, scope, macAlt, ...rest]) => {
   if (!SCOPE[scope] || rest.length) throw new Error(`KDEF ${id}: phạm vi "${scope}" hoặc số trường lạ`);
   const keyList = keys.split(' · ');
   return { id, group, name, command, keys: keyList, scope: SCOPE[scope], ...(macAlt ? { macAlt } : {}) };
@@ -28,10 +32,10 @@ const MODS = ['', 'Ctrl+', 'Alt+', 'Shift+', 'Ctrl+Alt+', 'Ctrl+Shift+', 'Alt+Sh
 const KEYS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', ...Array.from({ length: 12 }, (_, i) => `F${i + 1}`),
   'Delete', 'Del', 'Tab', 'Space', 'Esc', 'PgUp', 'PgDn', '?'];
 const inputs = new Set(['', 'Shift+Ctrl+S', 'Alt+Ctrl+Delete', 'Ctrl+S · Ctrl+L']);
-P.KDEF.forEach(k => [k[4], ...k[4].split(' · ')].forEach(c => inputs.add(c)));
+KDEF.forEach(k => [k[4], ...k[4].split(' · ')].forEach(c => inputs.add(c)));
 [...Object.keys(P.RESERVED), ...Object.keys(P.MACSYS)].forEach(c => inputs.add(c));
 MODS.forEach(m => KEYS.forEach(k => inputs.add(m + k)));
-const golden = { kdef: P.KDEF, keyLabelMac: [...inputs].map(s => [s, TC.keyLabel(s)]) };
+const golden = { kdef: KDEF, keyLabelMac: [...inputs].map(s => [s, TC.keyLabel(s)]) };
 
 // Mỗi dòng một bản ghi cho dễ đọc diff.
 const rows = list => '[\n' + list.map(r => '    ' + JSON.stringify(r)).join(',\n') + '\n  ]';
@@ -76,5 +80,5 @@ if (errs.length) {
   console.error(errs.join('\n') + '\n→ chạy lại: node app/core/keymap/keymap_gen.mjs');
   process.exit(1);
 }
-console.log(`keymap: ${actions.length}/${P.KDEF.length} dòng KDEF khớp từng trường; ` +
+console.log(`keymap: ${actions.length}/${KDEF.length} dòng KDEF (gồm ${EXTRA.length} EXTRA) khớp từng trường; ` +
   `${golden.keyLabelMac.length} ca vàng keyLabel còn mới`);

@@ -39,7 +39,8 @@
     ["coord","Palette, hiển thị","Kiểu hiển thị tọa độ","COORDS","Ctrl+I","Toàn cục"],
     ["ntab","Palette, hiển thị","Tab tệp kế / trước","—","Ctrl+Tab · Ctrl+Shift+Tab","Toàn cục"],
     ["nlay","Palette, hiển thị","Layout kế / trước","—","Ctrl+PgDn · Ctrl+PgUp","Toàn cục"],
-    ["vpnext","Palette, hiển thị","Chuyển viewport kích hoạt","VPNEXT","Ctrl+R","Vùng vẽ"]
+    ["vpnext","Palette, hiển thị","Chuyển viewport kích hoạt","VPNEXT","Ctrl+R","Vùng vẽ"],
+    ["pane","Palette, hiển thị","Palette kế / trước","—","F6 · Shift+F6","Toàn cục"]
   ],
   "keyLabelMac": [
     ["",""],
@@ -100,6 +101,9 @@
     ["Ctrl+PgDn","⌥⌘→"],
     ["Ctrl+PgUp","⌥⌘←"],
     ["Ctrl+R","⌃R"],
+    ["F6 · Shift+F6","F6 · ⇧F6"],
+    ["F6","F6"],
+    ["Shift+F6","⇧F6"],
     ["Ctrl+Alt+Delete","⌃⌥Delete"],
     ["Alt+F4","⌥F4"],
     ["Alt+Tab","⌥Tab"],
@@ -147,7 +151,6 @@
     ["8","8"],
     ["9","9"],
     ["F4","F4"],
-    ["F6","F6"],
     ["Tab","Tab"],
     ["Space","Space"],
     ["Esc","Esc"],
@@ -272,7 +275,6 @@
     ["Shift+F3","⇧F3"],
     ["Shift+F4","⇧F4"],
     ["Shift+F5","⇧F5"],
-    ["Shift+F6","⇧F6"],
     ["Shift+F7","⇧F7"],
     ["Shift+F8","⇧F8"],
     ["Shift+F9","⇧F9"],

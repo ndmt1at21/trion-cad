@@ -2323,6 +2323,10 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
         <translation>Switch active viewport</translation>
     </message>
     <message>
+        <source>Palette kế / trước</source>
+        <translation>Next / previous palette</translation>
+    </message>
+    <message>
         <source>Windows</source>
         <translation>Windows</translation>
     </message>
@@ -3515,6 +3519,43 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::edition::EditionBadge</name>
+    <message>
+        <source>Viewer</source>
+        <translation>Viewer</translation>
+    </message>
+    <message>
+        <source>Viewer Pro</source>
+        <translation>Viewer Pro</translation>
+    </message>
+    <message>
+        <source>Pro</source>
+        <translation>Pro</translation>
+    </message>
+    <message numerus="yes">
+        <source>Dùng thử: còn %n ngày</source>
+        <translation>
+            <numerusform>Trial: %n day left</numerusform>
+            <numerusform>Trial: %n days left</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Giáo dục</source>
+        <translation>Education</translation>
+    </message>
+    <message>
+        <source>Doanh nghiệp</source>
+        <translation>Enterprise</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · còn %n ngày offline</source>
+        <translation>
+            <numerusform>%1 · %n offline day left</numerusform>
+            <numerusform>%1 · %n offline days left</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::edition::EditionGate</name>
     <message>
         <source>Có trong TrionCAD %1</source>
@@ -4102,13 +4143,6 @@ TCVN</source>
 </context>
 <context>
     <name>trion::shell::StartPage</name>
-    <message numerus="yes">
-        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
-        <translation>
-            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 is not a drawing.</numerusform>
-            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 are not drawings.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>TCVN A3 ngang</source>
         <translation>TCVN A3 landscape</translation>
@@ -4965,6 +4999,10 @@ TCVN</source>
             <numerusform>%1 · %n other task</numerusform>
             <numerusform>%1 · %n other tasks</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>%1 · đang hủy…</source>
+        <translation>%1 · cancelling…</translation>
     </message>
     <message>
         <source>Hủy</source>

@@ -11,14 +11,15 @@
 //   chuột 1.000 Hz không thêm lần vẽ. Ô chỉ nới rộng (không nhảy theo từng điểm), đặt lại khi đổi đơn vị.
 // - MODEL/PAPER: trong layout bấm chuyển Paper ↔ Model trong viewport (^C^C_MSPACE / ^C^C_PSPACE); tab Model: vô hiệu.
 // - Nút chế độ: ModeToggles (UIA-112), macroRequested của nó đi ra macroRequested của thanh.
-// - Tác vụ nền (NT-013 qua ProgressPresenter, UI0-112): tác vụ chính là InlineProgress (thanh %, nút Hủy, "· N tác vụ
-//   khác"); nút Tác vụ nền mở danh sách mọi việc đang hiện tiến trình, mỗi dòng có nút hủy, rỗng thì có câu giải thích.
+// - Tác vụ nền (NT-013 qua ProgressPresenter, UI0-112): tác vụ chính là InlineProgress kiểu gọn (vòng quay, nhãn
+//   "· N tác vụ khác", thanh 80×4, nút ×); nút Tác vụ nền mở danh sách mọi việc đang hiện tiến trình, mỗi dòng có nút
+//   hủy, rỗng thì có câu giải thích.
 // - Bác sĩ Font: chỉ hiện khi có font thay thế hoặc đối tượng TCVN3; rê: "3 font đã thay thế · 250 đối tượng TCVN3";
 //   bấm: FIXFONT (UI-J02). Đồ họa: rê: backend · GPU, FPS đọc lúc rê; bấm: GRAPHICSCONFIG (UI-L10). Clean Screen:
 //   CLEANSCREENON (Ctrl+0, UIA-001). Lệnh đi qua QAction của ActionRegistry (cổng phiên bản, sink), không tự chạy.
 // - Chuông: chấm khi NotificationCenter còn thông báo chưa đọc (số chưa đọc ở mô tả tiếp cận); bấm: screenRequested
-//   ("notifications", UI-L14). Huy hiệu phiên bản như thanh tiêu đề (dùng thử còn N ngày, cảnh báo offline); bấm:
-//   screenRequested("license", UI-L03).
+//   ("notifications", UI-L14). Huy hiệu phiên bản edition::EditionBadge theo EditionGate (phiên bản, dùng thử còn N
+//   ngày, cảnh báo offline: EditionGate::setTrialDays/setOfflineDays); bấm: screenRequested("license", UI-L03).
 // - Tùy biến (≡): chọn mục hiện, lưu Store "ui/statusbar/hidden"; menu mở tiếp để đổi nhiều mục liền.
 // - Thiếu chỗ (1366 px, vi-XL, mật độ thoáng): mục ưu tiên thấp vào menu tràn (») trước; không mục nào bị nén dưới cỡ
 //   của nó nên không cắt chữ. Viewer: nút chế độ theo ModeToggles; Tùy biến, menu tràn chỉ có mục của hồ sơ.
@@ -94,9 +95,6 @@ public:
     void setGraphicsSource(std::function<GraphicsInfo()> source);
     // ponytail: VN-004 (vn::scanEncodings) đặt sau khi quét bản vẽ đang mở; 0, 0: ẩn chỉ báo.
     void setFontIssues(int substitutedFonts, int legacyObjects);
-    // ponytail: như TitleBar, tạm thay PLF-002: ngày dùng thử còn lại; ngày còn dùng offline (< 0: không cảnh báo).
-    void setTrialDays(int days);
-    void setOfflineDays(int days);
 
     // Chữ ô tọa độ: "x, y, z", "khoảng cách<góc, z" hoặc "Tọa độ tắt" (đã dịch); coords là giá trị COORDS.
     static QString coordText(QPointF point, std::optional<QPointF> base, int coords, const regen::UnitContext& units);
@@ -150,7 +148,6 @@ private:
     QStringList hidden_;      // khóa Tùy biến đang ẩn
     Space space_ = Space::Model;
     int fontSubstituted_ = 0, fontLegacy_ = 0;
-    int trialDays_ = 0, offlineDays_ = -1;
     std::function<GraphicsInfo()> graphics_;
 
     std::array<int, 2> seps_{-1, -1}; // x của hai vạch .sb-sep quanh dải nút chế độ; -1: không vẽ

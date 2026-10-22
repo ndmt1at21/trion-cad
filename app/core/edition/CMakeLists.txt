@@ -1,7 +1,8 @@
 # app/core/edition (UI0-011): cổng phiên bản trong UI — EditionGate (phiên bản, bảng khả năng 07.1 §2, UiProfile,
-# khóa QAction của ActionRegistry), UpgradeRouter (trang nâng cấp UI-L04 hoặc trang web), LockBadge (huy hiệu khóa).
+# khóa QAction của ActionRegistry), UpgradeRouter (trang nâng cấp UI-L04 hoặc trang web), LockBadge (huy hiệu khóa),
+# EditionBadge (huy hiệu phiên bản: dùng thử còn N ngày, cảnh báo offline).
 trion_add_library(trion_edition
-  SOURCES EditionGate.h EditionGate.cpp LockBadge.h LockBadge.cpp
+  SOURCES EditionGate.h EditionGate.cpp LockBadge.h LockBadge.cpp EditionBadge.h EditionBadge.cpp
   LIBS trion_actions trion_tooltip trion_fonts trion_theme Qt6::Widgets)
 
 trion_add_test(edition_test SOURCES tests/edition_test.cpp

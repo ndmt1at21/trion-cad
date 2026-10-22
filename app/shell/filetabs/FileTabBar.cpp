@@ -943,43 +943,41 @@ void FileTabBar::thumbnailReady(quint64 id, const QString& layout, QSize size, Q
 
 // ------------------------------------------------------------------------------------------------- thả tệp
 
-namespace {
-
-bool drawing(const QString& path)
+FileTabBar::Drop FileTabBar::readDrop(const QMimeData& data)
 {
-    const QString suffix = QFileInfo(path).suffix();
-    return suffix.compare(u"dwg"_s, Qt::CaseInsensitive) == 0 || suffix.compare(u"dxf"_s, Qt::CaseInsensitive) == 0
-           || suffix.compare(u"dwt"_s, Qt::CaseInsensitive) == 0;
+    Drop d;
+    QStringList rejected;
+    for (const QUrl& url : data.urls())
+        if (url.isLocalFile()) {
+            const QString path = url.toLocalFile();
+            const QString suffix = QFileInfo(path).suffix();
+            if (suffix.compare(u"dwg"_s, Qt::CaseInsensitive) == 0 || suffix.compare(u"dxf"_s, Qt::CaseInsensitive) == 0
+                || suffix.compare(u"dwt"_s, Qt::CaseInsensitive) == 0)
+                d.drawings << path;
+            else
+                rejected << u"“%1”"_s.arg(QFileInfo(path).fileName());
+        }
+    if (!rejected.isEmpty())
+        d.rejection = tr("TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.", nullptr, int(rejected.size()))
+                          .arg(rejected.join(u", "_s));
+    return d;
 }
-
-} // namespace
 
 void FileTabBar::dragEnterEvent(QDragEnterEvent* e)
 {
     // Nhận mọi tệp trên máy để thả được rồi báo tệp sai định dạng (prototype); URL web thì không nhận.
-    const QList<QUrl> urls = e->mimeData()->urls();
-    if (std::any_of(urls.begin(), urls.end(), [](const QUrl& u) { return u.isLocalFile(); }))
+    if (!readDrop(*e->mimeData()).empty())
         e->acceptProposedAction();
 }
 
 void FileTabBar::dropEvent(QDropEvent* e)
 {
-    QStringList open, rejected;
-    for (const QUrl& url : e->mimeData()->urls())
-        if (url.isLocalFile()) {
-            const QString path = url.toLocalFile();
-            if (drawing(path))
-                open << path;
-            else
-                rejected << u"“%1”"_s.arg(QFileInfo(path).fileName());
-        }
+    const Drop d = readDrop(*e->mimeData());
     e->acceptProposedAction();
-    if (!open.isEmpty())
-        emit openRequested(open);
-    if (!rejected.isEmpty())
-        toast(Severity::Error, tr("TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.", nullptr,
-                                  int(rejected.size()))
-                                   .arg(rejected.join(u", "_s)));
+    if (!d.drawings.isEmpty())
+        emit openRequested(d.drawings);
+    if (!d.rejection.isEmpty())
+        toast(Severity::Error, d.rejection);
 }
 
 } // namespace trion::shell

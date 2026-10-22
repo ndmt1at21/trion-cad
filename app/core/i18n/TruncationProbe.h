@@ -7,9 +7,10 @@
 //   for (const Truncation& t : findTruncations(window))
 //       qWarning("%s", qUtf8Printable(t.toString()));
 //
-// Quét root và mọi widget con đang hiện: QLabel; nút (QPushButton, QCheckBox, QRadioButton, QToolButton có hiện
-// chữ); tab của QTabBar; đầu cột/dòng của QHeaderView; ô đang trong vùng nhìn của view (bảng, cây, danh sách);
-// QMenu con của root (cả menu đang đóng: so với bề rộng tối đa của menu và màn hình). Bị cắt = cỡ cần để hiện đủ
+// Quét root và mọi widget con đang hiện và thấy được (visibleRegion không rỗng; vùng cuộn: của viewport; trang tab nền
+// Qt dời ra ngoài cửa sổ thì bỏ): QLabel; nút (QPushButton, QCheckBox, QRadioButton, QToolButton có hiện chữ); tab của
+// QTabBar; đầu cột/dòng của QHeaderView; ô đang trong vùng nhìn của view (bảng, cây, danh sách); QMenu con của root
+// (cả menu đang đóng: so với bề rộng tối đa của menu và màn hình). Bị cắt = cỡ cần để hiện đủ
 // chữ, tính bằng chính style đang dùng, lớn hơn cỡ đang có theo chiều ngang hoặc dọc (chữ đã rút gọn "…" cũng
 // tính). Chỉ đọc. root phải đang hiện và đã bố cục xong.
 //

@@ -12,8 +12,9 @@
 //   3  lazy: không palette nào dựng trước lần hiện đầu, kể cả tab nền của nhóm; firstFrame: UiProbe palette_open
 //      ≤ 150 ms (chỉ kiểm ở release).
 //   4  focusKeys: F6 / Shift+F6 vòng qua palette đang hiện và vùng vẽ; Esc về vùng vẽ (cả từ palette nổi); Esc của ô
-//      tìm còn chữ là của ô; accessibleNames: tên trình đọc màn hình của palette (tiêu đề) và nút đầu palette, đổi
-//      theo trạng thái ghim và ngôn ngữ. groupAccessibility: a11y::audit của cửa sổ mẫu 0 vi phạm (dải tab của
+//      tìm còn chữ là của ô; focusKeysFromKeymap: phím theo hành động "pane" của Keymap; accessibleNames: tên
+//      trình đọc màn hình của palette (tiêu đề) và nút đầu palette, đổi theo trạng thái ghim và ngôn ngữ.
+//      groupAccessibility: a11y::audit của cửa sổ mẫu 0 vi phạm (dải tab của
 //      nhóm có viền --c-focus khi Tab tới); palette ở tab nền và dải tab bị Qt cất không nhận Tab (đổi tab, đóng,
 //      mở, nhóm nổi).
 //   5  header: ảnh baseline đầu palette Tối/Sáng × 100/150/200% theo nền tảng, màu token ở chỗ không có chữ, cỡ theo
@@ -26,6 +27,7 @@
 #include "app/core/a11y/AccessibilityAudit.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
+#include "app/core/keymap/Keymap.h"
 #include "app/core/perf/UiProbe.h"
 #include "app/core/UiExecutor.h"
 #include "app/theme/fonts/FontRegistry.h"
@@ -65,6 +67,7 @@ using namespace std::chrono_literals;
 using namespace trion::theme;
 using namespace trion::ui;
 namespace i18n = trion::i18n;
+namespace keymap = trion::keymap;
 namespace sched = trion::sched;
 namespace settings = trion::settings;
 
@@ -634,6 +637,35 @@ private slots:
         QVERIFY(win_->isActiveWindow());
     }
 
+    // Tiêu chí 4, phím theo bảng phím một nguồn: hành động "pane" của Keymap (F6, Shift+F6); phím người dùng gán chạy,
+    // phím đã bỏ thôi chạy.
+    void focusKeysFromKeymap()
+    {
+        QVERIFY(build());
+        settings::Store keys(dir_.filePath(u"keys.json"_s));
+        keymap::Keymap km(keys, keymap::Platform::Windows);
+        host_->setKeymap(km);
+        canvas_->setFocus();
+        QTRY_VERIFY(canvas_->hasFocus());
+        const auto key = [](Qt::Key k, Qt::KeyboardModifiers m = Qt::NoModifier) {
+            QTest::keyClick(QApplication::focusWidget(), k, m);
+        };
+        key(Qt::Key_F6);
+        QTRY_VERIFY(focusIn("props"));
+        key(Qt::Key_Escape);
+        QTRY_VERIFY(canvas_->hasFocus());
+
+        QVERIFY(!km.assign(u"pane"_s, u"Ctrl+F6"_s));
+        km.unassign(u"pane"_s, u"F6"_s);
+        key(Qt::Key_F6);
+        QCoreApplication::processEvents();
+        QVERIFY(canvas_->hasFocus()); // F6 không còn trong bảng
+        key(Qt::Key_F6, Qt::ControlModifier);
+        QTRY_VERIFY(focusIn("props"));
+        key(Qt::Key_F6, Qt::ShiftModifier); // tổ hợp có Shift: lùi, trước palette đầu là vùng vẽ
+        QTRY_VERIFY(canvas_->hasFocus());
+    }
+
     void accessibleNames()
     {
         QVERIFY(build());
@@ -821,13 +853,12 @@ private slots:
         QVERIFY(translator_->setLanguage(i18n::kPseudoLanguage.toString()));
         QStringList cut;
         // Quét với mỗi tab của nhóm ở trên. Tab nền Qt dời ra ngoài cửa sổ với cỡ cũ (chưa từng bố cục thì 100×30):
-        // không ai thấy, bỏ qua (findTruncations quét mọi widget isVisible()).
+        // không ai thấy, findTruncations bỏ qua.
         const auto scan = [&] {
             QCoreApplication::processEvents(); // LanguageChange → tiêu đề, tên nút; bố cục lại
             QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
             for (const i18n::Truncation& t : i18n::findTruncations(win_.get()))
-                if (!t.widget->visibleRegion().isEmpty())
-                    cut << t.toString();
+                cut << t.toString();
         };
         scan();
         QTabBar* bar = groupBar();

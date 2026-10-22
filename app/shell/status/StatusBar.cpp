@@ -1,6 +1,7 @@
 #include "app/shell/status/StatusBar.h"
 
 #include "app/core/actions/ActionRegistry.h"
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/UiFormat.h"
 #include "app/shell/status/ModeToggles.h"
@@ -18,7 +19,6 @@
 
 #include <QAction>
 #include <QBoxLayout>
-#include <QCoreApplication>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QLabel>
@@ -38,7 +38,6 @@ namespace trion::shell {
 
 namespace {
 
-using edition::Edition;
 using theme::TextRole;
 using theme::Weight;
 using Clock = std::chrono::steady_clock;
@@ -109,9 +108,10 @@ struct StatusBar::Item {
     int width = 0;         // relayout: sizeHint, đo một lần mỗi lượt
 };
 
-// Nút chữ: .sb-txt (MODEL/PAPER), .sb-chip.warn (Bác sĩ Font), .ed (huy hiệu phiên bản), .sb-coord (CoordButton). Cao
-// --h-btn; rê --c-hover, nhấn --c-press (chip: viền trong --c-border-ctl; huy hiệu: như prototype, không đổi nền); focus
-// bàn phím: viền --c-focus. Enter như Space; menu (con của nút): chuột phải, phím Menu, Shift+F10.
+// Nút chữ: .sb-txt (MODEL/PAPER), .sb-chip.warn (Bác sĩ Font), .sb-edb (huy hiệu phiên bản EditionBadge), .sb-coord
+// (CoordButton). Cao --h-btn; rê --c-hover, nhấn --c-press (chip: viền trong --c-border-ctl; huy hiệu: như prototype,
+// không đổi nền); focus bàn phím: viền --c-focus. Enter như Space; menu (con của nút): chuột phải, phím Menu,
+// Shift+F10.
 class StatusBar::TextButton : public QToolButton {
 public:
     enum class Look : std::uint8_t { Coord, Space, Chip, Edition };
@@ -123,7 +123,7 @@ public:
     }
 
     ui::Menu* menu = nullptr;
-    tok::ColorId bg = tok::c_ed_pro, fg = tok::c_ed_pro_t; // .ed theo phiên bản
+    const edition::EditionGate* gate = nullptr; // Look::Edition: huy hiệu theo cổng
 
     virtual QString label() const { return text(); }
 
@@ -132,11 +132,11 @@ public:
 
     int widthFor(const QString& s) const
     {
+        if (look_ == Look::Edition)
+            return edition::EditionBadge::sizeFor(*gate).width() + 2 * px(tok::sp_2); // .sb .ed margin 0 4px
         int w = QFontMetrics(textFont()).horizontalAdvance(s) + 2 * pad();
         if (look_ == Look::Chip)
             w += px(tok::ic) + px(tok::sp_2); // biểu tượng warn, gap
-        if (look_ == Look::Edition)
-            w += 2 * px(tok::sp_2); // .sb .ed margin 0 4px
         return w;
     }
 
@@ -174,13 +174,12 @@ protected:
                 ui::paint::drawBox(p, face.adjusted(0.5, 0.5, -0.5, -0.5), QColor(), tm().color(tok::c_border_ctl));
             ink = tok::c_warn;
             break;
-        case Look::Edition: {
-            const qreal h = QFontMetrics(textFont()).height() + 2 * tm().px(tok::sp_1);
-            face = QRectF(px(tok::sp_2), (height() - h) / 2, width() - 2 * px(tok::sp_2), h);
-            p.setBrush(tm().color(bg));
-            p.drawRoundedRect(face, r, r);
-            ink = fg;
-            break;
+        case Look::Edition: { // huy hiệu vẽ như EditionBadge; nút chỉ thêm viền focus
+            const QSizeF s = edition::EditionBadge::sizeFor(*gate);
+            edition::EditionBadge::paint(p, QRectF(QPointF(px(tok::sp_2), (height() - s.height()) / 2), s), *gate);
+            if (ui::paint::focusVisible(this))
+                ui::paint::drawRing(p, rect(), tm().color(tok::c_focus));
+            return;
         }
         case Look::Coord:
         case Look::Space:
@@ -386,7 +385,8 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
     : QWidget(parent), actions_(actions), sysvars_(sysvars), gate_(gate), progress_(progress), notes_(notes),
       store_(store), hidden_(store.get(kHidden)), coord_(new CoordButton(this)),
       spaceButton_(new TextButton(TextButton::Look::Space, this)), modes_(new ModeToggles(actions, sysvars, this)),
-      taskBox_(new QWidget(this)), task_(new ui::InlineProgress(progress, 0, taskBox_)),
+      taskBox_(new QWidget(this)),
+      task_(new ui::InlineProgress(progress, 0, taskBox_, ui::InlineProgress::Style::Compact)),
       font_(new TextButton(TextButton::Look::Chip, this)), gpu_(new StatusButton(this)), tasks_(new StatusButton(this)),
       bell_(new StatusButton(this)), edition_(new TextButton(TextButton::Look::Edition, this)),
       clean_(new StatusButton(this)), overflow_(new StatusButton(this)), custom_(new StatusButton(this)),
@@ -395,6 +395,7 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
       licenseAction_(new QAction(this))
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    edition_->gate = &gate;
     auto* box = new QHBoxLayout(taskBox_);
     box->setContentsMargins({});
     box->addWidget(task_);
@@ -515,6 +516,7 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
     connect(&progress_, &ui::ProgressPresenter::changed, this, &StatusBar::relayout);
     connect(&notes_, &ui::NotificationCenter::unreadChanged, this, &StatusBar::retranslate);
     connect(&gate_, &edition::EditionGate::editionChanged, this, &StatusBar::syncEdition);
+    connect(&gate_, &edition::EditionGate::statusChanged, this, &StatusBar::syncEdition);
     connect(&gate_, &edition::EditionGate::profileChanged, this, &StatusBar::applyProfile);
     connect(&theme::ThemeManager::instance(), &theme::ThemeManager::changed, this, [this] {
         for (StatusButton* b : {gpu_, tasks_, bell_, clean_, overflow_, custom_})
@@ -631,61 +633,9 @@ void StatusBar::setFontIssues(int substitutedFonts, int legacyObjects)
     retranslate();
 }
 
-void StatusBar::setTrialDays(int days)
-{
-    trialDays_ = days;
-    syncEdition();
-}
-
-void StatusBar::setOfflineDays(int days)
-{
-    offlineDays_ = days;
-    syncEdition();
-}
-
 void StatusBar::syncEdition()
 {
-    // Như huy hiệu của thanh tiêu đề (edBadge của prototype); chữ dùng chung bản dịch của TitleBar.
-    // ponytail: hai nơi tính huy hiệu; gộp thành một widget ở app/core/edition khi có PLF-002 (đề nghị UIA-009).
-    QString badge;
-    edition_->bg = tok::c_ed_pro;
-    edition_->fg = tok::c_ed_pro_t;
-    switch (gate_.edition()) {
-    case Edition::Viewer:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Viewer");
-        edition_->bg = tok::c_ed_viewer;
-        edition_->fg = tok::c_ed_viewer_t;
-        break;
-    case Edition::ViewerPro:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Viewer Pro");
-        edition_->bg = tok::c_ed_vp;
-        edition_->fg = tok::c_ed_vp_t;
-        break;
-    case Edition::Pro:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Pro");
-        break;
-    case Edition::Trial:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Dùng thử: còn %n ngày", nullptr, trialDays_);
-        edition_->bg = tok::c_ed_trial;
-        edition_->fg = tok::c_ed_trial_t;
-        break;
-    case Edition::Education:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Giáo dục");
-        edition_->bg = tok::c_ed_edu;
-        edition_->fg = tok::c_ed_edu_t;
-        break;
-    case Edition::Enterprise:
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "Doanh nghiệp");
-        edition_->bg = tok::c_ed_ent;
-        edition_->fg = tok::c_ed_ent_t;
-        break;
-    }
-    if (offlineDays_ >= 0 && gate_.edition() != Edition::Viewer) { // .ed.warn: lâu chưa xác minh giấy phép
-        badge = QCoreApplication::translate("trion::shell::TitleBar", "%1 · còn %n ngày offline", nullptr, offlineDays_).arg(badge);
-        edition_->bg = tok::c_warn_soft;
-        edition_->fg = tok::c_warn;
-    }
-    edition_->setText(badge);
+    edition_->setText(edition::EditionBadge::label(gate_)); // tên tiếp cận, bề rộng (đổi chữ: updateGeometry)
     edition_->update();
 }
 

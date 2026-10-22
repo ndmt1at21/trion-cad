@@ -48,6 +48,7 @@
     QT_TRANSLATE_NOOP("keymap", "Tab tệp kế / trước"),
     QT_TRANSLATE_NOOP("keymap", "Layout kế / trước"),
     QT_TRANSLATE_NOOP("keymap", "Chuyển viewport kích hoạt"),
+    QT_TRANSLATE_NOOP("keymap", "Palette kế / trước"),
     QT_TRANSLATE_NOOP("keymap", "Windows"),
     QT_TRANSLATE_NOOP("keymap", "bộ gõ (đổi kiểu gõ tiếng Việt)"),
     QT_TRANSLATE_NOOP("keymap", "macOS (chụp màn hình)"),

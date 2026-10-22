@@ -3,7 +3,7 @@
 # UI0-010: AutoHideStrip — dải tự ẩn 22 px và khung trượt; bố cục mặc định theo lớp màn hình, đổi DPI (trion_display).
 trion_add_library(trion_dock
   SOURCES PaletteHost.h PaletteHost.cpp PaletteHeader.h PaletteHeader.cpp AutoHideStrip.h AutoHideStrip.cpp
-  LIBS trion_controls trion_display trion_perf trion_theme trion_base Qt6::Widgets)
+  LIBS trion_controls trion_display trion_keymap trion_perf trion_theme trion_base Qt6::Widgets)
 
 trion_add_test(dock_test SOURCES tests/dock_test.cpp LIBS trion_dock trion_a11y trion_fonts trion_i18n LABELS dock)
 # Ảnh baseline theo nền tảng × chủ đề × DPR, nhúng vào test để bản Windows đọc được; ghi lại:

@@ -568,8 +568,15 @@ private slots:
         main.show();
         QVERIFY(QTest::qWaitForWindowExposed(&main));
         QVERIFY(moveTo(main, "p100"));
+        QCOMPARE(DisplayContext::find(), nullptr); // chưa có: không dừng
+        {
+            DisplayContext first(&main);
+            QCOMPARE(DisplayContext::find(), &first);
+        }
+        QCOMPARE(DisplayContext::find(), nullptr); // hủy: không còn trỏ tới
         DisplayContext display(&main);
         QCOMPARE(&DisplayContext::instance(), &display);
+        QCOMPARE(DisplayContext::find(), &display);
         QCOMPARE(display.screenClass(), ScreenClass::Wide);
         QSignalSpy spy(&display, &DisplayContext::screenClassChanged);
         const std::pair<const char*, ScreenClass> steps[] = {

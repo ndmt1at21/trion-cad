@@ -9,6 +9,7 @@
 //      viewerProfile: hồ sơ Viewer — "+" mở bản vẽ, ổ khóa, mục Pro mở trang nâng cấp thay vì phát lệnh.
 //   3  fiftyTabs: ▾ liệt kê đủ 50 bản vẽ (và Start); tab đang mở luôn hiện; chuyển tab ≤ 100 ms tới khung kế (release).
 //   4  dropFiles: thả 5 tệp DWG/DXF → openRequested đúng thứ tự; .pdf/.txt bị từ chối kèm toast lỗi nêu tên.
+//      readDrop: quy tắc lọc và câu từ chối dùng chung với trang Start.
 //   Còn lại: sessionHooks (chỗ nối DOC-018), dragReorder, keyboard (Tab đi qua, ←→, Shift+F10/phím Menu, next/previous,
 //   tên trợ năng), idle (rảnh không timer), pseudoNoTruncation (vi-XL, gọn và thoáng), baseline (Tối/Sáng 100% so
 //   baseline theo nền tảng; ghi lại: TRION_UPDATE_BASELINE=<thư mục>).
@@ -736,6 +737,33 @@ private slots:
         QCOMPARE(center_->rowCount(), notes + 2);
         QVERIFY(!drop({QUrl(u"https://trioncad.vn/mau.dwg"_s)})); // URL web: không nhận
         QCOMPARE(open.count(), 2);
+    }
+
+    // Quy tắc thả dùng chung (dải tab, trang Start): DWG, DXF, DWT không phân biệt hoa thường, theo thứ tự thả; câu từ
+    // chối nêu tên, số ít/số nhiều; URL web bỏ qua.
+    void readDrop()
+    {
+        const auto read = [](const QList<QUrl>& urls) {
+            QMimeData mime;
+            mime.setUrls(urls);
+            return FileTabBar::readDrop(mime);
+        };
+        const QString a = dir_.filePath(u"Mau.DWT"_s), b = dir_.filePath(u"Nha.dwg"_s), c = dir_.filePath(u"Ket.Dxf"_s);
+        FileTabBar::Drop d = read({QUrl::fromLocalFile(a), QUrl::fromLocalFile(dir_.filePath(u"Bao-gia.pdf"_s)),
+                                   QUrl::fromLocalFile(b), QUrl(u"https://trioncad.vn/mau.dwg"_s),
+                                   QUrl::fromLocalFile(c)});
+        QCOMPARE(d.drawings, (QStringList{a, b, c}));
+        QCOMPARE(d.rejection, FileTabBar::tr("TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.", nullptr, 1)
+                                  .arg(u"“Bao-gia.pdf”"_s));
+        QVERIFY(!d.empty());
+
+        d = read({QUrl::fromLocalFile(dir_.filePath(u"anh.png"_s)), QUrl::fromLocalFile(dir_.filePath(u"dwg"_s))});
+        QVERIFY(d.drawings.isEmpty()); // "dwg" không có đuôi: không phải bản vẽ
+        QCOMPARE(d.rejection, FileTabBar::tr("TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.", nullptr, 2)
+                                  .arg(u"“anh.png”, “dwg”"_s));
+
+        QVERIFY(read({QUrl(u"https://trioncad.vn/mau.dwg"_s)}).empty()); // không có tệp trên máy: không nhận kéo
+        QVERIFY(read({}).empty());
     }
 
     // Kéo tab bản vẽ đổi chỗ (moved); Start đứng yên ở đầu.

@@ -21,9 +21,11 @@
 //  - Các loại còn lại do nơi sở hữu đo: Scope (đồng bộ), record() (đã tự đo), untilFrame() (đến khung kế).
 //
 // Watchdog: luồng UI ở trong một sự kiện (hoặc một lượt vòng sự kiện) liên tục ≥ ngưỡng (mặc định 50 ms) là
-// khựng. Luồng watchdog báo ngay khi đang khựng (stderr, kể cả khi treo hẳn); luồng UI chốt độ dài thật khi
-// chạy tiếp, nên không lần khựng nào bị sót dù luồng watchdog thức muộn. Báo kèm loại sự kiện, lớp đối tượng
-// nhận và vùng đo (TRION_UI_PROBE_SCOPE) đang mở. Luồng UI chờ trong vòng sự kiện (aboutToBlock) thì watchdog
+// khựng. Thời gian đo là đồng hồ thật trừ lúc luồng UI nằm hàng chờ CPU (Linux: /proc/thread-self/schedstat; nơi
+// khác đồng hồ thật): máy tải không thành khựng giả, còn chạy, chờ khóa, I/O, sleep vẫn tính. Luồng watchdog báo
+// ngay khi đang khựng (stderr, kể cả khi treo hẳn); luồng UI chốt độ dài thật khi chạy tiếp, nên không lần khựng
+// nào bị sót dù luồng watchdog thức muộn, và bỏ lần watchdog đã báo nếu hóa ra phần lớn là chờ CPU. Báo kèm loại
+// sự kiện, lớp đối tượng nhận và vùng đo (TRION_UI_PROBE_SCOPE) đang mở. Luồng UI chờ trong vòng sự kiện (aboutToBlock) thì watchdog
 // ngủ không thời hạn: không timer, không polling.
 //
 // JSON (toJson, cho QA-011), thời gian tính bằng ms:
@@ -123,7 +125,7 @@ private:
 #define TRION_UI_PROBE_SCOPE(name) ::trion::ui::probe::Scope TRION_UI_PROBE_CAT(trionUiProbeScope_, __LINE__)(name)
 
 struct Stall {
-    Clock::duration duration; // độ dài thật khi luồng UI đã chạy tiếp; còn treo thì là độ dài đến lúc báo
+    Clock::duration duration; // độ dài (không tính chờ CPU) khi luồng UI đã chạy tiếp; còn treo: đến lúc báo
     std::string where;        // "KeyPress -> QLineEdit [vùng đo]"
     bool live;                // luồng watchdog bắt được khi đang khựng
 };

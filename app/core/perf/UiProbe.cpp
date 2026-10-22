@@ -25,6 +25,11 @@
 #include <thread>
 #include <utility>
 
+#if defined(__linux__)
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+
 namespace trion::ui::probe {
 
 namespace detail {
@@ -61,6 +66,54 @@ constexpr std::array<OpInfo, kOps> kInfo{{
 
 Ns ns(Clock::time_point t) { return std::chrono::duration_cast<nanoseconds>(t.time_since_epoch()).count(); }
 double ms(Clock::duration d) { return std::chrono::duration<double, std::milli>(d).count(); }
+
+// Tổng thời gian luồng tạo đối tượng nằm hàng chờ CPU (sẵn sàng chạy mà chưa được chạy), ns; đọc được từ mọi luồng.
+// Khựng = đồng hồ thật trừ phần này: máy tải (agent, build song song) không thành khựng giả, còn chạy, chờ khóa, I/O,
+// sleep vẫn tính (giao diện đứng thật). Linux: cột 2 của /proc/thread-self/schedstat.
+// ponytail: Windows, macOS trả 0 (đồng hồ thật); tách thời gian chờ CPU ở đó khi cần (QueryThreadCycleTime,
+// thread_info).
+// Mẫu đọc cũ hơn mốc sự kiện tối đa kWaitSample: luồng UI đang chạy lúc đọc nên mọi lần chờ CPU cộng vào sau đó nằm
+// trọn trong khoảng ấy, thời gian khựng thiếu tối đa kWaitSample.
+constexpr Ns kWaitSample = 1'000'000;
+
+class RunQueue {
+public:
+    RunQueue()
+    {
+#if defined(__linux__)
+        fd_ = ::open("/proc/thread-self/schedstat", O_RDONLY | O_CLOEXEC);
+#endif
+    }
+    ~RunQueue()
+    {
+#if defined(__linux__)
+        if (fd_ >= 0)
+            ::close(fd_);
+#endif
+    }
+    RunQueue(const RunQueue&) = delete;
+    RunQueue& operator=(const RunQueue&) = delete;
+
+    Ns waited() const
+    {
+#if defined(__linux__)
+        char buf[96];
+        const ssize_t n = fd_ >= 0 ? ::pread(fd_, buf, sizeof buf - 1, 0) : -1; // pread: an toàn giữa hai luồng
+        unsigned long long run = 0, wait = 0;
+        if (n > 0) {
+            buf[n] = 0;
+            if (std::sscanf(buf, "%llu %llu", &run, &wait) == 2)
+                return Ns(wait);
+        }
+#endif
+        return 0;
+    }
+
+#if defined(__linux__)
+private:
+    int fd_ = -1;
+#endif
+};
 
 // Mẫu, mọi luồng ghi.
 // ponytail: giữ nguyên mẫu (tối đa 2^20 mỗi loại, ~8 MB); đổi sang histogram cố định nếu cần bật nhiều ngày.
@@ -156,6 +209,26 @@ void stallEnded(Ns start, Clock::duration d, int type, const char* cls, const ch
     print("", d, where);
 }
 
+// Luồng UI, khi lần bắt đầu ở start dài quá ngưỡng theo đồng hồ thật nhưng phần lớn là chờ CPU. Linux chỉ cộng một lần
+// chờ CPU vào schedstat khi luồng được chạy lại, nên watchdog đọc giữa lúc luồng UI đang chờ thấy thiếu và có thể đã
+// báo nhầm: bỏ bản ghi đó. Ghi start lại để watchdog thức muộn không báo lần này nữa.
+void stallRetracted(Ns start)
+{
+    bool reported = false;
+    {
+        std::lock_guard lk(g_stalls.m);
+        if (g_stalls.lastStart == start) {
+            reported = true;
+            --g_stalls.count;
+            if (!g_stalls.items.empty() && g_stalls.items.back().start == start)
+                g_stalls.items.pop_back();
+        }
+        g_stalls.lastStart = start;
+    }
+    if (reported)
+        std::fprintf(stderr, "trion ui-probe: bỏ lần khựng vừa báo: luồng UI chủ yếu chờ CPU (máy tải)\n");
+}
+
 // Luồng watchdog, khi luồng UI vẫn đang ở trong lần khựng bắt đầu ở start.
 void stallLive(Ns start, Clock::duration d, std::string where, const std::atomic<Ns>& progress)
 {
@@ -215,6 +288,8 @@ private:
     void checkStall(Ns now);
     void watch();
 
+    const RunQueue runQueue_; // của luồng UI (tạo trong enable(), trên luồng UI)
+
     // Luồng UI.
     std::array<Pending, 64> pend_{};
     std::size_t npend_ = 0;
@@ -224,6 +299,8 @@ private:
     bool markerQueued_ = false;
     bool busy_ = false; // đang xử lý sự kiện (từ sự kiện đầu sau aboutToBlock đến aboutToBlock kế)
     Ns last_ = 0;       // mốc tiến triển gần nhất: đầu một sự kiện hoặc một lượt vòng sự kiện
+    Ns lastWait_ = 0;   // runQueue_.waited() đọc ở waitAt_ (≤ last_)
+    Ns waitAt_ = -kWaitSample;
     int lastType_ = 0;
     const char* lastCls_ = nullptr;
     Ns stickyAt_ = -1;  // vùng đo đã vượt ngưỡng trong lần khựng bắt đầu ở stickyAt_
@@ -231,6 +308,7 @@ private:
 
     // Chung với luồng watchdog.
     std::atomic<Ns> progress_{0};
+    std::atomic<Ns> wait_{0}; // lastWait_, ghi trước progress_
     std::atomic<int> type_{0};
     std::atomic<const char*> cls_{nullptr};
     std::atomic<bool> idle_{true};
@@ -412,10 +490,15 @@ void Probe::progress(Clock::time_point now, int type, const char* cls)
     if (busy_)
         checkStall(t);
     last_ = t;
+    if (t - waitAt_ >= kWaitSample) { // đọc tối đa mỗi ms (pread procfs vài µs khi máy tải), không mỗi sự kiện
+        lastWait_ = runQueue_.waited();
+        waitAt_ = t;
+    }
     lastType_ = type;
     lastCls_ = cls;
     type_.store(type, std::memory_order_relaxed);
     cls_.store(cls, std::memory_order_relaxed);
+    wait_.store(lastWait_, std::memory_order_relaxed);
     progress_.store(t, std::memory_order_release);
     if (!busy_) { // rảnh → bận: đánh thức watchdog nếu nó đang ngủ (một lần mỗi đợt bận, không mỗi sự kiện)
         busy_ = true;
@@ -433,10 +516,16 @@ void Probe::progress(Clock::time_point now, int type, const char* cls)
 
 void Probe::checkStall(Ns now)
 {
-    if (now - last_ < g_thresholdNs.load(std::memory_order_relaxed))
+    const Ns threshold = g_thresholdNs.load(std::memory_order_relaxed);
+    if (now - last_ < threshold) // đồng hồ thật chưa tới thì thời gian không chờ CPU càng chưa
         return;
+    const Ns d = now - last_ - (runQueue_.waited() - lastWait_); // đang chạy: thời gian chờ đã cộng đủ
+    if (d < threshold) { // phần lớn là chờ CPU (máy tải): không phải khựng của ứng dụng
+        stallRetracted(last_);
+        return;
+    }
     const char* zone = stickyAt_ == last_ ? sticky_ : t_zone.load(std::memory_order_relaxed);
-    stallEnded(last_, nanoseconds(now - last_), lastType_, lastCls_, zone);
+    stallEnded(last_, nanoseconds(d), lastType_, lastCls_, zone);
 }
 
 void Probe::zoneLeft(const char* zone, Clock::time_point now)
@@ -500,19 +589,22 @@ void Probe::watch()
         }
         seen = armSeq_;
         const Ns p = progress_.load(std::memory_order_acquire);
+        const Ns wait = wait_.load(std::memory_order_relaxed);
         const Ns now = ns(Clock::now());
         const Ns threshold = g_thresholdNs.load(std::memory_order_relaxed);
-        if (now - p >= threshold && p != reported) {
+        const Ns d = now - p - (runQueue_.waited() - wait); // không tính thời gian luồng UI chờ CPU
+        if (d >= threshold && p != reported) {
             reported = p;
             std::string where = describe(type_.load(std::memory_order_relaxed), cls_.load(std::memory_order_relaxed),
                                          g_uiZone.load(std::memory_order_relaxed)->load(std::memory_order_relaxed));
             lk.unlock();
-            stallLive(p, nanoseconds(now - p), std::move(where), progress_);
+            stallLive(p, nanoseconds(d), std::move(where), progress_);
             lk.lock();
             continue;
         }
-        // Chưa tới ngưỡng: ngủ đến hạn. Đã báo lần khựng này: xem lại sau một ngưỡng (chỉ khi UI vẫn bận).
-        const Ns due = now - p >= threshold ? now + threshold : p + threshold;
+        // Chưa tới ngưỡng: ngủ đến sớm nhất lúc có thể tới (thời gian không chờ CPU tăng chậm hơn hoặc bằng đồng hồ
+        // thật). Đã báo lần khựng này: xem lại sau một ngưỡng (chỉ khi UI vẫn bận).
+        const Ns due = d >= threshold ? now + threshold : now + (threshold - d);
         cv_.wait_until(lk, Clock::time_point(nanoseconds(due)), [&] { return quit_; });
         g_wakeups.fetch_add(1, std::memory_order_relaxed);
     }

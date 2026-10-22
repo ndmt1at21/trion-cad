@@ -16,7 +16,7 @@ import sys
 CALL = re.compile(r"""
     \b(?P<name>set(?:Text|ToolTip|WindowTitle|PlaceholderText|StatusTip|WhatsThis|Title|LabelText|TabText
                      |TabToolTip|ItemText|AccessibleName|AccessibleDescription|InformativeText|DetailedText
-                     |HeaderLabels?)
+                     |HeaderLabels?|Confirm)
               |add(?:Action|Menu|Tab|Items?)|insert(?:Items?|Tab)|showMessage
               |QMessageBox\s*::\s*(?:information|warning|critical|question|about))\s*\(
   | \b(?P<cls>QAction|QLabel|QPushButton|QCheckBox|QRadioButton|QGroupBox|QMenu|QDockWidget|QMessageBox

@@ -60,6 +60,7 @@
 #include <functional>
 #include <vector>
 
+class QHBoxLayout;
 class QVBoxLayout;
 
 namespace trion::ui {
@@ -298,7 +299,10 @@ private:
 };
 
 // Trạng thái rỗng (.empty): biểu tượng 28 px --c-text-3, tiêu đề đậm, câu giải thích --c-text-2, nút .btn.sm gợi ý
-// (07.1 §12: "Bản vẽ chưa có block nào — [Mở Thư viện TCVN]"). Chữ do chủ widget đặt trong retranslate().
+// (07.1 §12: "Bản vẽ chưa có block nào — [Mở Thư viện TCVN]"), thêm nút cùng hàng bằng addAction (.empty .hrow: trang
+// Start "[Mở bản vẽ mẫu] [▶ Xem video 2 phút]"). Chữ do chủ widget đặt trong retranslate().
+// ponytail: hàng nút không xuống dòng như .hrow (flex-wrap): chỗ hẹp hơn cả hàng thì widget đòi rộng tối thiểu bằng
+// hàng; làm khi palette hẹp cần hai nút.
 class EmptyState final : public QWidget {
     Q_OBJECT
 public:
@@ -308,6 +312,9 @@ public:
     void setText(const QString& title, const QString& explanation = {});
     void setAction(const QString& label); // rỗng: không có nút
     Button* actionButton() const { return action_; }
+    // Nút nữa cùng hàng, sau các nút đã có (cách --sp-4; cỡ nhỏ, kiểu Normal; cả hàng canh giữa): chủ nối clicked, đặt
+    // chữ trong retranslate(), biểu tượng (setIconName), kiểu (setKind).
+    Button* addAction(const QString& label = {});
 
 signals:
     void actionTriggered();
@@ -317,6 +324,7 @@ private:
     QLabel* title_;
     QLabel* explanation_;
     Button* action_;
+    QHBoxLayout* actions_; // hàng nút
 };
 
 // Dòng dưới ô nhập (.fmsg, cỡ --fs-xs, cao tối thiểu 14 px để form không nhảy): lỗi = biểu tượng warn + câu --c-danger

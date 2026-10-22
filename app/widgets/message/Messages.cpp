@@ -800,13 +800,15 @@ void CursorTip::paintEvent(QPaintEvent*)
 
 EmptyState::EmptyState(const QString& icon, QWidget* parent)
     : QWidget(parent), glyph_(new Glyph(kEmptyIcon, this)), title_(new QLabel(this)), explanation_(new QLabel(this)),
-      action_(new Button({}, Button::Kind::Normal, this))
+      action_(new Button({}, Button::Kind::Normal, this)), actions_(new QHBoxLayout)
 {
     auto* box = new QVBoxLayout(this);
     box->addWidget(glyph_, 0, Qt::AlignHCenter);
     box->addWidget(title_);
     box->addWidget(explanation_);
-    box->addWidget(action_, 0, Qt::AlignHCenter);
+    actions_->addWidget(action_);
+    actions_->setAlignment(Qt::AlignHCenter); // hàng rộng theo nút, giữa: một nút ở đúng chỗ như AlignHCenter
+    box->addLayout(actions_);
     box->addStretch(); // .empty nằm đầu vùng chứa
     for (QLabel* l : {title_, explanation_}) {
         l->setTextFormat(Qt::PlainText);
@@ -822,6 +824,7 @@ EmptyState::EmptyState(const QString& icon, QWidget* parent)
         // .empty: padding 24px 16px, gap 8px; tiêu đề đậm --c-text, giải thích --c-text-2
         box->setContentsMargins(px(tok::sp_6), px(tok::sp_7), px(tok::sp_6), px(tok::sp_7));
         box->setSpacing(px(tok::sp_4));
+        actions_->setSpacing(px(tok::sp_4)); // .hrow gap 8px
         title_->setFont(theme::font(TextRole::Ui, Weight::Bold));
         explanation_->setFont(theme::font(TextRole::Ui));
         setInk(title_, col(tok::c_text));
@@ -846,6 +849,14 @@ void EmptyState::setAction(const QString& label)
 {
     action_->setText(label);
     action_->setVisible(!label.isEmpty());
+}
+
+Button* EmptyState::addAction(const QString& label)
+{
+    auto* b = new Button(label, Button::Kind::Normal, this);
+    b->setControlSize(Button::Size::Small);
+    actions_->addWidget(b);
+    return b;
 }
 
 // -------------------------------------------------------------------------------- FieldMessage

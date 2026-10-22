@@ -1,7 +1,8 @@
 # app/widgets/progress (UI0-112): ProgressPresenter (theo dõi tác vụ NT-013, quy tắc 0,5 s/2 s, con trỏ bận, gộp
-# nhiều tác vụ), ProgressItemModel (thanh trạng thái UIA-009), InlineProgress (hộp thoại, mục Tác vụ nền).
+# nhiều tác vụ), ProgressItemModel (thanh trạng thái UIA-009), InlineProgress (hộp thoại, mục Tác vụ nền; kiểu gọn của
+# thanh trạng thái), Spinner (vòng quay .spin).
 trion_add_library(trion_progress
-  SOURCES ProgressPresenter.h ProgressPresenter.cpp InlineProgress.h InlineProgress.cpp
+  SOURCES ProgressPresenter.h ProgressPresenter.cpp InlineProgress.h InlineProgress.cpp Spinner.h Spinner.cpp
   LIBS trion_controls trion_jobs trion_i18n trion_theme Qt6::Widgets)
 
 trion_add_test(progress_test SOURCES tests/progress_test.cpp LIBS trion_progress trion_fonts LABELS progress)

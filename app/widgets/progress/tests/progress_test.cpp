@@ -11,10 +11,12 @@
 //   4  multiple: 3 việc: tác vụ chính (cũ nhất) và "2 tác vụ khác"; trình đọc màn hình (bộ bắt sự kiện QAccessible):
 //      giá trị thanh chỉ đổi theo bước 10% (10, 20, …, 100), tên tiếp cận của nhãn cũng vậy.
 //   DoD-U: baseline (ảnh InlineProgress Tối/Sáng × 100/150/200% so baseline theo nền tảng, như UI0-106; ghi lại:
-//   TRION_UPDATE_BASELINE=<thư mục>), pseudoNoTruncation (vi-XL, findTruncations rỗng). Hàm công khai còn lại:
+//   TRION_UPDATE_BASELINE=<thư mục>), pseudoNoTruncation (vi-XL, findTruncations rỗng, cả kiểu gọn); compact (kiểu
+//   gọn của thanh trạng thái: thứ tự, cỡ, nút ×, đang hủy, vòng quay). Hàm công khai còn lại:
 //   presenterApi (model, finished, cancelling, label/percent, hủy presenter khi đang bận trả con trỏ).
 #include "app/widgets/progress/InlineProgress.h"
 #include "app/widgets/progress/ProgressPresenter.h"
+#include "app/widgets/progress/Spinner.h"
 
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
@@ -451,6 +453,62 @@ private slots:
         QVERIFY(spinUntil([&] { return !item->isVisible(); }));
     }
 
+    // Kiểu gọn của thanh trạng thái (.sb-task): vòng quay, nhãn --fs-xs --c-text-2, thanh 80×4, nút × biểu tượng (tên
+    // tiếp cận "Hủy"); bấm ×: tắt ngay, nhãn "… · đang hủy…" (không chỉ là màu); vòng quay chỉ quay khi đang hiện,
+    // giảm chuyển động thì đứng yên.
+    void compact()
+    {
+        use({1ms, 2ms, 1ms});
+        const auto g = gate();
+        g->progress = 0.63;
+        g->honorCancel = false; // giữ "đang hủy…" để kiểm
+        startGated(*jobs_, u"Đang mở"_s, g);
+        auto* item = new InlineProgress(*presenter_, 0, host_.get(), InlineProgress::Style::Compact);
+        auto* spin = item->findChild<Spinner*>();
+        auto* text = item->findChild<QLabel*>();
+        auto* bar = item->findChild<QProgressBar*>();
+        auto* cancel = item->findChild<Button*>();
+        QVERIFY(spin && text && bar && cancel);
+        QVERIFY(spinUntil([&] { // lần áp của presenter (mỗi khung) đã tới nhãn
+            return item->isVisible() && text->text() == ProgressPresenter::label(u"Đang mở"_s, 63);
+        }));
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
+        item->resize(item->sizeHint());
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
+        QVERIFY(spin->geometry().right() < text->geometry().left()); // trái → phải như .sb-task
+        QVERIFY(text->geometry().right() < bar->geometry().left());
+        QVERIFY(bar->geometry().right() < cancel->geometry().left());
+        QCOMPARE(bar->size(), QSize(qRound(5 * tm_->px(tok::sp_6)), qRound(tm_->px(tok::sp_2))));
+        QCOMPARE(cancel->kind(), Button::Kind::Icon);
+        QCOMPARE(cancel->controlSize(), Button::Size::Small);
+        QCOMPARE(cancel->iconName(), u"x"_s);
+        QVERIFY(cancel->text().isEmpty());
+        QCOMPARE(cancel->accessibleName(), InlineProgress::tr("Hủy"));
+        QCOMPARE(cancel->accessibleDescription(), u"Đang mở"_s);
+        QCOMPARE(text->text(), ProgressPresenter::label(u"Đang mở"_s, 63));
+        QCOMPARE(text->font().pointSizeF(), tm_->font(tok::fs_xs).pointSizeF());
+        QCOMPARE(text->palette().color(QPalette::WindowText), tm_->color(tok::c_text_2));
+        QCOMPARE(item->layout()->spacing(), qRound(tm_->px(tok::sp_3)));
+        QVERIFY(spin->spinning());
+
+        QTest::mouseClick(cancel, Qt::LeftButton); // ngay trong cú bấm
+        QVERIFY(!cancel->isEnabled());
+        QCOMPARE(cancel->accessibleName(), InlineProgress::tr("Đang hủy…"));
+        QCOMPARE(text->text(), InlineProgress::tr("%1 · đang hủy…").arg(u"Đang mở"_s));
+        g->release = true;
+        QVERIFY(spinUntil([&] { return !item->isVisible(); }));
+        QVERIFY(!spin->spinning()); // ẩn: không chạy
+
+        tm_->setReducedMotion(true);
+        const auto still = gate();
+        startGated(*jobs_, u"Đang in"_s, still);
+        QVERIFY(spinUntil([&] { return item->isVisible(); }));
+        QVERIFY(spin->isVisible() && !spin->spinning());
+        QVERIFY(cancel->isEnabled());
+        QCOMPARE(cancel->accessibleName(), InlineProgress::tr("Hủy"));
+        tm_->setReducedMotion(false);
+    }
+
     // Tiêu chí 3.
     void throttle()
     {
@@ -660,11 +718,13 @@ private slots:
         auto* rows = new QVBoxLayout(&footer);
         auto* single = new InlineProgress(*presenter_, id, &footer);
         auto* main = new InlineProgress(*presenter_, 0, &footer);
+        auto* compact = new InlineProgress(*presenter_, 0, &footer, InlineProgress::Style::Compact);
         rows->addWidget(single);
         rows->addWidget(main);
-        footer.resize(kSheetW + 40, 120);
+        rows->addWidget(compact, 0, Qt::AlignLeft); // thanh trạng thái: cỡ theo sizeHint, không giãn, không nén
+        footer.resize(2 * kSheetW, 160);            // đủ chỗ cho sizeHint của kiểu gọn (thanh trạng thái không nén mục)
         footer.show();
-        QVERIFY(spinUntil([&] { return single->isVisible() && main->isVisible(); }));
+        QVERIFY(spinUntil([&] { return single->isVisible() && main->isVisible() && compact->isVisible(); }));
         const auto report = [&footer] {
             QStringList out;
             for (const i18n::Truncation& t : i18n::findTruncations(&footer))
@@ -677,7 +737,7 @@ private slots:
         QVERIFY(translator_->setLanguage(i18n::kPseudoLanguage.toString()));
         QTRY_VERIFY(cancel->text().size() >= vi.size() + 2);
         QTRY_COMPARE(report(), QString());
-        presenter_->cancel(id); // "Đang hủy…" dài hơn "Hủy"
+        presenter_->cancel(id); // "Đang hủy…" dài hơn "Hủy"; kiểu gọn: "Đang mở · đang hủy… · 1 tác vụ khác"
         for (Density d : {Density::Comfortable, Density::Compact}) {
             tm_->setDensity(d);
             QTRY_COMPARE(report(), QString());

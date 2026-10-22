@@ -2,6 +2,7 @@
 
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/UiFormat.h"
+#include "app/shell/filetabs/FileTabBar.h"
 #include "app/theme/ThemeManager.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
@@ -208,13 +209,6 @@ private:
     QFont font_;
     QCache<QString, QStaticText> cache_{kTextCache};
 };
-
-bool drawing(const QString& path)
-{
-    const QString suffix = QFileInfo(path).suffix();
-    return suffix.compare(u"dwg"_s, Qt::CaseInsensitive) == 0 || suffix.compare(u"dxf"_s, Qt::CaseInsensitive) == 0
-           || suffix.compare(u"dwt"_s, Qt::CaseInsensitive) == 0;
-}
 
 void toast(Severity severity, const QString& text, ui::MessageAction action = {})
 {
@@ -951,22 +945,10 @@ void StartPage::build()
     empty_->setObjectName(u"recentEmpty"_s);
     empty_->actionButton()->setKind(Button::Kind::Primary);
     connect(empty_, &ui::EmptyState::actionTriggered, this, [this] { emit screenRequested(u"sample"_s); });
-    video_ = new Button;
+    video_ = empty_->addAction(); // cùng hàng với nút gợi ý (.empty .hrow)
     video_->setObjectName(u"emptyVideo"_s);
-    video_->setControlSize(Button::Size::Small);
     video_->setIconName(u"play"_s);
     connect(video_, &QPushButton::clicked, this, [this] { emit screenRequested(u"video-intro"_s); });
-    // Hai nút cùng hàng như prototype (.empty .hrow): EmptyState có một nút, chuyển nút đó vào hàng cùng nút video.
-    if (auto* box = qobject_cast<QBoxLayout*>(empty_->layout())) {
-        box->removeWidget(empty_->actionButton());
-        auto* row = new QHBoxLayout;
-        row->setSpacing(s3);
-        row->addStretch();
-        row->addWidget(empty_->actionButton());
-        row->addWidget(video_);
-        row->addStretch();
-        box->insertLayout(box->count() - 1, row); // trước khoảng giãn cuối
-    }
     stack_->addWidget(empty_);
     middle->addWidget(stack_, 1);
     content_->addLayout(middle, 1);
@@ -1384,9 +1366,8 @@ bool StartPage::eventFilter(QObject* watched, QEvent* e)
 
 void StartPage::dragEnterEvent(QDragEnterEvent* e)
 {
-    // Nhận mọi tệp trên máy để thả được rồi báo tệp sai định dạng (như dải tab tệp); URL web thì không.
-    const QList<QUrl> urls = e->mimeData()->urls();
-    if (std::none_of(urls.begin(), urls.end(), [](const QUrl& u) { return u.isLocalFile(); }))
+    // Nhận mọi tệp trên máy để thả được rồi báo tệp sai định dạng (quy tắc chung của dải tab tệp); URL web thì không.
+    if (FileTabBar::readDrop(*e->mimeData()).empty())
         return;
     e->acceptProposedAction();
     dropHint_->raise();
@@ -1402,22 +1383,12 @@ void StartPage::dragLeaveEvent(QDragLeaveEvent* e)
 void StartPage::dropEvent(QDropEvent* e)
 {
     dropHint_->hide();
-    QStringList open, rejected;
-    for (const QUrl& url : e->mimeData()->urls())
-        if (url.isLocalFile()) {
-            const QString path = url.toLocalFile();
-            if (drawing(path))
-                open << path;
-            else
-                rejected << u"“%1”"_s.arg(QFileInfo(path).fileName());
-        }
+    const FileTabBar::Drop d = FileTabBar::readDrop(*e->mimeData());
     e->acceptProposedAction();
-    if (!open.isEmpty())
-        emit openRequested(open);
-    if (!rejected.isEmpty())
-        toast(Severity::Error, tr("TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.", nullptr,
-                                  int(rejected.size()))
-                                   .arg(rejected.join(u", "_s)));
+    if (!d.drawings.isEmpty())
+        emit openRequested(d.drawings);
+    if (!d.rejection.isEmpty())
+        toast(Severity::Error, d.rejection);
 }
 
 } // namespace trion::shell

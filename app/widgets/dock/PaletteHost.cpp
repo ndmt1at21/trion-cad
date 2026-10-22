@@ -1,5 +1,6 @@
 #include "app/widgets/dock/PaletteHost.h"
 
+#include "app/core/keymap/Keymap.h"
 #include "app/core/perf/UiProbe.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/controls/Controls.h"
@@ -145,7 +146,8 @@ private:
     PaletteHost* host_;
 };
 
-PaletteHost::PaletteHost(QMainWindow* window, settings::Store& store) : QObject(window), window_(window), store_(store)
+PaletteHost::PaletteHost(QMainWindow* window, settings::Store& store)
+    : QObject(window), window_(window), store_(store), nextPane_(new QAction(this)), previousPane_(new QAction(this))
 {
     // GroupedDragging: kéo đầu palette mang cả nhóm tab, kéo tab tách một palette, nhóm nổi được. Animation của Qt
     // dài SH_Widget_Animation_Duration của TrionStyle (--t, về 0 khi giảm chuyển động hoặc Giao diện nhẹ).
@@ -158,12 +160,25 @@ PaletteHost::PaletteHost(QMainWindow* window, settings::Store& store) : QObject(
             fitWindow(w);
     });
 
-    for (bool backward : {false, true}) {
-        auto* a = new QAction(this);
-        a->setShortcut(backward ? QKeySequence(Qt::SHIFT | Qt::Key_F6) : QKeySequence(Qt::Key_F6));
-        connect(a, &QAction::triggered, this, [this, backward] { focusNextPalette(backward); });
-        window->addAction(a);
-    }
+    nextPane_->setShortcut(QKeySequence(Qt::Key_F6));
+    previousPane_->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F6));
+    connect(nextPane_, &QAction::triggered, this, [this] { focusNextPalette(); });
+    connect(previousPane_, &QAction::triggered, this, [this] { focusNextPalette(true); });
+    window->addActions({nextPane_, previousPane_});
+}
+
+void PaletteHost::setKeymap(const keymap::Keymap& keymap)
+{
+    const auto bind = [this, map = &keymap] {
+        QList<QKeySequence> next, previous;
+        if (const keymap::Action* a = map->action(QStringLiteral("pane")))
+            for (const QKeyCombination c : a->bindings)
+                (c.keyboardModifiers() & Qt::ShiftModifier ? previous : next) << QKeySequence(c);
+        nextPane_->setShortcuts(next);
+        previousPane_->setShortcuts(previous);
+    };
+    bind();
+    connect(&keymap, &keymap::Keymap::changed, this, bind);
 }
 
 QDockWidget* PaletteHost::registerPalette(PaletteSpec spec)

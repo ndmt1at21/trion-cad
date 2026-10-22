@@ -148,6 +148,22 @@ void EditionGate::setEdition(Edition e)
         emit profileChanged(profile());
 }
 
+void EditionGate::setTrialDays(int days)
+{
+    if (days == trialDays_)
+        return;
+    trialDays_ = days;
+    emit statusChanged();
+}
+
+void EditionGate::setOfflineDays(int days)
+{
+    if (days == offlineDays_)
+        return;
+    offlineDays_ = days;
+    emit statusChanged();
+}
+
 bool EditionGate::has(Edition e, Capability c)
 {
     return (editions(c) & bit(e)) != 0;

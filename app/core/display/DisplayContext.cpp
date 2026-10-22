@@ -73,6 +73,11 @@ DisplayContext& DisplayContext::instance()
     return *g_instance;
 }
 
+DisplayContext* DisplayContext::find()
+{
+    return g_instance;
+}
+
 void DisplayContext::track(QWidget* window)
 {
     TRION_CHECK(window && window->isWindow());

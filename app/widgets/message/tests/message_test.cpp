@@ -94,6 +94,7 @@ enum Text {
     EmptyTitle,
     EmptyWhy,
     EmptyAction,
+    EmptyMore,
     ScaleError,
     DotHint,
     TextCount
@@ -119,6 +120,7 @@ constexpr const char* kText[TextCount] = {
     "Bản vẽ chưa có block nào",                          // i18n-ok: dữ liệu thử
     "Tạo block bằng BLOCK hoặc chèn từ Thư viện TCVN.",  // i18n-ok: dữ liệu thử
     "Mở Thư viện TCVN",                                  // i18n-ok: dữ liệu thử
+    "Xem video 2 phút",                                  // i18n-ok: dữ liệu thử
     "Tỉ lệ phải lớn hơn 0. Gõ một số dương, ví dụ 1.5.", // i18n-ok: dữ liệu thử
     "Trong bản vẽ, dấu thập phân luôn là dấu chấm.",     // i18n-ok: dữ liệu thử
 };
@@ -866,10 +868,32 @@ private slots:
         QCOMPARE(empty.actionButton()->text(), text(EmptyAction));
         QTest::mouseClick(empty.actionButton(), Qt::LeftButton);
         QCOMPARE(triggered.size(), 1);
+
+        // Nút nữa cùng hàng (.empty .hrow): sau nút gợi ý, cách --sp-4, cả hàng giữa; bấm chỉ phát clicked của nó
+        const int center = empty.width() / 2;
+        QVERIFY(std::abs(empty.actionButton()->geometry().center().x() - center) <= 1); // một nút: giữa như trước
+        Button* more = empty.addAction(text(EmptyMore));
+        QSignalSpy moreClicked(more, &QPushButton::clicked);
+        QCoreApplication::processEvents(); // con thêm vào widget đang hiện: Qt hiện nó ở lượt sự kiện kế
+        empty.layout()->activate();
+        const QRect a = empty.actionButton()->geometry(), b = more->geometry();
+        QVERIFY(more->isVisible());
+        QCOMPARE(more->text(), text(EmptyMore));
+        QCOMPARE(more->controlSize(), Button::Size::Small);
+        QCOMPARE(a.center().y(), b.center().y());
+        QCOMPARE(b.left() - a.right() - 1, qRound(tm_->px(tok::sp_4)));
+        QVERIFY(std::abs((a.left() + b.right()) / 2 - center) <= 1);
+        QCOMPARE(empty.actionButton()->nextInFocusChain(), more); // Tab: nút gợi ý rồi nút thêm
+        QTest::mouseClick(more, Qt::LeftButton);
+        QCOMPARE(moreClicked.size(), 1);
+        QCOMPARE(triggered.size(), 1);
+
         empty.setText(text(EmptyTitle));
         empty.setAction({});
         QVERIFY(!labels[1]->isVisible());
         QVERIFY(!empty.actionButton()->isVisible());
+        empty.layout()->activate();
+        QVERIFY(std::abs(more->geometry().center().x() - center) <= 1); // còn một nút: giữa
         empty.setIconName(u"layers"_s);
         QCOMPARE(empty.findChild<Glyph*>()->name(), u"layers"_s);
 

@@ -26,7 +26,7 @@
 //   setTrialDays, hạn thuê bao setExpiry; nút Dùng thử/Mua mở trang nâng cấp qua EditionGate::upgrade(), Trạng thái giấy
 //   phép → screenRequested("license")).
 // - Thả tệp lên trang: gợi ý "Thả tệp DWG, DXF để mở" (.drop-hint) trong lúc kéo; DWG, DXF, DWT → openRequested(đường
-//   dẫn theo thứ tự thả), tệp khác bị từ chối kèm toast lỗi nêu tên (như FileTabBar).
+//   dẫn theo thứ tự thả), tệp khác bị từ chối kèm toast lỗi nêu tên (quy tắc và câu chung: FileTabBar::readDrop).
 // Màu, cỡ đọc token lúc vẽ/khi ThemeManager::changed; chữ dịch lại khi LanguageChange. Rảnh không timer. Luồng UI.
 //
 // Dùng (bước integration, sau ThemeManager, IconProvider, RichTooltip, ToastHost, EditionGate; RecentFiles do main giữ):

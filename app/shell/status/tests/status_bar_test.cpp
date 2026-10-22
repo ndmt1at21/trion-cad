@@ -20,6 +20,7 @@
 
 #include "app/core/a11y/AccessibilityAudit.h"
 #include "app/core/actions/ActionRegistry.h"
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
@@ -487,8 +488,8 @@ private slots:
         QVERIFY(spinUntil([&] { return progress_->shownCount() == 1; }));
         bar_->setFontIssues(3, 250);
         gate_->setEdition(edition::Edition::Trial);
-        bar_->setTrialDays(12);
-        bar_->setOfflineDays(3);
+        gate_->setTrialDays(12);
+        gate_->setOfflineDays(3);
         notes_->add(u"Đã xuất"_s, ui::Severity::Ok); // i18n-ok: thông báo mẫu
         bar_->setCursorPoint(-12345.6789, -98765.4321);
         window_->resize(1366, 200);
@@ -529,7 +530,7 @@ private slots:
         QVERIFY(spinUntil([&] { return bar_->width() == 2560 && bar_->overflowed().isEmpty(); }));
         QVERIFY(!button("overflow")->isVisible());
         bar_->setFontIssues(0, 0);
-        bar_->setOfflineDays(-1);
+        gate_->setOfflineDays(-1);
         gate_->setEdition(edition::Edition::Pro);
         notes_->markAllRead();
     }
@@ -609,18 +610,22 @@ private slots:
         notes_->markAllRead();
         QVERIFY(!button("notifications")->dot);
 
-        // Huy hiệu phiên bản
+        // Huy hiệu phiên bản: theo EditionGate (phiên bản, ngày dùng thử, ngày offline)
         gate_->setEdition(edition::Edition::Trial);
-        bar_->setTrialDays(12);
-        const QString trial = QCoreApplication::translate("trion::shell::TitleBar", "Dùng thử: còn %n ngày", nullptr, 12);
+        gate_->setTrialDays(30);
+        QCOMPARE(item<QToolButton>("edition")->text(), edition::EditionBadge::tr("Dùng thử: còn %n ngày", nullptr, 30));
+        gate_->setTrialDays(12);
+        const QString trial = edition::EditionBadge::tr("Dùng thử: còn %n ngày", nullptr, 12);
         QCOMPARE(item<QToolButton>("edition")->text(), trial);
-        bar_->setOfflineDays(3);
+        const int badge = edition::EditionBadge::sizeFor(*gate_).width();
+        QCOMPARE(item("edition")->sizeHint().width(), badge + 2 * qRound(tm_->px(tok::sp_2))); // .sb .ed margin 0 4px
+        gate_->setOfflineDays(3);
         QVERIFY(item<QToolButton>("edition")->text().startsWith(trial + u" · "_s));
         QTest::mouseClick(item("edition"), Qt::LeftButton);
         QCOMPARE(screens_.takeLast(), u"license"_s);
-        bar_->setOfflineDays(-1);
+        gate_->setOfflineDays(-1);
         gate_->setEdition(edition::Edition::Pro);
-        QCOMPARE(item<QToolButton>("edition")->text(), QCoreApplication::translate("trion::shell::TitleBar", "Pro"));
+        QCOMPARE(item<QToolButton>("edition")->text(), edition::EditionBadge::tr("Pro"));
 
         // Clean Screen: QAction CLEANSCREENON của registry (Ctrl+0)
         QTest::mouseClick(button("cleanScreen"), Qt::LeftButton);
@@ -643,7 +648,7 @@ private slots:
                 QVERIFY(!a->isVisible()); // không có trong Viewer: không liệt kê
             else if (a->data().toString() == u"osnap"_s)
                 QVERIFY(a->isVisible());
-        QCOMPARE(item<QToolButton>("edition")->text(), QCoreApplication::translate("trion::shell::TitleBar", "Viewer"));
+        QCOMPARE(item<QToolButton>("edition")->text(), edition::EditionBadge::tr("Viewer"));
         gate_->setEdition(edition::Edition::Pro);
         settle();
         QVERIFY(bar_->findChild<shell::ModeToggles*>()->button(u"grid"_s)->isVisible());
@@ -711,10 +716,10 @@ private slots:
         const QPoint badge(tm_->px(tok::sp_2) + 2, item("edition")->height() / 2);
         settle();
         QVERIFY(near(pixel("edition", badge), on(tok::c_ed_trial)));
-        bar_->setOfflineDays(2);
+        gate_->setOfflineDays(2);
         settle();
         QVERIFY(near(pixel("edition", badge), on(tok::c_warn_soft)));
-        bar_->setOfflineDays(-1);
+        gate_->setOfflineDays(-1);
         gate_->setEdition(edition::Edition::Pro);
 
         auto* bell = button("notifications"); // chấm --c-danger

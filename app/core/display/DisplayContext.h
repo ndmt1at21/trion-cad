@@ -64,6 +64,8 @@ public:
 
     // DisplayContext tạo gần nhất còn sống. Chưa có thì dừng (TRION_CHECK).
     static DisplayContext& instance();
+    // Như instance() nhưng nullptr khi chưa có (widget dùng được cả khi chưa dựng cửa sổ chính, trong test).
+    static DisplayContext* find();
 
     // Theo dõi thêm một cửa sổ cấp cao (palette nổi, hộp thoại không modal); widget hủy thì tự bỏ, gọi lại thì bỏ qua.
     void track(QWidget* window);

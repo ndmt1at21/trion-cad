@@ -175,7 +175,17 @@ class TruncationTest : public QObject {
     std::unique_ptr<Store> store_;
     std::unique_ptr<Translator> translator_;
 
-    static void settle() { QTest::qWait(20); } // LanguageChange → retranslate(), bố cục, đổi cỡ cột (hẹn giờ 0)
+    // LanguageChange → retranslate(), bố cục, đổi cỡ cột (hẹn giờ 0): mỗi bước đăng việc cho lượt kế. Máy tải nặng,
+    // qWait hết giờ khi chuỗi đó chưa xong: thêm các lượt không tính giờ, mỗi lượt giao mọi sự kiện đã đăng và hẹn giờ
+    // đã tới (đủ cho chuỗi sâu 10 bước), nên kết quả không phụ thuộc tải.
+    static void settle()
+    {
+        QTest::qWait(20);
+        for (int i = 0; i < 10; ++i) {
+            QCoreApplication::sendPostedEvents();
+            QCoreApplication::processEvents();
+        }
+    }
 
     // "tên đối tượng: chữ" của mọi chỗ bị cắt, đã sắp xếp
     static QStringList found(QWidget* root)
@@ -319,7 +329,8 @@ private slots:
         }
     }
 
-    // Cắt theo chiều dọc (nhãn thấp hơn dòng chữ, nhãn xuống dòng thiếu chỗ); widget ẩn không đo; toString cho QA.
+    // Cắt theo chiều dọc (nhãn thấp hơn dòng chữ, nhãn xuống dòng thiếu chỗ); widget ẩn hoặc không ai thấy (ngoài cha,
+    // bị che) không đo, view không viền vẫn đo; toString cho QA.
     void verticalCutsAndHiddenWidgets()
     {
         QWidget root;
@@ -338,12 +349,37 @@ private slots:
         rows->addWidget(low);
         rows->addWidget(wrapped);
         rows->addWidget(hidden);
+        // isVisible() mà không ai thấy: ngoài cha (trang tab nền của nhóm dock Qt dời ra ngoài cửa sổ), bị anh em đục
+        // che hết. View không viền vẫn quét: viewport đục phủ hết khung.
+        auto* outside = new QLabel(tr("Bản vẽ này có nhiều layer đang khóa"), &root);
+        outside->setGeometry(-400, 0, 20, 20);
+        auto* covered = new QLabel(tr("Bản vẽ này có nhiều layer đang khóa"), &root);
+        covered->setGeometry(300, 250, 20, 20);
+        auto* cover = new QWidget(&root); // tạo sau: nằm trên
+        cover->setAutoFillBackground(true);
+        cover->setGeometry(290, 240, 40, 40);
+        auto* table = new QTableWidget(1, 1, &root);
+        table->setObjectName(u"frameless"_s);
+        table->setFrameShape(QFrame::NoFrame);
+        table->horizontalHeader()->hide();
+        table->verticalHeader()->hide();
+        table->setItem(0, 0, new QTableWidgetItem(tr("Bản vẽ này có nhiều layer đang khóa")));
+        table->setColumnWidth(0, 30);
+        table->setFixedSize(40, 40);
+        rows->addWidget(table);
+        root.resize(400, 300);
         root.show();
         QVERIFY(QTest::qWaitForWindowExposed(&root));
+        settle();
+        QVERIFY(outside->isVisible() && covered->isVisible());
+        QVERIFY(table->visibleRegion().isEmpty()); // khung bị viewport che: phải xét viewport
 
         const QList<trion::i18n::Truncation> cuts = trion::i18n::findTruncations(&root);
-        QCOMPARE(found(&root), (QStringList{u"low: "_s + low->text(), u"wrapped: "_s + wrapped->text()}));
+        QCOMPARE(found(&root), (QStringList{u"frameless: "_s + table->item(0, 0)->text(), u"low: "_s + low->text(),
+                                            u"wrapped: "_s + wrapped->text()}));
         for (const auto& t : cuts) {
+            if (t.widget == table)
+                continue;
             QVERIFY(t.need.height() > t.have.height());
             QVERIFY2(t.toString().startsWith(u"QLabel '%1': «%2» cần "_s.arg(t.widget->objectName(), t.text)),
                      qPrintable(t.toString()));

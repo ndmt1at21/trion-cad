@@ -13,6 +13,8 @@
 //   DoD-U: badges (ảnh baseline Tối/Sáng × 100/150/200% theo nền tảng; ghi lại: TRION_UPDATE_BASELINE=<thư mục>
 //   chạy test, chép badges-*-<nền tảng>.png vào tests/baseline), pseudoNoTruncation (vi-XL), commandNotice.
 //   bindLifetime, orphanBadge: gỡ cổng khi EditionGate hủy; huy hiệu chưa có cha không tự mở thành cửa sổ.
+//   editionBadge: huy hiệu phiên bản EditionBadge (chữ, màu theo phiên bản, offline, theo cổng, vi-XL).
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/edition/LockBadge.h"
 
@@ -125,11 +127,19 @@ double ms(qint64 ns)
     return double(ns) / 1e6;
 }
 
-// Sai khác ≤ 8/255 mỗi kênh coi là trùng (khử răng cưa).
-bool sameColor(QColor a, QColor b)
+// Sai khác ≤ tol/255 mỗi kênh coi là trùng (khử răng cưa).
+bool sameColor(QColor a, QColor b, int tol = 8)
 {
-    return std::abs(a.red() - b.red()) <= 8 && std::abs(a.green() - b.green()) <= 8 &&
-           std::abs(a.blue() - b.blue()) <= 8;
+    return std::abs(a.red() - b.red()) <= tol && std::abs(a.green() - b.green()) <= tol &&
+           std::abs(a.blue() - b.blue()) <= tol;
+}
+
+// Màu token (có thể trong suốt, như --c-warn-soft) phủ lên nền.
+QColor over(QColor bg, QColor fg)
+{
+    const double a = fg.alphaF();
+    return QColor::fromRgbF(float(fg.redF() * a + bg.redF() * (1 - a)), float(fg.greenF() * a + bg.greenF() * (1 - a)),
+                            float(fg.blueF() * a + bg.blueF() * (1 - a)));
 }
 
 #if defined(Q_OS_WIN)
@@ -597,6 +607,91 @@ private slots:
         QCoreApplication::processEvents();
         QCOMPARE(cut.size(), 0);
         QCOMPARE(early->sizeHint().width(), viWidth);
+    }
+
+    // Huy hiệu phiên bản (EditionBadge): chữ và nền theo phiên bản (.ed[data-ed]); lâu chưa xác minh giấy phép: thêm số
+    // ngày offline, màu .ed.warn, trừ Viewer; đổi ngay theo cổng; trình đọc màn hình đọc chữ; vi-XL không cắt chữ.
+    void editionBadge()
+    {
+        EditionGate gate;
+        QSignalSpy status(&gate, &EditionGate::statusChanged);
+        gate.setTrialDays(12);
+        gate.setTrialDays(12); // trùng: không phát
+        QCOMPARE(status.count(), 1);
+
+        QWidget host;
+        auto* row = new QHBoxLayout(&host);
+        auto* badge = new EditionBadge(gate, &host);
+        row->addWidget(badge);
+        row->addStretch();
+        host.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&host));
+
+        // Nền ở mép trái giữa chiều cao (token trong suốt phủ lên --c-base của cửa sổ); có chữ: điểm ảnh gần màu chữ
+        // hơn hẳn màu nền (nét chữ mảnh như "Viewer" ít điểm ảnh phủ kín) — không chỉ là màu.
+        const auto check = [&](tok::ColorId bg, tok::ColorId fg) {
+            QCoreApplication::processEvents(); // LayoutRequest: cỡ theo chữ mới
+            QCOMPARE(badge->size(), EditionBadge::sizeFor(gate));
+            const QImage img = badge->grab().toImage();
+            const QColor got = img.pixelColor(2, img.height() / 2);
+            const QColor want = over(tm_->color(tok::c_base), tm_->color(bg));
+            QVERIFY2(sameColor(got, want), qPrintable(badge->text() + u": "_s + got.name() + u" ≠ "_s + want.name()));
+            const QColor ink = tm_->color(fg);
+            const int contrast = std::max({std::abs(ink.red() - want.red()), std::abs(ink.green() - want.green()),
+                                           std::abs(ink.blue() - want.blue())});
+            int strokes = 0;
+            for (int y = 0; y < img.height(); ++y)
+                for (int x = 0; x < img.width(); ++x)
+                    strokes += sameColor(img.pixelColor(x, y), ink, contrast / 3);
+            QVERIFY2(strokes >= 4, qPrintable(badge->text() + u": thiếu chữ màu "_s + ink.name()));
+        };
+        struct Case {
+            Edition edition;
+            QString text;
+            tok::ColorId bg, fg;
+        };
+        const Case cases[] = {
+            {Edition::Viewer, u"Viewer"_s, tok::c_ed_viewer, tok::c_ed_viewer_t},
+            {Edition::ViewerPro, u"Viewer Pro"_s, tok::c_ed_vp, tok::c_ed_vp_t},
+            {Edition::Pro, u"Pro"_s, tok::c_ed_pro, tok::c_ed_pro_t},
+            {Edition::Trial, u"Dùng thử: còn 12 ngày"_s, tok::c_ed_trial, tok::c_ed_trial_t}, // i18n-ok: chữ huy hiệu
+            {Edition::Education, u"Giáo dục"_s, tok::c_ed_edu, tok::c_ed_edu_t},                // i18n-ok: chữ huy hiệu
+            {Edition::Enterprise, u"Doanh nghiệp"_s, tok::c_ed_ent, tok::c_ed_ent_t},           // i18n-ok: chữ huy hiệu
+        };
+        for (const theme::Theme t : {theme::Theme::Dark, theme::Theme::Light}) {
+            tm_->setTheme(t);
+            for (const Case& c : cases) {
+                gate.setEdition(c.edition);
+                QCOMPARE(badge->text(), c.text);
+                QCOMPARE(QAccessible::queryAccessibleInterface(badge)->text(QAccessible::Name), c.text);
+                check(c.bg, c.fg);
+                gate.setOfflineDays(3);
+                if (c.edition == Edition::Viewer) { // Viewer không cần xác minh giấy phép
+                    QCOMPARE(badge->text(), c.text);
+                } else {
+                    QCOMPARE(badge->text(), c.text + u" · còn 3 ngày offline"_s); // i18n-ok: .ed.warn
+                    check(tok::c_warn_soft, tok::c_warn);
+                }
+                gate.setOfflineDays(-1);
+            }
+        }
+        QCOMPARE(status.count(), 1 + 2 * 2 * kEditionCount);
+
+        gate.setEdition(Edition::Trial);
+        gate.setOfflineDays(3);
+        const QString vi = badge->text();
+        QVERIFY(translator_->setLanguage(i18n::kPseudoLanguage.toString()));
+        QCoreApplication::processEvents(); // LanguageChange đăng hàng đợi
+        QCOMPARE(badge->text(), EditionBadge::label(gate));
+        QVERIFY(badge->text() != vi);
+        QCoreApplication::processEvents();
+        const QList<i18n::Truncation> cut = i18n::findTruncations(&host);
+        for (const i18n::Truncation& c : cut)
+            qWarning("%s", qUtf8Printable(c.toString()));
+        QVERIFY(translator_->setLanguage(u"vi"_s));
+        QCoreApplication::processEvents();
+        QCOMPARE(cut.size(), 0);
+        QCOMPARE(badge->text(), vi);
     }
 
     void commandNotice()
