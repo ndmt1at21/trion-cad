@@ -1,6 +1,7 @@
 #include "app/widgets/controls/Controls.h"
 
 #include "app/core/perf/UiProbe.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/theme/generated/Tokens.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -51,12 +52,6 @@ constexpr int kBorder = 1;               // nét viền, nét chia 1 px (không 
 constexpr qreal kDisabledOpacity = 0.45; // .btn[disabled]{opacity:.45}
 constexpr int kChevron = 9;              // mũi tên .ic.xs: 9 px, nét --sw × 1,5 trên lưới 16
 
-// Focus từ bàn phím (:focus-visible); nhấp chuột không vẽ viền focus cho nút.
-bool focusVisible(const QWidget* w)
-{
-    return w->hasFocus() && w->window()->testAttribute(Qt::WA_KeyboardFocusChange);
-}
-
 // Popup của QComboBox (QComboBoxPrivateContainer) và của ComboBox đều là con trực tiếp của ô.
 bool popupOpen(const QComboBox* c)
 {
@@ -64,42 +59,11 @@ bool popupOpen(const QComboBox* c)
     return p && p->parentWidget() == c;
 }
 
-// Khung .btn/.dd/.seg: nền rồi viền 1 px; màu không hợp lệ thì bỏ phần đó.
-void drawBox(QPainter& p, const QRectF& r, const QColor& fill, const QColor& border)
-{
-    const qreal rad = tm().px(tok::r);
-    p.setPen(border.isValid() ? QPen(border, kBorder) : QPen(Qt::NoPen));
-    p.setBrush(fill.isValid() ? QBrush(fill) : QBrush(Qt::NoBrush));
-    p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), rad, rad);
-}
-
-// Viền 2 px nằm trong mép (outline 2 px, offset -1 px): focus --c-focus, lỗi --c-danger.
-void drawRing(QPainter& p, const QRectF& r, const QColor& c)
-{
-    const qreal rad = tm().px(tok::r);
-    p.setPen(QPen(c, 2));
-    p.setBrush(Qt::NoBrush);
-    p.drawRoundedRect(r.adjusted(1, 1, -1, -1), rad, rad);
-}
-
-// Mũi tên xuống tự vẽ (.ic.xs) căn giữa tại c.
-void drawChevron(QPainter& p, QPointF c, const QColor& color)
-{
-    const qreal u = kChevron / 16.0; // một đơn vị của lưới biểu tượng 16 px
-    p.setPen(QPen(color, tok::num(tok::sw) * 1.5 * u, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-    p.setBrush(Qt::NoBrush);
-    p.drawPolyline(QList<QPointF>{c + QPointF(-4 * u, -2 * u), c + QPointF(0, 2 * u), c + QPointF(4 * u, -2 * u)});
-}
-
-// Biểu tượng một màu tô bằng màu chữ của điều khiển (currentColor của prototype): alpha giữ nguyên (bản Locked mờ
-// 75% và huy hiệu ổ khóa của IconProvider vẫn còn hình).
-QPixmap tinted(QPixmap pm, const QColor& c)
-{
-    QPainter p(&pm);
-    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    p.fillRect(pm.rect(), c);
-    return pm;
-}
+using paint::drawBox;
+using paint::drawChevron;
+using paint::drawRing;
+using paint::focusVisible;
+using paint::tinted;
 
 QPixmap lockGlyph(int size, qreal dpr, const QColor& c)
 {
@@ -112,6 +76,49 @@ QFont::Weight weight(tok::NumId id)
 }
 
 } // namespace
+
+// Paint.h
+namespace paint {
+
+bool focusVisible(const QWidget* w)
+{
+    return w->hasFocus() && w->window()->testAttribute(Qt::WA_KeyboardFocusChange);
+}
+
+void drawBox(QPainter& p, const QRectF& r, const QColor& fill, const QColor& border)
+{
+    const qreal rad = tm().px(tok::r);
+    p.setPen(border.isValid() ? QPen(border, kBorder) : QPen(Qt::NoPen));
+    p.setBrush(fill.isValid() ? QBrush(fill) : QBrush(Qt::NoBrush));
+    p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), rad, rad);
+}
+
+void drawRing(QPainter& p, const QRectF& r, const QColor& c)
+{
+    const qreal rad = tm().px(tok::r);
+    p.setPen(QPen(c, 2));
+    p.setBrush(Qt::NoBrush);
+    p.drawRoundedRect(r.adjusted(1, 1, -1, -1), rad, rad);
+}
+
+void drawChevron(QPainter& p, QPointF c, const QColor& color)
+{
+    const qreal u = kChevron / 16.0; // một đơn vị của lưới biểu tượng 16 px
+    p.setPen(QPen(color, tok::num(tok::sw) * 1.5 * u, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    p.setBrush(Qt::NoBrush);
+    p.drawPolyline(QList<QPointF>{c + QPointF(-4 * u, -2 * u), c + QPointF(0, 2 * u), c + QPointF(4 * u, -2 * u)});
+}
+
+// Alpha giữ nguyên: bản Locked mờ 75% và huy hiệu ổ khóa của IconProvider vẫn còn hình.
+QPixmap tinted(QPixmap pm, const QColor& c)
+{
+    QPainter p(&pm);
+    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    p.fillRect(pm.rect(), c);
+    return pm;
+}
+
+} // namespace paint
 
 // ---------------------------------------------------------------------------------------------------- Button
 

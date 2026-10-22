@@ -2,7 +2,7 @@
 # SegmentedGroup, DropDown, ComboBox có ô lọc, SearchField, TabBar, Slider: lớp con widget Qt chuẩn tự vẽ theo token
 # (Controls.h).
 trion_add_library(trion_controls
-  SOURCES Controls.h Controls.cpp
+  SOURCES Controls.h Controls.cpp Paint.h
   LIBS trion_icons trion_perf trion_theme trion_base Qt6::Widgets)
 
 trion_add_test(controls_test SOURCES tests/controls_test.cpp LIBS trion_controls trion_fonts trion_i18n LABELS controls)
