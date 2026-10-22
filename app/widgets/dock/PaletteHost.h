@@ -10,6 +10,10 @@
 //     trong vùng làm việc (fitToScreens);
 //   - F6 / Shift+F6 đưa focus lần lượt qua các palette đang hiện rồi về vùng vẽ; Esc trong palette trả focus về
 //     widget trung tâm (vùng vẽ).
+//   - trợ năng của nhóm tab (DoD-U 7): dải tab Qt tạo khi gộp (QMainWindowTabBar; tên cho trình đọc màn hình là chữ
+//     của tab đang mở) có viền focus --c-focus quanh tab đang mở khi Tab tới. Qt cất palette ở tab nền và dải của
+//     nhóm còn dưới hai palette mở ra tọa độ âm mà vẫn isVisible(): palette cất bị vô hiệu, dải cất không nhận focus
+//     (không còn điểm dừng Tab không thấy); về chỗ thì trả lại.
 //
 // Dùng (UIA-001; sau ThemeManager, IconProvider; trước window.show()):
 //   auto* host = new PaletteHost(&window);                 // con của window, sống theo window
@@ -121,7 +125,8 @@ signals:
     void pinnedChanged(const QString& id, bool pinned);
 
 protected:
-    // Close của window → saveLayout; ChildPolished của nhóm tab nổi → DisplayContext::track.
+    // Close của window → saveLayout; ChildPolished: dải tab của nhóm, nhóm tab nổi (watch). Dải tab: Move (cất),
+    // Paint (viền focus).
     bool eventFilter(QObject* watched, QEvent* e) override;
 
 private:
@@ -136,6 +141,9 @@ private:
     AutoHideStrip* stripOf(const Dock* d) const;
     QStringList stripped() const; // mã palette trong các dải, theo cạnh rồi theo tab
     QList<QWidget*> floatingWindows() const;
+    // Con Qt tạo cho nhóm tab: dải tab (QMainWindowTabBar: lọc sự kiện) hoặc nhóm tab nổi (QDockWidgetGroupWindow:
+    // lọc ChildPolished vì Qt chuyển dải tab vào đó, DisplayContext::track).
+    void watch(QWidget* w);
 
     QMainWindow* window_;
     settings::Store& store_;

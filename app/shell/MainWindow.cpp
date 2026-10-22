@@ -3,10 +3,12 @@
 #include "app/core/i18n/Translator.h"
 #include "app/shell/Workspace.h"
 #include "app/theme/ThemeManager.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/widgets/dock/PaletteHost.h"
 #include "app/widgets/message/Messages.h"
 #include "core/base/assert.h"
 
+#include <QAccessibleWidget>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QMouseEvent>
@@ -58,8 +60,9 @@ int rowHeight(Region r, bool compact)
 }
 
 // Ô giữ chỗ của vùng chưa có widget thật: cao đúng token, nền và nét theo prototype, tên cho trình đọc màn hình.
-// Vùng vẽ: nền --c-canvas, nhận focus. ponytail: UIA-002 (thanh tiêu đề), UIA-005 (ribbon), UIA-010 (tab tệp),
-// UIA-011 (tab layout), UIA-107 (dòng lệnh), UIA-009 (thanh trạng thái), UIA-109 (vùng vẽ) thay qua setRegion.
+// Vùng vẽ: nền --c-canvas, nhận focus (viền --c-focus khi Tab tới), vai trò Canvas (QWidget thường là Client: trình
+// đọc màn hình không biết là gì). ponytail: UIA-002 (thanh tiêu đề), UIA-005 (ribbon), UIA-010 (tab tệp), UIA-011 (tab
+// layout), UIA-107 (dòng lệnh), UIA-009 (thanh trạng thái), UIA-109 (vùng vẽ) thay qua setRegion.
 class Placeholder final : public QWidget {
 public:
     explicit Placeholder(Region r) : region_(r)
@@ -69,6 +72,7 @@ public:
         if (r == Region::Canvas) {
             setFocusPolicy(Qt::StrongFocus);
             setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            QAccessible::installFactory(&accessible); // Qt bỏ qua lần cài lại
         } else {
             setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         }
@@ -98,6 +102,10 @@ protected:
         switch (region_) {
         case Region::Canvas:
             p.fillRect(r, t.color(tok::c_canvas));
+            if (ui::paint::focusVisible(this)) {
+                p.setRenderHint(QPainter::Antialiasing);
+                ui::paint::drawRing(p, r, t.color(tok::c_focus));
+            }
             return;
         case Region::Ribbon: // hàng tab --c-chrome trên thân --c-base
             p.fillRect(r, t.color(tok::c_base));
@@ -117,6 +125,12 @@ protected:
 
 private:
     bool compact() const { return property("compact").toBool(); }
+
+    static QAccessibleInterface* accessible(const QString&, QObject* o)
+    {
+        auto* p = dynamic_cast<Placeholder*>(o);
+        return p && p->region_ == Region::Canvas ? new QAccessibleWidget(p, QAccessible::Canvas) : nullptr;
+    }
 
     Region region_;
 };

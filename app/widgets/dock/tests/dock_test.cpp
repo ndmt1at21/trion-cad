@@ -13,7 +13,9 @@
 //      ≤ 150 ms (chỉ kiểm ở release).
 //   4  focusKeys: F6 / Shift+F6 vòng qua palette đang hiện và vùng vẽ; Esc về vùng vẽ (cả từ palette nổi); Esc của ô
 //      tìm còn chữ là của ô; accessibleNames: tên trình đọc màn hình của palette (tiêu đề) và nút đầu palette, đổi
-//      theo trạng thái ghim và ngôn ngữ.
+//      theo trạng thái ghim và ngôn ngữ. groupAccessibility: a11y::audit của cửa sổ mẫu 0 vi phạm (dải tab của
+//      nhóm có viền --c-focus khi Tab tới); palette ở tab nền và dải tab bị Qt cất không nhận Tab (đổi tab, đóng,
+//      mở, nhóm nổi).
 //   5  header: ảnh baseline đầu palette Tối/Sáng × 100/150/200% theo nền tảng, màu token ở chỗ không có chữ, cỡ theo
 //      token. Ghi lại baseline: TRION_UPDATE_BASELINE=<thư mục> chạy test, chép header-*-<nền tảng>.png vào
 //      tests/baseline. pseudoNoTruncation: vi-XL, findTruncations = 0; idleNoTimers: rảnh không timer nào chạy.
@@ -21,6 +23,7 @@
 #include "app/widgets/dock/PaletteHeader.h"
 #include "app/widgets/dock/PaletteHost.h"
 
+#include "app/core/a11y/AccessibilityAudit.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
 #include "app/core/perf/UiProbe.h"
@@ -179,7 +182,9 @@ class DockTest : public QObject {
         col->setSpacing(0);
         auto* search = new SearchField;
         search->setObjectName(u"search"_s);
+        search->setAccessibleName(id); // tên cho trình đọc màn hình (a11y::audit ở groupAccessibility)
         auto* list = new QListWidget;
+        list->setAccessibleName(id);
         for (int i = 0; i < 100; ++i)
             list->addItem(u"%1 %2"_s.arg(id).arg(i));
         col->addWidget(search);
@@ -669,6 +674,67 @@ private slots:
         QVERIFY(translator_->setLanguage(u"vi"_s));
         QTRY_COMPARE(d->windowTitle(), u"Thuộc tính"_s);
         QCOMPARE(h->closeButton()->accessibleName(), u"Đóng palette"_s);
+    }
+
+    // Nhóm tab (DoD-U 7; integration nhóm 5 bắt trên cửa sổ chính): Qt cất palette ở tab nền và dải tab của nhóm còn
+    // dưới hai palette mở ra tọa độ âm mà vẫn isVisible() — điểm dừng Tab không thấy, dải rỗng không tên; focus của
+    // tab vẽ bằng Fusion, không qua TrionStyle.
+    void groupAccessibility()
+    {
+        tm_->setReducedMotion(true); // như drag: thả palette không animation
+        QVERIFY(build());
+        // Cả cửa sổ mẫu: tên, vai trò, vòng Tab, viền --c-focus. Vùng vẽ giả của mẫu (không tên, không viền) ngoài phạm
+        // vi.
+        canvas_->setFocusPolicy(Qt::NoFocus);
+        const auto audit = [this](QStringList* order = nullptr) {
+            return (trion::a11y::checkNames(win_.get()) + trion::a11y::checkFocus(win_.get(), order)).join(u'\n');
+        };
+        QString issues = audit(); // Thuộc tính mở, Layer đóng: dải của nhóm bị cất
+        QVERIFY2(issues.isEmpty(), qPrintable(issues));
+
+        host_->showPalette(u"layers"_s); // lên đầu nhóm; Thuộc tính (đã dựng) thành tab nền
+        QTabBar* bar = groupBar();
+        QVERIFY(bar);
+        // Điểm dừng Tab trong palette theo luật của QWidget::focusNextPrevChild (như a11y::checkFocus).
+        const auto stops = [this](const char* id) {
+            int n = 0;
+            for (const QWidget* w : dock(id)->findChildren<QWidget*>())
+                n += w->isVisible() && w->isEnabled() && (w->focusPolicy() & Qt::TabFocus) == Qt::TabFocus;
+            return n;
+        };
+        QCOMPARE(stops("props"), 0);
+        QVERIFY(stops("layers") >= 3); // ghim, tùy chọn, đóng, nội dung
+        QStringList order;
+        issues = audit(&order);
+        QVERIFY2(issues.isEmpty(), qPrintable(issues));
+        QVERIFY(order.contains(u"%1 ''"_s.arg(QLatin1StringView(bar->metaObject()->className())))); // dải có viền
+        canvas_->setFocusPolicy(Qt::StrongFocus);
+
+        // Đổi tab: tab mới mở nhận Tab, tab thành nền thì không; focus đang ở palette thành nền về vùng vẽ.
+        host_->header(u"layers"_s)->menuButton()->setFocus();
+        bar->setCurrentIndex(tabIndex(bar, dock("props")->windowTitle()));
+        QTRY_VERIFY(stops("props") >= 3);
+        QCOMPARE(stops("layers"), 0);
+        QVERIFY(canvas_->hasFocus());
+        // Đóng Layer: nhóm còn một palette, dải bị cất không nhận focus; mở lại thì nhận.
+        dock("layers")->close();
+        QTRY_COMPARE(bar->focusPolicy(), Qt::NoFocus); // Qt bố cục lại qua hàng đợi
+        host_->showPalette(u"layers"_s);
+        QTRY_COMPARE(bar->focusPolicy(), Qt::TabFocus);
+
+        // Nhóm nổi tạo bằng kéo (palette thả vào giữa palette nổi): tab nền trong cửa sổ của nhóm không nhận Tab.
+        host_->moveTo(u"tcvn"_s, Qt::NoDockWidgetArea);
+        host_->moveTo(u"count"_s, Qt::NoDockWidgetArea);
+        QList<double> ms;
+        dragHeader("count", dock("tcvn")->mapToGlobal(dock("tcvn")->rect().center()), ms);
+        QWidget* group = dock("tcvn")->parentWidget();
+        QVERIFY(group->isWindow() && group->inherits("QDockWidgetGroupWindow"));
+        QCOMPARE(dock("count")->parentWidget(), group);
+        const QList<QTabBar*> bars = group->findChildren<QTabBar*>(Qt::FindDirectChildrenOnly);
+        QCOMPARE(bars.size(), 1);
+        const bool countFront = bars[0]->tabText(bars[0]->currentIndex()) == dock("count")->windowTitle();
+        QVERIFY(stops(countFront ? "count" : "tcvn") >= 3);
+        QCOMPARE(stops(countFront ? "tcvn" : "count"), 0);
     }
 
     // Tiêu chí 5 (DoD-U 1, 2).

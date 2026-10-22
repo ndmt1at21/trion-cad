@@ -3,6 +3,7 @@
 #include "app/core/perf/UiProbe.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/controls/Controls.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/widgets/dock/AutoHideStrip.h"
 #include "app/widgets/dock/PaletteHeader.h"
 #include "core/base/assert.h"
@@ -14,7 +15,9 @@
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QMenu>
+#include <QPainter>
 #include <QScreen>
+#include <QTabBar>
 
 #include <algorithm>
 
@@ -31,6 +34,13 @@ constexpr int kLayoutVersion = 1; // tăng khi đổi bố cục không tương 
 bool onScreen(const QWidget* w)
 {
     return w->isVisible() && !w->visibleRegion().isEmpty();
+}
+
+// Qt cất widget của bố cục dock ra tọa độ âm mà vẫn isVisible(): tab nền của nhóm, dải tab của nhóm còn dưới hai
+// palette đang mở. Widget đó vẫn ở chuỗi Tab dù không thấy. Cửa sổ (palette nổi) dùng tọa độ màn hình, có thể âm.
+bool parked(const QWidget* w)
+{
+    return !w->isWindow() && (w->geometry().right() < 0 || w->geometry().bottom() < 0);
 }
 
 // Widget đầu tiên nhận focus bằng Tab trong cây của root (theo chuỗi focus), nullptr nếu không có.
@@ -119,6 +129,16 @@ protected:
         if (AutoHideStrip* s = host_->stripOf(this))
             s->removePalette(this);
         QDockWidget::closeEvent(e);
+    }
+
+    // Tab nền của nhóm (parked): vô hiệu cả dock để đầu và thân ra khỏi chuỗi Tab, bật lại khi về tab đang mở.
+    void moveEvent(QMoveEvent* e) override
+    {
+        const bool away = parked(this);
+        if (away && isAncestorOf(QApplication::focusWidget()))
+            host_->focusCanvas(); // bấm tab khác khi focus ở palette này: không để focus ở widget không thấy
+        setEnabled(!away);
+        QDockWidget::moveEvent(e);
     }
 
 private:
@@ -478,15 +498,48 @@ void PaletteHost::focusCanvas()
     canvas->setFocus(Qt::ShortcutFocusReason);
 }
 
+void PaletteHost::watch(QWidget* w)
+{
+    if (qobject_cast<QTabBar*>(w)) {
+        w->installEventFilter(this);
+    } else if (w->isWindow() && w->inherits("QDockWidgetGroupWindow")) {
+        // Nhóm tab nổi do Qt tạo khi kéo: dải tab Qt chuyển vào nhóm (ChildPolished của dải tới nhóm, không tới
+        // window); DPI, màn hình như palette nổi.
+        w->installEventFilter(this);
+        for (QTabBar* bar : w->findChildren<QTabBar*>(Qt::FindDirectChildrenOnly))
+            watch(bar);
+        if (display_)
+            display_->track(w);
+    }
+}
+
 bool PaletteHost::eventFilter(QObject* watched, QEvent* e)
 {
+    if (auto* bar = qobject_cast<QTabBar*>(watched)) {
+        // Dải đang cất (nhóm còn dưới hai palette mở) ra khỏi chuỗi Tab và khỏi kiểm tên: QAccessibleTabBar lấy tên là
+        // chữ của tab đang mở, dải rỗng không có tên.
+        if (e->type() == QEvent::Move) {
+            const bool away = parked(bar);
+            if (away && bar->hasFocus())
+                focusCanvas();
+            bar->setFocusPolicy(away ? Qt::NoFocus : Qt::TabFocus); // TabFocus: mặc định của QTabBar
+        }
+        if (e->type() != QEvent::Paint || !paint::focusVisible(bar) || bar->currentIndex() < 0)
+            return false;
+        // Viền focus quanh tab đang mở như ui::TabBar (QCommonStyle vẽ focus của tab bằng Fusion, không qua
+        // TrionStyle): dải tự vẽ xong rồi vẽ đè. ponytail: khung focus mờ của Fusion vẫn còn bên trong viền; bỏ khi
+        // TrionStyle vẽ focus của tab.
+        watched->event(e);
+        QPainter p(bar);
+        p.setRenderHint(QPainter::Antialiasing);
+        paint::drawRing(p, bar->tabRect(bar->currentIndex()), theme::ThemeManager::instance().color(tok::c_focus));
+        return true;
+    }
     if (watched == window_ && e->type() == QEvent::Close) {
         saveLayout();
-    } else if (watched == window_ && e->type() == QEvent::ChildPolished && display_) {
-        // Nhóm tab nổi do Qt tạo khi kéo (QDockWidgetGroupWindow): theo dõi DPI, màn hình như palette nổi.
-        auto* w = qobject_cast<QWidget*>(static_cast<QChildEvent*>(e)->child());
-        if (w && w->isWindow() && w->inherits("QDockWidgetGroupWindow"))
-            display_->track(w);
+    } else if (e->type() == QEvent::ChildPolished) { // con của window hoặc của nhóm tab nổi
+        if (auto* w = qobject_cast<QWidget*>(static_cast<QChildEvent*>(e)->child()))
+            watch(w);
     }
     return QObject::eventFilter(watched, e);
 }

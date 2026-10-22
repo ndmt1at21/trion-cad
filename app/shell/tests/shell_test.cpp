@@ -921,6 +921,17 @@ private slots:
         }
         QCOMPARE(MainWindow::regionName(Region::Canvas), u"Vùng vẽ"_s);
         QCOMPARE(canvas()->focusPolicy(), Qt::StrongFocus);
+        // Ô giữ chỗ vùng vẽ (UIA-109 thay): vai trò Canvas (QWidget thường là Client), viền 2 px --c-focus chỉ khi focus
+        // đến từ bàn phím.
+        QCOMPARE(QAccessible::queryAccessibleInterface(canvas())->role(), QAccessible::Canvas);
+        const auto edge = [this] {
+            const QImage shot = canvas()->grab().toImage();
+            return shot.pixel(1, shot.height() / 2);
+        };
+        QCOMPARE(edge(), tm_->color(tok::c_canvas).rgb());
+        win_->setAttribute(Qt::WA_KeyboardFocusChange); // như vừa Tab tới
+        QCOMPARE(edge(), tm_->color(tok::c_focus).rgb());
+        win_->setAttribute(Qt::WA_KeyboardFocusChange, false);
         // F6: vào palette đang mở rồi về vùng vẽ (PaletteHost)
         QTest::keyClick(QApplication::focusWidget(), Qt::Key_F6);
         QVERIFY(spinUntil([&] { return dock("props")->isAncestorOf(QApplication::focusWidget()); }));
