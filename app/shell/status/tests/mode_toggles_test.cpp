@@ -6,7 +6,8 @@
 //                      hàng token như gõ 'ORTHOMODE (bản ghi INT-002 thật: Hoãn)
 //   osnapMenu          ô chọn đúng bit OSMODE; bật/tắt từng chế độ gửi mặt nạ đúng, menu mở tiếp
 //   polarMenu          góc tăng, góc người dùng → 'POLARANG …; chọn góc thì bật Polar
-//   otherMenus         SNAPTYPE, DYNMODE/DYNPROMPT; "Thiết lập…" → '_+DSETTINGS <tab>, '_LWEIGHT
+//   otherMenus         SNAPTYPE, DYNMODE/DYNPROMPT; Isometric (SNAPSTYL, mặt SNAPISOPAIR); "Thiết lập…" →
+//                      '_+DSETTINGS <tab>, '_LWEIGHT
 //   tooltips           tiêu chí 3: tên, sysvar · phím, mô tả; tên cho trình đọc màn hình
 //   withoutColor       tiêu chí 3: bật/tắt khác nhau ở ảnh xám (gạch dưới); trợ năng báo trạng thái chọn
 //   viewerProfile      tiêu chí 4: Viewer còn 3 nút; "Thiết lập…" khóa → trang nâng cấp, không gửi lệnh
@@ -519,10 +520,27 @@ private slots:
         QCOMPARE(take(), QStringList{u"'DYNPROMPT 0"_s});
         QVERIFY(!prompt->isChecked());
 
+        // Isometric (P1, hành động "iso" gắn SNAPSTYL của ActionRegistry): bật/tắt, menu mặt trái/trên/phải
+        QToolButton* iso = button("iso");
+        QVERIFY(iso);
+        sysvars_->set(u"SNAPSTYL"_s, 0);
+        QVERIFY(!iso->isChecked());
+        iso->click();
+        QCOMPARE(take(), QStringList{u"'SNAPSTYL 1"_s});
+        QVERIFY(iso->isChecked());
+        QMenu* faces = menuOf(iso);
+        sysvars_->set(u"SNAPISOPAIR"_s, 0);
+        QVERIFY(item(faces, u"Mặt trái"_s)->isChecked());
+        item(faces, u"Mặt phải"_s)->trigger();
+        QCOMPARE(take(), QStringList{u"'SNAPISOPAIR 2"_s});
+        QVERIFY(item(faces, u"Mặt phải"_s)->isChecked() && !item(faces, u"Mặt trái"_s)->isChecked());
+        sysvars_->set(u"SNAPSTYL"_s, 0);
+
         // "Thiết lập…": tab +DSETTINGS của AutoCAD theo prototype (tabOf); lineweight mở LWEIGHT
         const std::pair<const char*, const char*> kSettings[] = {
             {"grid", "'_+DSETTINGS 0"},  {"snap", "'_+DSETTINGS 0"},   {"dyn", "'_+DSETTINGS 4"},
             {"ortho", "'_+DSETTINGS 0"}, {"otrack", "'_+DSETTINGS 2"}, {"LWDISPLAY", "'_LWEIGHT"},
+            {"iso", "'_+DSETTINGS 0"},
         };
         for (const auto& [id, macro] : kSettings) {
             QMenu* m = menuOf(button(id));
@@ -532,8 +550,6 @@ private slots:
             QCOMPARE(take(), QStringList{QString::fromLatin1(macro)});
         }
         QVERIFY(!menuOf(button("TRANSPARENCYDISPLAY"))); // 07.1 §10: không có menu
-        // Isometric (P1) Hoãn: ActionRegistry chưa có hành động "iso" gắn SNAPSTYL
-        QVERIFY(!button("iso"));
     }
 
     void tooltips()
@@ -648,7 +664,7 @@ private slots:
 
         restore.dismiss();
         gate_->setEdition(edition::Edition::Pro);
-        QCOMPARE(visible().size(), 9);
+        QCOMPARE(visible().size(), 10); // 9 nút EA + Isometric (P1)
         QCOMPARE(osnap->accessibleName(), u"Bắt điểm"_s);
         m->popup(osnap->mapToGlobal(QPoint(0, 0)));
         QCOMPARE(ui::RichTooltip::info(settings).need, ui::Edition::None);
@@ -709,8 +725,8 @@ private slots:
         tm_->setTheme(light ? Theme::Light : Theme::Dark);
         QCoreApplication::processEvents(); // Qt 6.11 gửi ApplicationPaletteChange qua hàng đợi
         const std::pair<const char*, int> kState[] = {
-            {"GRIDMODE", 0},  {"SNAPMODE", 1},  {"DYNMODE", 3},   {"ORTHOMODE", 0},
-            {"AUTOSNAP", 47}, {"OSMODE", 4133}, {"LWDISPLAY", 0}, {"TRANSPARENCYDISPLAY", 1},
+            {"GRIDMODE", 0}, {"SNAPMODE", 1},  {"DYNMODE", 3},   {"ORTHOMODE", 0},           {"AUTOSNAP", 47},
+            {"SNAPSTYL", 0}, {"OSMODE", 4133}, {"LWDISPLAY", 0}, {"TRANSPARENCYDISPLAY", 1},
         };
         for (const auto& [name, value] : kState)
             sysvars_->set(QString::fromLatin1(name), value);

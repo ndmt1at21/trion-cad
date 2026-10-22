@@ -6,18 +6,20 @@
 // parseOptions → SingleInstance (lần chạy sau chuyển đường dẫn rồi thoát ở đây). Application dựng tiếp, mỗi pha một mốc
 // trong StartupTrace:
 //   Store (tệp cài đặt của --settings) → UiExecutor → Translator → loadFonts → ThemeManager → IconProvider → Keymap →
-//   [ready] → cửa sổ chính (UIA-001: Sysvars, ActionRegistry, EditionGate, CommandRouter, MainWindow + CleanScreen;
-//   khôi phục hình học, palette, workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn
-//   hình; lớp màn hình cho MainWindow) → hiện cửa sổ.
-// Thoát (hàm hủy): hủy token toàn ứng dụng, lưu hình học và bố cục của cửa sổ chính, hủy cửa sổ và IconProvider (hủy
-// việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự ngược; UiExecutor và
-// Store (ghi nốt cài đặt) cuối cùng.
+//   [ready] → BackgroundJobs (NT-013) → cửa sổ chính (UIA-001: Sysvars, ActionRegistry, EditionGate, CommandRouter,
+//   MainWindow + CleanScreen; ShellAssembly lắp vùng thật của đợt 5 và nối lệnh; khôi phục hình học, palette,
+//   workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình; lớp màn hình cho
+//   MainWindow) → hiện cửa sổ.
+// Thoát (hàm hủy): hủy token toàn ứng dụng, lưu hình học và bố cục của cửa sổ chính, hủy cửa sổ (widget trước
+// ShellAssembly, ActionRegistry, Sysvars, EditionGate), hủy BackgroundJobs (yêu cầu hủy mọi tác vụ) và IconProvider
+// (hủy việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự ngược;
+// UiExecutor và Store (ghi nốt cài đặt) cuối cùng.
 //
 // Luồng UI sở hữu document (UiExecutor.h: kết quả nền về luồng UI, requireUiThread chặn API ghi gọi sai luồng).
 // ponytail: chưa có phiên nhiều bản vẽ DOC-018 và input pipeline INT-002, nên chưa có CoreSession; đường dẫn cần mở
-// (dòng lệnh, lần chạy sau) chỉ tới openRequested(), DOC-018/UIB-002 nối. Lệnh từ hành động (ActionRegistry) tới bộ
-// định tuyến tạm shell::CommandRouter (Clean Screen chạy, lệnh khác ghi log); vùng của cửa sổ chính là ô giữ chỗ tới
-// bước integration (MainWindow::setRegion).
+// (dòng lệnh, lần chạy sau, thả tệp lên tab tệp) chỉ tới openRequested(), DOC-018/UIB-002 nối. Lệnh từ hành động
+// (ActionRegistry), ribbon, dòng lệnh, tab tệp, nút chế độ tới bộ định tuyến tạm shell::CommandRouter (Clean Screen,
+// COMMANDLINE/HIDE, sysvar trong suốt chạy; lệnh khác ghi log); vùng vẽ, tab layout còn là ô giữ chỗ (ShellAssembly.h).
 
 #include "core/base/sched/Scheduler.h"
 
@@ -55,12 +57,16 @@ class Sysvars;
 namespace trion::edition {
 class EditionGate;
 }
+namespace trion::jobs {
+class BackgroundJobs;
+}
 namespace trion::shell {
 class CommandRouter;
 }
 
 namespace trion::app {
 
+class ShellAssembly;
 class StartupTrace;
 
 // Dòng lệnh của trion (Application::parseOptions).
@@ -89,10 +95,11 @@ public:
 
     // Luồng UI: token bị hủy khi ứng dụng thoát. Việc nền dài chép token lúc gửi và kiểm thường xuyên (DoD-H 5: dừng
     // ≤ 50 ms): thoát chờ mọi việc nền dừng, việc không kiểm token làm thoát chậm. Không có Application: token không
-    // hủy. ponytail: tác vụ có tiến trình của NT-013 (BackgroundJobs) chưa có; khi có, thoát gọi hủy mọi tác vụ của nó.
+    // hủy. Tác vụ có tiến trình (BackgroundJobs::instance(), NT-013) bị hủy khi thoát cùng lúc.
     static sched::CancelToken cancelToken();
 
     QMainWindow* mainWindow() const { return window_.get(); }
+    ShellAssembly* shell() const { return shell_.get(); } // vùng thật, phần nối của cửa sổ chính; nullptr với --gallery
 
     // Luồng UI: tệp từ dòng lệnh hoặc từ lần chạy sau (SingleInstance::received). Đưa cửa sổ chính lên trước (bỏ thu
     // nhỏ), rồi phát openRequested nếu có đường dẫn.
@@ -116,12 +123,14 @@ private:
     std::unique_ptr<theme::IconProvider> icons_;
     std::unique_ptr<keymap::Keymap> keymap_;
     std::unique_ptr<ui::RichTooltip> tips_;
+    std::unique_ptr<jobs::BackgroundJobs> jobs_; // tác vụ nền có tiến trình của ứng dụng (NT-013)
     // Cửa sổ chính (không có với --gallery): sysvar tạm (INT-005), hành động, cổng phiên bản, bộ định tuyến lệnh tạm.
     std::unique_ptr<actions::Sysvars> sysvars_;
     std::unique_ptr<actions::ActionRegistry> actions_;
     std::unique_ptr<edition::EditionGate> gate_;
     std::unique_ptr<shell::CommandRouter> router_;
-    std::unique_ptr<QMainWindow> window_; // shell::MainWindow, hoặc GalleryWindow với --gallery
+    std::unique_ptr<ShellAssembly> shell_; // ribbon, thông báo; widget của nó thuộc window_ (hủy trước)
+    std::unique_ptr<QMainWindow> window_;  // shell::MainWindow, hoặc GalleryWindow với --gallery
     std::unique_ptr<ui::DisplayContext> display_;
 };
 

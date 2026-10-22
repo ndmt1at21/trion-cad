@@ -26,3 +26,6 @@ trion_integration_test(it_khung_test
   trion_base trion_appcore trion_theme trion_fonts trion_icons trion_i18n trion_perf trion_display trion_keymap
   trion_tooltip trion_menu trion_actions trion_edition trion_controls trion_dialog trion_dock trion_jobs trion_progress
   trion_message trion_numeric_field trion_cmdline trion_views)
+# Nhóm 5 (khung ứng dụng đợt 5): UIA-001 cửa sổ chính, UIA-002 thanh tiêu đề, UIA-010 tab tệp, UIA-102 ribbon, UIA-107
+# dòng lệnh, UIA-112 nút chế độ, UI0-013 trợ năng — lắp bằng Application (app/main/ShellAssembly) như exe trion.
+trion_integration_test(it_vo_test trion_application trion_a11y)

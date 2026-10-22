@@ -54,6 +54,7 @@ constexpr SysvarAction kSysvarActions[] = {
     {"infer", "CONSTRAINTINFER", SysvarAction::Bit, 1, "PRO", "infer", nullptr},
     {"cycle", "SELECTIONCYCLING", SysvarAction::Sign, 2, "PRO", "cycle", nullptr},
     {"isop", "SNAPISOPAIR", SysvarAction::Cycle, 3, "PRO", "iso", nullptr},
+    {"iso", "SNAPSTYL", SysvarAction::Bit, 1, "PRO", "iso", QT_TRANSLATE_NOOP("actions", "Isometric")},
     {"coord", "COORDS", SysvarAction::Cycle, 3, "V", "", nullptr},
     {"PICKSTYLE", "PICKSTYLE", SysvarAction::Bit, 1, "PRO", "select", nullptr},
     {"LWDISPLAY", "LWDISPLAY", SysvarAction::Bit, 1, "V", "lw", QT_TRANSLATE_NOOP("actions", "Hiển thị độ dày nét")},
@@ -211,10 +212,14 @@ QString ActionRegistry::macro(const Entry& e) const
         const QString name = QString::fromLatin1(s->sysvar);
         return u"'%1 %2"_s.arg(name).arg(next(*s, sysvars_.get(name)));
     }
-    // Clean Screen (Ctrl+0, nút thanh trạng thái) đổi vòng như macro CUI của AutoCAD: DIESEL $M=$(if,…) chọn
-    // _cleanscreenoff khi CLEANSCREENSTATE bật, _cleanscreenon khi tắt (UIA-001).
-    const QString command =
-        e.command == u"CLEANSCREENON"_s && sysvars_.get(u"CLEANSCREENSTATE"_s) != 0 ? u"CLEANSCREENOFF"_s : e.command;
+    // Clean Screen (Ctrl+0, nút thanh trạng thái) và dòng lệnh (Ctrl+9) đổi vòng như macro CUI của AutoCAD: DIESEL
+    // $M=$(if,…) chọn _cleanscreenoff khi CLEANSCREENSTATE bật (UIA-001), _commandlinehide khi CLISTATE bật (dòng lệnh
+    // đang hiện; integration nhóm 5).
+    QString command = e.command;
+    if (command == u"CLEANSCREENON"_s && sysvars_.get(u"CLEANSCREENSTATE"_s) != 0)
+        command = u"CLEANSCREENOFF"_s;
+    else if (command == u"COMMANDLINE"_s && sysvars_.get(u"CLISTATE"_s) != 0)
+        command = u"COMMANDLINEHIDE"_s;
     return (e.transparent ? u"'_"_s : u"^C^C_"_s) + command;
 }
 

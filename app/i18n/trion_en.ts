@@ -679,6 +679,10 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
 <context>
     <name>actions</name>
     <message>
+        <source>Isometric</source>
+        <translation>Isometric</translation>
+    </message>
+    <message>
         <source>Hiển thị độ dày nét</source>
         <translation>Lineweight display</translation>
     </message>
@@ -3493,6 +3497,21 @@ TCVN</source>
     <message>
         <source>Mở bảng mẫu thành phần giao diện thay cho cửa sổ chính.</source>
         <translation>Open the UI component gallery instead of the main window.</translation>
+    </message>
+</context>
+<context>
+    <name>trion::app::ShellAssembly</name>
+    <message>
+        <source>&lt;Clean Screen tắt&gt;</source>
+        <translation>&lt;Clean Screen off&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Clean Screen bật&gt;</source>
+        <translation>&lt;Clean Screen on&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Clean Screen bật · %1 để tắt&gt;</source>
+        <translation>&lt;Clean Screen on · %1 to turn off&gt;</translation>
     </message>
 </context>
 <context>

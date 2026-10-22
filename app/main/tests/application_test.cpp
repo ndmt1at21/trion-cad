@@ -16,11 +16,13 @@
 #include "core/base/settings/Settings.h"
 #include "tests/timing.h"
 
+#include <QCursor>
 #include <QDebug>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -147,6 +149,10 @@ private slots:
     {
         dir_ = std::make_unique<QTemporaryDir>();
         QVERIFY(dir_->isValid());
+        // Con trỏ offscreen mặc định (10, 10) nằm trên nút menu ứng dụng của thanh tiêu đề (integration nhóm 5): cửa sổ
+        // hiện lên dưới con trỏ thì tooltip 2 mức chạy (đúng hành vi, không phải rảnh). Đặt con trỏ giữa màn hình (vùng
+        // vẽ, không tooltip).
+        QCursor::setPos(QGuiApplication::primaryScreen()->geometry().center());
     }
 
     void cleanupTestCase()

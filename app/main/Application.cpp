@@ -6,9 +6,11 @@
 #include "app/core/i18n/Translator.h"
 #include "app/core/keymap/Keymap.h"
 #include "app/core/UiExecutor.h"
+#include "app/main/ShellAssembly.h"
 #include "app/main/StartupTrace.h"
 #include "app/shell/CleanScreen.h"
 #include "app/shell/CommandRouter.h"
+#include "app/shell/filetabs/FileTabBar.h"
 #include "app/shell/MainWindow.h"
 #include "app/shell/Workspace.h"
 #include "app/widgets/dock/PaletteHost.h"
@@ -18,6 +20,7 @@
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
 #include "core/base/assert.h"
+#include "core/base/jobs/BackgroundJobs.h"
 #include "core/base/settings/Settings.h"
 
 #include <QCommandLineParser>
@@ -114,6 +117,7 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
     trace_.mark(u"keymap"_s);
     trace_.mark(u"ready"_s);
 
+    jobs_ = std::make_unique<jobs::BackgroundJobs>(); // BackgroundJobs::instance() của ứng dụng
     shell::MainWindow* main = nullptr;
     if (options.gallery) {
         window_ = std::make_unique<ui::GalleryWindow>();
@@ -127,9 +131,13 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
         actions_->setSink([router = router_.get()](const QString& macro) { router->submit(macro); });
         auto window = std::make_unique<shell::MainWindow>(*store_);
         main = window.get();
-        new shell::CleanScreen(*main, *sysvars_, *router_); // con của cửa sổ; CLEANSCREENON/OFF, Ctrl+0
+        auto* clean = new shell::CleanScreen(*main, *sysvars_, *router_); // con của cửa sổ; CLEANSCREENON/OFF, Ctrl+0
         actions_->install(main);
         actions_->addViewport(main->region(shell::MainWindow::Region::Canvas));
+        // Vùng thật trước khi khôi phục: hình học, bố cục áp lên widget thật.
+        shell_ =
+            std::make_unique<ShellAssembly>(*main, *keymap_, *actions_, *sysvars_, *gate_, *router_, *clean, *jobs_);
+        connect(shell_->fileTabs, &shell::FileTabBar::openRequested, this, &Application::requestOpen);
         // Hồ sơ trước khi khôi phục: bố cục của workspace đang dùng áp một lần.
         main->workspace().setProfile(gate_->profile());
         connect(gate_.get(), &edition::EditionGate::profileChanged, &main->workspace(), &shell::Workspace::setProfile);
@@ -165,10 +173,12 @@ Application::~Application()
         main->save(); // thoát không qua đóng cửa sổ (quit, phiên kết thúc): vẫn lưu hình học, bố cục
     display_.reset();
     window_.reset();
+    shell_.reset(); // sau widget: RibbonControls sống lâu hơn nút ribbon, NotificationCenter lâu hơn ToastHost
     router_.reset();
     gate_.reset(); // gỡ cổng khỏi ActionRegistry
     actions_.reset();
     sysvars_.reset();
+    jobs_.reset(); // yêu cầu hủy mọi tác vụ còn chạy; waitIdle dưới chờ chúng dừng
     tips_.reset();
     icons_.reset(); // hủy việc raster trước còn chờ
     sched::waitIdle();

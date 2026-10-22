@@ -3,7 +3,8 @@
 //                     danh mục và mọi hành động KDEF của Keymap có QAction
 //   surfacesAndKeys   tiêu chí 1: mục Menu, nút QToolBar, mọi phím của Keymap cho đúng chuỗi của hành động giữ phím
 //   sysvarTwoWay      tiêu chí 2: sysvar đổi từ nơi khác → QAction và nút đổi ngay (đồng bộ), bấm không tự đảo
-//   cleanScreenCycle  UIA-001: Ctrl+0 gửi '_CLEANSCREENON hoặc '_CLEANSCREENOFF theo CLEANSCREENSTATE
+//   cleanScreenCycle  UIA-001: Ctrl+0 gửi '_CLEANSCREENON hoặc '_CLEANSCREENOFF theo CLEANSCREENSTATE; integration
+//                     nhóm 5: Ctrl+9 gửi '_COMMANDLINE hoặc '_COMMANDLINEHIDE theo CLISTATE
 //   viewportScope     tiêu chí 3: phím Vùng vẽ không chạy ở ô văn bản; Ctrl+C ở ô là chép chữ, ở vùng vẽ là COPYCLIP
 //   latency           tiêu chí 4: phím/bấm → chuỗi tới chỗ nối INT-002; không timer
 //   keymapFollows, retranslate, gate, metadata: phím đổi theo Keymap, nhãn theo ngôn ngữ, cổng UI0-011, phiên bản
@@ -77,6 +78,7 @@ const SysvarSpec kSysvarSpec[] = {
     {"infer", "CONSTRAINTINFER", 0, "'CONSTRAINTINFER 1", false},
     {"cycle", "SELECTIONCYCLING", -2, "'SELECTIONCYCLING 2", false},
     {"isop", "SNAPISOPAIR", 2, "'SNAPISOPAIR 0", false}, // Phải → Trái
+    {"iso", "SNAPSTYL", 0, "'SNAPSTYL 1", false},        // nút Isometric (UIA-112)
     {"coord", "COORDS", 1, "'COORDS 2", false},
     {"PICKSTYLE", "PICKSTYLE", 3, "'PICKSTYLE 2", true},
     {"LWDISPLAY", "LWDISPLAY", 0, "'LWDISPLAY 1", false},
@@ -353,8 +355,18 @@ private slots:
     }
 
     // UIA-001: Ctrl+0 đổi vòng bật/tắt theo CLEANSCREENSTATE như macro CUI của AutoCAD; trạng thái do CleanScreen đặt.
+    // Ctrl+9 như vậy theo CLISTATE (1: dòng lệnh đang hiện; cửa sổ chính đặt khi ẩn/hiện vùng).
     void cleanScreenCycle()
     {
+        const QKeyCombination ctrl9(Qt::ControlModifier, Qt::Key_9);
+        sysvars_->set(u"CLISTATE"_s, 1);
+        press(viewport_, ctrl9);
+        QCOMPARE(take(), QStringList{u"'_COMMANDLINEHIDE"_s});
+        sysvars_->set(u"CLISTATE"_s, 0);
+        press(viewport_, ctrl9);
+        QCOMPARE(take(), QStringList{u"'_COMMANDLINE"_s});
+        QCOMPARE(reg_->macro(u"COMMANDLINE"_s), u"'_COMMANDLINE"_s);
+
         const QKeyCombination ctrl0(Qt::ControlModifier, Qt::Key_0);
         sysvars_->set(u"CLEANSCREENSTATE"_s, 0);
         press(viewport_, ctrl0);

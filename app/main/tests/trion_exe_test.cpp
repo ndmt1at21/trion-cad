@@ -329,13 +329,15 @@ private slots:
     }
 
     // Tiêu chí 5: rảnh sau khởi động, CPU trung bình ≤ 0,5%; Linux: luồng UI không thức lần nào (0 timer định kỳ).
-    // Khoảng đo 30 s ở bản release (bộ test vẫn < 60 s), 5 s ở bản khác; không tính 2 s đầu (raster trước biểu tượng).
+    // Khoảng đo 30 s ở bản release (bộ test vẫn < 60 s), 5 s ở bản khác; không tính 3 s đầu: raster trước biểu tượng,
+    // và tooltip 2 mức (450 ms + 1,5 s, timer một lần) của nút menu ứng dụng nằm dưới con trỏ offscreen (10, 10) lúc
+    // cửa sổ hiện (integration nhóm 5: thanh tiêu đề thật).
     void idleUsesNoCpu()
     {
         const QString trace = path(u"idle.trace.json"_s);
         auto session = start({u"--settings"_s, path(u"idle.json"_s), u"--startup-trace"_s, trace});
         QVERIFY(spinUntil([&] { return markAt(readTrace(trace), u"first_frame"_s).has_value(); }));
-        spinFor(2s);
+        spinFor(3s);
         const qint64 pid = session->processId();
         const double cpu0 = cpuSeconds(pid);
         const qint64 switches0 = mainThreadSwitches(pid);
