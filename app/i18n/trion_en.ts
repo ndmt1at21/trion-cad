@@ -4828,6 +4828,176 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::shell::ViewStateFile</name>
+    <message>
+        <source>Bỏ qua trạng thái hiển thị đã lưu: %1 lớn hơn %2.</source>
+        <translation>Ignored the saved display state: %1 is larger than %2.</translation>
+    </message>
+    <message>
+        <source>Bỏ qua trạng thái hiển thị đã lưu: %1 hỏng hoặc không đọc được.</source>
+        <translation>Ignored the saved display state: %1 is damaged or unreadable.</translation>
+    </message>
+    <message>
+        <source>Lưu trạng thái hiển thị</source>
+        <translation>Save display state</translation>
+    </message>
+    <message>
+        <source>Không lưu được trạng thái hiển thị: lớn hơn %1.</source>
+        <translation>Could not save the display state: larger than %1.</translation>
+    </message>
+    <message>
+        <source>Không lưu được trạng thái hiển thị vào %1.</source>
+        <translation>Could not save the display state to %1.</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::ViewerLayers</name>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Số</source>
+        <translation>Count</translation>
+    </message>
+    <message>
+        <source>Trạng thái</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Bật/Tắt</source>
+        <translation>On/Off</translation>
+    </message>
+    <message>
+        <source>Đóng băng</source>
+        <translation>Freeze</translation>
+    </message>
+    <message>
+        <source>Khóa</source>
+        <translation>Lock</translation>
+    </message>
+    <message>
+        <source>Màu</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Số đối tượng</source>
+        <translation>Object count</translation>
+    </message>
+    <message>
+        <source>%1 · đã đổi tạm thời</source>
+        <translation>%1 · changed temporarily</translation>
+    </message>
+    <message>
+        <source>Layer hiện hành</source>
+        <translation>Current layer</translation>
+    </message>
+    <message>
+        <source>Đang dùng</source>
+        <translation>In use</translation>
+    </message>
+    <message>
+        <source>Không có đối tượng</source>
+        <translation>No objects</translation>
+    </message>
+    <message>
+        <source>Đang bật</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Đang tắt</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <source>Đang đóng băng</source>
+        <translation>Frozen</translation>
+    </message>
+    <message>
+        <source>Không đóng băng</source>
+        <translation>Thawed</translation>
+    </message>
+    <message>
+        <source>Đang khóa</source>
+        <translation>Locked</translation>
+    </message>
+    <message>
+        <source>Không khóa</source>
+        <translation>Unlocked</translation>
+    </message>
+    <message>
+        <source>tạm</source>
+        <translation>temp</translation>
+    </message>
+    <message>
+        <source>Khóa layer, đổi thuộc tính layer</source>
+        <translation>Lock layers, change layer properties</translation>
+    </message>
+    <message>
+        <source>Đổi màu, kiểu đường, độ dày nét của layer</source>
+        <translation>Change layer color, linetype and lineweight</translation>
+    </message>
+    <message>
+        <source>Hiện %1/%2 layer</source>
+        <translation>Showing %1/%2 layers</translation>
+    </message>
+    <message>
+        <source>Bật/tắt và đóng băng là tạm thời. Thay đổi không lưu vào bản vẽ.</source>
+        <translation>Turning layers on/off and freezing them is temporary. Changes are not saved to the drawing.</translation>
+    </message>
+    <message>
+        <source>Tìm layer, ví dụ KT-*</source>
+        <translation>Search layers, e.g. KT-*</translation>
+    </message>
+    <message>
+        <source>Tìm layer</source>
+        <translation>Search layers</translation>
+    </message>
+    <message>
+        <source>Thao tác khác</source>
+        <translation>More actions</translation>
+    </message>
+    <message>
+        <source>Danh sách layer</source>
+        <translation>Layer list</translation>
+    </message>
+    <message>
+        <source>Khôi phục như tệp gốc</source>
+        <translation>Restore as in file</translation>
+    </message>
+    <message>
+        <source>Chưa có bản vẽ</source>
+        <translation>No drawing open</translation>
+    </message>
+    <message>
+        <source>Mở bản vẽ để xem và bật, tắt layer.</source>
+        <translation>Open a drawing to view its layers and turn them on or off.</translation>
+    </message>
+    <message>
+        <source>Chỉ hiện layer đang dùng</source>
+        <translation>Show only layers in use</translation>
+    </message>
+    <message>
+        <source>Bật tất cả</source>
+        <translation>Turn All Layers On</translation>
+    </message>
+    <message>
+        <source>Rã đông tất cả</source>
+        <translation>Thaw All Layers</translation>
+    </message>
+    <message>
+        <source>Cô lập layer của đối tượng…</source>
+        <translation>Isolate layers of objects…</translation>
+    </message>
+    <message>
+        <source>Bỏ cô lập</source>
+        <translation>Unisolate</translation>
+    </message>
+    <message>
+        <source>Lưu trạng thái hiển thị</source>
+        <translation>Save display state</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::Workspace</name>
     <message>
         <source>Soạn thảo 2D</source>
