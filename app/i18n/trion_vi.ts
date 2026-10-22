@@ -20,6 +20,15 @@
     </message>
 </context>
 <context>
+    <name>trion::shell::FileTabBar</name>
+    <message numerus="yes">
+        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
+        <translation>
+            <numerusform>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::TitleBar</name>
     <message numerus="yes">
         <source>Dùng thử: còn %n ngày</source>

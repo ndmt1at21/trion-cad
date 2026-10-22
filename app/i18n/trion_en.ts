@@ -2431,6 +2431,100 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::shell::FileTabBar</name>
+    <message>
+        <source>Start</source>
+        <translation>Start</translation>
+    </message>
+    <message>
+        <source>%1, chưa lưu</source>
+        <translation>%1, unsaved</translation>
+    </message>
+    <message>
+        <source>%1, chỉ đọc</source>
+        <translation>%1, read-only</translation>
+    </message>
+    <message>
+        <source>Tab tệp</source>
+        <translation>File tabs</translation>
+    </message>
+    <message>
+        <source>Mở bản vẽ</source>
+        <translation>Open drawing</translation>
+    </message>
+    <message>
+        <source>Bản vẽ mới</source>
+        <translation>New drawing</translation>
+    </message>
+    <message>
+        <source>Mọi tab tệp</source>
+        <translation>All file tabs</translation>
+    </message>
+    <message>
+        <source>Mới</source>
+        <translation>New</translation>
+    </message>
+    <message>
+        <source>Mở…</source>
+        <translation>Open…</translation>
+    </message>
+    <message>
+        <source>Lưu</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Lưu tất cả</source>
+        <translation>Save all</translation>
+    </message>
+    <message>
+        <source>Không có bản vẽ nào cần lưu.</source>
+        <translation>No drawings need saving.</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>Đóng tất cả</source>
+        <translation>Close all</translation>
+    </message>
+    <message>
+        <source>Đóng các tab khác</source>
+        <translation>Close other tabs</translation>
+    </message>
+    <message>
+        <source>Sao chép đường dẫn</source>
+        <translation>Copy path</translation>
+    </message>
+    <message>
+        <source>Đã sao chép: %1</source>
+        <translation>Copied: %1</translation>
+    </message>
+    <message>
+        <source>Mở thư mục chứa</source>
+        <translation>Open containing folder</translation>
+    </message>
+    <message>
+        <source>Không mở được thư mục %1.</source>
+        <translation>Could not open folder %1.</translation>
+    </message>
+    <message>
+        <source>Xem trước %1</source>
+        <translation>Preview of %1</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message numerus="yes">
+        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
+        <translation>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 is not a drawing.</numerusform>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 are not drawings.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::MainWindow</name>
     <message>
         <source>Thuộc tính</source>
