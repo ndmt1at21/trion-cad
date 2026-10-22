@@ -18,6 +18,7 @@
 //   connect(bar, &TitleBar::screenRequested, router, &Screens::open);                // "license"…
 //   bar->search()->setLocator([&](const QString& c) { return ribbon.location(c); }); // UIA-102
 //   bar->setDocument({.name = doc.name(), .path = doc.path(), .dirty = doc.modified()}); // DOC-018
+//   QAT (bar->qat()): nối theo mục "Dùng" của Qat.h (chuỗi lệnh, "Thêm vào QAT", nguồn hoàn tác, dưới ribbon).
 
 #include <QString>
 #include <QUrl>

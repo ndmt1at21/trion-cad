@@ -3974,8 +3974,59 @@ TCVN</source>
         <translation>Match properties</translation>
     </message>
     <message>
+        <source>Mới</source>
+        <translation>New</translation>
+    </message>
+    <message>
+        <source>Lưu</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Lưu thành</source>
+        <translation>Save as</translation>
+    </message>
+    <message>
+        <source>Hoàn tác</source>
+        <translation>Undo</translation>
+    </message>
+    <message>
+        <source>Làm lại</source>
+        <translation>Redo</translation>
+    </message>
+    <message>
         <source>In hàng loạt</source>
         <translation>Batch plot</translation>
+    </message>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Chuyển không gian làm việc</source>
+        <translation>Switch workspace</translation>
+    </message>
+    <message>
+        <source>Không có bước để làm lại</source>
+        <translation>Nothing to redo</translation>
+    </message>
+    <message>
+        <source>Không có bước để hoàn tác</source>
+        <translation>Nothing to undo</translation>
+    </message>
+    <message>
+        <source>Làm lại tới</source>
+        <translation>Redo to</translation>
+    </message>
+    <message>
+        <source>Hoàn tác tới</source>
+        <translation>Undo to</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n bước)</source>
+        <translation>
+            <numerusform>%1 (%n step)</numerusform>
+            <numerusform>%1 (%n steps)</numerusform>
+        </translation>
     </message>
     <message>
         <source>Thanh truy cập nhanh</source>
@@ -3986,12 +4037,32 @@ TCVN</source>
         <translation>Add to Quick Access Toolbar</translation>
     </message>
     <message>
+        <source>Hiện bên dưới ribbon</source>
+        <translation>Show below the ribbon</translation>
+    </message>
+    <message>
+        <source>Hiện thanh menu</source>
+        <translation>Show menu bar</translation>
+    </message>
+    <message>
+        <source>Đặt lại mặc định</source>
+        <translation>Reset to defaults</translation>
+    </message>
+    <message>
         <source>Tùy biến thanh truy cập nhanh</source>
         <translation>Customize Quick Access Toolbar</translation>
     </message>
     <message>
         <source>Lệnh in</source>
         <translation>Plot commands</translation>
+    </message>
+    <message>
+        <source>Danh sách hoàn tác</source>
+        <translation>Undo list</translation>
+    </message>
+    <message>
+        <source>Danh sách làm lại</source>
+        <translation>Redo list</translation>
     </message>
 </context>
 <context>

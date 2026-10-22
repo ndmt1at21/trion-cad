@@ -29,6 +29,15 @@
     </message>
 </context>
 <context>
+    <name>trion::shell::Qat</name>
+    <message numerus="yes">
+        <source>%1 (%n bước)</source>
+        <translation>
+            <numerusform>%1 (%n bước)</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::StartPage</name>
     <message numerus="yes">
         <source>Dùng thử: còn %n ngày</source>

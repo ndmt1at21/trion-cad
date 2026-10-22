@@ -484,7 +484,7 @@ private slots:
         QCOMPARE(ui::RichTooltip::info(title).name, path);
         QVERIFY(title->geometry().right() < search()->geometry().left()); // không đè ô Tìm lệnh
 
-        QCOMPARE(search()->width(), 160); // thiếu chỗ: ô Tìm lệnh co tới tối thiểu trước khi rút gọn tên
+        QCOMPARE(search()->width(), 80); // thiếu chỗ: ô Tìm lệnh co tới tối thiểu trước khi rút gọn tên
         resizeHost(3000); // đủ chỗ: hiện đủ tên, ô rộng 300 px
 
         QCOMPARE(bar_->shownName(), name);
@@ -502,8 +502,11 @@ private slots:
         auto* help = child<ui::Button>("helpButton");
         QVERIFY(appButton && open && plot && more && user && help);
 
-        // Tab từ vùng vẽ qua mọi nút theo thứ tự trên thanh rồi về vùng vẽ.
-        const QList<QWidget*> want{appButton, open, plot, more, search(), user, help, canvas_};
+        // Tab từ vùng vẽ qua mọi nút theo thứ tự trên thanh rồi về vùng vẽ (QAT mặc định của bản đầy đủ, UIA-101).
+        QList<QWidget*> want{appButton};
+        for (const QString& c : {u"NEW"_s, u"OPEN"_s, u"QSAVE"_s, u"SAVEAS"_s, u"U"_s, u"REDO"_s, u"PLOT"_s})
+            want << bar_->qat()->button(c);
+        want << more << search() << user << help << canvas_;
         QList<QWidget*> got;
         for (int i = 0; i < want.size(); ++i) {
             key(Qt::Key_Tab);
@@ -749,12 +752,25 @@ private slots:
         QVERIFY(match->isVisible() && !match->isLocked());
         QCOMPARE(ui::RichTooltip::info(match).command, u"MATCHPROP"_s);
         QCOMPARE(match->accessibleName(), reg_->action(u"MATCHPROP"_s)->text());
-        gate_->setEdition(Edition::Viewer); // hạ cấp: nút còn, có ổ khóa; bấm mở trang nâng cấp
-        QVERIFY(match->isLocked());
-        match->click();
-        QVERIFY(sent_.isEmpty());
-        toggle("Khớp thuộc tính")->trigger(); // tắt vẫn được khi khóa
+        // Hạ cấp về Viewer: bộ giao diện Viewer có danh sách riêng (Mở, In; UIA-101), nút của bản đầy đủ ẩn và giữ lại.
+        gate_->setEdition(Edition::Viewer);
+        QVERIFY(match->isHidden() && match->isLocked());
+        gate_->setEdition(Edition::Pro);
+        QVERIFY(match->isVisible());
+        toggle("Khớp thuộc tính")->trigger();
         QVERIFY(!match->isVisible());
+
+        // Hạ cấp trong cùng bộ Viewer (Viewer Pro → Viewer): nút còn, có ổ khóa; bấm mở trang nâng cấp.
+        gate_->setEdition(Edition::ViewerPro);
+        toggle("In hàng loạt")->trigger();
+        ui::Button* batch = qat->button(u"TCBATCHPLOT"_s);
+        QVERIFY(batch->isVisible() && !batch->isLocked());
+        gate_->setEdition(Edition::Viewer);
+        QVERIFY(batch->isVisible() && batch->isLocked());
+        batch->click();
+        QVERIFY(sent_.isEmpty());
+        toggle("In hàng loạt")->trigger(); // tắt vẫn được khi khóa
+        QVERIFY(!batch->isVisible());
     }
 
     // DoD-U: rảnh không timer chạy.

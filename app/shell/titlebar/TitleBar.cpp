@@ -8,6 +8,7 @@
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/controls/Controls.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/widgets/menu/Menu.h"
 #include "app/widgets/tooltip/RichTooltip.h"
 
@@ -30,8 +31,9 @@ using theme::TextRole;
 using theme::Weight;
 
 constexpr int kSearchWidth = 300; // .tb-search width:300px (không có token)
-// ponytail: thanh chật thì ô Tìm lệnh co trước tên bản vẽ (prototype: ô co theo flex), tới chỗ đủ gõ vài từ.
-constexpr int kSearchMin = 160;
+// ponytail: thanh chật thì ô Tìm lệnh co trước tên bản vẽ (prototype: ô co theo flex), tới chỗ còn thấy vài chữ đang
+// gõ (kết quả ở popup riêng): đủ cho thanh 1366 px có QAT đủ 7 mục (UIA-101), vi-XL, dùng thử kèm cảnh báo offline.
+constexpr int kSearchMin = 80;
 constexpr int kChevron = 9;       // mũi tên .ic.xs
 
 const theme::ThemeManager& tm()
@@ -80,11 +82,8 @@ protected:
             p.setBrush(col(isDown() ? tok::c_press : tok::c_hover));
             p.drawRoundedRect(box, rad, rad);
         }
-        if (hasFocus() && window()->testAttribute(Qt::WA_KeyboardFocusChange)) { // :focus-visible
-            p.setPen(QPen(col(tok::c_focus), 2));
-            p.setBrush(Qt::NoBrush);
-            p.drawRoundedRect(box.adjusted(1, 1, -1, -1), rad, rad);
-        }
+        if (ui::paint::focusVisible(this))
+            ui::paint::drawRing(p, box, col(tok::c_focus));
         int x = px(tok::sp_3);
         p.drawPixmap(x, (height() - logo()) / 2,
                      IconProvider::instance().pixmap(u"logo"_s, logo(), devicePixelRatio(), theme::IconState::On));
@@ -93,7 +92,7 @@ protected:
         p.setPen(col(tok::c_text));
         p.drawText(QRect(x, 0, brandWidth(), height()), Qt::AlignVCenter | Qt::TextSingleLine, brand());
         x += brandWidth() + px(tok::sp_3);
-        drawChevron(p, QPointF(x + kChevron / 2.0, height() / 2.0), col(tok::c_text_2));
+        ui::paint::drawChevron(p, QPointF(x + kChevron / 2.0, height() / 2.0), col(tok::c_text_2));
     }
 
 private:
@@ -277,6 +276,11 @@ TitleBar::TitleBar(actions::ActionRegistry& actions, edition::EditionGate& gate,
     connect(user_, &QAbstractButton::clicked, this, [this] { popupBelow(userMenu_, user_); });
     connect(help_, &QAbstractButton::clicked, this, [this] { popupBelow(helpMenu_, help_); });
     connect(&gate, &edition::EditionGate::editionChanged, this, &TitleBar::sync);
+    // Thôi "Hiện bên dưới ribbon": lấy QAT về sau nút menu ứng dụng (cửa sổ chính đã dời nó xuống dưới ribbon).
+    connect(qat_, &Qat::belowRibbonChanged, this, [this, row](bool below) {
+        if (!below && qat_->parentWidget() != this)
+            row->insertWidget(row->indexOf(app_) + 1, qat_);
+    });
     sync();
 }
 
