@@ -97,16 +97,16 @@ QPixmap glyph(const QString& name, int size, qreal dpr, const QColor& c)
     return pm;
 }
 
-// Tên biểu tượng của lệnh theo danh mục (tạm thay INT-001).
-QString commandIcon(const QString& cmd)
+// Lệnh trong danh mục (tạm thay INT-001); nullptr nếu không có (hành động gắn sysvar).
+const actions::CommandInfo* commandInfo(const QString& cmd)
 {
-    static const QHash<QString, QString> icons = [] {
-        QHash<QString, QString> h;
+    static const QHash<QString, const actions::CommandInfo*> index = [] {
+        QHash<QString, const actions::CommandInfo*> h;
         for (const actions::CommandInfo& c : actions::commands())
-            h.insert(QString::fromLatin1(c.name), QString::fromLatin1(c.icon));
+            h.insert(QString::fromLatin1(c.name), &c);
         return h;
     }();
-    return icons.value(cmd);
+    return index.value(cmd);
 }
 
 QString keyId(const actions::ActionRegistry& r, const QString& cmd)
@@ -167,6 +167,7 @@ void tip(QWidget* w, const RibbonControls& o, const Control& c, const QString& n
     ui::RichTooltip::attach(w, {.name = name,
                                 .command = c.cmd,
                                 .keyId = keyId(o.registry(), c.cmd),
+                                .description = RibbonControls::describe(c.cmd, name),
                                 .need = RibbonControls::locked(need) ? need : ui::Edition::None});
 }
 
@@ -448,7 +449,7 @@ private:
         down_->setAccessibleName(RibbonControls::tr("Hàng sau"));
         more_->setAccessibleName(RibbonControls::tr("Mở toàn bộ gallery"));
         for (ui::Button* b : {up_, down_, more_})
-            b->setToolTip(b->accessibleName());
+            ui::RichTooltip::attach(b, {.name = b->accessibleName()});
         tip(view_, owner_, c_, name);
     }
 
@@ -553,7 +554,8 @@ private:
         }
         QWidget* input = field_ ? static_cast<QWidget*>(field_) : slider_;
         input->setAccessibleDescription(locked ? EditionGate::availableIn(need) : QString());
-        ui::RichTooltip::attach(label_, {.name = name, .command = c_.sysvar});
+        for (QWidget* w : {static_cast<QWidget*>(label_), input})
+            ui::RichTooltip::attach(w, {.name = name, .command = c_.sysvar});
     }
 
     void applyColor() // .rb-num: nhãn --c-text-2
@@ -718,6 +720,20 @@ void RibbonControls::remember(const QString& id, const QString& key)
     store_.set(kSplitChoice, o);
 }
 
+QString RibbonControls::commandIcon(const QString& cmd)
+{
+    const actions::CommandInfo* c = commandInfo(cmd);
+    return c ? QString::fromLatin1(c->icon) : QString();
+}
+
+// ponytail: mô tả là nhãn lệnh của danh mục; INT-001 thay bằng nội dung trợ giúp riêng kèm ảnh minh họa (07.1 §7.1).
+QString RibbonControls::describe(const QString& cmd, const QString& name)
+{
+    const actions::CommandInfo* c = commandInfo(cmd);
+    const QString d = c ? QCoreApplication::translate("actions", c->label) : QString();
+    return d == name ? QString() : d;
+}
+
 // ---------------------------------------------------------------------------------------------------- RibbonButton
 
 namespace {
@@ -820,7 +836,7 @@ QRect RibbonButton::arrowZone() const
         const int top = qRound(height() * kArrowSplit);
         return {0, top, width(), height() - top};
     }
-    const int w = kChevron + px(c_.size == ControlSize::Icon ? tok::sp_2 : tok::sp_3) + gap() / 2;
+    const int w = kChevron + px(drawSize(compact_) == ControlSize::Icon ? tok::sp_2 : tok::sp_3) + gap() / 2;
     return QStyle::visualRect(layoutDirection(), rect(), QRect(width() - w, 0, w, height()));
 }
 
@@ -836,9 +852,24 @@ QRect RibbonButton::mainZone() const
                : QStyle::visualRect(layoutDirection(), rect(), QRect(0, 0, width() - a.width(), height()));
 }
 
-QSize RibbonButton::sizeHint() const
+ControlSize RibbonButton::drawSize(bool compact) const
+{
+    return compact && c_.size == ControlSize::Small ? ControlSize::Icon : c_.size;
+}
+
+void RibbonButton::setCompact(bool compact)
+{
+    if (compact == compact_)
+        return;
+    compact_ = compact;
+    updateGeometry();
+    update();
+}
+
+QSize RibbonButton::sizeFor(bool compact) const
 {
     ensurePolished();
+    const ControlSize sz = drawSize(compact);
     const QFont f = labelFont(c_.size);
     const QFontMetrics fm(f);
     const bool split = c_.type == ControlType::Split;
@@ -854,8 +885,8 @@ QSize RibbonButton::sizeHint() const
         const int h = top + px(tok::ic_lg) + top + int(lines.size() - 1) * lineStep(f) + fm.height();
         return {std::max(px(tok::lg_w), w + 2 * pad), std::max(h, 3 * px(tok::h_btn) + 2 * kBorder)};
     }
-    int w = px(tok::sp_2) + px(tok::ic) + px(c_.size == ControlSize::Icon ? tok::sp_2 : tok::sp_3);
-    if (c_.size == ControlSize::Small)
+    int w = px(tok::sp_2) + px(tok::ic) + px(sz == ControlSize::Icon ? tok::sp_2 : tok::sp_3);
+    if (sz == ControlSize::Small)
         w += gap() + fm.horizontalAdvance(text());
     if (split)
         w += gap() + kChevron;
@@ -901,9 +932,9 @@ void RibbonButton::paintEvent(QPaintEvent*)
     const MenuItem main = mainItem(); // split: biểu tượng theo lựa chọn gần nhất
     QString icon = main.icon;
     if (icon.isEmpty() && main.cmd != c_.cmd)
-        icon = commandIcon(main.cmd);
+        icon = RibbonControls::commandIcon(main.cmd);
     if (icon.isEmpty())
-        icon = c_.icon.isEmpty() ? commandIcon(c_.cmd) : c_.icon;
+        icon = c_.icon.isEmpty() ? RibbonControls::commandIcon(c_.cmd) : c_.icon;
     const ui::Edition need = owner_.need(c_);
     const QSize badge = locked_ ? LockBadge::size(need, LockBadge::Style::Ribbon) : QSize();
     const QFont f = labelFont(c_.size);
@@ -941,7 +972,7 @@ void RibbonButton::paintEvent(QPaintEvent*)
     int x = px(tok::sp_2);
     drawIcon(x, (height() - ic) / 2, ic);
     x += ic;
-    if (c_.size == ControlSize::Small) {
+    if (drawSize(compact_) == ControlSize::Small) {
         x += gap();
         const int tw = fm.horizontalAdvance(text());
         p.setPen(ink);
@@ -1047,11 +1078,12 @@ void RibbonButton::fillMenu()
             menu_->addSeparator();
             continue;
         }
-        const QString icon = m.icon.isEmpty() ? commandIcon(m.cmd) : m.icon;
+        const QString icon = m.icon.isEmpty() ? RibbonControls::commandIcon(m.cmd) : m.icon;
         QAction* a = menu_->addAction(icon.isEmpty() ? QIcon() : IconProvider::icon(icon), RibbonModel::line(m.label));
         const ui::Edition need = owner_.registry().need(m.cmd);
         ui::RichTooltip::attach(a, {.command = m.cmd,
                                     .keyId = keyId(owner_.registry(), m.cmd),
+                                    .description = RibbonControls::describe(m.cmd, a->text()),
                                     .need = RibbonControls::locked(need) ? need : ui::Edition::None});
         connect(a, &QAction::triggered, this, [this, m, need] {
             if (!RibbonControls::locked(need)) {
@@ -1073,9 +1105,11 @@ void RibbonButton::sync()
     const MenuItem m = mainItem();
     const QString detail = m.label.isEmpty() ? QString() : RibbonModel::line(m.label);
     setAccessibleDescription(locked_ ? EditionGate::availableIn(need) : detail);
-    ui::RichTooltip::attach(this, {.name = detail.isEmpty() ? name : u"%1: %2"_s.arg(name, detail),
+    const QString shown = detail.isEmpty() ? name : u"%1: %2"_s.arg(name, detail);
+    ui::RichTooltip::attach(this, {.name = shown,
                                    .command = m.cmd,
                                    .keyId = keyId(owner_.registry(), m.cmd),
+                                   .description = RibbonControls::describe(m.cmd, detail.isEmpty() ? name : detail),
                                    .need = locked_ ? need : ui::Edition::None});
     updateGeometry();
     update();

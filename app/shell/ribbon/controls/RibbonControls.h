@@ -97,6 +97,11 @@ public:
     QString choice(const QString& id) const; // khóa mục đã chọn gần nhất của split; rỗng nếu chưa
     void remember(const QString& id, const QString& key);
 
+    // Tên biểu tượng (UI0-103) và mô tả của lệnh trong danh mục (tạm thay INT-001); rỗng nếu không có. describe: mức 2
+    // của tooltip (UIA-005), rỗng khi trùng name ("Đoạn thẳng" → "Vẽ đoạn thẳng").
+    static QString commandIcon(const QString& cmd);
+    static QString describe(const QString& cmd, const QString& name);
+
 signals:
     // Chuỗi lệnh không có QAction riêng: "^C^C_CIRCLE D", "'_ZOOM W", "'TEXTSIZE 2.5".
     void macroRequested(const QString& macro);
@@ -129,8 +134,13 @@ public:
     MenuItem mainItem() const;
     // Split: vùng mũi tên (nửa dưới nút lớn, vùng ▾ cuối nút nhỏ); cả nút nếu menuOnly.
     QRect arrowZone() const;
+    // Panel hẹp (UIA-005, .rb-p.is-compact): nút nhỏ chỉ còn biểu tượng; chữ vẫn là tên cho trình đọc màn hình và
+    // tooltip. Nút lớn, nút chỉ biểu tượng không đổi.
+    void setCompact(bool compact);
+    bool isCompact() const { return compact_; }
+    QSize sizeFor(bool compact) const; // cỡ ở dạng đó: khung ribbon tính bề rộng panel trước khi đổi dạng
 
-    QSize sizeHint() const override;
+    QSize sizeHint() const override { return sizeFor(compact_); }
     QSize minimumSizeHint() const override { return sizeHint(); }
 
 protected:
@@ -145,6 +155,7 @@ private:
     void fillMenu();
     void sync(); // chữ, khóa, tooltip, trợ năng theo ngôn ngữ, phiên bản, lựa chọn gần nhất
     QRect mainZone() const;
+    ControlSize drawSize(bool compact) const; // nút nhỏ ở dạng gọn vẽ như nút chỉ biểu tượng
 
     Control c_;
     RibbonControls& owner_;
@@ -153,6 +164,7 @@ private:
     QString choice_; // Split: khóa mục chọn gần nhất (đọc từ Store khi dựng)
     bool locked_ = false;
     bool menuOpen_ = false;
+    bool compact_ = false;
 };
 
 // Trang các tab: trang của tab i dựng (build(i)) khi mở lần đầu, giữ lại cho lần sau.

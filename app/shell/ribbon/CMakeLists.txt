@@ -1,8 +1,10 @@
-# app/shell/ribbon (UIA-102): mô hình ribbon JSON (RibbonModel) và các loại điều khiển (controls/RibbonControls).
+# app/shell/ribbon (UIA-102): mô hình ribbon JSON (RibbonModel) và các loại điều khiển (controls/RibbonControls);
+# (UIA-005) khung ribbon RibbonBar: dải tab, khung panel, co theo ưu tiên, 3 mức thu gọn, panel mở rộng có ghim.
 # Nội dung 8 tab (resources/*.json) và nhãn cho lupdate (ribbon_strings.cpp) sinh từ prototype bằng ribbon_gen.mjs;
 # JSON nhúng ở :/trion/ribbon/ (resources/schema.json chỉ là mô tả khóa, không nhúng).
 trion_add_library(trion_ribbon
   SOURCES RibbonModel.h RibbonModel.cpp ribbon_strings.cpp controls/RibbonControls.h controls/RibbonControls.cpp
+          RibbonBar.h RibbonBar.cpp
   LIBS trion_actions trion_edition trion_controls trion_menu trion_numeric_field trion_tooltip trion_icons
        trion_fonts trion_theme trion_base Qt6::Widgets)
 file(GLOB ribbon_json CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.json)
@@ -11,6 +13,9 @@ qt_add_resources(trion_ribbon ribbon_json PREFIX /trion/ribbon BASE resources FI
 
 trion_add_test(ribbon_test SOURCES tests/ribbon_test.cpp LIBS trion_ribbon trion_keymap trion_i18n trion_appcore
   LABELS ribbon)
+# UIA-005: khung ribbon; số đo đổi tab, tính lại bố cục khi kéo (benchmark dạng test, ngưỡng khi kTimed).
+trion_add_test(ribbon_bar_test SOURCES tests/ribbon_bar_test.cpp LIBS trion_ribbon trion_keymap trion_i18n
+  trion_appcore LABELS ribbon bench)
 
 # Tiêu chí 1, chạy trong CI: lệnh có trong ActionRegistry, biểu tượng có trong bộ UI0-103, nhãn có bản English trong
 # app/i18n/trion_en.ts (nhúng vào test để bản Windows đọc được).

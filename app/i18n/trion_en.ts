@@ -3548,6 +3548,53 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::ribbon::RibbonBar</name>
+    <message>
+        <source>Thêm vào thanh truy cập nhanh</source>
+        <translation>Add to Quick Access Toolbar</translation>
+    </message>
+    <message>
+        <source>Hiện tab</source>
+        <translation>Show Tabs</translation>
+    </message>
+    <message>
+        <source>Hiện panel</source>
+        <translation>Show Panels</translation>
+    </message>
+    <message>
+        <source>Thu gọn</source>
+        <translation>Minimize</translation>
+    </message>
+    <message>
+        <source>Đầy đủ</source>
+        <translation>Full Ribbon</translation>
+    </message>
+    <message>
+        <source>Chỉ tên panel</source>
+        <translation>Minimize to Panel Titles</translation>
+    </message>
+    <message>
+        <source>Chỉ tên tab</source>
+        <translation>Minimize to Tabs</translation>
+    </message>
+    <message>
+        <source>Ribbon</source>
+        <translation>Ribbon</translation>
+    </message>
+    <message>
+        <source>Tab ribbon</source>
+        <translation>Ribbon tabs</translation>
+    </message>
+    <message>
+        <source>Thu gọn ribbon</source>
+        <translation>Minimize ribbon</translation>
+    </message>
+    <message>
+        <source>Đầy đủ → chỉ tên panel → chỉ tên tab.</source>
+        <translation>Full → panel titles → tabs.</translation>
+    </message>
+</context>
+<context>
     <name>trion::ribbon::RibbonControls</name>
     <message>
         <source>Đang tải…</source>
@@ -3572,6 +3619,33 @@ TCVN</source>
     <message>
         <source>Mở toàn bộ gallery</source>
         <translation>Open full gallery</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ribbon::RibbonPanel</name>
+    <message>
+        <source>%1 mở rộng</source>
+        <translation>%1 (expanded)</translation>
+    </message>
+    <message>
+        <source>Mở rộng panel %1</source>
+        <translation>Expand %1 panel</translation>
+    </message>
+    <message>
+        <source>Panel %1</source>
+        <translation>%1 panel</translation>
+    </message>
+    <message>
+        <source>Các lệnh của panel đã thu gọn.</source>
+        <translation>Commands of the collapsed panel.</translation>
+    </message>
+    <message>
+        <source>Bỏ ghim panel mở rộng</source>
+        <translation>Unpin expanded panel</translation>
+    </message>
+    <message>
+        <source>Ghim panel mở rộng</source>
+        <translation>Pin expanded panel</translation>
     </message>
 </context>
 <context>
