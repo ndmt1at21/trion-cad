@@ -3921,6 +3921,172 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::shell::StatusBar</name>
+    <message>
+        <source>Tọa độ</source>
+        <translation>Coordinates</translation>
+    </message>
+    <message>
+        <source>Model / Paper</source>
+        <translation>Model / Paper</translation>
+    </message>
+    <message>
+        <source>Tác vụ nền</source>
+        <translation>Background tasks</translation>
+    </message>
+    <message>
+        <source>Chỉ báo Bác sĩ Font</source>
+        <translation>Font Doctor indicator</translation>
+    </message>
+    <message>
+        <source>Chỉ báo đồ họa</source>
+        <translation>Graphics indicator</translation>
+    </message>
+    <message>
+        <source>Thông báo</source>
+        <translation>Notifications</translation>
+    </message>
+    <message>
+        <source>Huy hiệu phiên bản</source>
+        <translation>Edition badge</translation>
+    </message>
+    <message>
+        <source>Clean Screen</source>
+        <translation>Clean Screen</translation>
+    </message>
+    <message>
+        <source>Không có tác vụ đang chạy</source>
+        <translation>No tasks running</translation>
+    </message>
+    <message>
+        <source>Tự lưu, in hàng loạt, chuyển font, nạp tệp hiện ở đây kèm tiến trình và nút hủy.</source>
+        <translation>Autosave, batch plotting, font conversion and file loading appear here with progress and a cancel button.</translation>
+    </message>
+    <message>
+        <source>Tọa độ tắt</source>
+        <translation>Coordinates off</translation>
+    </message>
+    <message>
+        <source>Đồ họa: %1</source>
+        <translation>Graphics: %1</translation>
+    </message>
+    <message>
+        <source>Khung hình hiện tại %1 FPS. Bấm để mở Thiết lập đồ họa.</source>
+        <translation>Current frame rate %1 FPS. Click to open Graphics Settings.</translation>
+    </message>
+    <message>
+        <source>Bấm để mở Thiết lập đồ họa.</source>
+        <translation>Click to open Graphics Settings.</translation>
+    </message>
+    <message>
+        <source>Tọa độ con trỏ</source>
+        <translation>Cursor coordinates</translation>
+    </message>
+    <message>
+        <source>Bấm để đổi kiểu hiển thị: tuyệt đối, tương đối, tắt. Chuột phải để chọn kiểu.</source>
+        <translation>Click to switch display: absolute, relative, off. Right-click to choose.</translation>
+    </message>
+    <message>
+        <source>Trong layout: chuyển giữa Paper và Model trong viewport.</source>
+        <translation>In a layout: switch between paper space and model space in the viewport.</translation>
+    </message>
+    <message>
+        <source>Kiểu hiển thị</source>
+        <translation>Display mode</translation>
+    </message>
+    <message>
+        <source>Tuyệt đối</source>
+        <translation>Absolute</translation>
+    </message>
+    <message>
+        <source>Tương đối</source>
+        <translation>Relative</translation>
+    </message>
+    <message>
+        <source>Tắt</source>
+        <translation>Off</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 font đã thay thế</source>
+        <translation>
+            <numerusform>%1 substituted font</numerusform>
+            <numerusform>%1 substituted fonts</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng TCVN3</source>
+        <translation>
+            <numerusform>%1 TCVN3 object</numerusform>
+            <numerusform>%1 TCVN3 objects</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 thay thế</source>
+        <translation>
+            <numerusform>Fonts: %1 substituted</numerusform>
+            <numerusform>Fonts: %1 substituted</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 TCVN3</source>
+        <translation>
+            <numerusform>Fonts: %1 TCVN3</numerusform>
+            <numerusform>Fonts: %1 TCVN3</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+    <message>
+        <source>%1. Bấm để mở Bác sĩ Font.</source>
+        <translation>%1. Click to open Font Doctor.</translation>
+    </message>
+    <message>
+        <source>Tự lưu, in hàng loạt, chuyển font, nạp tệp; có tiến trình và nút hủy.</source>
+        <translation>Autosave, batch plotting, font conversion, file loading; with progress and a cancel button.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 thông báo chưa đọc</source>
+        <translation>
+            <numerusform>%1 unread notification</numerusform>
+            <numerusform>%1 unread notifications</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Trung tâm thông báo</source>
+        <translation>Notification center</translation>
+    </message>
+    <message>
+        <source>Trạng thái giấy phép</source>
+        <translation>License status</translation>
+    </message>
+    <message>
+        <source>Thu gọn toàn bộ giao diện, chỉ còn vùng vẽ, dòng lệnh, thanh trạng thái.</source>
+        <translation>Hide all panels, leaving only the drawing area, command line and status bar.</translation>
+    </message>
+    <message>
+        <source>Mục khác</source>
+        <translation>More items</translation>
+    </message>
+    <message>
+        <source>Các mục không đủ chỗ trên thanh trạng thái.</source>
+        <translation>Items that do not fit on the status bar.</translation>
+    </message>
+    <message>
+        <source>Tùy biến thanh trạng thái</source>
+        <translation>Customize status bar</translation>
+    </message>
+    <message>
+        <source>Chọn mục hiện trên thanh trạng thái.</source>
+        <translation>Choose which items appear on the status bar.</translation>
+    </message>
+    <message>
+        <source>Hiện trên thanh trạng thái</source>
+        <translation>Show on status bar</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::TitleBar</name>
     <message>
         <source>TrionCAD Viewer</source>

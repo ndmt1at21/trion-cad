@@ -114,58 +114,65 @@ QString settingsCommand(int tab)
     return tab == kLweight ? u"LWEIGHT"_s : u"DSETTINGS"_s;
 }
 
-// Nút .sbt: rộng --h-btn + --sp-2, cao --h-btn (25 × 21 ở mật độ gọn), biểu tượng --ic. Nền và màu biểu tượng theo
-// TrionStyle (.ib: rê --c-hover, nhấn --c-press, bật --c-on-bg và --c-on); bật thêm gạch dưới cao --sp-1 màu --c-on để
-// phân biệt không cần màu (07.3 Phụ lục C). Enter như Space; phím Menu, Shift+F10 mở menu như chuột phải.
-class ModeButton final : public QToolButton {
-public:
-    using QToolButton::QToolButton;
-    QMenu* menu = nullptr; // con của nút
-
-    QSize sizeHint() const override { return {px(tok::h_btn) + px(tok::sp_2), px(tok::h_btn)}; }
-    QSize minimumSizeHint() const override { return sizeHint(); }
-
-protected:
-    void paintEvent(QPaintEvent*) override
-    {
-        QStylePainter p(this);
-        QStyleOptionToolButton o;
-        initStyleOption(&o);
-        o.state &= ~QStyle::State_HasFocus; // vòng focus của style lùi vào 3 px, đè biểu tượng: vẽ sát mép ở dưới
-        p.drawComplexControl(QStyle::CC_ToolButton, o);
-        if (isChecked()) {
-            const int inset = px(tok::sp_2), h = px(tok::sp_1);
-            p.fillRect(QRect(inset, height() - h, width() - 2 * inset, h), ThemeManager::instance().color(tok::c_on));
-        }
-        if (hasFocus()) { // TrionStyle chỉ vẽ khi focus đến từ bàn phím (:focus-visible)
-            QStyleOptionFocusRect f;
-            f.initFrom(this);
-            p.drawPrimitive(QStyle::PE_FrameFocusRect, f);
-        }
-    }
-
-    void keyPressEvent(QKeyEvent* e) override
-    {
-        if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
-            click();
-        else if (menu &&
-                 (e->key() == Qt::Key_Menu || e->keyCombination() == QKeyCombination(Qt::ShiftModifier, Qt::Key_F10)))
-            popupMenu(mapToGlobal(QPoint(0, 0)));
-        else
-            QToolButton::keyPressEvent(e);
-    }
-
-    void contextMenuEvent(QContextMenuEvent* e) override
-    {
-        if (menu)
-            popupMenu(e->globalPos());
-    }
-
-private:
-    void popupMenu(QPoint at) { menu->popup(at - QPoint(0, menu->sizeHint().height())); } // mở lên trên (prototype)
-};
-
 } // namespace
+
+StatusButton::StatusButton(QWidget* parent) : QToolButton(parent)
+{
+    setAutoRaise(true);
+}
+
+QSize StatusButton::sizeHint() const
+{
+    return {px(tok::h_btn) + px(tok::sp_2), px(tok::h_btn)}; // 25 × 21 ở mật độ gọn
+}
+
+void StatusButton::popupAbove(QMenu* m, const QWidget* anchor, bool alignRight)
+{
+    const QSize s = m->sizeHint();
+    m->popup(anchor->mapToGlobal(QPoint(alignRight ? anchor->width() - s.width() : 0, -s.height())));
+}
+
+void StatusButton::paintEvent(QPaintEvent*)
+{
+    QStylePainter p(this);
+    QStyleOptionToolButton o;
+    initStyleOption(&o);
+    o.state &= ~QStyle::State_HasFocus; // vòng focus của style lùi vào 3 px, đè biểu tượng: vẽ sát mép ở dưới
+    p.drawComplexControl(QStyle::CC_ToolButton, o);
+    const ThemeManager& tm = ThemeManager::instance();
+    if (isChecked()) {
+        const int inset = px(tok::sp_2), h = px(tok::sp_1);
+        p.fillRect(QRect(inset, height() - h, width() - 2 * inset, h), tm.color(tok::c_on));
+    }
+    if (dot) { // .has-dot::after: chấm --sp-3 cách mép trên --sp-1, mép phải --sp-2, viền nền thanh tách khỏi biểu tượng
+        const qreal d = tm.px(tok::sp_3), ring = tm.px(tok::sp_1) * 0.75;
+        p.setRenderHint(QPainter::Antialiasing);
+        p.setPen(QPen(tm.color(tok::c_chrome), ring));
+        p.setBrush(tm.color(tok::c_danger));
+        p.drawEllipse(QRectF(width() - tm.px(tok::sp_2) - d, tm.px(tok::sp_1), d, d));
+    }
+    if (hasFocus()) { // TrionStyle chỉ vẽ khi focus đến từ bàn phím (:focus-visible)
+        QStyleOptionFocusRect f;
+        f.initFrom(this);
+        p.drawPrimitive(QStyle::PE_FrameFocusRect, f);
+    }
+}
+
+void StatusButton::keyPressEvent(QKeyEvent* e)
+{
+    if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
+        click();
+    else if (menu && (e->key() == Qt::Key_Menu || e->keyCombination() == QKeyCombination(Qt::ShiftModifier, Qt::Key_F10)))
+        popupAbove(menu, this);
+    else
+        QToolButton::keyPressEvent(e);
+}
+
+void StatusButton::contextMenuEvent(QContextMenuEvent* e)
+{
+    if (menu)
+        menu->popup(e->globalPos() - QPoint(0, menu->sizeHint().height())); // mở lên trên (prototype)
+}
 
 ModeToggles::ModeToggles(actions::ActionRegistry& actions, actions::Sysvars& sysvars, QWidget* parent)
     : QWidget(parent), actions_(actions), sysvars_(sysvars)
@@ -177,8 +184,7 @@ ModeToggles::ModeToggles(actions::ActionRegistry& actions, actions::Sysvars& sys
         QAction* action = actions.action(QString::fromLatin1(s.id));
         if (!action)
             continue;
-        auto* b = new ModeButton(this);
-        b->setAutoRaise(true);
+        auto* b = new StatusButton(this);
         b->setDefaultAction(action); // checkable theo sysvar; bấm gửi lệnh qua sink (và cổng phiên bản) của registry
         row->addWidget(b);
         buttons_.emplace_back(&s, b);

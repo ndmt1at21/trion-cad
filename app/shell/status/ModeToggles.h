@@ -27,6 +27,7 @@
 
 #include "app/core/edition/EditionGate.h"
 
+#include <QToolButton>
 #include <QWidget>
 
 #include <utility>
@@ -34,7 +35,6 @@
 
 class QAction;
 class QMenu;
-class QToolButton;
 
 namespace trion::actions {
 class ActionRegistry;
@@ -42,6 +42,29 @@ class Sysvars;
 } // namespace trion::actions
 
 namespace trion::shell {
+
+// Nút biểu tượng .sbt của thanh trạng thái, dùng chung cho dải nút chế độ và StatusBar (UIA-009): rộng --h-btn + --sp-2,
+// cao --h-btn. Nền và màu biểu tượng theo TrionStyle (.ib: rê --c-hover, nhấn --c-press, bật --c-on-bg và --c-on); bật
+// thêm gạch dưới cao --sp-1 màu --c-on để phân biệt không cần màu (07.3 Phụ lục C); dot: chấm --c-danger góc trên phải
+// (.sbt.has-dot, có thông báo chưa đọc). Enter như Space; menu (con của nút): chuột phải, phím Menu, Shift+F10 mở lên
+// trên (prototype).
+class StatusButton : public QToolButton {
+public:
+    explicit StatusButton(QWidget* parent = nullptr);
+    QMenu* menu = nullptr; // menu chuột phải
+    bool dot = false;
+
+    // Mở m lên trên anchor: mép trái thẳng anchor, hoặc mép phải (alignRight, .sb cuối thanh như prototype).
+    static void popupAbove(QMenu* m, const QWidget* anchor, bool alignRight = false);
+
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override { return sizeHint(); }
+
+protected:
+    void paintEvent(QPaintEvent* e) override;
+    void keyPressEvent(QKeyEvent* e) override;
+    void contextMenuEvent(QContextMenuEvent* e) override;
+};
 
 class ModeToggles : public QWidget {
     Q_OBJECT

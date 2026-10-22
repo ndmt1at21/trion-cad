@@ -29,6 +29,39 @@
     </message>
 </context>
 <context>
+    <name>trion::shell::StatusBar</name>
+    <message numerus="yes">
+        <source>%1 font đã thay thế</source>
+        <translation>
+            <numerusform>%1 font đã thay thế</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng TCVN3</source>
+        <translation>
+            <numerusform>%1 đối tượng TCVN3</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 thay thế</source>
+        <translation>
+            <numerusform>Font: %1 thay thế</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 TCVN3</source>
+        <translation>
+            <numerusform>Font: %1 TCVN3</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 thông báo chưa đọc</source>
+        <translation>
+            <numerusform>%1 thông báo chưa đọc</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::TitleBar</name>
     <message numerus="yes">
         <source>Dùng thử: còn %n ngày</source>

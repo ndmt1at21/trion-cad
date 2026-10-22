@@ -1,8 +1,9 @@
-# app/shell/status (UIA-112): ModeToggles — dải nút chế độ hỗ trợ vẽ của thanh trạng thái UI-A08 (ModeToggles.h).
-# UIA-009 thêm StatusBar vào thư viện này.
+# app/shell/status: thanh trạng thái UI-A08. UIA-112: ModeToggles (dải nút chế độ hỗ trợ vẽ, nút .sbt StatusButton);
+# UIA-009: StatusBar (tọa độ, MODEL/PAPER, chỉ báo, tác vụ nền, thông báo, huy hiệu, Tùy biến, menu tràn).
 trion_add_library(trion_status
-  SOURCES ModeToggles.h ModeToggles.cpp
-  LIBS trion_actions trion_edition trion_menu trion_tooltip trion_theme Qt6::Widgets)
+  SOURCES ModeToggles.h ModeToggles.cpp StatusBar.h StatusBar.cpp
+  LIBS trion_actions trion_edition trion_menu trion_tooltip trion_progress trion_message trion_controls trion_regen
+       trion_icons trion_fonts trion_i18n trion_theme Qt6::Widgets)
 
 trion_add_test(mode_toggles_test SOURCES tests/mode_toggles_test.cpp
   LIBS trion_status trion_i18n trion_icons trion_fonts trion_perf trion_appcore LABELS status)
@@ -12,3 +13,7 @@ file(GLOB baseline CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} tests/
 if(baseline)
   qt_add_resources(mode_toggles_test status_baseline PREFIX /baseline BASE tests/baseline FILES ${baseline})
 endif()
+
+# UIA-009: kiểm thuộc tính và điểm ảnh, không ảnh baseline.
+trion_add_test(status_bar_test SOURCES tests/status_bar_test.cpp
+  LIBS trion_status trion_a11y trion_jobs trion_i18n trion_icons trion_fonts trion_appcore LABELS status)
