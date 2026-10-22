@@ -64,6 +64,7 @@ trion_component(app/shell/ribbon)
 trion_component(app/shell/cmdline)
 trion_component(app/shell/status)
 trion_component(app/shell/start)
+trion_component(app/shell/appmenu)
 trion_component(app/main)
 trion_component(tests/integration)
 

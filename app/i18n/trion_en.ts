@@ -3690,6 +3690,101 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::shell::AppMenu</name>
+    <message>
+        <source>Mới</source>
+        <translation>New</translation>
+    </message>
+    <message>
+        <source>Mở</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>Lưu</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Lưu thành</source>
+        <translation>Save As</translation>
+    </message>
+    <message>
+        <source>Xuất</source>
+        <translation>Export</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Print</translation>
+    </message>
+    <message>
+        <source>Tiện ích bản vẽ</source>
+        <translation>Drawing Utilities</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>Menu ứng dụng</source>
+        <translation>Application menu</translation>
+    </message>
+    <message>
+        <source>Tìm trong menu ứng dụng</source>
+        <translation>Search the application menu</translation>
+    </message>
+    <message>
+        <source>Tìm lệnh hoặc tệp gần đây</source>
+        <translation>Search commands or recent files</translation>
+    </message>
+    <message>
+        <source>Lệnh</source>
+        <translation>Commands</translation>
+    </message>
+    <message>
+        <source>Tệp gần đây</source>
+        <translation>Recent files</translation>
+    </message>
+    <message>
+        <source>Ngày</source>
+        <translation>Date</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Kích thước</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Sắp xếp tệp gần đây</source>
+        <translation>Sort recent files</translation>
+    </message>
+    <message>
+        <source>%1 (khuyến nghị)</source>
+        <translation>%1 (recommended)</translation>
+    </message>
+    <message>
+        <source>Mẫu bản vẽ (DWT)</source>
+        <translation>Drawing Template (DWT)</translation>
+    </message>
+    <message>
+        <source>Xuất DXF</source>
+        <translation>Export DXF</translation>
+    </message>
+    <message>
+        <source>Đóng tất cả bản vẽ</source>
+        <translation>Close All Drawings</translation>
+    </message>
+    <message>
+        <source>Chưa có tệp gần đây.</source>
+        <translation>No recent files.</translation>
+    </message>
+    <message>
+        <source>Không có tệp nào khớp.</source>
+        <translation>No matching files.</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::CommandSearch</name>
     <message>
         <source>Không tìm thấy “%1”. Thử từ khóa khác, ví dụ “đo”, “in”, “layer”.</source>
