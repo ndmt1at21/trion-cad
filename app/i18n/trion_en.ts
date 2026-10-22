@@ -3724,6 +3724,141 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::shell::ModeToggles</name>
+    <message>
+        <source>Điểm cuối</source>
+        <translation>Endpoint</translation>
+    </message>
+    <message>
+        <source>Trung điểm</source>
+        <translation>Midpoint</translation>
+    </message>
+    <message>
+        <source>Tâm</source>
+        <translation>Center</translation>
+    </message>
+    <message>
+        <source>Tâm hình học</source>
+        <translation>Geometric center</translation>
+    </message>
+    <message>
+        <source>Điểm</source>
+        <translation>Node</translation>
+    </message>
+    <message>
+        <source>Góc phần tư</source>
+        <translation>Quadrant</translation>
+    </message>
+    <message>
+        <source>Giao điểm</source>
+        <translation>Intersection</translation>
+    </message>
+    <message>
+        <source>Kéo dài</source>
+        <translation>Extension</translation>
+    </message>
+    <message>
+        <source>Điểm chèn</source>
+        <translation>Insertion</translation>
+    </message>
+    <message>
+        <source>Vuông góc</source>
+        <translation>Perpendicular</translation>
+    </message>
+    <message>
+        <source>Tiếp xúc</source>
+        <translation>Tangent</translation>
+    </message>
+    <message>
+        <source>Gần nhất</source>
+        <translation>Nearest</translation>
+    </message>
+    <message>
+        <source>Giao biểu kiến</source>
+        <translation>Apparent intersection</translation>
+    </message>
+    <message>
+        <source>Song song</source>
+        <translation>Parallel</translation>
+    </message>
+    <message>
+        <source>Snap lưới</source>
+        <translation>Grid snap</translation>
+    </message>
+    <message>
+        <source>Snap polar</source>
+        <translation>Polar snap</translation>
+    </message>
+    <message>
+        <source>Nhập con trỏ</source>
+        <translation>Pointer input</translation>
+    </message>
+    <message>
+        <source>Nhập kích thước</source>
+        <translation>Dimension input</translation>
+    </message>
+    <message>
+        <source>Prompt động</source>
+        <translation>Dynamic prompts</translation>
+    </message>
+    <message>
+        <source>Mặt trái</source>
+        <translation>Isoplane left</translation>
+    </message>
+    <message>
+        <source>Mặt trên</source>
+        <translation>Isoplane top</translation>
+    </message>
+    <message>
+        <source>Mặt phải</source>
+        <translation>Isoplane right</translation>
+    </message>
+    <message>
+        <source>Chế độ bắt điểm</source>
+        <translation>Object snap modes</translation>
+    </message>
+    <message>
+        <source>Chọn tất cả</source>
+        <translation>Select all</translation>
+    </message>
+    <message>
+        <source>Bỏ tất cả</source>
+        <translation>Clear all</translation>
+    </message>
+    <message>
+        <source>Thiết lập bắt điểm…</source>
+        <translation>Object snap settings…</translation>
+    </message>
+    <message>
+        <source>Thiết lập theo dõi…</source>
+        <translation>Tracking settings…</translation>
+    </message>
+    <message>
+        <source>Thiết lập…</source>
+        <translation>Settings…</translation>
+    </message>
+    <message>
+        <source>Góc khác…</source>
+        <translation>Other angle…</translation>
+    </message>
+    <message>
+        <source>Bắt điểm (khi đo)</source>
+        <translation>Object snap (when measuring)</translation>
+    </message>
+    <message>
+        <source>Bắt điểm</source>
+        <translation>Object snap</translation>
+    </message>
+    <message>
+        <source>Biến hệ thống %1.</source>
+        <translation>System variable %1.</translation>
+    </message>
+    <message>
+        <source>Biến hệ thống %1. Chuột phải để xem thiết lập.</source>
+        <translation>System variable %1. Right-click for settings.</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::Qat</name>
     <message>
         <source>Mở</source>
