@@ -2412,6 +2412,25 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::shell::CommandSearch</name>
+    <message>
+        <source>Không tìm thấy “%1”. Thử từ khóa khác, ví dụ “đo”, “in”, “layer”.</source>
+        <translation>No results for “%1”. Try another keyword, such as “measure”, “plot”, “layer”.</translation>
+    </message>
+    <message>
+        <source>Tìm lệnh</source>
+        <translation>Search commands</translation>
+    </message>
+    <message>
+        <source>Tìm lệnh: “đường tròn”, CIRCLE, C…</source>
+        <translation>Search commands: “circle”, CIRCLE, C…</translation>
+    </message>
+    <message>
+        <source>Kết quả tìm lệnh</source>
+        <translation>Command search results</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::MainWindow</name>
     <message>
         <source>Thuộc tính</source>
@@ -2464,6 +2483,181 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     <message>
         <source>Thanh trạng thái</source>
         <translation>Status bar</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::Qat</name>
+    <message>
+        <source>Mở</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Plot</translation>
+    </message>
+    <message>
+        <source>Xem trước bản in</source>
+        <translation>Plot preview</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+    <message>
+        <source>Khớp thuộc tính</source>
+        <translation>Match properties</translation>
+    </message>
+    <message>
+        <source>In hàng loạt</source>
+        <translation>Batch plot</translation>
+    </message>
+    <message>
+        <source>Thanh truy cập nhanh</source>
+        <translation>Quick Access Toolbar</translation>
+    </message>
+    <message>
+        <source>Thêm vào thanh truy cập nhanh</source>
+        <translation>Add to Quick Access Toolbar</translation>
+    </message>
+    <message>
+        <source>Tùy biến thanh truy cập nhanh</source>
+        <translation>Customize Quick Access Toolbar</translation>
+    </message>
+    <message>
+        <source>Lệnh in</source>
+        <translation>Plot commands</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::TitleBar</name>
+    <message>
+        <source>TrionCAD Viewer</source>
+        <translation>TrionCAD Viewer</translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation>Viewer</translation>
+    </message>
+    <message>
+        <source>TrionCAD Viewer Pro</source>
+        <translation>TrionCAD Viewer Pro</translation>
+    </message>
+    <message>
+        <source>Viewer Pro</source>
+        <translation>Viewer Pro</translation>
+    </message>
+    <message>
+        <source>TrionCAD Pro</source>
+        <translation>TrionCAD Pro</translation>
+    </message>
+    <message>
+        <source>Pro</source>
+        <translation>Pro</translation>
+    </message>
+    <message numerus="yes">
+        <source>Dùng thử: còn %n ngày</source>
+        <translation>
+            <numerusform>Trial: %n day left</numerusform>
+            <numerusform>Trial: %n days left</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>TrionCAD Giáo dục</source>
+        <translation>TrionCAD Education</translation>
+    </message>
+    <message>
+        <source>Giáo dục</source>
+        <translation>Education</translation>
+    </message>
+    <message>
+        <source>TrionCAD Doanh nghiệp</source>
+        <translation>TrionCAD Enterprise</translation>
+    </message>
+    <message>
+        <source>Doanh nghiệp</source>
+        <translation>Enterprise</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · còn %n ngày offline</source>
+        <translation>
+            <numerusform>%1 · %n offline day left</numerusform>
+            <numerusform>%1 · %n offline days left</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>[Chỉ xem]</source>
+        <translation>[View only]</translation>
+    </message>
+    <message>
+        <source>[Chỉ đọc]</source>
+        <translation>[Read-only]</translation>
+    </message>
+    <message>
+        <source>[Đã phục hồi]</source>
+        <translation>[Recovered]</translation>
+    </message>
+    <message>
+        <source>Menu ứng dụng</source>
+        <translation>Application menu</translation>
+    </message>
+    <message>
+        <source>Mở, xuất, in, tiện ích bản vẽ, tùy chọn và tệp gần đây.</source>
+        <translation>Open, export, plot, drawing utilities, options and recent files.</translation>
+    </message>
+    <message>
+        <source>Tài khoản</source>
+        <translation>Account</translation>
+    </message>
+    <message>
+        <source>Trợ giúp</source>
+        <translation>Help</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · còn %n ngày</source>
+        <translation>
+            <numerusform>%1 · %n day left</numerusform>
+            <numerusform>%1 · %n days left</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Trạng thái giấy phép</source>
+        <translation>License status</translation>
+    </message>
+    <message>
+        <source>Kích hoạt, nhập key…</source>
+        <translation>Activate, enter key…</translation>
+    </message>
+    <message>
+        <source>Đăng nhập, kích hoạt…</source>
+        <translation>Sign in, activate…</translation>
+    </message>
+    <message>
+        <source>Quản lý tài khoản</source>
+        <translation>Manage account</translation>
+    </message>
+    <message>
+        <source>Đăng xuất</source>
+        <translation>Sign out</translation>
+    </message>
+    <message>
+        <source>Chuyển từ AutoCAD sang</source>
+        <translation>Switching from AutoCAD</translation>
+    </message>
+    <message>
+        <source>Bảng phím tắt</source>
+        <translation>Keyboard shortcuts</translation>
+    </message>
+    <message>
+        <source>Liên hệ hỗ trợ</source>
+        <translation>Contact support</translation>
+    </message>
+    <message>
+        <source>Góp ý</source>
+        <translation>Feedback</translation>
+    </message>
+    <message>
+        <source>Kiểm tra cập nhật</source>
+        <translation>Check for updates</translation>
     </message>
 </context>
 <context>

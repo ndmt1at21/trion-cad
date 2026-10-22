@@ -20,6 +20,27 @@
     </message>
 </context>
 <context>
+    <name>trion::shell::TitleBar</name>
+    <message numerus="yes">
+        <source>Dùng thử: còn %n ngày</source>
+        <translation>
+            <numerusform>Dùng thử: còn %n ngày</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · còn %n ngày offline</source>
+        <translation>
+            <numerusform>%1 · còn %n ngày offline</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · còn %n ngày</source>
+        <translation>
+            <numerusform>%1 · còn %n ngày</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::CanvasBanner</name>
     <message numerus="yes">
         <source>+%n thông báo khác</source>
