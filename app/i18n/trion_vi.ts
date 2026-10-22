@@ -29,6 +29,27 @@
     </message>
 </context>
 <context>
+    <name>trion::shell::StartPage</name>
+    <message numerus="yes">
+        <source>Dùng thử: còn %n ngày</source>
+        <translation>
+            <numerusform>Dùng thử: còn %n ngày</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Còn %n ngày dùng thử. Hết hạn, phần mềm chuyển về Viewer; bản vẽ vẫn mở và in được.</source>
+        <translation>
+            <numerusform>Còn %n ngày dùng thử. Hết hạn, phần mềm chuyển về Viewer; bản vẽ vẫn mở và in được.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
+        <translation>
+            <numerusform>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::StatusBar</name>
     <message numerus="yes">
         <source>%1 font đã thay thế</source>

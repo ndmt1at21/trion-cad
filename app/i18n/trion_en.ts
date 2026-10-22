@@ -3995,6 +3995,341 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::shell::RecentFiles</name>
+    <message>
+        <source>Bỏ ghim</source>
+        <translation>Unpin</translation>
+    </message>
+    <message>
+        <source>Ghim</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <source>đã ghim</source>
+        <translation>pinned</translation>
+    </message>
+    <message>
+        <source>Không tìm thấy</source>
+        <translation>Not found</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Ngày sửa</source>
+        <translation>Date modified</translation>
+    </message>
+    <message>
+        <source>Kích thước</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Phiên bản</source>
+        <translation>Version</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::StartPage</name>
+    <message>
+        <source>TCVN A3 ngang</source>
+        <translation>TCVN A3 landscape</translation>
+    </message>
+    <message>
+        <source>TCVN A3 dọc</source>
+        <translation>TCVN A3 portrait</translation>
+    </message>
+    <message>
+        <source>TCVN A1 ngang</source>
+        <translation>TCVN A1 landscape</translation>
+    </message>
+    <message>
+        <source>TCVN A2 ngang</source>
+        <translation>TCVN A2 landscape</translation>
+    </message>
+    <message>
+        <source>TCVN A4 dọc</source>
+        <translation>TCVN A4 portrait</translation>
+    </message>
+    <message>
+        <source>Trống (mm)</source>
+        <translation>Blank (mm)</translation>
+    </message>
+    <message>
+        <source>Trống (inch)</source>
+        <translation>Blank (inch)</translation>
+    </message>
+    <message>
+        <source>Mẫu của tôi</source>
+        <translation>My templates</translation>
+    </message>
+    <message>
+        <source>Chuyển từ AutoCAD sang trong 1 ngày</source>
+        <translation>Switch from AutoCAD in 1 day</translation>
+    </message>
+    <message>
+        <source>12 phút · các lệnh và phím tắt giữ nguyên</source>
+        <translation>12 min · same commands and shortcuts</translation>
+    </message>
+    <message>
+        <source>Đo diện tích phòng bằng một cú bấm</source>
+        <translation>Measure a room&apos;s area in one click</translation>
+    </message>
+    <message>
+        <source>2 phút · Đo nhanh</source>
+        <translation>2 min · Quick measure</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font sửa chữ TCVN3, VNI thế nào</source>
+        <translation>How Font Doctor fixes TCVN3 and VNI text</translation>
+    </message>
+    <message>
+        <source>3 phút</source>
+        <translation>3 min</translation>
+    </message>
+    <message>
+        <source>Sửa bản vẽ</source>
+        <translation>Edit drawings</translation>
+    </message>
+    <message>
+        <source>Tạo mới</source>
+        <translation>New</translation>
+    </message>
+    <message>
+        <source>Mở</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>Tệp gần đây</source>
+        <translation>Recent files</translation>
+    </message>
+    <message>
+        <source>Học tập</source>
+        <translation>Learn</translation>
+    </message>
+    <message>
+        <source>Mẹo</source>
+        <translation>Tips</translation>
+    </message>
+    <message>
+        <source>Thông báo</source>
+        <translation>Announcements</translation>
+    </message>
+    <message>
+        <source>Duyệt mẫu…</source>
+        <translation>Browse templates…</translation>
+    </message>
+    <message>
+        <source>Mở tệp…</source>
+        <translation>Open file…</translation>
+    </message>
+    <message>
+        <source>Phục hồi bản vẽ lỗi</source>
+        <translation>Recover damaged drawing</translation>
+    </message>
+    <message>
+        <source>Mở tệp có lỗi cấu trúc để xem</source>
+        <translation>Open a file with structural errors to view it</translation>
+    </message>
+    <message>
+        <source>Tìm trong tệp gần đây</source>
+        <translation>Search recent files</translation>
+    </message>
+    <message>
+        <source>Ngày sửa</source>
+        <translation>Date modified</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Kích thước</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Sắp xếp</source>
+        <translation>Sort</translation>
+    </message>
+    <message>
+        <source>Kiểu xem</source>
+        <translation>View</translation>
+    </message>
+    <message>
+        <source>Lưới</source>
+        <translation>Grid</translation>
+    </message>
+    <message>
+        <source>Danh sách</source>
+        <translation>List</translation>
+    </message>
+    <message>
+        <source>Mở bản vẽ mẫu</source>
+        <translation>Open sample drawing</translation>
+    </message>
+    <message>
+        <source>Xem video 2 phút</source>
+        <translation>Watch 2-minute video</translation>
+    </message>
+    <message>
+        <source>Gõ tiếng Việt vào dòng lệnh để tìm lệnh: “đo”, “in”, “layer”. Tên lệnh AutoCAD vẫn dùng được như cũ.</source>
+        <translation>Type Vietnamese in the command line to find commands: “đo”, “in”, “layer”. AutoCAD command names still work as before.</translation>
+    </message>
+    <message>
+        <source>Thả tệp DWG, DXF để mở</source>
+        <translation>Drop DWG or DXF files to open</translation>
+    </message>
+    <message>
+        <source>TrionCAD Viewer</source>
+        <translation>TrionCAD Viewer</translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation>Viewer</translation>
+    </message>
+    <message>
+        <source>Xem, đo, in và xuất PDF miễn phí. Sửa bản vẽ cần TrionCAD Pro.</source>
+        <translation>View, measure, print and export PDF for free. Editing drawings requires TrionCAD Pro.</translation>
+    </message>
+    <message>
+        <source>Dùng thử Pro 30 ngày</source>
+        <translation>Try Pro for 30 days</translation>
+    </message>
+    <message>
+        <source>TrionCAD Viewer Pro</source>
+        <translation>TrionCAD Viewer Pro</translation>
+    </message>
+    <message>
+        <source>Viewer Pro</source>
+        <translation>Viewer Pro</translation>
+    </message>
+    <message>
+        <source>Xem, in hàng loạt, so sánh bản vẽ, markup. Sửa bản vẽ cần TrionCAD Pro.</source>
+        <translation>View, batch print, compare drawings, markup. Editing drawings requires TrionCAD Pro.</translation>
+    </message>
+    <message>
+        <source>TrionCAD Pro</source>
+        <translation>TrionCAD Pro</translation>
+    </message>
+    <message numerus="yes">
+        <source>Dùng thử: còn %n ngày</source>
+        <translation>
+            <numerusform>Trial: %n day left</numerusform>
+            <numerusform>Trial: %n days left</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Còn %n ngày dùng thử. Hết hạn, phần mềm chuyển về Viewer; bản vẽ vẫn mở và in được.</source>
+        <translation>
+            <numerusform>%n day of trial left. When it ends, the software switches to Viewer; drawings can still be opened and printed.</numerusform>
+            <numerusform>%n days of trial left. When it ends, the software switches to Viewer; drawings can still be opened and printed.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Mua TrionCAD Pro</source>
+        <translation>Buy TrionCAD Pro</translation>
+    </message>
+    <message>
+        <source>TrionCAD Giáo dục</source>
+        <translation>TrionCAD Education</translation>
+    </message>
+    <message>
+        <source>TrionCAD Doanh nghiệp</source>
+        <translation>TrionCAD Enterprise</translation>
+    </message>
+    <message>
+        <source>Pro</source>
+        <translation>Pro</translation>
+    </message>
+    <message>
+        <source>Giáo dục</source>
+        <translation>Education</translation>
+    </message>
+    <message>
+        <source>Doanh nghiệp</source>
+        <translation>Enterprise</translation>
+    </message>
+    <message>
+        <source>Thuê bao còn hạn đến %1.</source>
+        <translation>Subscription valid until %1.</translation>
+    </message>
+    <message>
+        <source>Trạng thái giấy phép</source>
+        <translation>License status</translation>
+    </message>
+    <message>
+        <source>Mở thư mục gần đây</source>
+        <translation>Open recent folder</translation>
+    </message>
+    <message>
+        <source>Chưa có thư mục gần đây</source>
+        <translation>No recent folders yet</translation>
+    </message>
+    <message>
+        <source>Chưa có tệp gần đây</source>
+        <translation>No recent files yet</translation>
+    </message>
+    <message>
+        <source>Không có tệp khớp “%1”</source>
+        <translation>No files match “%1”</translation>
+    </message>
+    <message>
+        <source>Mở một bản vẽ, hoặc kéo-thả tệp DWG vào đây.</source>
+        <translation>Open a drawing, or drag and drop a DWG file here.</translation>
+    </message>
+    <message>
+        <source>Không tìm thấy “%1”. Tệp đã bị xóa, đổi tên hoặc ổ đĩa không vào được.</source>
+        <translation>“%1” was not found. The file was deleted or renamed, or the drive is unavailable.</translation>
+    </message>
+    <message>
+        <source>Xóa khỏi danh sách</source>
+        <translation>Remove from list</translation>
+    </message>
+    <message>
+        <source>Đã xóa “%1” khỏi danh sách. Tệp trên ổ đĩa không bị xóa.</source>
+        <translation>Removed “%1” from the list. The file on disk was not deleted.</translation>
+    </message>
+    <message>
+        <source>Hoàn tác</source>
+        <translation>Undo</translation>
+    </message>
+    <message>
+        <source>Không mở được thư mục %1.</source>
+        <translation>Could not open folder %1.</translation>
+    </message>
+    <message>
+        <source>Mở chỉ đọc</source>
+        <translation>Open read-only</translation>
+    </message>
+    <message>
+        <source>Mở thư mục chứa</source>
+        <translation>Open containing folder</translation>
+    </message>
+    <message>
+        <source>Sao chép đường dẫn</source>
+        <translation>Copy path</translation>
+    </message>
+    <message>
+        <source>Đã sao chép: %1</source>
+        <translation>Copied: %1</translation>
+    </message>
+    <message>
+        <source>Bỏ ghim</source>
+        <translation>Unpin</translation>
+    </message>
+    <message>
+        <source>Ghim</source>
+        <translation>Pin</translation>
+    </message>
+    <message numerus="yes">
+        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
+        <translation>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 is not a drawing.</numerusform>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 are not drawings.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::StatusBar</name>
     <message>
         <source>Tọa độ</source>
