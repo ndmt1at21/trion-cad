@@ -2443,6 +2443,49 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::ui::CommandLine</name>
+    <message>
+        <source>TrionCAD đã sẵn sàng. Gõ lệnh như AutoCAD, hoặc gõ tiếng Việt (ví dụ “đo”, “in”) để tìm lệnh.</source>
+        <translation>TrionCAD is ready. Type commands as in AutoCAD, or type Vietnamese (e.g. “đo”, “in”) to find a command.</translation>
+    </message>
+    <message>
+        <source>Lệnh: %1</source>
+        <translation>Command: %1</translation>
+    </message>
+    <message>
+        <source>Trong bản vẽ, dấu thập phân luôn là dấu chấm: gõ 12.5, không gõ 12,5.</source>
+        <translation>In drawings the decimal separator is always a period: type 12.5, not 12,5.</translation>
+    </message>
+    <message>
+        <source>Gõ lệnh hoặc từ khóa tiếng Việt, ví dụ: đo, in, layer</source>
+        <translation>Type a command or a Vietnamese keyword, e.g. đo, in, layer</translation>
+    </message>
+    <message>
+        <source>Lịch sử dòng lệnh</source>
+        <translation>Command history</translation>
+    </message>
+    <message>
+        <source>Chưa có</source>
+        <translation>None yet</translation>
+    </message>
+    <message>
+        <source>Lệnh gần đây</source>
+        <translation>Recent Commands</translation>
+    </message>
+    <message>
+        <source>Giá trị đã nhập gần đây</source>
+        <translation>Recent Input</translation>
+    </message>
+    <message>
+        <source>Sao chép lịch sử</source>
+        <translation>Copy History</translation>
+    </message>
+    <message>
+        <source>Tùy chọn dòng lệnh…</source>
+        <translation>Command Line Options…</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ConfirmDialog</name>
     <message>
         <source>Không hỏi lại</source>

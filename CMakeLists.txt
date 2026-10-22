@@ -56,6 +56,7 @@ trion_component(app/widgets/numeric)
 trion_component(app/widgets/progress)
 trion_component(app/widgets/tooltip)
 trion_component(app/widgets/views)
+trion_component(app/shell/cmdline)
 trion_component(app/main)
 trion_component(tests/integration)
 
