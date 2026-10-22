@@ -1,0 +1,325 @@
+{
+  "id": "insert",
+  "name": "Chèn",
+  "panels": [
+    {
+      "id": "block",
+      "name": "Block",
+      "icon": "insert",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Chèn",
+          "icon": "insert",
+          "cmd": "INSERT",
+          "source": "blocks"
+        },
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Palette\nBlocks",
+          "icon": "blocks",
+          "cmd": "BLOCKSPALETTE"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tạo block",
+              "icon": "bcreate",
+              "cmd": "BLOCK"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Ghi block ra tệp",
+              "icon": "saveas",
+              "cmd": "WBLOCK"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Block Editor",
+              "icon": "bedit",
+              "cmd": "BEDIT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Điểm gốc bản vẽ",
+              "icon": "idpoint",
+              "cmd": "BASE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dinh-nghia-block",
+      "name": "Định nghĩa block",
+      "icon": "attedit",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Định nghĩa\nattribute",
+          "icon": "attedit",
+          "cmd": "ATTDEF"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý attribute",
+              "icon": "attedit",
+              "cmd": "BATTMAN"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đồng bộ",
+              "icon": "refresh",
+              "cmd": "ATTSYNC"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Hiển thị attribute",
+              "icon": "eye",
+              "cmd": "ATTDISP",
+              "menu": [
+                {
+                  "label": "Bình thường",
+                  "cmd": "ATTDISP",
+                  "args": "N"
+                },
+                {
+                  "label": "Hiện tất cả",
+                  "cmd": "ATTDISP",
+                  "args": "ON"
+                },
+                {
+                  "label": "Ẩn tất cả",
+                  "cmd": "ATTDISP",
+                  "args": "OFF"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tham-chieu",
+      "name": "Tham chiếu",
+      "icon": "xref",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Gắn",
+          "icon": "xref",
+          "cmd": "ATTACH",
+          "menu": [
+            {
+              "label": "DWG…",
+              "cmd": "XATTACH"
+            },
+            {
+              "label": "Ảnh…",
+              "cmd": "IMAGEATTACH"
+            },
+            {
+              "label": "PDF…",
+              "cmd": "PDFATTACH"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Clip",
+              "icon": "zwin",
+              "cmd": "CLIP"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Điều chỉnh",
+              "icon": "image",
+              "cmd": "ADJUST"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Layer của underlay",
+              "icon": "layers",
+              "cmd": "ULAYERS"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Khung tham chiếu",
+              "icon": "rect",
+              "cmd": "FRAME",
+              "menu": [
+                {
+                  "label": "Ẩn khung",
+                  "cmd": "FRAME",
+                  "args": "0"
+                },
+                {
+                  "label": "Hiện và in khung",
+                  "cmd": "FRAME",
+                  "args": "1"
+                },
+                {
+                  "label": "Hiện nhưng không in",
+                  "cmd": "FRAME",
+                  "args": "2"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bắt điểm vào underlay",
+              "icon": "osnap",
+              "cmd": "UOSNAP"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tham chiếu ngoài",
+              "icon": "xref",
+              "cmd": "EXTERNALREFERENCES"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bind từng đối tượng",
+              "icon": "xref",
+              "cmd": "XBIND"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nhap",
+      "name": "Nhập",
+      "icon": "pdf",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Nhập PDF",
+              "icon": "pdf",
+              "cmd": "PDFIMPORT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "du-lieu",
+      "name": "Dữ liệu",
+      "icon": "stats",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Field",
+              "icon": "mtext",
+              "cmd": "FIELD"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Cập nhật field",
+              "icon": "refresh",
+              "cmd": "UPDATEFIELD"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Trích xuất dữ liệu",
+              "icon": "stats",
+              "cmd": "DATAEXTRACTION"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Hyperlink",
+              "icon": "link",
+              "cmd": "HYPERLINK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "noi-dung",
+      "name": "Nội dung",
+      "icon": "lib",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Thư viện\nTCVN",
+          "icon": "lib",
+          "cmd": "TCLIB"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "DesignCenter",
+              "icon": "folder",
+              "cmd": "ADCENTER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tool Palettes",
+              "icon": "blocks",
+              "cmd": "TOOLPALETTES"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "id": "express",
+  "name": "Mở rộng",
+  "panels": [
+    {
+      "id": "block",
+      "name": "Block",
+      "icon": "insert",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phá block giữ chữ",
+              "icon": "explode",
+              "cmd": "BURST"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sao chép đối tượng lồng",
+              "icon": "copy",
+              "cmd": "NCOPY"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sửa attribute hàng loạt",
+              "icon": "attedit",
+              "cmd": "GATTE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phá theo tùy chọn",
+              "icon": "explode",
+              "cmd": "XPLODE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thay block",
+              "icon": "breplace",
+              "cmd": "BLOCKREPLACE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đếm block",
+              "icon": "count",
+              "cmd": "BCOUNT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Liệt kê lồng",
+              "icon": "xlist",
+              "cmd": "XLIST"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Block thành tham chiếu ngoài",
+              "icon": "xref",
+              "cmd": "BLOCKTOXREF"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tỉ lệ block",
+              "icon": "scale",
+              "cmd": "BSCALE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "van-ban",
+      "name": "Văn bản",
+      "icon": "mtext",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đổi hoa, thường",
+              "icon": "case",
+              "cmd": "TCASE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đánh số",
+              "icon": "mtext",
+              "cmd": "TCOUNT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phá chữ thành nét",
+              "icon": "explode",
+              "cmd": "TXTEXP"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chữ theo cung",
+              "icon": "arctext",
+              "cmd": "ARCTEXT"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Che nền chữ",
+              "icon": "bgmask",
+              "cmd": "TEXTMASK",
+              "menu": [
+                {
+                  "label": "Che nền chữ",
+                  "cmd": "TEXTMASK"
+                },
+                {
+                  "label": "Bỏ che nền",
+                  "cmd": "TEXTUNMASK"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Co chữ cho vừa",
+              "icon": "textfit",
+              "cmd": "TEXTFIT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xoay chữ đọc xuôi",
+              "icon": "torient",
+              "cmd": "TORIENT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chữ từ tệp ngoài",
+              "icon": "rtext",
+              "cmd": "RTEXT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sua",
+      "name": "Sửa",
+      "icon": "move",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Làm phẳng Z",
+              "icon": "move",
+              "cmd": "FLATTEN"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Cắt theo đường bao",
+              "icon": "trim",
+              "cmd": "EXTRIM"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sửa nhiều polyline",
+              "icon": "pline",
+              "cmd": "MPEDIT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sao chép kèm xoay",
+              "icon": "mocoro",
+              "cmd": "MOCORO"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kéo giãn nhiều vùng",
+              "icon": "mstretch",
+              "cmd": "MSTRETCH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ve",
+      "name": "Vẽ",
+      "icon": "line",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đường ngắt",
+              "icon": "breakline",
+              "cmd": "BREAKLINE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Hatch ảnh, block",
+              "icon": "superhatch",
+              "cmd": "SUPERHATCH"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tạo shape",
+              "icon": "mkshape",
+              "cmd": "MKSHAPE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tạo kiểu đường",
+              "icon": "mkltype",
+              "cmd": "MKLTYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layout",
+      "name": "Layout",
+      "icon": "layout",
+      "shrink": 4,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Gióng Model và Paper",
+              "icon": "alignspace",
+              "cmd": "ALIGNSPACE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đồng bộ viewport",
+              "icon": "vpsync",
+              "cmd": "VPSYNC"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tỉ lệ nhiều viewport",
+              "icon": "vpscale",
+              "cmd": "VPSCALE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kich-thuoc",
+      "name": "Kích thước",
+      "icon": "dim",
+      "shrink": 4,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xuất kiểu kích thước",
+              "icon": "dimex",
+              "cmd": "DIMEX"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Nhập kiểu kích thước",
+              "icon": "dimim",
+              "cmd": "DIMIM"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Gắn đường dẫn vào chữ",
+              "icon": "qlattach",
+              "cmd": "QLATTACH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tep",
+      "name": "Tệp",
+      "icon": "save",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Lưu tất cả",
+              "icon": "save",
+              "cmd": "SAVEALL"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Mở lại bản đã lưu",
+              "icon": "refresh",
+              "cmd": "REVERT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đóng tất cả không lưu",
+              "icon": "fileclose",
+              "cmd": "QQUIT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chuyển tệp .bak",
+              "icon": "movebak",
+              "cmd": "MOVEBAK"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đổi đường dẫn",
+              "icon": "redir",
+              "cmd": "REDIR"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cong-cu",
+      "name": "Công cụ",
+      "icon": "gear",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Biến hệ thống",
+              "icon": "gear",
+              "cmd": "SYSVDLG"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Xem xdata",
+              "icon": "xdata",
+              "cmd": "XDLIST",
+              "menu": [
+                {
+                  "label": "Xem xdata",
+                  "cmd": "XDLIST"
+                },
+                {
+                  "label": "Gắn xdata",
+                  "cmd": "XDATA"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thời gian sửa",
+              "icon": "clock",
+              "cmd": "EDITTIME"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Shape thành block",
+              "icon": "shp2blk",
+              "cmd": "SHP2BLK"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trion/ribbon/tab.schema.json",
+  "title": "Tab ribbon (UIA-102)",
+  "description": "Một tệp là một tab: tab → panel → hàng/cột → điều khiển (07.1 §7.1). RibbonModel đọc đúng các khóa này; khóa lạ, sai kiểu là lỗi (ribbon_lint_test). Nhãn viết bằng tiếng Việt gốc; bản English trong app/i18n/trion_en.ts (nhãn trùng nhãn lệnh: ngữ cảnh \"actions\", còn lại \"ribbon\").",
+  "type": "object",
+  "required": ["id", "name", "panels"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "description": "home, insert, annotate, view, manage, output, vntools, express"},
+    "name": {"type": "string", "description": "Tên tab"},
+    "panels": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/panel"}}
+  },
+  "$defs": {
+    "panel": {
+      "type": "object",
+      "required": ["id", "name", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "description": "Không trùng trong tab"},
+        "name": {"type": "string"},
+        "icon": {"type": "string", "description": "Biểu tượng của nút panel khi thu gọn (UIA-005); tên trong bộ UI0-103"},
+        "shrink": {"type": "integer", "minimum": 1, "default": 1,
+          "description": "Ưu tiên co (UIA-005, prototype data-prio): 1 co sau cùng; số lớn thu thành nút thả xuống trước"},
+        "items": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/item"}},
+        "more": {"type": "array", "items": {"$ref": "#/$defs/menuItem"}, "description": "Panel mở rộng (UIA-005)"}
+      }
+    },
+    "item": {
+      "oneOf": [
+        {"type": "object", "required": ["row"], "additionalProperties": false,
+          "properties": {"row": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/item"}}}},
+        {"type": "object", "required": ["column"], "additionalProperties": false,
+          "properties": {"column": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/item"}}}},
+        {"$ref": "#/$defs/control"}
+      ]
+    },
+    "control": {
+      "type": "object",
+      "required": ["type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"enum": ["button", "split", "toggle", "dropdown", "gallery", "number", "slider"]},
+        "size": {"enum": ["large", "small", "icon"], "default": "small", "description": "button, split, toggle"},
+        "id": {"type": "string", "description": "Khóa nhớ lựa chọn của split, objectName; mặc định cmd (không có: source, sysvar)"},
+        "label": {"type": "string", "description": "'\\n' ngắt dòng ở nút lớn"},
+        "icon": {"type": "string", "description": "Tên trong bộ biểu tượng UI0-103; không có: biểu tượng của lệnh"},
+        "cmd": {"type": "string", "description": "Id hành động ActionRegistry: tên lệnh hoặc id gắn sysvar (LWDISPLAY). Bắt buộc với button, split, toggle"},
+        "args": {"type": "string", "description": "Tham số lựa chọn gửi sau tên lệnh"},
+        "need": {"enum": ["VP", "PRO"], "description": "Cờ phiên bản riêng; không có: theo lệnh"},
+        "source": {"type": "string", "description": "Nguồn model (RibbonControls::setModel): bắt buộc với dropdown, gallery; split có source thì danh sách theo model"},
+        "sysvar": {"type": "string", "description": "Bắt buộc với number, slider: nhận giá trị gửi 'SYSVAR giá-trị"},
+        "above": {"type": "number", "description": "number: giá trị phải lớn hơn"},
+        "min": {"type": "number", "default": 0, "description": "slider"},
+        "max": {"type": "number", "default": 100, "description": "slider"},
+        "width": {"type": "integer", "description": "Bề rộng px logic ở 100% (dropdown, gallery, ô của number, slider)"},
+        "menuOnly": {"type": "boolean", "description": "split: cả nút mở danh sách, không có phần chính"},
+        "menu": {"type": "array", "items": {"$ref": "#/$defs/menuItem"}, "description": "split: danh sách cố định"}
+      }
+    },
+    "menuItem": {
+      "oneOf": [
+        {"type": "object", "required": ["separator"], "additionalProperties": false,
+          "properties": {"separator": {"const": true}}},
+        {"type": "object", "required": ["label", "cmd"], "additionalProperties": false,
+          "properties": {
+            "label": {"type": "string"},
+            "cmd": {"type": "string"},
+            "args": {"type": "string"},
+            "icon": {"type": "string"}
+          }}
+      ]
+    }
+  }
+}

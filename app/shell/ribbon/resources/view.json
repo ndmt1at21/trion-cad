@@ -1,0 +1,404 @@
+{
+  "id": "view",
+  "name": "Hiển thị",
+  "panels": [
+    {
+      "id": "dieu-huong",
+      "name": "Điều hướng",
+      "icon": "pan",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Pan",
+          "icon": "pan",
+          "cmd": "PAN"
+        },
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Zoom",
+          "icon": "zoom",
+          "cmd": "ZOOM",
+          "menu": [
+            {
+              "label": "Toàn bộ đối tượng",
+              "cmd": "ZOOM",
+              "args": "E",
+              "icon": "zext"
+            },
+            {
+              "label": "Cửa sổ",
+              "cmd": "ZOOM",
+              "args": "W",
+              "icon": "zwin"
+            },
+            {
+              "label": "Trước đó",
+              "cmd": "ZOOM",
+              "args": "P",
+              "icon": "zprev"
+            },
+            {
+              "label": "Thời gian thực",
+              "cmd": "ZOOM",
+              "args": "R"
+            },
+            {
+              "label": "Tất cả",
+              "cmd": "ZOOM",
+              "args": "A"
+            },
+            {
+              "label": "Tỉ lệ…",
+              "cmd": "ZOOM"
+            },
+            {
+              "label": "Đối tượng",
+              "cmd": "ZOOM",
+              "args": "O"
+            },
+            {
+              "separator": true
+            },
+            {
+              "label": "Phóng to",
+              "cmd": "ZOOM",
+              "args": "2X"
+            },
+            {
+              "label": "Thu nhỏ",
+              "cmd": "ZOOM",
+              "args": ".5X",
+              "icon": "zoomout"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Toàn bộ",
+              "icon": "zext",
+              "cmd": "ZOOM",
+              "args": "E"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xoay 3D",
+              "icon": "views",
+              "cmd": "3DORBIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tạo lại hình",
+              "icon": "regen",
+              "cmd": "REGEN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "khung-nhin",
+      "name": "Khung nhìn",
+      "icon": "views",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "View đã lưu",
+              "icon": "views",
+              "cmd": "VIEW",
+              "source": "views",
+              "menuOnly": true
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Trình quản lý view",
+              "icon": "views",
+              "cmd": "VIEW"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viewport",
+      "name": "Viewport",
+      "icon": "ws",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Cấu hình\nviewport",
+          "icon": "ws",
+          "cmd": "VPORTS"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Viewport đã đặt tên",
+              "icon": "ws",
+              "cmd": "VPORTS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Gộp viewport",
+              "icon": "ws",
+              "cmd": "VPORTS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kieu-hien-thi",
+      "name": "Kiểu hiển thị",
+      "icon": "vstyle",
+      "shrink": 4,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "vstyle",
+              "label": "Kiểu hiển thị",
+              "source": "visualstyles",
+              "width": 130
+            },
+            {
+              "type": "toggle",
+              "size": "small",
+              "label": "Độ dày nét",
+              "icon": "lw",
+              "cmd": "LWDISPLAY",
+              "id": "lwtgl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palette",
+      "name": "Palette",
+      "icon": "props",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thuộc tính",
+              "icon": "props",
+              "cmd": "PROPERTIES"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Layer",
+              "icon": "layers",
+              "cmd": "LAYER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Blocks",
+              "icon": "blocks",
+              "cmd": "BLOCKSPALETTE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tham chiếu ngoài",
+              "icon": "xref",
+              "cmd": "EXTERNALREFERENCES"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bác sĩ Font",
+              "icon": "fontdoc",
+              "cmd": "FIXFONT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thư viện TCVN",
+              "icon": "lib",
+              "cmd": "TCLIB"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đếm",
+              "icon": "count",
+              "cmd": "COUNT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Markup",
+              "icon": "markup",
+              "cmd": "TCMARKUP"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Dòng lệnh",
+              "icon": "keyboard",
+              "cmd": "COMMANDLINE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tool Palettes",
+              "icon": "tpal",
+              "cmd": "TOOLPALETTES"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "DesignCenter",
+              "icon": "dcenter",
+              "cmd": "ADCENTER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Máy tính nhanh",
+              "icon": "calc",
+              "cmd": "QUICKCALC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "giao-dien",
+      "name": "Giao diện",
+      "icon": "monitor",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Clean Screen",
+              "icon": "fullscreen",
+              "cmd": "CLEANSCREENON"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Biểu tượng UCS",
+              "icon": "iso",
+              "cmd": "UCSICON"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "ViewCube",
+              "icon": "views",
+              "cmd": "NAVVCUBE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "toa-do",
+      "name": "Tọa độ",
+      "icon": "iso",
+      "shrink": 3,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "UCS",
+          "icon": "iso",
+          "cmd": "UCS",
+          "menu": [
+            {
+              "label": "Thế giới",
+              "cmd": "UCS",
+              "args": "W"
+            },
+            {
+              "label": "Gốc",
+              "cmd": "UCS"
+            },
+            {
+              "label": "3 điểm",
+              "cmd": "UCS",
+              "args": "3"
+            },
+            {
+              "label": "Theo đối tượng",
+              "cmd": "UCS",
+              "args": "OB"
+            },
+            {
+              "label": "Theo view",
+              "cmd": "UCS",
+              "args": "V"
+            },
+            {
+              "label": "Trước đó",
+              "cmd": "UCS",
+              "args": "P"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý UCS",
+              "icon": "iso",
+              "cmd": "UCSMAN"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Nhìn mặt bằng",
+              "icon": "views",
+              "cmd": "PLAN"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

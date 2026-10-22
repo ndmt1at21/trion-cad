@@ -1,0 +1,433 @@
+{
+  "id": "annotate",
+  "name": "Chú thích",
+  "panels": [
+    {
+      "id": "van-ban",
+      "name": "Văn bản",
+      "icon": "mtext",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Văn bản",
+          "icon": "mtext",
+          "cmd": "MTEXT",
+          "menu": [
+            {
+              "label": "Nhiều dòng",
+              "cmd": "MTEXT"
+            },
+            {
+              "label": "Một dòng",
+              "cmd": "TEXT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-ts",
+              "label": "Kiểu chữ",
+              "source": "textstyles",
+              "width": 150,
+              "cmd": "STYLE"
+            },
+            {
+              "type": "number",
+              "sysvar": "TEXTSIZE",
+              "above": 0,
+              "id": "rb-th",
+              "label": "Chiều cao",
+              "width": 70
+            },
+            {
+              "row": [
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Tìm và thay thế",
+                  "icon": "findtext",
+                  "cmd": "FIND"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Kiểm tra chính tả",
+                  "icon": "spell",
+                  "cmd": "SPELL"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Đổi tỉ lệ chữ",
+                  "icon": "scale",
+                  "cmd": "SCALETEXT"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Đổi điểm canh",
+                  "icon": "mtext",
+                  "cmd": "JUSTIFYTEXT"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Gộp thành MText",
+                  "icon": "mtext",
+                  "cmd": "TXT2MTXT"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kich-thuoc",
+      "name": "Kích thước",
+      "icon": "dim",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Kích thước",
+          "icon": "dim",
+          "cmd": "DIM",
+          "menu": [
+            {
+              "label": "Thông minh",
+              "cmd": "DIM"
+            },
+            {
+              "label": "Thẳng",
+              "cmd": "DIMLINEAR"
+            },
+            {
+              "label": "Nghiêng",
+              "cmd": "DIMALIGNED"
+            },
+            {
+              "label": "Góc",
+              "cmd": "DIMANGULAR"
+            },
+            {
+              "label": "Độ dài cung",
+              "cmd": "DIMARC"
+            },
+            {
+              "label": "Bán kính",
+              "cmd": "DIMRADIUS"
+            },
+            {
+              "label": "Đường kính",
+              "cmd": "DIMDIAMETER"
+            },
+            {
+              "label": "Gãy khúc",
+              "cmd": "DIMJOGGED"
+            },
+            {
+              "label": "Tọa độ điểm",
+              "cmd": "DIMORDINATE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Ghi nhanh",
+              "icon": "dim",
+              "cmd": "QDIM"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Nối tiếp",
+              "icon": "dim",
+              "cmd": "DIMCONTINUE",
+              "menu": [
+                {
+                  "label": "Nối tiếp",
+                  "cmd": "DIMCONTINUE"
+                },
+                {
+                  "label": "Cùng gốc",
+                  "cmd": "DIMBASELINE"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Ngắt dim",
+              "icon": "dim",
+              "cmd": "DIMBREAK"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Giãn cách dim",
+              "icon": "dim",
+              "cmd": "DIMSPACE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sửa kích thước",
+              "icon": "dim",
+              "cmd": "DIMEDIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Vị trí chữ",
+              "icon": "dim",
+              "cmd": "DIMTEDIT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-ds",
+              "label": "Kiểu kích thước",
+              "source": "dimstyles",
+              "width": 150,
+              "cmd": "DIMSTYLE"
+            },
+            {
+              "row": [
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Dấu tâm",
+                  "icon": "circle",
+                  "cmd": "CENTERMARK"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Đường tâm",
+                  "icon": "line",
+                  "cmd": "CENTERLINE"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Dung sai hình học",
+                  "icon": "dim",
+                  "cmd": "TOLERANCE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "duong-dan",
+      "name": "Đường dẫn",
+      "icon": "leader",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Multileader",
+          "icon": "leader",
+          "cmd": "MLEADER"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thêm nhánh",
+              "icon": "plus",
+              "cmd": "MLEADEREDIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Gióng hàng",
+              "icon": "leader",
+              "cmd": "MLEADERALIGN"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Gom nhóm",
+              "icon": "leader",
+              "cmd": "MLEADERCOLLECT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-ms",
+              "label": "Kiểu multileader",
+              "source": "mleaderstyles",
+              "width": 150,
+              "cmd": "MLEADERSTYLE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đường dẫn nhanh",
+              "icon": "leader",
+              "cmd": "QLEADER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bang",
+      "name": "Bảng",
+      "icon": "table",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Bảng",
+          "icon": "table",
+          "cmd": "TABLE"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Dán bảng từ Excel",
+              "icon": "stats",
+              "cmd": "TCEXCELPASTE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xuất bảng ra Excel",
+              "icon": "stats",
+              "cmd": "TCEXCELOUT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Trích xuất dữ liệu",
+              "icon": "stats",
+              "cmd": "DATAEXTRACTION"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-bs",
+              "label": "Kiểu bảng",
+              "source": "tablestyles",
+              "width": 150,
+              "cmd": "TABLESTYLE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "danh-dau",
+      "name": "Đánh dấu",
+      "icon": "cloud",
+      "shrink": 3,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Đám mây",
+          "icon": "cloud",
+          "cmd": "REVCLOUD",
+          "menu": [
+            {
+              "label": "Chữ nhật",
+              "cmd": "REVCLOUD",
+              "args": "R"
+            },
+            {
+              "label": "Đa giác",
+              "cmd": "REVCLOUD",
+              "args": "P"
+            },
+            {
+              "label": "Tự do",
+              "cmd": "REVCLOUD",
+              "args": "F"
+            },
+            {
+              "label": "Chọn đối tượng",
+              "cmd": "REVCLOUD",
+              "args": "O"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Vùng che",
+              "icon": "rect",
+              "cmd": "WIPEOUT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ti-le-chu-thich",
+      "name": "Tỉ lệ chú thích",
+      "icon": "anno",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-anno",
+              "label": "Tỉ lệ chú thích",
+              "source": "annoscales",
+              "width": 110,
+              "cmd": "SCALELISTEDIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Danh sách tỉ lệ",
+              "icon": "list",
+              "cmd": "SCALELISTEDIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thêm, xóa tỉ lệ",
+              "icon": "anno",
+              "cmd": "OBJECTSCALE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

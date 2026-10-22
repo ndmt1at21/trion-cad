@@ -2340,6 +2340,1123 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>ribbon</name>
+    <message>
+        <source>Trang chủ</source>
+        <translation>Home</translation>
+    </message>
+    <message>
+        <source>Vẽ</source>
+        <translation>Draw</translation>
+    </message>
+    <message>
+        <source>Đoạn
+thẳng</source>
+        <translation>Line</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>Polyline</translation>
+    </message>
+    <message>
+        <source>Đường
+tròn</source>
+        <translation>Circle</translation>
+    </message>
+    <message>
+        <source>Tâm, Bán kính</source>
+        <translation>Center, Radius</translation>
+    </message>
+    <message>
+        <source>Tâm, Đường kính</source>
+        <translation>Center, Diameter</translation>
+    </message>
+    <message>
+        <source>2 điểm</source>
+        <translation>2-Point</translation>
+    </message>
+    <message>
+        <source>3 điểm</source>
+        <translation>3-Point</translation>
+    </message>
+    <message>
+        <source>Tiếp, Tiếp, Bán kính</source>
+        <translation>Tan, Tan, Radius</translation>
+    </message>
+    <message>
+        <source>Tiếp, Tiếp, Tiếp</source>
+        <translation>Tan, Tan, Tan</translation>
+    </message>
+    <message>
+        <source>Cung</source>
+        <translation>Arc</translation>
+    </message>
+    <message>
+        <source>Đầu, Tâm, Cuối</source>
+        <translation>Start, Center, End</translation>
+    </message>
+    <message>
+        <source>Đầu, Tâm, Góc</source>
+        <translation>Start, Center, Angle</translation>
+    </message>
+    <message>
+        <source>Đầu, Tâm, Dây cung</source>
+        <translation>Start, Center, Length</translation>
+    </message>
+    <message>
+        <source>Đầu, Cuối, Góc</source>
+        <translation>Start, End, Angle</translation>
+    </message>
+    <message>
+        <source>Đầu, Cuối, Hướng</source>
+        <translation>Start, End, Direction</translation>
+    </message>
+    <message>
+        <source>Đầu, Cuối, Bán kính</source>
+        <translation>Start, End, Radius</translation>
+    </message>
+    <message>
+        <source>Tâm, Đầu, Cuối</source>
+        <translation>Center, Start, End</translation>
+    </message>
+    <message>
+        <source>Tâm, Đầu, Góc</source>
+        <translation>Center, Start, Angle</translation>
+    </message>
+    <message>
+        <source>Tâm, Đầu, Dây cung</source>
+        <translation>Center, Start, Length</translation>
+    </message>
+    <message>
+        <source>Nối tiếp</source>
+        <translation>Continue</translation>
+    </message>
+    <message>
+        <source>Chữ nhật</source>
+        <translation>Rectangle</translation>
+    </message>
+    <message>
+        <source>Hình chữ nhật</source>
+        <translation>Rectangle</translation>
+    </message>
+    <message>
+        <source>Đa giác</source>
+        <translation>Polygon</translation>
+    </message>
+    <message>
+        <source>Hatch</source>
+        <translation>Hatch</translation>
+    </message>
+    <message>
+        <source>Gradient</source>
+        <translation>Gradient</translation>
+    </message>
+    <message>
+        <source>Đường biên</source>
+        <translation>Boundary</translation>
+    </message>
+    <message>
+        <source>Ellipse</source>
+        <translation>Ellipse</translation>
+    </message>
+    <message>
+        <source>Tâm</source>
+        <translation>Center</translation>
+    </message>
+    <message>
+        <source>Trục, Đầu mút</source>
+        <translation>Axis, End</translation>
+    </message>
+    <message>
+        <source>Cung ellipse</source>
+        <translation>Elliptical Arc</translation>
+    </message>
+    <message>
+        <source>Spline</source>
+        <translation>Spline</translation>
+    </message>
+    <message>
+        <source>Điểm đi qua</source>
+        <translation>Fit Points</translation>
+    </message>
+    <message>
+        <source>Điểm điều khiển</source>
+        <translation>Control Vertices</translation>
+    </message>
+    <message>
+        <source>Đường dựng hình</source>
+        <translation>Construction Line</translation>
+    </message>
+    <message>
+        <source>Đám mây</source>
+        <translation>Revision Cloud</translation>
+    </message>
+    <message>
+        <source>Tự do</source>
+        <translation>Freehand</translation>
+    </message>
+    <message>
+        <source>Tia</source>
+        <translation>Ray</translation>
+    </message>
+    <message>
+        <source>Nhiều điểm</source>
+        <translation>Multiple Points</translation>
+    </message>
+    <message>
+        <source>Chia đều</source>
+        <translation>Divide</translation>
+    </message>
+    <message>
+        <source>Đám mây: chữ nhật</source>
+        <translation>Cloud: Rectangular</translation>
+    </message>
+    <message>
+        <source>Đám mây: đa giác</source>
+        <translation>Cloud: Polygonal</translation>
+    </message>
+    <message>
+        <source>Đám mây: tự do</source>
+        <translation>Cloud: Freehand</translation>
+    </message>
+    <message>
+        <source>Đám mây: chọn đối tượng</source>
+        <translation>Cloud: Object</translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation>Region</translation>
+    </message>
+    <message>
+        <source>Sửa</source>
+        <translation>Modify</translation>
+    </message>
+    <message>
+        <source>Theo đường</source>
+        <translation>Path</translation>
+    </message>
+    <message>
+        <source>Tròn</source>
+        <translation>Polar</translation>
+    </message>
+    <message>
+        <source>Hộp thoại cổ điển</source>
+        <translation>Classic Dialog</translation>
+    </message>
+    <message>
+        <source>Xóa</source>
+        <translation>Erase</translation>
+    </message>
+    <message>
+        <source>Offset</source>
+        <translation>Offset</translation>
+    </message>
+    <message>
+        <source>Lên trên cùng</source>
+        <translation>Bring to Front</translation>
+    </message>
+    <message>
+        <source>Xuống dưới cùng</source>
+        <translation>Send to Back</translation>
+    </message>
+    <message>
+        <source>Đưa chữ lên trên</source>
+        <translation>Bring Text to Front</translation>
+    </message>
+    <message>
+        <source>Đưa hatch xuống dưới</source>
+        <translation>Send Hatches to Back</translation>
+    </message>
+    <message>
+        <source>Đặt về ByLayer</source>
+        <translation>Set to ByLayer</translation>
+    </message>
+    <message>
+        <source>Chuyển không gian</source>
+        <translation>Change Space</translation>
+    </message>
+    <message>
+        <source>Chú thích</source>
+        <translation>Annotate</translation>
+    </message>
+    <message>
+        <source>Văn bản</source>
+        <translation>Text</translation>
+    </message>
+    <message>
+        <source>Nhiều dòng</source>
+        <translation>Multiline Text</translation>
+    </message>
+    <message>
+        <source>Một dòng</source>
+        <translation>Single Line</translation>
+    </message>
+    <message>
+        <source>Kích thước</source>
+        <translation>Dimension</translation>
+    </message>
+    <message>
+        <source>Thông minh</source>
+        <translation>Smart</translation>
+    </message>
+    <message>
+        <source>Thẳng</source>
+        <translation>Linear</translation>
+    </message>
+    <message>
+        <source>Nghiêng</source>
+        <translation>Aligned</translation>
+    </message>
+    <message>
+        <source>Góc</source>
+        <translation>Angle</translation>
+    </message>
+    <message>
+        <source>Độ dài cung</source>
+        <translation>Arc Length</translation>
+    </message>
+    <message>
+        <source>Bán kính</source>
+        <translation>Radius</translation>
+    </message>
+    <message>
+        <source>Đường kính</source>
+        <translation>Diameter</translation>
+    </message>
+    <message>
+        <source>Gãy khúc</source>
+        <translation>Jogged</translation>
+    </message>
+    <message>
+        <source>Đường dẫn</source>
+        <translation>Leader</translation>
+    </message>
+    <message>
+        <source>Multileader</source>
+        <translation>Multileader</translation>
+    </message>
+    <message>
+        <source>Thêm nhánh</source>
+        <translation>Add Leader</translation>
+    </message>
+    <message>
+        <source>Bớt nhánh</source>
+        <translation>Remove Leader</translation>
+    </message>
+    <message>
+        <source>Dán bảng Excel</source>
+        <translation>Paste Excel Table</translation>
+    </message>
+    <message>
+        <source>Kiểu kích thước</source>
+        <translation>Dimension Style</translation>
+    </message>
+    <message>
+        <source>Layer</source>
+        <translation>Layers</translation>
+    </message>
+    <message>
+        <source>Thuộc tính
+layer</source>
+        <translation>Layer Properties</translation>
+    </message>
+    <message>
+        <source>Layer hiện hành</source>
+        <translation>Current Layer</translation>
+    </message>
+    <message>
+        <source>Layer của đối tượng thành hiện hành</source>
+        <translation>Make Object&apos;s Layer Current</translation>
+    </message>
+    <message>
+        <source>Cô lập</source>
+        <translation>Isolate</translation>
+    </message>
+    <message>
+        <source>Bỏ cô lập</source>
+        <translation>Unisolate</translation>
+    </message>
+    <message>
+        <source>Tắt</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <source>Đóng băng</source>
+        <translation>Freeze</translation>
+    </message>
+    <message>
+        <source>Khóa</source>
+        <translation>Lock</translation>
+    </message>
+    <message>
+        <source>Mở khóa</source>
+        <translation>Unlock</translation>
+    </message>
+    <message>
+        <source>Bật tất cả</source>
+        <translation>Turn All Layers On</translation>
+    </message>
+    <message>
+        <source>Rã đông tất cả</source>
+        <translation>Thaw All Layers</translation>
+    </message>
+    <message>
+        <source>Xóa layer</source>
+        <translation>Delete Layer</translation>
+    </message>
+    <message>
+        <source>Nạp bộ layer chuẩn TCVN…</source>
+        <translation>Load TCVN Standard Layers…</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>Block</translation>
+    </message>
+    <message>
+        <source>Chèn</source>
+        <translation>Insert</translation>
+    </message>
+    <message>
+        <source>Tạo</source>
+        <translation>Create</translation>
+    </message>
+    <message>
+        <source>Một block</source>
+        <translation>Single Block</translation>
+    </message>
+    <message>
+        <source>Nhiều block</source>
+        <translation>Multiple Blocks</translation>
+    </message>
+    <message>
+        <source>Cổ điển</source>
+        <translation>Classic</translation>
+    </message>
+    <message>
+        <source>Quản lý attribute</source>
+        <translation>Manage Attributes</translation>
+    </message>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Khớp
+thuộc tính</source>
+        <translation>Match Properties</translation>
+    </message>
+    <message>
+        <source>Màu</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Kiểu đường</source>
+        <translation>Linetype</translation>
+    </message>
+    <message>
+        <source>Độ dày nét</source>
+        <translation>Lineweight</translation>
+    </message>
+    <message>
+        <source>Trong suốt</source>
+        <translation>Transparency</translation>
+    </message>
+    <message>
+        <source>Liệt kê</source>
+        <translation>List</translation>
+    </message>
+    <message>
+        <source>Nhóm</source>
+        <translation>Group</translation>
+    </message>
+    <message>
+        <source>Chọn theo nhóm</source>
+        <translation>Group Selection</translation>
+    </message>
+    <message>
+        <source>Tiện ích</source>
+        <translation>Utilities</translation>
+    </message>
+    <message>
+        <source>Đo</source>
+        <translation>Measure</translation>
+    </message>
+    <message>
+        <source>Nhanh</source>
+        <translation>Quick</translation>
+    </message>
+    <message>
+        <source>Khoảng cách</source>
+        <translation>Distance</translation>
+    </message>
+    <message>
+        <source>Diện tích</source>
+        <translation>Area</translation>
+    </message>
+    <message>
+        <source>Chọn nhanh</source>
+        <translation>Quick Select</translation>
+    </message>
+    <message>
+        <source>Clipboard</source>
+        <translation>Clipboard</translation>
+    </message>
+    <message>
+        <source>Palette
+Blocks</source>
+        <translation>Blocks Palette</translation>
+    </message>
+    <message>
+        <source>Định nghĩa block</source>
+        <translation>Block Definition</translation>
+    </message>
+    <message>
+        <source>Định nghĩa
+attribute</source>
+        <translation>Define Attributes</translation>
+    </message>
+    <message>
+        <source>Đồng bộ</source>
+        <translation>Synchronize</translation>
+    </message>
+    <message>
+        <source>Bình thường</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Hiện tất cả</source>
+        <translation>Show All</translation>
+    </message>
+    <message>
+        <source>Ẩn tất cả</source>
+        <translation>Hide All</translation>
+    </message>
+    <message>
+        <source>Tham chiếu</source>
+        <translation>Reference</translation>
+    </message>
+    <message>
+        <source>Gắn</source>
+        <translation>Attach</translation>
+    </message>
+    <message>
+        <source>DWG…</source>
+        <translation>DWG…</translation>
+    </message>
+    <message>
+        <source>Ảnh…</source>
+        <translation>Image…</translation>
+    </message>
+    <message>
+        <source>PDF…</source>
+        <translation>PDF…</translation>
+    </message>
+    <message>
+        <source>Clip</source>
+        <translation>Clip</translation>
+    </message>
+    <message>
+        <source>Điều chỉnh</source>
+        <translation>Adjust</translation>
+    </message>
+    <message>
+        <source>Ẩn khung</source>
+        <translation>Hide Frames</translation>
+    </message>
+    <message>
+        <source>Hiện và in khung</source>
+        <translation>Show and Plot Frames</translation>
+    </message>
+    <message>
+        <source>Hiện nhưng không in</source>
+        <translation>Show but Do Not Plot</translation>
+    </message>
+    <message>
+        <source>Tham chiếu ngoài</source>
+        <translation>External References</translation>
+    </message>
+    <message>
+        <source>Bind từng đối tượng</source>
+        <translation>Bind Individual Objects</translation>
+    </message>
+    <message>
+        <source>Nhập</source>
+        <translation>Import</translation>
+    </message>
+    <message>
+        <source>Nhập PDF</source>
+        <translation>Import PDF</translation>
+    </message>
+    <message>
+        <source>Dữ liệu</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Field</source>
+        <translation>Field</translation>
+    </message>
+    <message>
+        <source>Nội dung</source>
+        <translation>Content</translation>
+    </message>
+    <message>
+        <source>Thư viện
+TCVN</source>
+        <translation>TCVN Library</translation>
+    </message>
+    <message>
+        <source>Chiều cao</source>
+        <translation>Height</translation>
+    </message>
+    <message>
+        <source>Tìm và thay thế</source>
+        <translation>Find and Replace</translation>
+    </message>
+    <message>
+        <source>Đổi điểm canh</source>
+        <translation>Justify</translation>
+    </message>
+    <message>
+        <source>Gộp thành MText</source>
+        <translation>Convert to MText</translation>
+    </message>
+    <message>
+        <source>Ghi nhanh</source>
+        <translation>Quick Dimension</translation>
+    </message>
+    <message>
+        <source>Cùng gốc</source>
+        <translation>Baseline</translation>
+    </message>
+    <message>
+        <source>Ngắt dim</source>
+        <translation>Dim Break</translation>
+    </message>
+    <message>
+        <source>Giãn cách dim</source>
+        <translation>Adjust Space</translation>
+    </message>
+    <message>
+        <source>Vị trí chữ</source>
+        <translation>Text Position</translation>
+    </message>
+    <message>
+        <source>Dung sai hình học</source>
+        <translation>Geometric Tolerance</translation>
+    </message>
+    <message>
+        <source>Gióng hàng</source>
+        <translation>Align</translation>
+    </message>
+    <message>
+        <source>Gom nhóm</source>
+        <translation>Collect</translation>
+    </message>
+    <message>
+        <source>Đánh dấu</source>
+        <translation>Markup</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ chú thích</source>
+        <translation>Annotation Scale</translation>
+    </message>
+    <message>
+        <source>Thêm, xóa tỉ lệ</source>
+        <translation>Add/Delete Scales</translation>
+    </message>
+    <message>
+        <source>Hiển thị</source>
+        <translation>View</translation>
+    </message>
+    <message>
+        <source>Điều hướng</source>
+        <translation>Navigate</translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation>Pan</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Zoom</translation>
+    </message>
+    <message>
+        <source>Toàn bộ đối tượng</source>
+        <translation>Extents</translation>
+    </message>
+    <message>
+        <source>Cửa sổ</source>
+        <translation>Window</translation>
+    </message>
+    <message>
+        <source>Trước đó</source>
+        <translation>Previous</translation>
+    </message>
+    <message>
+        <source>Thời gian thực</source>
+        <translation>Realtime</translation>
+    </message>
+    <message>
+        <source>Tất cả</source>
+        <translation>All</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ…</source>
+        <translation>Scale…</translation>
+    </message>
+    <message>
+        <source>Đối tượng</source>
+        <translation>Object</translation>
+    </message>
+    <message>
+        <source>Phóng to</source>
+        <translation>Zoom In</translation>
+    </message>
+    <message>
+        <source>Thu nhỏ</source>
+        <translation>Zoom Out</translation>
+    </message>
+    <message>
+        <source>Toàn bộ</source>
+        <translation>Extents</translation>
+    </message>
+    <message>
+        <source>Khung nhìn</source>
+        <extracomment>glossary-ok: &quot;khung nhìn&quot; ở đây là View đã đặt tên (07.1 §7.6 &quot;Khung nhìn đã đặt tên&quot;), không phải Viewport</extracomment>
+        <translation>Named Views</translation>
+    </message>
+    <message>
+        <source>View đã lưu</source>
+        <translation>Saved Views</translation>
+    </message>
+    <message>
+        <source>Trình quản lý view</source>
+        <translation>View Manager</translation>
+    </message>
+    <message>
+        <source>Viewport</source>
+        <translation>Viewports</translation>
+    </message>
+    <message>
+        <source>Cấu hình
+viewport</source>
+        <translation>Viewport Configuration</translation>
+    </message>
+    <message>
+        <source>Viewport đã đặt tên</source>
+        <translation>Named Viewports</translation>
+    </message>
+    <message>
+        <source>Gộp viewport</source>
+        <translation>Join Viewports</translation>
+    </message>
+    <message>
+        <source>Kiểu hiển thị</source>
+        <translation>Visual Styles</translation>
+    </message>
+    <message>
+        <source>Palette</source>
+        <translation>Palettes</translation>
+    </message>
+    <message>
+        <source>Blocks</source>
+        <translation>Blocks</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+    <message>
+        <source>Đếm</source>
+        <translation>Count</translation>
+    </message>
+    <message>
+        <source>Markup</source>
+        <translation>Markup</translation>
+    </message>
+    <message>
+        <source>Dòng lệnh</source>
+        <translation>Command Line</translation>
+    </message>
+    <message>
+        <source>Giao diện</source>
+        <translation>Interface</translation>
+    </message>
+    <message>
+        <source>Clean Screen</source>
+        <translation>Clean Screen</translation>
+    </message>
+    <message>
+        <source>Tọa độ</source>
+        <translation>Coordinates</translation>
+    </message>
+    <message>
+        <source>UCS</source>
+        <translation>UCS</translation>
+    </message>
+    <message>
+        <source>Thế giới</source>
+        <translation>World</translation>
+    </message>
+    <message>
+        <source>Gốc</source>
+        <translation>Origin</translation>
+    </message>
+    <message>
+        <source>Theo đối tượng</source>
+        <translation>Object</translation>
+    </message>
+    <message>
+        <source>Theo view</source>
+        <translation>View</translation>
+    </message>
+    <message>
+        <source>Nhìn mặt bằng</source>
+        <translation>Plan View</translation>
+    </message>
+    <message>
+        <source>Quản lý</source>
+        <translation>Manage</translation>
+    </message>
+    <message>
+        <source>Tùy biến</source>
+        <translation>Customization</translation>
+    </message>
+    <message>
+        <source>Viết tắt
+lệnh</source>
+        <translation>Command Aliases</translation>
+    </message>
+    <message>
+        <source>Giao diện (CUI)</source>
+        <translation>User Interface (CUI)</translation>
+    </message>
+    <message>
+        <source>Ứng dụng</source>
+        <translation>Applications</translation>
+    </message>
+    <message>
+        <source>Nạp ứng
+dụng</source>
+        <translation>Load Application</translation>
+    </message>
+    <message>
+        <source>Biến hệ thống</source>
+        <translation>System Variables</translation>
+    </message>
+    <message>
+        <source>Chuẩn CAD</source>
+        <translation>CAD Standards</translation>
+    </message>
+    <message>
+        <source>Chuẩn .dws</source>
+        <translation>.dws Standards</translation>
+    </message>
+    <message>
+        <source>Cấu hình chuẩn…</source>
+        <translation>Configure Standards…</translation>
+    </message>
+    <message>
+        <source>Kiểm tra chuẩn…</source>
+        <translation>Check Standards…</translation>
+    </message>
+    <message>
+        <source>Kiểm tra TCVN</source>
+        <translation>TCVN Check</translation>
+    </message>
+    <message>
+        <source>Làm sạch</source>
+        <translation>Cleanup</translation>
+    </message>
+    <message>
+        <source>Dọn dẹp</source>
+        <translation>Purge</translation>
+    </message>
+    <message>
+        <source>Phục hồi</source>
+        <translation>Recover</translation>
+    </message>
+    <message>
+        <source>Đổi tên</source>
+        <translation>Rename</translation>
+    </message>
+    <message>
+        <source>Đơn vị</source>
+        <translation>Units</translation>
+    </message>
+    <message>
+        <source>Làm sạch hình học</source>
+        <translation>Geometry Cleanup</translation>
+    </message>
+    <message>
+        <source>Sức khỏe bản vẽ</source>
+        <translation>Drawing Health</translation>
+    </message>
+    <message>
+        <source>Tệp hàng loạt</source>
+        <translation>Batch Files</translation>
+    </message>
+    <message>
+        <source>Chuyển font hàng loạt</source>
+        <translation>Batch Font Conversion</translation>
+    </message>
+    <message>
+        <source>Hiệu năng</source>
+        <translation>Performance</translation>
+    </message>
+    <message>
+        <source>Kiểm tra hiệu năng</source>
+        <translation>Performance Test</translation>
+    </message>
+    <message>
+        <source>Xuất</source>
+        <translation>Output</translation>
+    </message>
+    <message>
+        <source>In theo
+khung tên</source>
+        <translation>Plot by Title Block</translation>
+    </message>
+    <message>
+        <source>In nhiều layout</source>
+        <translation>Plot Multiple Layouts</translation>
+    </message>
+    <message>
+        <source>Thiết lập trang</source>
+        <translation>Page Setup</translation>
+    </message>
+    <message>
+        <source>Xem trước</source>
+        <translation>Preview</translation>
+    </message>
+    <message>
+        <source>Quản lý kiểu in</source>
+        <translation>Plot Style Manager</translation>
+    </message>
+    <message>
+        <source>Quản lý máy in</source>
+        <translation>Plotter Manager</translation>
+    </message>
+    <message>
+        <source>PDF</source>
+        <translation>PDF</translation>
+    </message>
+    <message>
+        <source>Layout hiện tại</source>
+        <translation>Current Layout</translation>
+    </message>
+    <message>
+        <source>Tất cả layout</source>
+        <translation>All Layouts</translation>
+    </message>
+    <message>
+        <source>Vùng đang xem</source>
+        <translation>Current Display</translation>
+    </message>
+    <message>
+        <source>Ảnh</source>
+        <translation>Image</translation>
+    </message>
+    <message>
+        <source>DXF</source>
+        <translation>DXF</translation>
+    </message>
+    <message>
+        <source>Layout thành Model</source>
+        <translation>Layout to Model</translation>
+    </message>
+    <message>
+        <source>Gửi</source>
+        <translation>Send</translation>
+    </message>
+    <message>
+        <source>Công cụ VN</source>
+        <translation>VN Tools</translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation>Font</translation>
+    </message>
+    <message>
+        <source>Bác sĩ
+Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+    <message>
+        <source>Chuyển sang Unicode</source>
+        <translation>Convert to Unicode</translation>
+    </message>
+    <message>
+        <source>TCVN</source>
+        <translation>TCVN</translation>
+    </message>
+    <message>
+        <source>Mẫu bản vẽ TCVN</source>
+        <translation>TCVN Template</translation>
+    </message>
+    <message>
+        <source>Khung in trong Model</source>
+        <translation>Plot Frame in Model</translation>
+    </message>
+    <message>
+        <source>Đo và thống kê</source>
+        <translation>Measure and Statistics</translation>
+    </message>
+    <message>
+        <source>Attribute ra Excel</source>
+        <translation>Attributes to Excel</translation>
+    </message>
+    <message>
+        <source>Nhập attribute</source>
+        <translation>Import Attributes</translation>
+    </message>
+    <message>
+        <source>Công cụ text</source>
+        <translation>Text Tools</translation>
+    </message>
+    <message>
+        <source>Ký hiệu</source>
+        <translation>Symbols</translation>
+    </message>
+    <message>
+        <source>Ký hiệu
+TCVN</source>
+        <translation>TCVN Symbols</translation>
+    </message>
+    <message>
+        <source>Cao độ</source>
+        <translation>Elevation</translation>
+    </message>
+    <message>
+        <source>Trục định vị</source>
+        <translation>Grid Axes</translation>
+    </message>
+    <message>
+        <source>Mặt cắt</source>
+        <translation>Section</translation>
+    </message>
+    <message>
+        <source>Chi tiết</source>
+        <translation>Detail</translation>
+    </message>
+    <message>
+        <source>Hướng Bắc</source>
+        <translation>North Arrow</translation>
+    </message>
+    <message>
+        <source>Độ dốc</source>
+        <translation>Slope</translation>
+    </message>
+    <message>
+        <source>Vật liệu</source>
+        <translation>Material</translation>
+    </message>
+    <message>
+        <source>In ấn</source>
+        <translation>Plotting</translation>
+    </message>
+    <message>
+        <source>In theo khung tên</source>
+        <translation>Plot by Title Block</translation>
+    </message>
+    <message>
+        <source>Mở rộng</source>
+        <translation>Express Tools</translation>
+    </message>
+    <message>
+        <source>Phá block giữ chữ</source>
+        <translation>Burst Blocks</translation>
+    </message>
+    <message>
+        <source>Phá theo tùy chọn</source>
+        <translation>Explode with Options</translation>
+    </message>
+    <message>
+        <source>Liệt kê lồng</source>
+        <translation>List Nested Objects</translation>
+    </message>
+    <message>
+        <source>Block thành tham chiếu ngoài</source>
+        <translation>Block to Xref</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ block</source>
+        <translation>Scale Blocks</translation>
+    </message>
+    <message>
+        <source>Đổi hoa, thường</source>
+        <translation>Change Case</translation>
+    </message>
+    <message>
+        <source>Đánh số</source>
+        <translation>Number Text</translation>
+    </message>
+    <message>
+        <source>Bỏ che nền</source>
+        <translation>Unmask Text</translation>
+    </message>
+    <message>
+        <source>Xoay chữ đọc xuôi</source>
+        <translation>Orient Text</translation>
+    </message>
+    <message>
+        <source>Chữ từ tệp ngoài</source>
+        <translation>Remote Text</translation>
+    </message>
+    <message>
+        <source>Sao chép kèm xoay</source>
+        <translation>Move Copy Rotate</translation>
+    </message>
+    <message>
+        <source>Hatch ảnh, block</source>
+        <translation>Hatch with Images or Blocks</translation>
+    </message>
+    <message>
+        <source>Tạo shape</source>
+        <translation>Make Shape</translation>
+    </message>
+    <message>
+        <source>Tạo kiểu đường</source>
+        <translation>Make Linetype</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <source>Gióng Model và Paper</source>
+        <translation>Align Model and Paper</translation>
+    </message>
+    <message>
+        <source>Đồng bộ viewport</source>
+        <translation>Synchronize Viewports</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ nhiều viewport</source>
+        <translation>Scale Viewports</translation>
+    </message>
+    <message>
+        <source>Gắn đường dẫn vào chữ</source>
+        <translation>Attach Leader to Annotation</translation>
+    </message>
+    <message>
+        <source>Tệp</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <source>Đổi đường dẫn</source>
+        <translation>Redefine Paths</translation>
+    </message>
+    <message>
+        <source>Công cụ</source>
+        <translation>Tools</translation>
+    </message>
+    <message>
+        <source>Thời gian sửa</source>
+        <translation>Edit Time</translation>
+    </message>
+</context>
+<context>
     <name>trion::app::Application</name>
     <message>
         <source>tệp</source>
@@ -2409,6 +3526,33 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     <message>
         <source>%1 có trong TrionCAD %2.</source>
         <translation>%1 is available in TrionCAD %2.</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ribbon::RibbonControls</name>
+    <message>
+        <source>Đang tải…</source>
+        <translation>Loading…</translation>
+    </message>
+    <message>
+        <source>Không tải được</source>
+        <translation>Could not load</translation>
+    </message>
+    <message>
+        <source>Không có mục</source>
+        <translation>No items</translation>
+    </message>
+    <message>
+        <source>Hàng trước</source>
+        <translation>Previous row</translation>
+    </message>
+    <message>
+        <source>Hàng sau</source>
+        <translation>Next row</translation>
+    </message>
+    <message>
+        <source>Mở toàn bộ gallery</source>
+        <translation>Open full gallery</translation>
     </message>
 </context>
 <context>

@@ -1,0 +1,280 @@
+{
+  "id": "vntools",
+  "name": "Công cụ VN",
+  "panels": [
+    {
+      "id": "font",
+      "name": "Font",
+      "icon": "fontdoc",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Bác sĩ\nFont",
+          "icon": "fontdoc",
+          "cmd": "FIXFONT"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chuyển sang Unicode",
+              "icon": "fontdoc",
+              "cmd": "FIXFONT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chuyển font hàng loạt",
+              "icon": "fontbatch",
+              "cmd": "FIXFONTBATCH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tcvn",
+      "name": "TCVN",
+      "icon": "lib",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Thư viện\nTCVN",
+          "icon": "lib",
+          "cmd": "TCLIB"
+        },
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Khung tên",
+          "icon": "layout",
+          "cmd": "TCTITLE"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Mẫu bản vẽ TCVN",
+              "icon": "new",
+              "cmd": "NEW"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Khung in trong Model",
+              "icon": "layout",
+              "cmd": "TCFRAME"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kiểm tra TCVN",
+              "icon": "shield",
+              "cmd": "TCCHECK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "do-va-thong-ke",
+      "name": "Đo và thống kê",
+      "icon": "sigma",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tổng chiều dài",
+              "icon": "sigma",
+              "cmd": "TCLENGTH"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tổng diện tích",
+              "icon": "area",
+              "cmd": "TCAREA"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bảng diện tích phòng",
+              "icon": "area",
+              "cmd": "TCROOMAREA"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đếm block",
+              "icon": "count",
+              "cmd": "COUNT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thống kê thép",
+              "icon": "rebar",
+              "cmd": "TCREBAR"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xuất bảng ra Excel",
+              "icon": "stats",
+              "cmd": "TCEXCELOUT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Attribute ra Excel",
+              "icon": "stats",
+              "cmd": "TCATTOUT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Nhập attribute",
+              "icon": "stats",
+              "cmd": "TCATTIN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "van-ban",
+      "name": "Văn bản",
+      "icon": "mtext",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đánh số tự động",
+              "icon": "mtext",
+              "cmd": "TCNUMBER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sao chép tăng số",
+              "icon": "copy",
+              "cmd": "TCINCCOPY"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Công cụ text",
+              "icon": "mtext",
+              "cmd": "TCTEXT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ky-hieu",
+      "name": "Ký hiệu",
+      "icon": "anno",
+      "shrink": 3,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Ký hiệu\nTCVN",
+          "icon": "elev",
+          "cmd": "TCSYMBOL",
+          "menu": [
+            {
+              "label": "Cao độ",
+              "cmd": "TCSYMBOL",
+              "args": "elev",
+              "icon": "elev"
+            },
+            {
+              "label": "Trục định vị",
+              "cmd": "TCSYMBOL",
+              "args": "axes",
+              "icon": "axisgrid"
+            },
+            {
+              "label": "Mặt cắt",
+              "cmd": "TCSYMBOL",
+              "args": "cut",
+              "icon": "cutsym"
+            },
+            {
+              "label": "Chi tiết",
+              "cmd": "TCSYMBOL",
+              "args": "detail",
+              "icon": "detailsym"
+            },
+            {
+              "label": "Hướng Bắc",
+              "cmd": "TCSYMBOL",
+              "args": "north",
+              "icon": "north"
+            },
+            {
+              "label": "Độ dốc",
+              "cmd": "TCSYMBOL",
+              "args": "slope",
+              "icon": "slope"
+            },
+            {
+              "label": "Vật liệu",
+              "cmd": "TCSYMBOL",
+              "args": "mat",
+              "icon": "hatch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "in-an",
+      "name": "In ấn",
+      "icon": "batchplot",
+      "shrink": 2,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "In theo khung tên",
+              "icon": "batchplot",
+              "cmd": "TCBATCHPLOT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý bộ bản vẽ",
+              "icon": "sheetset",
+              "cmd": "TCSHEETS"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

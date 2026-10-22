@@ -1,0 +1,152 @@
+{
+  "id": "output",
+  "name": "Xuất",
+  "panels": [
+    {
+      "id": "in",
+      "name": "In",
+      "icon": "print",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "In",
+          "icon": "print",
+          "cmd": "PLOT"
+        },
+        {
+          "type": "button",
+          "size": "large",
+          "label": "In theo\nkhung tên",
+          "icon": "batchplot",
+          "cmd": "TCBATCHPLOT"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "In nhiều layout",
+              "icon": "publish",
+              "cmd": "PUBLISH"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thiết lập trang",
+              "icon": "print",
+              "cmd": "PAGESETUP"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xem trước",
+              "icon": "preview",
+              "cmd": "PREVIEW"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý kiểu in",
+              "icon": "plotstyle",
+              "cmd": "STYLESMANAGER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý máy in",
+              "icon": "print",
+              "cmd": "PLOTTERMANAGER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "xuat",
+      "name": "Xuất",
+      "icon": "pdf",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "PDF",
+          "icon": "pdf",
+          "cmd": "EXPORTPDF",
+          "menu": [
+            {
+              "label": "Layout hiện tại",
+              "cmd": "EXPORTPDF",
+              "args": "cur"
+            },
+            {
+              "label": "Tất cả layout",
+              "cmd": "EXPORTPDF",
+              "args": "all"
+            },
+            {
+              "label": "Vùng đang xem",
+              "cmd": "EXPORTPDF",
+              "args": "view"
+            },
+            {
+              "label": "Cửa sổ",
+              "cmd": "EXPORTPDF",
+              "args": "win"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Ảnh",
+              "icon": "image",
+              "cmd": "PNGOUT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "DXF",
+              "icon": "saveas",
+              "cmd": "SAVEAS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Layout thành Model",
+              "icon": "layout",
+              "cmd": "EXPORTLAYOUT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gui",
+      "name": "Gửi",
+      "icon": "send",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đóng gói gửi đi",
+              "icon": "pkg",
+              "cmd": "ETRANSMIT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1163 @@
+{
+  "id": "home",
+  "name": "Trang chủ",
+  "panels": [
+    {
+      "id": "ve",
+      "name": "Vẽ",
+      "icon": "line",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Đoạn\nthẳng",
+          "icon": "line",
+          "cmd": "LINE"
+        },
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Polyline",
+          "icon": "pline",
+          "cmd": "PLINE"
+        },
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Đường\ntròn",
+          "icon": "circle",
+          "cmd": "CIRCLE",
+          "menu": [
+            {
+              "label": "Tâm, Bán kính",
+              "cmd": "CIRCLE"
+            },
+            {
+              "label": "Tâm, Đường kính",
+              "cmd": "CIRCLE",
+              "args": "D"
+            },
+            {
+              "label": "2 điểm",
+              "cmd": "CIRCLE",
+              "args": "2P"
+            },
+            {
+              "label": "3 điểm",
+              "cmd": "CIRCLE",
+              "args": "3P"
+            },
+            {
+              "label": "Tiếp, Tiếp, Bán kính",
+              "cmd": "CIRCLE",
+              "args": "T"
+            },
+            {
+              "label": "Tiếp, Tiếp, Tiếp",
+              "cmd": "CIRCLE",
+              "args": "TTT"
+            }
+          ]
+        },
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Cung",
+          "icon": "arc",
+          "cmd": "ARC",
+          "menu": [
+            {
+              "label": "3 điểm",
+              "cmd": "ARC"
+            },
+            {
+              "label": "Đầu, Tâm, Cuối",
+              "cmd": "ARC",
+              "args": "SCE"
+            },
+            {
+              "label": "Đầu, Tâm, Góc",
+              "cmd": "ARC",
+              "args": "SCA"
+            },
+            {
+              "label": "Đầu, Tâm, Dây cung",
+              "cmd": "ARC",
+              "args": "SCL"
+            },
+            {
+              "label": "Đầu, Cuối, Góc",
+              "cmd": "ARC",
+              "args": "SEA"
+            },
+            {
+              "label": "Đầu, Cuối, Hướng",
+              "cmd": "ARC",
+              "args": "SED"
+            },
+            {
+              "label": "Đầu, Cuối, Bán kính",
+              "cmd": "ARC",
+              "args": "SER"
+            },
+            {
+              "label": "Tâm, Đầu, Cuối",
+              "cmd": "ARC",
+              "args": "CSE"
+            },
+            {
+              "label": "Tâm, Đầu, Góc",
+              "cmd": "ARC",
+              "args": "CSA"
+            },
+            {
+              "label": "Tâm, Đầu, Dây cung",
+              "cmd": "ARC",
+              "args": "CSL"
+            },
+            {
+              "separator": true
+            },
+            {
+              "label": "Nối tiếp",
+              "cmd": "ARC",
+              "args": "CONT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Chữ nhật",
+              "icon": "rect",
+              "cmd": "RECTANG",
+              "menu": [
+                {
+                  "label": "Hình chữ nhật",
+                  "cmd": "RECTANG"
+                },
+                {
+                  "label": "Đa giác",
+                  "cmd": "POLYGON"
+                }
+              ]
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Hatch",
+              "icon": "hatch",
+              "cmd": "HATCH",
+              "menu": [
+                {
+                  "label": "Hatch",
+                  "cmd": "HATCH"
+                },
+                {
+                  "label": "Gradient",
+                  "cmd": "GRADIENT"
+                },
+                {
+                  "label": "Đường biên",
+                  "cmd": "BOUNDARY"
+                }
+              ]
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Ellipse",
+              "icon": "ellipse",
+              "cmd": "ELLIPSE",
+              "menu": [
+                {
+                  "label": "Tâm",
+                  "cmd": "ELLIPSE",
+                  "args": "C"
+                },
+                {
+                  "label": "Trục, Đầu mút",
+                  "cmd": "ELLIPSE"
+                },
+                {
+                  "label": "Cung ellipse",
+                  "cmd": "ELLIPSE",
+                  "args": "A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Spline",
+              "icon": "spline",
+              "cmd": "SPLINE",
+              "menu": [
+                {
+                  "label": "Điểm đi qua",
+                  "cmd": "SPLINE"
+                },
+                {
+                  "label": "Điểm điều khiển",
+                  "cmd": "SPLINE",
+                  "args": "CV"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đường dựng hình",
+              "icon": "xline",
+              "cmd": "XLINE"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Đám mây",
+              "icon": "cloud",
+              "cmd": "REVCLOUD",
+              "menu": [
+                {
+                  "label": "Chữ nhật",
+                  "cmd": "REVCLOUD",
+                  "args": "R"
+                },
+                {
+                  "label": "Đa giác",
+                  "cmd": "REVCLOUD",
+                  "args": "P"
+                },
+                {
+                  "label": "Tự do",
+                  "cmd": "REVCLOUD",
+                  "args": "F"
+                },
+                {
+                  "label": "Chọn đối tượng",
+                  "cmd": "REVCLOUD",
+                  "args": "O"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "more": [
+        {
+          "label": "Đường dựng hình",
+          "cmd": "XLINE"
+        },
+        {
+          "label": "Tia",
+          "cmd": "RAY"
+        },
+        {
+          "label": "Nhiều điểm",
+          "cmd": "POINT"
+        },
+        {
+          "label": "Chia đều",
+          "cmd": "DIVIDE"
+        },
+        {
+          "label": "Chia theo khoảng",
+          "cmd": "MEASURE"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Đám mây: chữ nhật",
+          "cmd": "REVCLOUD",
+          "args": "R"
+        },
+        {
+          "label": "Đám mây: đa giác",
+          "cmd": "REVCLOUD",
+          "args": "P"
+        },
+        {
+          "label": "Đám mây: tự do",
+          "cmd": "REVCLOUD",
+          "args": "F"
+        },
+        {
+          "label": "Đám mây: chọn đối tượng",
+          "cmd": "REVCLOUD",
+          "args": "O"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Region",
+          "cmd": "REGION"
+        },
+        {
+          "label": "Vùng che",
+          "cmd": "WIPEOUT"
+        },
+        {
+          "label": "Vành khuyên",
+          "cmd": "DONUT"
+        },
+        {
+          "label": "Đa tuyến song song",
+          "cmd": "MLINE"
+        },
+        {
+          "label": "Dấu tâm",
+          "cmd": "CENTERMARK"
+        },
+        {
+          "label": "Đường tâm",
+          "cmd": "CENTERLINE"
+        }
+      ]
+    },
+    {
+      "id": "sua",
+      "name": "Sửa",
+      "icon": "move",
+      "shrink": 1,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Di chuyển",
+              "icon": "move",
+              "cmd": "MOVE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sao chép",
+              "icon": "copy",
+              "cmd": "COPY"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kéo giãn",
+              "icon": "stretch",
+              "cmd": "STRETCH"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xoay",
+              "icon": "rotate",
+              "cmd": "ROTATE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đối xứng",
+              "icon": "mirror",
+              "cmd": "MIRROR"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tỉ lệ",
+              "icon": "scale",
+              "cmd": "SCALE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Cắt",
+              "icon": "trim",
+              "cmd": "TRIM",
+              "menu": [
+                {
+                  "label": "Cắt",
+                  "cmd": "TRIM"
+                },
+                {
+                  "label": "Kéo dài",
+                  "cmd": "EXTEND"
+                }
+              ]
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Bo góc",
+              "icon": "fillet",
+              "cmd": "FILLET",
+              "menu": [
+                {
+                  "label": "Bo góc",
+                  "cmd": "FILLET"
+                },
+                {
+                  "label": "Vát góc",
+                  "cmd": "CHAMFER"
+                },
+                {
+                  "label": "Nối cong",
+                  "cmd": "BLEND"
+                }
+              ]
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Mảng",
+              "icon": "array",
+              "cmd": "ARRAYRECT",
+              "menu": [
+                {
+                  "label": "Chữ nhật",
+                  "cmd": "ARRAYRECT"
+                },
+                {
+                  "label": "Theo đường",
+                  "cmd": "ARRAYPATH"
+                },
+                {
+                  "label": "Tròn",
+                  "cmd": "ARRAYPOLAR"
+                },
+                {
+                  "separator": true
+                },
+                {
+                  "label": "Hộp thoại cổ điển",
+                  "cmd": "ARRAYCLASSIC"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xóa",
+              "icon": "erase",
+              "cmd": "ERASE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phá khối",
+              "icon": "explode",
+              "cmd": "EXPLODE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Offset",
+              "icon": "offset",
+              "cmd": "OFFSET"
+            }
+          ]
+        }
+      ],
+      "more": [
+        {
+          "label": "Nối",
+          "cmd": "JOIN"
+        },
+        {
+          "label": "Bẻ",
+          "cmd": "BREAK"
+        },
+        {
+          "label": "Bẻ tại điểm",
+          "cmd": "BREAKATPOINT"
+        },
+        {
+          "label": "Kéo dài thêm",
+          "cmd": "LENGTHEN"
+        },
+        {
+          "label": "Căn chỉnh",
+          "cmd": "ALIGN"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Sửa polyline",
+          "cmd": "PEDIT"
+        },
+        {
+          "label": "Sửa spline",
+          "cmd": "SPLINEDIT"
+        },
+        {
+          "label": "Sửa hatch",
+          "cmd": "HATCHEDIT"
+        },
+        {
+          "label": "Đảo chiều",
+          "cmd": "REVERSE"
+        },
+        {
+          "label": "Xóa trùng lặp",
+          "cmd": "OVERKILL"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Lên trên cùng",
+          "cmd": "DRAWORDER",
+          "args": "F"
+        },
+        {
+          "label": "Xuống dưới cùng",
+          "cmd": "DRAWORDER",
+          "args": "B"
+        },
+        {
+          "label": "Đưa chữ lên trên",
+          "cmd": "TEXTTOFRONT"
+        },
+        {
+          "label": "Đưa hatch xuống dưới",
+          "cmd": "HATCHTOBACK"
+        },
+        {
+          "label": "Đặt về ByLayer",
+          "cmd": "SETBYLAYER"
+        },
+        {
+          "label": "Chuyển không gian",
+          "cmd": "CHSPACE"
+        }
+      ]
+    },
+    {
+      "id": "chu-thich",
+      "name": "Chú thích",
+      "icon": "mtext",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Văn bản",
+          "icon": "mtext",
+          "cmd": "MTEXT",
+          "menu": [
+            {
+              "label": "Nhiều dòng",
+              "cmd": "MTEXT"
+            },
+            {
+              "label": "Một dòng",
+              "cmd": "TEXT"
+            }
+          ]
+        },
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Kích thước",
+          "icon": "dim",
+          "cmd": "DIM",
+          "menu": [
+            {
+              "label": "Thông minh",
+              "cmd": "DIM"
+            },
+            {
+              "label": "Thẳng",
+              "cmd": "DIMLINEAR"
+            },
+            {
+              "label": "Nghiêng",
+              "cmd": "DIMALIGNED"
+            },
+            {
+              "label": "Góc",
+              "cmd": "DIMANGULAR"
+            },
+            {
+              "label": "Độ dài cung",
+              "cmd": "DIMARC"
+            },
+            {
+              "label": "Bán kính",
+              "cmd": "DIMRADIUS"
+            },
+            {
+              "label": "Đường kính",
+              "cmd": "DIMDIAMETER"
+            },
+            {
+              "label": "Gãy khúc",
+              "cmd": "DIMJOGGED"
+            },
+            {
+              "label": "Tọa độ điểm",
+              "cmd": "DIMORDINATE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Đường dẫn",
+              "icon": "leader",
+              "cmd": "MLEADER",
+              "menu": [
+                {
+                  "label": "Multileader",
+                  "cmd": "MLEADER"
+                },
+                {
+                  "label": "Thêm nhánh",
+                  "cmd": "MLEADEREDIT"
+                },
+                {
+                  "label": "Bớt nhánh",
+                  "cmd": "MLEADEREDIT"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bảng",
+              "icon": "table",
+              "cmd": "TABLE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Dán bảng Excel",
+              "icon": "stats",
+              "cmd": "TCEXCELPASTE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-ts",
+              "label": "Kiểu chữ",
+              "source": "textstyles",
+              "width": 150,
+              "cmd": "STYLE"
+            },
+            {
+              "type": "dropdown",
+              "id": "rb-ds",
+              "label": "Kiểu kích thước",
+              "source": "dimstyles",
+              "width": 150,
+              "cmd": "DIMSTYLE"
+            },
+            {
+              "type": "dropdown",
+              "id": "rb-ms",
+              "label": "Kiểu multileader",
+              "source": "mleaderstyles",
+              "width": 150,
+              "cmd": "MLEADERSTYLE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layer",
+      "name": "Layer",
+      "icon": "layers",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Thuộc tính\nlayer",
+          "icon": "layers",
+          "cmd": "LAYER"
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "layerdd",
+              "label": "Layer hiện hành",
+              "source": "layers",
+              "width": 220
+            },
+            {
+              "row": [
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Layer của đối tượng thành hiện hành",
+                  "icon": "laycur",
+                  "cmd": "LAYMCUR"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Khớp layer",
+                  "icon": "laymatch",
+                  "cmd": "LAYMCH"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Cô lập",
+                  "icon": "isolate",
+                  "cmd": "LAYISO"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Bỏ cô lập",
+                  "icon": "unisolate",
+                  "cmd": "LAYUNISO"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Tắt",
+                  "icon": "bulboff",
+                  "cmd": "LAYOFF"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Đóng băng",
+                  "icon": "snow",
+                  "cmd": "LAYFRZ"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Khóa",
+                  "icon": "lock",
+                  "cmd": "LAYLCK"
+                },
+                {
+                  "type": "button",
+                  "size": "icon",
+                  "label": "Mở khóa",
+                  "icon": "unlock",
+                  "cmd": "LAYULK"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "more": [
+        {
+          "label": "Bật tất cả",
+          "cmd": "LAYON"
+        },
+        {
+          "label": "Rã đông tất cả",
+          "cmd": "LAYTHW"
+        },
+        {
+          "label": "Trạng thái layer trước",
+          "cmd": "LAYERP"
+        },
+        {
+          "label": "Duyệt layer",
+          "cmd": "LAYWALK"
+        },
+        {
+          "label": "Gộp layer",
+          "cmd": "LAYMRG"
+        },
+        {
+          "label": "Xóa layer",
+          "cmd": "LAYDEL"
+        },
+        {
+          "label": "Sao chép sang layer",
+          "cmd": "COPYTOLAYER"
+        },
+        {
+          "label": "Đổi sang layer hiện hành",
+          "cmd": "LAYCUR"
+        },
+        {
+          "label": "Cô lập layer trong viewport",
+          "cmd": "LAYVPI"
+        },
+        {
+          "label": "Trạng thái layer",
+          "cmd": "LAYERSTATE"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Nạp bộ layer chuẩn TCVN…",
+          "cmd": "TCLIB"
+        }
+      ]
+    },
+    {
+      "id": "block",
+      "name": "Block",
+      "icon": "insert",
+      "shrink": 3,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Chèn",
+          "icon": "insert",
+          "cmd": "INSERT",
+          "source": "blocks"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tạo",
+              "icon": "bcreate",
+              "cmd": "BLOCK"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sửa",
+              "icon": "bedit",
+              "cmd": "BEDIT"
+            },
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Sửa attribute",
+              "icon": "attedit",
+              "cmd": "EATTEDIT",
+              "menu": [
+                {
+                  "label": "Một block",
+                  "cmd": "EATTEDIT"
+                },
+                {
+                  "label": "Nhiều block",
+                  "cmd": "GATTE"
+                },
+                {
+                  "label": "Cổ điển",
+                  "cmd": "ATTEDIT"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Định nghĩa attribute",
+              "icon": "attedit",
+              "cmd": "ATTDEF"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý attribute",
+              "icon": "attedit",
+              "cmd": "BATTMAN"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đồng bộ attribute",
+              "icon": "refresh",
+              "cmd": "ATTSYNC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thuoc-tinh",
+      "name": "Thuộc tính",
+      "icon": "match",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Khớp\nthuộc tính",
+          "icon": "match",
+          "cmd": "MATCHPROP"
+        },
+        {
+          "column": [
+            {
+              "type": "dropdown",
+              "id": "rb-color",
+              "label": "Màu",
+              "source": "colors",
+              "width": 132
+            },
+            {
+              "type": "dropdown",
+              "id": "rb-lt",
+              "label": "Kiểu đường",
+              "source": "linetypes",
+              "width": 132,
+              "cmd": "LINETYPE"
+            },
+            {
+              "type": "dropdown",
+              "id": "rb-lw",
+              "label": "Độ dày nét",
+              "source": "lineweights",
+              "width": 132,
+              "cmd": "LWEIGHT"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "slider",
+              "sysvar": "CETRANSPARENCY",
+              "min": 0,
+              "max": 90,
+              "id": "rb-transp",
+              "label": "Trong suốt",
+              "width": 52
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Liệt kê",
+              "icon": "list",
+              "cmd": "LIST"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thuộc tính",
+              "icon": "props",
+              "cmd": "PROPERTIES"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nhom",
+      "name": "Nhóm",
+      "icon": "group",
+      "shrink": 4,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Nhóm",
+          "icon": "group",
+          "cmd": "GROUP"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Bỏ nhóm",
+              "icon": "ungroup",
+              "cmd": "UNGROUP"
+            },
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Sửa nhóm",
+              "icon": "bedit",
+              "cmd": "GROUPEDIT"
+            },
+            {
+              "type": "toggle",
+              "size": "icon",
+              "label": "Chọn theo nhóm",
+              "icon": "select",
+              "cmd": "PICKSTYLE"
+            },
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Quản lý nhóm",
+              "icon": "group",
+              "cmd": "CLASSICGROUP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tien-ich",
+      "name": "Tiện ích",
+      "icon": "measure",
+      "shrink": 3,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Đo",
+          "icon": "measure",
+          "cmd": "MEASUREGEOM",
+          "menu": [
+            {
+              "label": "Nhanh",
+              "cmd": "MEASUREGEOM",
+              "args": "Q"
+            },
+            {
+              "label": "Khoảng cách",
+              "cmd": "DIST"
+            },
+            {
+              "label": "Bán kính",
+              "cmd": "MEASUREGEOM",
+              "args": "R"
+            },
+            {
+              "label": "Góc",
+              "cmd": "MEASUREGEOM",
+              "args": "A"
+            },
+            {
+              "label": "Diện tích",
+              "cmd": "AREA"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chọn nhanh",
+              "icon": "qselect",
+              "cmd": "QSELECT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chọn tất cả",
+              "icon": "selall",
+              "cmd": "SELECTALL"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chọn tương tự",
+              "icon": "select",
+              "cmd": "SELECTSIMILAR"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tọa độ điểm",
+              "icon": "idpoint",
+              "cmd": "ID"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bộ lọc chọn",
+              "icon": "filter",
+              "cmd": "FILTER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clipboard",
+      "name": "Clipboard",
+      "icon": "paste",
+      "shrink": 4,
+      "items": [
+        {
+          "type": "split",
+          "size": "large",
+          "label": "Dán",
+          "icon": "paste",
+          "cmd": "PASTECLIP",
+          "menu": [
+            {
+              "label": "Dán",
+              "cmd": "PASTECLIP"
+            },
+            {
+              "label": "Dán dạng block",
+              "cmd": "PASTEBLOCK"
+            },
+            {
+              "label": "Dán về tọa độ gốc",
+              "cmd": "PASTEORIG"
+            },
+            {
+              "label": "Dán đặc biệt",
+              "cmd": "PASTESPEC"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Cắt",
+              "icon": "cut",
+              "cmd": "CUTCLIP"
+            },
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Sao chép",
+              "icon": "copyclip",
+              "cmd": "COPYCLIP"
+            },
+            {
+              "type": "button",
+              "size": "icon",
+              "label": "Sao chép có điểm gốc",
+              "icon": "copybase",
+              "cmd": "COPYBASE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

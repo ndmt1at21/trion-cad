@@ -1,0 +1,301 @@
+{
+  "id": "manage",
+  "name": "Quản lý",
+  "panels": [
+    {
+      "id": "tuy-bien",
+      "name": "Tùy biến",
+      "icon": "gear",
+      "shrink": 2,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Viết tắt\nlệnh",
+          "icon": "keyboard",
+          "cmd": "ALIASEDIT"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chuyển cài đặt từ AutoCAD",
+              "icon": "ext",
+              "cmd": "TCMIGRATE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phím tắt",
+              "icon": "keyboard",
+              "cmd": "TCKEYS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Không gian làm việc",
+              "icon": "ws",
+              "cmd": "WORKSPACE"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Giao diện (CUI)",
+              "icon": "gear",
+              "cmd": "CUI"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tool Palettes",
+              "icon": "blocks",
+              "cmd": "TOOLPALETTES"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ung-dung",
+      "name": "Ứng dụng",
+      "icon": "pkg",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Nạp ứng\ndụng",
+          "icon": "pkg",
+          "cmd": "APPLOAD"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chạy script",
+              "icon": "play",
+              "cmd": "SCRIPT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Tùy chọn bảo mật",
+              "icon": "shield",
+              "cmd": "SECURITYOPTIONS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Biến hệ thống",
+              "icon": "gear",
+              "cmd": "SYSVARMONITOR"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Bảng điều khiển LISP",
+              "icon": "lisp",
+              "cmd": "LISPCONSOLE"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Quản lý plugin",
+              "icon": "pkg",
+              "cmd": "PLUGINS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chuan-cad",
+      "name": "Chuẩn CAD",
+      "icon": "shield",
+      "shrink": 5,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "split",
+              "size": "small",
+              "label": "Chuẩn .dws",
+              "icon": "shield",
+              "cmd": "STANDARDS",
+              "menu": [
+                {
+                  "label": "Cấu hình chuẩn…",
+                  "cmd": "STANDARDS"
+                },
+                {
+                  "label": "Kiểm tra chuẩn…",
+                  "cmd": "CHECKSTANDARDS"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Dịch layer",
+              "icon": "layers",
+              "cmd": "LAYTRANS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kiểm tra TCVN",
+              "icon": "shield",
+              "cmd": "TCCHECK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lam-sach",
+      "name": "Làm sạch",
+      "icon": "erase",
+      "shrink": 1,
+      "items": [
+        {
+          "type": "button",
+          "size": "large",
+          "label": "Dọn dẹp",
+          "icon": "erase",
+          "cmd": "PURGE"
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kiểm tra lỗi",
+              "icon": "bug",
+              "cmd": "AUDIT"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Phục hồi",
+              "icon": "recover",
+              "cmd": "RECOVER"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xóa trùng lặp",
+              "icon": "erase",
+              "cmd": "OVERKILL"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đổi tên",
+              "icon": "bedit",
+              "cmd": "RENAME"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Đơn vị",
+              "icon": "dist",
+              "cmd": "UNITS"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thuộc tính bản vẽ",
+              "icon": "info",
+              "cmd": "DWGPROPS"
+            }
+          ]
+        },
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Làm sạch hình học",
+              "icon": "geoclean",
+              "cmd": "TCCLEANUP"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Sức khỏe bản vẽ",
+              "icon": "gauge",
+              "cmd": "TCCLEANUP",
+              "args": "health"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tep-hang-loat",
+      "name": "Tệp hàng loạt",
+      "icon": "fontbatch",
+      "shrink": 3,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Xử lý tệp hàng loạt",
+              "icon": "fontbatch",
+              "cmd": "TCBATCH"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Chuyển font hàng loạt",
+              "icon": "fontbatch",
+              "cmd": "FIXFONTBATCH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hieu-nang",
+      "name": "Hiệu năng",
+      "icon": "gpu",
+      "shrink": 4,
+      "items": [
+        {
+          "column": [
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Thiết lập đồ họa",
+              "icon": "gpu",
+              "cmd": "GRAPHICSCONFIG"
+            },
+            {
+              "type": "button",
+              "size": "small",
+              "label": "Kiểm tra hiệu năng",
+              "icon": "gauge",
+              "cmd": "TRIONBENCH"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
