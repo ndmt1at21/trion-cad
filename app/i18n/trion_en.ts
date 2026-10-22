@@ -4102,6 +4102,13 @@ TCVN</source>
 </context>
 <context>
     <name>trion::shell::StartPage</name>
+    <message numerus="yes">
+        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
+        <translation>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 is not a drawing.</numerusform>
+            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 are not drawings.</numerusform>
+        </translation>
+    </message>
     <message>
         <source>TCVN A3 ngang</source>
         <translation>TCVN A3 landscape</translation>
@@ -4391,13 +4398,6 @@ TCVN</source>
     <message>
         <source>Ghim</source>
         <translation>Pin</translation>
-    </message>
-    <message numerus="yes">
-        <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
-        <translation>
-            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 is not a drawing.</numerusform>
-            <numerusform>TrionCAD opens DWG, DXF and DWT files. %1 are not drawings.</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -5101,8 +5101,8 @@ TCVN</source>
 <context>
     <name>trion::ui::Menu</name>
     <message>
-        <source>Khóa, cần bản %1</source>
-        <translation>Locked, requires %1</translation>
+        <source>Có trong TrionCAD %1</source>
+        <translation>Available in TrionCAD %1</translation>
     </message>
 </context>
 <context>

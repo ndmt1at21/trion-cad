@@ -330,8 +330,8 @@ public:
         case QAccessible::Description: {
             const TipInfo i = RichTooltip::info(action_);
             QStringList d;
-            if (i.need != Edition::None)
-                d << Menu::tr("Khóa, cần bản %1").arg(RichTooltip::editionName(i.need));
+            if (i.need != Edition::None) // như huy hiệu khóa (EditionGate::availableIn)
+                d << Menu::tr("Có trong TrionCAD %1").arg(RichTooltip::editionName(i.need));
             if (!i.description.isEmpty())
                 d << i.description;
             return d.join(u". "_s);

@@ -8,8 +8,8 @@
 // Menu đo và vẽ, đọc token mỗi lần: cột biểu tượng hoặc dấu chọn --ic, tên, huy hiệu phiên bản khi khóa, phím (Mono
 // --fs-xs --c-text-3, nhãn theo nền tảng từ Keymap của RichTooltip, đổi ngay khi Keymap đổi), mũi tên menu con.
 // Phím, khóa, lệnh, mô tả của mục gắn vào QAction bằng RichTooltip::attach; rê mục có thông tin thì hiện tooltip 2 mức,
-// F1 khi rê phát RichTooltip::helpRequested. Trình đọc màn hình: tên mục, phím (Accelerator), "khóa, cần bản …" và
-// mô tả (Description).
+// F1 khi rê phát RichTooltip::helpRequested. Trình đọc màn hình: tên mục, phím (Accelerator), "Có trong TrionCAD …"
+// (mục khóa, như huy hiệu) và mô tả (Description).
 //
 // Dùng (sau ThemeManager, IconProvider, RichTooltip như main):
 //   auto* m = new Menu(parent);

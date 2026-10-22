@@ -223,8 +223,7 @@ public:
     void setTabError(int index, bool error);
 
 protected:
-    void initStyleOption(QStyleOptionTab* option, int tabIndex) const override; // bỏ focus kiểu Fusion
-    void paintEvent(QPaintEvent* e) override;
+    void paintEvent(QPaintEvent* e) override; // nét chia dưới dải; tab, viền focus do TrionStyle
 };
 
 // Thanh trượt: rãnh --sp-2, phần đã chọn --c-accent, núm tròn cỡ --ic; bàn phím, chuột của QSlider.

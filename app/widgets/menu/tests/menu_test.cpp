@@ -386,9 +386,9 @@ private slots:
         QCOMPARE(text(s.repeat, QAccessible::Accelerator), QString());
         QCOMPARE(text(s.similar, QAccessible::Name), u"Chọn tương tự"_s);
         QCOMPARE(text(s.similar, QAccessible::Description),
-                 u"Khóa, cần bản Pro. Chọn đối tượng cùng loại, cùng layer."_s);
+                 u"Có trong TrionCAD Pro. Chọn đối tượng cùng loại, cùng layer."_s);
         QVERIFY(!child(s.similar)->state().disabled); // khóa vẫn chọn được để mở trang nâng cấp
-        QCOMPARE(text(s.pdf, QAccessible::Description), u"Khóa, cần bản Viewer Pro"_s);
+        QCOMPARE(text(s.pdf, QAccessible::Description), u"Có trong TrionCAD Viewer Pro"_s);
         QCOMPARE(text(s.pdf, QAccessible::Accelerator), u"Ctrl+P"_s);
         QVERIFY(child(s.paste)->state().disabled);
         QCOMPARE(text(s.paste, QAccessible::Accelerator), u"Ctrl+V"_s);

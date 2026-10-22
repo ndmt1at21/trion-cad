@@ -1,7 +1,7 @@
 // UI0-004 · IconProvider. Tiêu chí 1: raster đúng cỡ pixel thiết bị, khớp baseline 3 DPI × 2 chủ đề × 5 trạng thái.
 // 2: đổi chủ đề, 550 biểu tượng đang hiện tô lại ≤ 30 ms luồng UI (kiểm ở bản release, vòng tốt nhất), không raster
-// lại SVG. 3: lần vẽ thứ hai 0 raster; cache ≤ 16 MB, loại LRU; raster trước bộ Viewer ở nền. 4: khóa khác vô hiệu
-// về hình (huy hiệu); tương phản ≥ 3:1 với --c-base và --c-raised ở cả hai chủ đề.
+// lại SVG. 3: lần vẽ thứ hai 0 raster; cache ≤ 16 MB, loại LRU; raster trước bộ Viewer, danh sách cho trước ở nền. 4:
+// khóa khác vô hiệu về hình (huy hiệu); tương phản ≥ 3:1 với --c-base và --c-raised ở cả hai chủ đề.
 #include "app/core/UiExecutor.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -298,6 +298,26 @@ private slots:
             for (const int logical : {16, 32})
                 QVERIFY(!icons.pixmap(n, logical, 1.5, IconState::Normal).isNull());
         QCOMPARE(icons.stats().rasters, quint64(2 * viewer.size()));
+    }
+
+    // Raster trước danh sách cho trước (ribbon): bỏ tên lạ, tên trùng; xong thì vẽ không raster thêm; xin lại tên đã
+    // có cả hai cỡ thì không gửi việc. idpoint (nút chọn điểm của ô số UI-C09) nằm trong bộ Viewer.
+    void prewarmList()
+    {
+        IconProvider icons;
+        const QStringList list = {u"circle"_s, u"arc"_s, u"circle"_s, u"khong-co"_s, u"hatch"_s};
+        icons.prewarm(1.25, list);
+        sched::waitIdle();
+        QTRY_COMPARE(icons.stats().rasters, quint64(2 * 3));
+        for (const QString& n : {u"circle"_s, u"arc"_s, u"hatch"_s})
+            for (const int logical : {16, 32})
+                QVERIFY(!icons.pixmap(n, logical, 1.25, IconState::Hover).isNull());
+        QCOMPARE(icons.stats().rasters, quint64(2 * 3));
+        icons.prewarm(1.25, list);
+        sched::waitIdle();
+        QCoreApplication::processEvents();
+        QCOMPARE(icons.stats().rasters, quint64(2 * 3));
+        QVERIFY(IconProvider::names(true).contains(u"idpoint"_s));
     }
 
     // Tiêu chí 4: bỏ màu (chỉ xét alpha), Locked vẫn khác Disabled nhờ huy hiệu ổ khóa.

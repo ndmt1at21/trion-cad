@@ -908,14 +908,6 @@ void TabBar::setTabError(int index, bool error)
     setTabIcon(index, error ? IconProvider::icon(u"error"_s) : QIcon());
 }
 
-// QCommonStyle vẽ focus của tab bằng drawPrimitive của Fusion (không qua TrionStyle): bỏ cờ, tự vẽ viền trong
-// paintEvent.
-void TabBar::initStyleOption(QStyleOptionTab* option, int tabIndex) const
-{
-    QTabBar::initStyleOption(option, tabIndex);
-    option->state &= ~QStyle::State_HasFocus;
-}
-
 void TabBar::paintEvent(QPaintEvent* e)
 {
     {
@@ -923,11 +915,6 @@ void TabBar::paintEvent(QPaintEvent* e)
         p.fillRect(QRect(0, height() - kBorder, width(), kBorder), col(tok::c_border));
     }
     QTabBar::paintEvent(e);
-    if (focusVisible(this) && currentIndex() >= 0) {
-        QPainter p(this);
-        p.setRenderHint(QPainter::Antialiasing);
-        drawRing(p, tabRect(currentIndex()), col(tok::c_focus));
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------- Slider

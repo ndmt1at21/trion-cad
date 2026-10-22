@@ -1,13 +1,17 @@
 #include "app/theme/ThemeManager.h"
 
 #include "core/base/assert.h"
+#include "core/base/tsan.h"
 
 #include <QAbstractAnimation>
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QFile>
 #include <QFocusFrame>
+#include <QGroupBox>
 #include <QHeaderView>
+#include <QKeyEvent>
+#include <QMenu>
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -18,6 +22,7 @@
 #include <QStyleFactory>
 #include <QStyleHints>
 #include <QStyleOption>
+#include <QTabBar>
 #include <QTextEdit>
 #include <QToolTip>
 
@@ -57,6 +62,52 @@ bool wantsQss(const QWidget* w)
 
 bool isPopup(const QWidget* w) { return w->windowType() == Qt::Popup || w->windowType() == Qt::ToolTip; }
 
+// Widget đang hiện chữ có '&' (nút, nhãn, tab, tiêu đề nhóm, menu): vẽ lại khi Alt đổi. Không vẽ lại cả cửa sổ (vùng vẽ
+// bản vẽ không có chữ tắt).
+bool hasMnemonic(const QWidget* w)
+{
+    if (qobject_cast<const QMenu*>(w))
+        return true;
+    if (const auto* t = qobject_cast<const QTabBar*>(w)) {
+        for (int i = 0; i < t->count(); ++i)
+            if (t->tabText(i).contains(u'&'))
+                return true;
+        return false;
+    }
+    return w->property(qobject_cast<const QGroupBox*>(w) ? "title" : "text").toString().contains(u'&');
+}
+
+// Chữ tắt '&' gạch chân khi đang giữ Alt (Windows, Linux; 07.1 §13.6: macOS không gạch chân). Bộ lọc của ứng dụng:
+// phím đi tới widget có focus, không qua cửa sổ. Rời ứng dụng khi còn giữ (Alt+Tab) thì tắt.
+class AltWatch final : public QObject {
+public:
+    bool down = false;
+
+protected:
+    bool eventFilter(QObject* o, QEvent* e) override
+    {
+        TRION_TSAN_ACQUIRE(e); // sự kiện đánh thức của UiExecutor dựng ở luồng nền (core/base/tsan.h)
+        const QEvent::Type t = e->type();
+        if (t == QEvent::KeyPress || t == QEvent::KeyRelease) {
+            if (const auto* k = static_cast<QKeyEvent*>(e); k->key() == Qt::Key_Alt && !k->isAutoRepeat())
+                set(t == QEvent::KeyPress);
+        } else if (t == QEvent::ApplicationDeactivate) {
+            set(false);
+        }
+        return QObject::eventFilter(o, e);
+    }
+
+private:
+    void set(bool on)
+    {
+        if (std::exchange(down, on) == on)
+            return;
+        for (QWidget* w : QApplication::allWidgets())
+            if (w->isVisible() && hasMnemonic(w))
+                w->update();
+    }
+};
+
 } // namespace
 
 // Fusion + token của chế độ hiện tại: chiều cao theo mật độ, thời gian chuyển động, vẽ phẳng theo prototype
@@ -93,6 +144,8 @@ public:
     {
         if (h == SH_Widget_Animation_Duration)
             return tok::ms(tok::t, mode);
+        if (h == SH_UnderlineShortcut) // chữ tắt '&': chỉ khi giữ Alt; macOS không bao giờ
+            return alt_.down;
         if (h == SH_FocusFrame_AboveWidget) // vùng nhìn của ô nhiều dòng phủ kín ô: viền vẽ đè lên
             return true;
         if (h == SH_FocusFrame_Mask) { // vòng 2 px
@@ -180,12 +233,22 @@ public:
             QProxyStyle::drawControl(ce, &b, p, w);
             return;
         }
-        if (ce == CE_TabBarTabLabel && tab) { // chữ --c-text-2; rê, đang mở: --c-text
+        if (ce == CE_TabBarTabLabel && tab) { // chữ --c-text-2; rê, đang mở: --c-text; đang mở đậm --fw-m
             QStyleOptionTab t = *tab;
             if (o->state & State_Enabled)
                 t.palette.setColor(QPalette::WindowText,
                                    o->state & (State_Selected | State_MouseOver) ? c(tok::c_text) : c(tok::c_text_2));
+            t.state &= ~State_HasFocus; // QCommonStyle vẽ khung focus của Fusion trong tab: thay bằng viền sau đây
+            p->save();
+            if (o->state & State_Selected) {
+                QFont f = p->font();
+                f.setWeight(QFont::Weight(qRound(tok::num(tok::fw_m))));
+                p->setFont(f);
+            }
             QProxyStyle::drawControl(ce, &t, p, w);
+            p->restore();
+            if (o->state & State_HasFocus) // :focus-visible: viền 2 px quanh cả tab (PE_FrameFocusRect)
+                drawPrimitive(PE_FrameFocusRect, o, p, w);
             return;
         }
         QProxyStyle::drawControl(ce, o, p, w);
@@ -315,6 +378,18 @@ public:
         w->removeEventFilter(this);
         QProxyStyle::unpolish(w);
     }
+    void polish(QApplication* app) override
+    {
+        QProxyStyle::polish(app);
+#ifndef Q_OS_MACOS
+        app->installEventFilter(&alt_);
+#endif
+    }
+    void unpolish(QApplication* app) override
+    {
+        app->removeEventFilter(&alt_);
+        QProxyStyle::unpolish(app);
+    }
     using QProxyStyle::polish;
     using QProxyStyle::unpolish;
 
@@ -336,6 +411,7 @@ public:
 
 private:
     QPointer<QFocusFrame> ring_;
+    AltWatch alt_;
 };
 
 ThemeManager::ThemeManager(settings::Store& store, QObject* parent)

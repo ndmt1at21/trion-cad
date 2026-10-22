@@ -326,6 +326,26 @@ private slots:
         QVERIFY2(!kTimed || (firstMax <= 16.6 && againMax <= 16.6), qPrintable(QString::number(firstMax)));
     }
 
+    // Biểu tượng mọi tab raster trước ở nền khi dựng ribbon (IconProvider::prewarm): mở lần đầu từng tab, cả panel
+    // đã thu (1000 px), không raster SVG trên luồng UI.
+    void iconsPrewarmed()
+    {
+        icons_ = std::make_unique<theme::IconProvider>(); // cache rỗng
+        for (const int w : {1920, 1000}) {
+            rebuild(w);
+            sched::waitIdle();
+            settle();
+            const quint64 before = icons_->stats().rasters;
+            QVERIFY(before > 0);
+            for (int i = 0; i < ribbon_->tabBar()->count(); ++i) {
+                ribbon_->setCurrentTab(i);
+                settle();
+                ribbon_->repaint();
+            }
+            QCOMPARE(icons_->stats().rasters, before);
+        }
+    }
+
     // Tiêu chí 2. Ribbon tách khỏi layout của cửa sổ để bề rộng do test đặt. 3 lượt kéo, mỗi bước lấy số tốt nhất.
     void resizeFit()
     {

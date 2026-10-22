@@ -12,11 +12,14 @@
 // Dùng, trên luồng UI, sau ThemeManager và UiExecutor:
 //   trion::theme::IconProvider icons;                       // main giữ suốt đời ứng dụng; test tạo riêng
 //   icons.prewarm(window.devicePixelRatio());               // bộ Viewer raster ở nền
+//   icons.prewarm(dpr, ribbonIcons);                        // biểu tượng của một màn hình sắp mở (ribbon)
 //   button->setIcon(IconProvider::icon(u"layers"_s));       // Disabled → Disabled, On → On, Active/Selected → Hover
 //   rbButton->setIcon(IconProvider::icon(u"publish"_s, true)); // tính năng khóa theo phiên bản: mọi mode vẽ Locked
 //   p.drawPixmap(r, IconProvider::instance().pixmap(u"lock"_s, 16, dpr, IconState::Hover)); // widget tự vẽ
 // Widget tự vẽ lấy pixmap trong paintEvent, không giữ lại: đổi chủ đề thì Qt gửi PaletteChange, lần vẽ sau lấy
 // bản của chủ đề mới. Đổi màn hình (DPR mới): gọi lại prewarm(dpr mới); biểu tượng khác raster khi vẽ lần đầu.
+// ponytail: ribbon prewarm khi dựng, ở DPR lúc đó; đổi DPR thì biểu tượng ribbon raster khi vẽ lần đầu (DisplayContext
+// chỉ prewarm bộ Viewer). Nhớ danh sách đã xin và prewarm lại khi DPR đổi nếu đo thấy khựng.
 
 #include "core/base/sched/Scheduler.h"
 
@@ -52,9 +55,10 @@ public:
     // Tên lạ: QPixmap rỗng.
     QPixmap pixmap(const QString& name, int logicalPx, qreal dpr, IconState state);
 
-    // Raster mặt nạ bộ Viewer ở --ic và --ic-lg với dpr này trên luồng nền (sched, Background); kết quả vào cache
-    // qua ui::post. Không chặn: chỉ gửi việc.
-    void prewarm(qreal dpr);
+    // Raster mặt nạ của list (mặc định bộ Viewer) ở --ic và --ic-lg với dpr này trên luồng nền (sched, Background);
+    // kết quả vào cache qua ui::post. Bỏ qua tên lạ, tên trùng, tên đã có trong cache ở cả hai cỡ. Không chặn: chỉ
+    // gửi việc.
+    void prewarm(qreal dpr, const QStringList& list = IconProvider::names(true));
 
     // Số đo cho test và UI0-105. Chỉ đọc trên luồng UI.
     struct Stats {

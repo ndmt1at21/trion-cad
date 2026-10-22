@@ -76,6 +76,32 @@ int bodyHeight(RibbonBar::Collapse c)
     return 0;
 }
 
+// Biểu tượng mọi tab theo thứ tự tab (tab đầu raster trước): điều khiển, mục split và panel mở rộng (không có thì của
+// lệnh), nút panel đã thu; thêm của khung (ghim, thu gọn), ô số (chọn điểm), khóa và dấu chọn của menu.
+QStringList iconNames(const RibbonModel& model)
+{
+    QStringList out;
+    const auto add = [&](const QString& icon, const QString& cmd) {
+        out << (icon.isEmpty() ? RibbonControls::commandIcon(cmd) : icon);
+    };
+    const std::function<void(const std::vector<Item>&)> walk = [&](const std::vector<Item>& items) {
+        for (const Item& it : items) {
+            add(it.control.icon, it.control.cmd);
+            for (const MenuItem& m : it.control.menu)
+                add(m.icon, m.cmd);
+            walk(it.items);
+        }
+    };
+    for (const Tab& t : model.tabs())
+        for (const Panel& p : t.panels) {
+            out << (p.icon.isEmpty() ? u"more"_s : p.icon);
+            walk(p.items);
+            for (const MenuItem& m : p.more)
+                add(m.icon, m.cmd);
+        }
+    return out << u"pin"_s << u"up"_s << u"down"_s << u"idpoint"_s << u"lock"_s << u"check"_s;
+}
+
 bool inside(const QWidget* root, const QWidget* w)
 {
     return root && w && (w == root || root->isAncestorOf(w));
@@ -129,15 +155,7 @@ protected:
         return {fontMetrics().horizontalAdvance(tabText(index)) + 2 * px(tok::sp_5), px(tok::h_tab)};
     }
     QSize minimumTabSizeHint(int index) const override { return tabSizeHint(index); }
-    void paintEvent(QPaintEvent* e) override
-    {
-        QTabBar::paintEvent(e); // bỏ nét dưới của ui::TabBar
-        if (ui::paint::focusVisible(this) && currentIndex() >= 0) {
-            QPainter p(this);
-            p.setRenderHint(QPainter::Antialiasing);
-            ui::paint::drawRing(p, tabRect(currentIndex()), col(tok::c_focus));
-        }
-    }
+    void paintEvent(QPaintEvent* e) override { QTabBar::paintEvent(e); } // bỏ nét dưới của ui::TabBar
 };
 
 // Nét chia giữa nhóm mục của panel mở rộng (.ms: --c-border, lề --sp-1).
@@ -702,6 +720,8 @@ RibbonBar::RibbonBar(const RibbonModel& model, RibbonControls& controls, setting
       pages_(new RibbonPages(int(model.tabs().size()), [this](int i) { return buildPage(i); }, this)),
       collapse_(Collapse(std::clamp(store.get(kCollapse), 0, 2)))
 {
+    // Lần đầu mở tab không raster SVG trên luồng UI (0,1–0,2 ms mỗi biểu tượng): raster trước cả 8 tab ở nền.
+    IconProvider::instance().prewarm(devicePixelRatio(), iconNames(model));
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     tabs_->setObjectName(u"tabs"_s);
     tabs_->setFocusPolicy(Qt::TabFocus);

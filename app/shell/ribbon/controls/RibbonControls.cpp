@@ -8,6 +8,7 @@
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/controls/Controls.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/widgets/menu/Menu.h"
 #include "app/widgets/numeric/NumericField.h"
 #include "app/widgets/tooltip/RichTooltip.h"
@@ -63,38 +64,15 @@ constexpr qreal kLockedOpacity = 0.75; // .locked .ic
 constexpr qreal kArrowSplit = 0.55;    // nút lớn: phần chính là 55% trên (prototype ctlRun)
 constexpr int kMenuRows = 200;         // danh sách split theo source: QMenu không ảo hóa (DoD-U 4)
 
-// Focus từ bàn phím (:focus-visible), như app/widgets/controls.
-bool focusVisible(const QWidget* w)
-{
-    return w->hasFocus() && w->window()->testAttribute(Qt::WA_KeyboardFocusChange);
-}
-
-void drawRing(QPainter& p, const QRectF& r, const QColor& c)
-{
-    const qreal rad = tm().px(tok::r);
-    p.setPen(QPen(c, 2));
-    p.setBrush(Qt::NoBrush);
-    p.drawRoundedRect(r.adjusted(1, 1, -1, -1), rad, rad);
-}
-
-void drawChevron(QPainter& p, QPointF c, const QColor& color)
-{
-    const qreal u = kChevron / 16.0;
-    p.setPen(QPen(color, tok::num(tok::sw) * 1.5 * u, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-    p.setBrush(Qt::NoBrush);
-    p.drawPolyline(QList<QPointF>{c + QPointF(-4 * u, -2 * u), c + QPointF(0, 2 * u), c + QPointF(4 * u, -2 * u)});
-}
+using ui::paint::drawChevron;
+using ui::paint::drawRing;
+using ui::paint::focusVisible;
 
 // Biểu tượng một màu tô bằng màu chữ (currentColor của prototype).
 QPixmap glyph(const QString& name, int size, qreal dpr, const QColor& c)
 {
-    QPixmap pm = IconProvider::instance().pixmap(name, size, dpr, IconState::Normal);
-    if (pm.isNull())
-        return pm;
-    QPainter p(&pm);
-    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    p.fillRect(pm.rect(), c);
-    return pm;
+    const QPixmap pm = IconProvider::instance().pixmap(name, size, dpr, IconState::Normal);
+    return pm.isNull() ? pm : ui::paint::tinted(pm, c);
 }
 
 // Lệnh trong danh mục (tạm thay INT-001); nullptr nếu không có (hành động gắn sysvar).
@@ -265,15 +243,10 @@ public:
         if (!(o.state & QStyle::State_Enabled))
             p->setOpacity(0.45); // như nút vô hiệu
         toIcon(i.data(Qt::DecorationRole)).paint(p, inner);
-        const qreal rad = tm().px(tok::r);
-        const QRectF box = QRectF(o.rect).adjusted(0.5, 0.5, -0.5, -0.5);
-        if (o.state & QStyle::State_Selected) { // .rb-gi.on: viền --c-accent và viền trong 1 px
-            p->setPen(QPen(col(tok::c_accent), 2 * kBorder));
-            p->drawRoundedRect(box.adjusted(0.5, 0.5, -0.5, -0.5), rad, rad);
-        } else if (o.state & QStyle::State_MouseOver) {
-            p->setPen(QPen(col(tok::c_border_ctl), kBorder));
-            p->drawRoundedRect(box, rad, rad);
-        }
+        if (o.state & QStyle::State_Selected) // .rb-gi.on: viền --c-accent và viền trong 1 px
+            drawRing(*p, o.rect, col(tok::c_accent));
+        else if (o.state & QStyle::State_MouseOver)
+            ui::paint::drawBox(*p, o.rect, {}, col(tok::c_border_ctl));
         if ((o.state & QStyle::State_HasFocus) && focusVisible(static_cast<const QWidget*>(o.widget)))
             drawRing(*p, o.rect, col(tok::c_focus));
         p->restore();
@@ -389,10 +362,7 @@ protected:
     {
         QPainter p(this);
         p.setRenderHint(QPainter::Antialiasing);
-        const qreal rad = tm().px(tok::r);
-        p.setPen(QPen(col(tok::c_border_ctl), kBorder));
-        p.setBrush(col(tok::c_sunken));
-        p.drawRoundedRect(QRectF(rect()).adjusted(0.5, 0.5, -0.5, -0.5), rad, rad);
+        ui::paint::drawBox(p, rect(), col(tok::c_sunken), col(tok::c_border_ctl));
         p.fillRect(QRect(up_->x() - kBorder, kBorder, kBorder, height() - 2 * kBorder), col(tok::c_border_ctl));
     }
 

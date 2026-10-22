@@ -25,6 +25,8 @@ qt_add_resources(trion_theme theme_qss PREFIX /trion/theme BASE qss FILES qss/ap
 
 trion_add_test(theme_switch_test SOURCES tests/theme_test.cpp LIBS trion_theme LABELS theme)
 trion_add_test(theme_semantic_test SOURCES tests/semantic_test.cpp LIBS trion_theme LABELS theme)
+# TrionStyle: tab đang mở --fw-m, viền focus của tab, chữ tắt khi giữ Alt.
+trion_add_test(theme_style_test SOURCES tests/style_test.cpp LIBS trion_theme LABELS theme)
 
 # Lint DoD-U 2: màu, cỡ chữ, khoảng cách viết thẳng trong app/ (cả thành phần chưa cấu hình) làm PR lỗi.
 set(no_literal ${CMAKE_SOURCE_DIR}/ci/lint/no-literal-style)

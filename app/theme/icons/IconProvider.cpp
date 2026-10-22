@@ -10,8 +10,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPainter>
+#include <QSet>
 #include <QSvgRenderer>
 
+#include <algorithm>
 #include <utility>
 
 using namespace Qt::StringLiterals;
@@ -31,6 +33,16 @@ constexpr double kLockedOpacity = 0.75; // .locked .ic{opacity: .75}
 QString path(const QString& name)
 {
     return u":/trion/icons/"_s + name + u".svg"_s;
+}
+
+// Tên trong manifest (đọc một lần): icon(), prewarm() tra ở đây thay vì hỏi hệ tệp resource mỗi lần.
+const QSet<QString>& known()
+{
+    static const QSet<QString> set = [] {
+        const QStringList all = IconProvider::names();
+        return QSet<QString>(all.cbegin(), all.cend());
+    }();
+    return set;
 }
 
 // Nét thẻ gốc (đơn vị viewBox 16) theo cỡ logic. ponytail: hai mức (16 và ≥ 32 px, đúng 07.1 §13.1); .ic.md (20 px,
@@ -178,7 +190,7 @@ IconProvider& IconProvider::instance()
 
 QIcon IconProvider::icon(const QString& name, bool locked)
 {
-    if (!QFile::exists(path(name))) {
+    if (!known().contains(name)) {
         qWarning("IconProvider: không có biểu tượng \"%s\"", qUtf8Printable(name));
         return {};
     }
@@ -240,14 +252,19 @@ void IconProvider::put(const Key& key, const QImage& image)
     cache_.insert(key, new QImage(image), image.sizeInBytes());
 }
 
-void IconProvider::prewarm(qreal dpr)
+void IconProvider::prewarm(qreal dpr, const QStringList& list)
 {
     TRION_ASSERT_UI_THREAD();
     const ThemeManager& t = ThemeManager::instance();
     const int sizes[] = {qRound(t.px(tok::ic)), qRound(t.px(tok::ic_lg))};
     const ui::Receiver rx(this);
     const sched::CancelToken token = cancel_.token();
-    for (const QString& name : names(true))
+    QStringList todo = list;
+    todo.removeDuplicates();
+    for (const QString& name : std::as_const(todo)) {
+        const auto cached = [&](int logical) { return cache_.contains({name, qRound(logical * dpr), dpr, 0, kMask}); };
+        if (!known().contains(name) || std::ranges::all_of(sizes, cached))
+            continue;
         sched::submit(sched::Priority::Background, [=, this] {
             QList<std::pair<Key, QImage>> done; // nền: không chạm `this`
             for (const int logical : sizes) {
@@ -264,6 +281,7 @@ void IconProvider::prewarm(qreal dpr)
                 }
             });
         });
+    }
 }
 
 } // namespace trion::theme

@@ -39,8 +39,8 @@
 //   router.add(u"RIBBON"_s, [&] { mainWindow.setRegionVisible(Region::Ribbon, true); });       // RIBBON.md
 //   router.add(u"RIBBONCLOSE"_s, [&] { mainWindow.setRegionVisible(Region::Ribbon, false); }); // RIBBONCLOSE.md
 //
-// ponytail: tab đang mở có chữ thường (prototype --fw-m), gạch chân lùi --sp-4 như .tabs (prototype 10 px); vùng nổi
-// chưa có bóng đổ; không có Keytips (P2) và hiệu ứng trượt khi mở thân nổi.
+// ponytail: gạch chân tab đang mở lùi --sp-4 như .tabs (prototype 10 px); vùng nổi chưa có bóng đổ; không có Keytips
+// (P2) và hiệu ứng trượt khi mở thân nổi.
 
 #include "app/shell/ribbon/RibbonModel.h"
 #include "core/base/settings/Settings.h"
