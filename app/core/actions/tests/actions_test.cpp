@@ -3,6 +3,7 @@
 //                     danh mục và mọi hành động KDEF của Keymap có QAction
 //   surfacesAndKeys   tiêu chí 1: mục Menu, nút QToolBar, mọi phím của Keymap cho đúng chuỗi của hành động giữ phím
 //   sysvarTwoWay      tiêu chí 2: sysvar đổi từ nơi khác → QAction và nút đổi ngay (đồng bộ), bấm không tự đảo
+//   cleanScreenCycle  UIA-001: Ctrl+0 gửi '_CLEANSCREENON hoặc '_CLEANSCREENOFF theo CLEANSCREENSTATE
 //   viewportScope     tiêu chí 3: phím Vùng vẽ không chạy ở ô văn bản; Ctrl+C ở ô là chép chữ, ở vùng vẽ là COPYCLIP
 //   latency           tiêu chí 4: phím/bấm → chuỗi tới chỗ nối INT-002; không timer
 //   keymapFollows, retranslate, gate, metadata: phím đổi theo Keymap, nhãn theo ngôn ngữ, cổng UI0-011, phiên bản
@@ -349,6 +350,22 @@ private slots:
 
         // Không timer, không polling: registry không có timer nào
         QVERIFY(reg_->findChildren<QTimer*>().isEmpty());
+    }
+
+    // UIA-001: Ctrl+0 đổi vòng bật/tắt theo CLEANSCREENSTATE như macro CUI của AutoCAD; trạng thái do CleanScreen đặt.
+    void cleanScreenCycle()
+    {
+        const QKeyCombination ctrl0(Qt::ControlModifier, Qt::Key_0);
+        sysvars_->set(u"CLEANSCREENSTATE"_s, 0);
+        press(viewport_, ctrl0);
+        QCOMPARE(take(), QStringList{u"'_CLEANSCREENON"_s});
+        sysvars_->set(u"CLEANSCREENSTATE"_s, 1);
+        press(viewport_, ctrl0);
+        QCOMPARE(take(), QStringList{u"'_CLEANSCREENOFF"_s});
+        reg_->action(u"CLEANSCREENON"_s)->trigger(); // nút thanh trạng thái, mục menu: cùng chuỗi
+        QCOMPARE(take(), QStringList{u"'_CLEANSCREENOFF"_s});
+        sysvars_->set(u"CLEANSCREENSTATE"_s, 0);
+        QCOMPARE(reg_->macro(u"CLEANSCREENON"_s), u"'_CLEANSCREENON"_s);
     }
 
     void viewportScope()

@@ -1,0 +1,8 @@
+{
+  "regions": ["TitleBar", "Ribbon", "FileTabs", "Canvas", "LayoutTabs", "CommandLine", "StatusBar"],
+  "palettes": [
+    {"id": "props", "area": "right", "pinned": true},
+    {"id": "layers", "area": "right", "pinned": true},
+    {"id": "fontdoc", "area": "right", "pinned": true}
+  ]
+}

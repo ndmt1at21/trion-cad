@@ -1,10 +1,17 @@
 #include "app/main/Application.h"
 
+#include "app/core/actions/ActionRegistry.h"
 #include "app/core/display/DisplayContext.h"
+#include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/keymap/Keymap.h"
 #include "app/core/UiExecutor.h"
 #include "app/main/StartupTrace.h"
+#include "app/shell/CleanScreen.h"
+#include "app/shell/CommandRouter.h"
+#include "app/shell/MainWindow.h"
+#include "app/shell/Workspace.h"
+#include "app/widgets/dock/PaletteHost.h"
 #include "app/widgets/gallery/Gallery.h"
 #include "app/widgets/tooltip/RichTooltip.h"
 #include "app/theme/fonts/FontRegistry.h"
@@ -107,14 +114,39 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
     trace_.mark(u"keymap"_s);
     trace_.mark(u"ready"_s);
 
-    if (options.gallery)
+    shell::MainWindow* main = nullptr;
+    if (options.gallery) {
         window_ = std::make_unique<ui::GalleryWindow>();
-    else
-        window_ = std::make_unique<QMainWindow>();
+    } else {
+        // Hành động → chuỗi lệnh → bộ định tuyến tạm (INT-002 thay); cổng phiên bản chặn lệnh bị khóa (UI0-011).
+        sysvars_ = std::make_unique<actions::Sysvars>();
+        actions_ = std::make_unique<actions::ActionRegistry>(*keymap_, *sysvars_);
+        gate_ = std::make_unique<edition::EditionGate>();
+        gate_->bind(*actions_);
+        router_ = std::make_unique<shell::CommandRouter>(*sysvars_);
+        actions_->setSink([router = router_.get()](const QString& macro) { router->submit(macro); });
+        auto window = std::make_unique<shell::MainWindow>(*store_);
+        main = window.get();
+        new shell::CleanScreen(*main, *sysvars_, *router_); // con của cửa sổ; CLEANSCREENON/OFF, Ctrl+0
+        actions_->install(main);
+        actions_->addViewport(main->region(shell::MainWindow::Region::Canvas));
+        // Hồ sơ trước khi khôi phục: bố cục của workspace đang dùng áp một lần.
+        main->workspace().setProfile(gate_->profile());
+        connect(gate_.get(), &edition::EditionGate::profileChanged, &main->workspace(), &shell::Workspace::setProfile);
+        main->restore(); // hình học (phóng to, màn hình), palette, workspace đã lưu
+        window_ = std::move(window);
+    }
     // Raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình (IconProvider::prewarm). Không gọi prewarm riêng ở
     // pha icons: DisplayContext gọi lại cho cùng DPR thì 236 mặt nạ bị raster hai lần.
     display_ = std::make_unique<ui::DisplayContext>(window_.get());
-    window_->showMaximized(); // ponytail: UIA-001 khôi phục kích thước, vị trí đã lưu
+    if (main) {
+        main->setScreenClass(display_->screenClass());
+        connect(display_.get(), &ui::DisplayContext::screenClassChanged, main, &shell::MainWindow::setScreenClass);
+        main->palettes().trackDisplay(*display_);
+        main->show(); // phóng to nếu lần trước phóng to (lần đầu: phóng to)
+    } else {
+        window_->showMaximized();
+    }
     trace_.mark(u"window"_s);
     trace_.watchFirstFrame(window_.get());
 
@@ -129,8 +161,14 @@ Application::~Application()
     TRION_ASSERT_UI_THREAD();
     // Thoát: việc nền dừng hợp tác trước khi hủy UiExecutor (UiExecutor.h).
     cancel_.cancel();
+    if (auto* main = qobject_cast<shell::MainWindow*>(window_.get()))
+        main->save(); // thoát không qua đóng cửa sổ (quit, phiên kết thúc): vẫn lưu hình học, bố cục
     display_.reset();
     window_.reset();
+    router_.reset();
+    gate_.reset(); // gỡ cổng khỏi ActionRegistry
+    actions_.reset();
+    sysvars_.reset();
     tips_.reset();
     icons_.reset(); // hủy việc raster trước còn chờ
     sched::waitIdle();

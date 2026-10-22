@@ -230,6 +230,9 @@ private slots:
               qPrintable(phases.join(u", "_s)));
         QVERIFY2(!trion::test::kTimed || ready <= 400, qPrintable(u"%1 ms"_s.arg(ready)));
         QVERIFY2(!trion::test::kTimed || exit <= 500, qPrintable(u"%1 ms"_s.arg(exit)));
+        // Khởi động ấm đến khung đầu của cửa sổ chính thật (UIA-001) ≤ 1,5 s (DoD-L, 05 §1.1).
+        const double firstFrame = *markAt(best, u"first_frame"_s);
+        QVERIFY2(!trion::test::kTimed || firstFrame <= 1500, qPrintable(u"%1 ms"_s.arg(firstFrame)));
     }
 
     // Tiêu chí 1 (lần chạy đầu): `trion a.dwg sub/../b.dxf` yêu cầu mở hai đường dẫn tuyệt đối.

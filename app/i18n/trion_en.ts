@@ -2412,6 +2412,72 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>trion::shell::MainWindow</name>
+    <message>
+        <source>Thuộc tính</source>
+        <translation>Properties</translation>
+    </message>
+    <message>
+        <source>Layer</source>
+        <translation>Layers</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+    <message>
+        <source>Thư viện TCVN</source>
+        <translation>TCVN library</translation>
+    </message>
+    <message>
+        <source>Blocks</source>
+        <translation>Blocks</translation>
+    </message>
+    <message>
+        <source>Nội dung palette có ở bản sau.</source>
+        <translation>Palette content is coming in a later version.</translation>
+    </message>
+    <message>
+        <source>Thanh tiêu đề</source>
+        <translation>Title bar</translation>
+    </message>
+    <message>
+        <source>Ribbon</source>
+        <translation>Ribbon</translation>
+    </message>
+    <message>
+        <source>Bản vẽ đang mở</source>
+        <translation>Open drawings</translation>
+    </message>
+    <message>
+        <source>Vùng vẽ</source>
+        <translation>Drawing area</translation>
+    </message>
+    <message>
+        <source>Model và layout</source>
+        <translation>Model and layouts</translation>
+    </message>
+    <message>
+        <source>Dòng lệnh</source>
+        <translation>Command line</translation>
+    </message>
+    <message>
+        <source>Thanh trạng thái</source>
+        <translation>Status bar</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::Workspace</name>
+    <message>
+        <source>Soạn thảo 2D</source>
+        <translation>2D Drafting</translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation>Viewer</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::AutoHideStrip</name>
     <message>
         <source>Palette tự ẩn</source>

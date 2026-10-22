@@ -12,6 +12,8 @@
 //   '_ZOOM         lệnh trong suốt
 //   'ORTHOMODE 1   hành động gắn sysvar: đặt giá trị mới tính từ giá trị hiện tại, trong suốt (F8 khi đang LINE không
 //                  ngắt lệnh, giống gõ 'ORTHOMODE; UIA-112)
+//   '_CLEANSCREENON / '_CLEANSCREENOFF   hành động CLEANSCREENON (Ctrl+0) đổi vòng theo CLEANSCREENSTATE như macro
+//                  CUI của AutoCAD (UIA-001)
 // Hành động gắn sysvar (toggle F3 OSNAP, F8 ORTHO…; F5 mặt isometric, Ctrl+I kiểu tọa độ đổi vòng): trạng thái chọn
 // chỉ theo sysvar (Sysvars::changed, đồng bộ, không timer, không polling). Bấm chỉ gửi lệnh; nút đổi khi sysvar đổi.
 //

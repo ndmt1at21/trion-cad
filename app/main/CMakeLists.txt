@@ -2,7 +2,7 @@
 # Thư viện trion_application cho exe và test; exe trion chỉ có main.cpp.
 trion_add_library(trion_application
   SOURCES Application.h Application.cpp SingleInstance.h SingleInstance.cpp StartupTrace.h StartupTrace.cpp
-  LIBS trion_gallery trion_tooltip trion_display trion_keymap trion_i18n trion_fonts trion_icons trion_perf trion_appcore
+  LIBS trion_shell trion_gallery trion_tooltip trion_display trion_keymap trion_i18n trion_fonts trion_icons trion_perf trion_appcore
     Qt6::Widgets Qt6::Network)
 
 add_executable(trion WIN32 main.cpp)
@@ -13,3 +13,6 @@ trion_add_test(app_main_test SOURCES tests/application_test.cpp LIBS trion_appli
 # Chạy exe trion thật (cùng thư mục với test: <build>/app/main, bản Windows <build>/bin).
 trion_add_test(trion_exe_test SOURCES tests/trion_exe_test.cpp LIBS trion_application LABELS app_main)
 add_dependencies(trion_exe_test trion)
+# Chạy một mình (ctest -j): đo khởi động, CPU lúc rảnh; dựng các tiến trình trion thật (tiến trình con sót lại khi
+# test bị ctest dừng giữ phiên duy nhất, làm lần chạy sau treo).
+set_tests_properties(trion_exe_test PROPERTIES RUN_SERIAL TRUE)

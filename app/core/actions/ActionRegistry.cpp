@@ -211,7 +211,11 @@ QString ActionRegistry::macro(const Entry& e) const
         const QString name = QString::fromLatin1(s->sysvar);
         return u"'%1 %2"_s.arg(name).arg(next(*s, sysvars_.get(name)));
     }
-    return (e.transparent ? u"'_"_s : u"^C^C_"_s) + e.command;
+    // Clean Screen (Ctrl+0, nút thanh trạng thái) đổi vòng như macro CUI của AutoCAD: DIESEL $M=$(if,…) chọn
+    // _cleanscreenoff khi CLEANSCREENSTATE bật, _cleanscreenon khi tắt (UIA-001).
+    const QString command =
+        e.command == u"CLEANSCREENON"_s && sysvars_.get(u"CLEANSCREENSTATE"_s) != 0 ? u"CLEANSCREENOFF"_s : e.command;
+    return (e.transparent ? u"'_"_s : u"^C^C_"_s) + command;
 }
 
 ui::Edition ActionRegistry::need(const QString& id) const

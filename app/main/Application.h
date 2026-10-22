@@ -6,15 +6,18 @@
 // parseOptions → SingleInstance (lần chạy sau chuyển đường dẫn rồi thoát ở đây). Application dựng tiếp, mỗi pha một mốc
 // trong StartupTrace:
 //   Store (tệp cài đặt của --settings) → UiExecutor → Translator → loadFonts → ThemeManager → IconProvider → Keymap →
-//   [ready] → cửa sổ chính → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình) → hiện cửa
-//   sổ.
-// Thoát (hàm hủy): hủy token toàn ứng dụng, hủy cửa sổ và IconProvider (hủy việc raster còn chờ), chờ mọi việc nền dừng
-// (sched::waitIdle), rồi hủy phần còn lại theo thứ tự ngược; UiExecutor và Store (ghi nốt cài đặt) cuối cùng.
+//   [ready] → cửa sổ chính (UIA-001: Sysvars, ActionRegistry, EditionGate, CommandRouter, MainWindow + CleanScreen;
+//   khôi phục hình học, palette, workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn
+//   hình; lớp màn hình cho MainWindow) → hiện cửa sổ.
+// Thoát (hàm hủy): hủy token toàn ứng dụng, lưu hình học và bố cục của cửa sổ chính, hủy cửa sổ và IconProvider (hủy
+// việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự ngược; UiExecutor và
+// Store (ghi nốt cài đặt) cuối cùng.
 //
 // Luồng UI sở hữu document (UiExecutor.h: kết quả nền về luồng UI, requireUiThread chặn API ghi gọi sai luồng).
 // ponytail: chưa có phiên nhiều bản vẽ DOC-018 và input pipeline INT-002, nên chưa có CoreSession; đường dẫn cần mở
-// (dòng lệnh, lần chạy sau) chỉ tới openRequested(), DOC-018/UIB-002 nối. Cửa sổ chính là QMainWindow trống, UIA-001
-// thay bằng cửa sổ thật.
+// (dòng lệnh, lần chạy sau) chỉ tới openRequested(), DOC-018/UIB-002 nối. Lệnh từ hành động (ActionRegistry) tới bộ
+// định tuyến tạm shell::CommandRouter (Clean Screen chạy, lệnh khác ghi log); vùng của cửa sổ chính là ô giữ chỗ tới
+// bước integration (MainWindow::setRegion).
 
 #include "core/base/sched/Scheduler.h"
 
@@ -44,6 +47,16 @@ class ThemeManager;
 } // namespace trion::theme
 namespace trion::keymap {
 class Keymap;
+}
+namespace trion::actions {
+class ActionRegistry;
+class Sysvars;
+} // namespace trion::actions
+namespace trion::edition {
+class EditionGate;
+}
+namespace trion::shell {
+class CommandRouter;
 }
 
 namespace trion::app {
@@ -103,7 +116,12 @@ private:
     std::unique_ptr<theme::IconProvider> icons_;
     std::unique_ptr<keymap::Keymap> keymap_;
     std::unique_ptr<ui::RichTooltip> tips_;
-    std::unique_ptr<QMainWindow> window_;
+    // Cửa sổ chính (không có với --gallery): sysvar tạm (INT-005), hành động, cổng phiên bản, bộ định tuyến lệnh tạm.
+    std::unique_ptr<actions::Sysvars> sysvars_;
+    std::unique_ptr<actions::ActionRegistry> actions_;
+    std::unique_ptr<edition::EditionGate> gate_;
+    std::unique_ptr<shell::CommandRouter> router_;
+    std::unique_ptr<QMainWindow> window_; // shell::MainWindow, hoặc GalleryWindow với --gallery
     std::unique_ptr<ui::DisplayContext> display_;
 };
 

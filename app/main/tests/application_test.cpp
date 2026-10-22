@@ -1,6 +1,7 @@
 // UI0-001 trong tiến trình test: StartupTrace (mốc, khung đầu, JSON), Application (thứ tự khởi động, thoát hủy việc nền
 // hợp tác, đưa cửa sổ lên trước, rảnh không sự kiện, dòng lệnh), SingleInstance (khóa theo tệp cài đặt, giao thức, khóa
-// và socket của phiên đã chết). Exe trion thật (lần chạy sau, trace, CPU rảnh): trion_exe_test.cpp.
+// và socket của phiên đã chết). UIA-001: cửa sổ chính thật (Ctrl+0 tới Clean Screen, giữ hình học qua lần chạy). Exe
+// trion thật (lần chạy sau, trace, CPU rảnh): trion_exe_test.cpp.
 
 #include "app/core/display/DisplayContext.h"
 #include "app/core/i18n/Translator.h"
@@ -8,6 +9,7 @@
 #include "app/main/Application.h"
 #include "app/main/SingleInstance.h"
 #include "app/main/StartupTrace.h"
+#include "app/shell/MainWindow.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
 #include "core/base/sched/Scheduler.h"
@@ -311,6 +313,44 @@ private slots:
         loop.exec();
         qApp->removeEventFilter(&log);
         QVERIFY2(log.seen.isEmpty(), qPrintable(log.seen.join(u", "_s)));
+    }
+
+    // UIA-001: cửa sổ chính là shell::MainWindow; Ctrl+0 đi hết đường ActionRegistry → CommandRouter → Clean Screen.
+    void cleanScreenKey()
+    {
+        StartupTrace trace;
+        Application app(options(u"clean"_s), trace);
+        auto* w = qobject_cast<trion::shell::MainWindow*>(app.mainWindow());
+        QVERIFY(w);
+        QVERIFY(QTest::qWaitForWindowActive(w));
+        const QWidget* ribbon = w->region(trion::shell::MainWindow::Region::Ribbon);
+        QVERIFY(ribbon->isVisible());
+        QTest::keyClick(w, Qt::Key_0, Qt::ControlModifier);
+        QVERIFY(!ribbon->isVisible());
+        QVERIFY(w->region(trion::shell::MainWindow::Region::CommandLine)->isVisible());
+        QTest::keyClick(w, Qt::Key_0, Qt::ControlModifier);
+        QVERIFY(ribbon->isVisible());
+    }
+
+    // UIA-001: thoát rồi chạy lại với cùng tệp cài đặt giữ kích thước, vị trí, trạng thái phóng to (lần đầu: phóng to).
+    void restoresWindowGeometry()
+    {
+        const Options o = options(u"geometry"_s);
+        QRect normal;
+        {
+            StartupTrace trace;
+            Application app(o, trace);
+            QMainWindow* w = app.mainWindow();
+            QVERIFY(w->isMaximized());
+            w->showNormal();
+            w->setGeometry(40, 30, 600, 400);
+            QVERIFY(spinUntil([&] { return w->geometry() == QRect(40, 30, 600, 400); }));
+            normal = w->geometry();
+        } // thoát không qua đóng cửa sổ: hàm hủy vẫn lưu
+        StartupTrace trace;
+        Application app(o, trace);
+        QVERIFY(!app.mainWindow()->isMaximized());
+        QCOMPARE(app.mainWindow()->geometry(), normal);
     }
 
     // Đường dẫn tuyệt đối theo thư mục hiện tại; --ui-probe=<tệp> (của UiProbe) không làm parser báo lỗi.
