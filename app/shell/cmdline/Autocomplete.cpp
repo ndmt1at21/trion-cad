@@ -578,9 +578,10 @@ void Autocomplete::recordPick(const QString& typo, const QString& command)
 QList<Autocomplete::Correction> Autocomplete::corrections()
 {
     QList<Correction> out;
-    for (const QString& typo : settings::Store::instance().get(kAutoCorrect).keys())
-        if (const QString command = learnedFor(typo); !command.isEmpty())
-            out.append({typo, command});
+    const QJsonObject all = settings::Store::instance().get(kAutoCorrect);
+    for (auto it = all.begin(); it != all.end(); ++it)
+        if (const QString command = learnedFor(it.key()); !command.isEmpty())
+            out.append({it.key(), command, it.value().toObject().value(command).toInt()});
     return out;
 }
 

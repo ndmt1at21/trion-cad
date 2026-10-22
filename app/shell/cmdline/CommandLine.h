@@ -36,6 +36,11 @@
 //   cmd->appendHistory(tr("Đã chọn %n đối tượng", nullptr, n));
 //   cmd->clearPrompt();                                          // lệnh xong: về dấu nhắc lệnh
 //   cmd->reportUnknown(name);                                    // INT-002 không biết lệnh: "Ý bạn là" bấm được
+//   cmd->notifyLocked(u"LINE"_s, Edition::Pro);                  // lệnh bị khóa theo phiên bản (07.1 §2)
+//
+// UIA-007: nút ^ cuối khung .cmd-in (.cmd-r #cmd-histbtn của prototype) và F2 (QAction TEXTSCR) chạy "'_TEXTSCR" qua
+// commandRequested; bước integration mở HistoryWindow.h. Thiết lập (INPUTSEARCHOPTIONS, InputSearchOptions.h): các
+// Setting dưới đây, đổi là áp ngay. Dạng nổi: setFloating.
 
 #include "core/base/settings/Settings.h"
 
@@ -44,6 +49,9 @@
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+
+#include <QBasicTimer>
+#include <QPoint>
 
 #include <cstdint>
 #include <optional>
@@ -55,9 +63,17 @@ namespace trion::ui {
 
 class Autocomplete;
 class CommandInput;
+enum class Edition : std::uint8_t; // app/widgets/tooltip/RichTooltip.h
 
 // Số dòng lịch sử hiện (CLIPROMPTLINES; 0–10, mặc định 3). Hộp INPUTSEARCHOPTIONS (UIA-007) ghi; đổi là áp ngay.
 inline const settings::Setting<int> kHistoryLines{"cmdline/historyLines", 3};
+// Cỡ chữ của dòng lệnh, px; 0: theo --fs của giao diện. Chữ, cao dòng, ô nhập, chip co giãn cùng tỉ lệ.
+inline const settings::Setting<int> kFontSize{"cmdline/fontSize", 0};
+// Độ trong suốt của nền khi nổi, % (0–90; prototype mặc định 20).
+inline const settings::Setting<int> kFloatTransparency{"cmdline/floatTransparency", 20};
+// Độ trễ trước khi danh sách tự hoàn thành cập nhật, ms (0 = ngay: DoD-L ≤ 16 ms sau mỗi phím). Enter, Tab, ↑↓, Esc
+// không chờ: danh sách được tính ngay trước khi nhận phím, nên kết quả gửi đi như độ trễ 0.
+inline const settings::Setting<int> kCompletionDelay{"cmdline/completionDelay", 0};
 
 class CommandLine : public QWidget {
     Q_OBJECT
@@ -117,26 +133,61 @@ public:
     // ponytail: chỉ khớp nguyên chữ tắt/tên toàn cục; tiền tố kiểu AutoCAD ("Dia" của Diameter), nhãn tiếng Việt: INT-003.
     static QString resolve(const Prompt& prompt, const QString& text);
 
+    // Mọi dòng lịch sử (≤ 100.000 dòng cuối), chữ nguyên văn; HistoryWindow chụp lúc mở rồi theo historyAppended.
+    QStringList historyLines() const;
+
+    // Lệnh bị khóa theo phiên bản (07.1 §2): dòng "Lệnh LINE có trong TrionCAD Pro. [Dùng thử 30 ngày] [Tìm hiểu]"
+    // (EditionGate::commandNotice), chip bấm được phát upgradeRequested. Không phát submitted: lệnh không chạy.
+    // ponytail: router (INT-002/INT-020) gọi khi tên gõ là lệnh khóa (ActionRegistry::need + EditionGate::locked);
+    // bước integration nối. Chip "Dùng thử" mở UI-L05 khi có UIL-019; nay cả hai như "Tìm hiểu".
+    void notifyLocked(const QString& command, Edition need);
+
+    // Dạng nổi (07.1 §8): cha phải là widget phủ vùng vẽ (bên gọi đặt cha trước). Nổi: chỉ hàng ô nhập (dải nắm, khung
+    // .cmd-in) nhận chuột; lịch sử là widget anh em ngay trên, chuột đi xuyên xuống vùng vẽ; nền trong suốt theo
+    // kFloatTransparency. at: góc trên trái (tọa độ màn hình), kẹp trong cha; rộng 2/3 cha khi vừa rời dock.
+    // setFloating(false): lịch sử về lại trong widget; bên gọi đưa widget về ô dock.
+    // Kéo dải nắm bên trái: đang dock, thả xa hơn startDragDistance → floatRequested(góc trên trái mới); đang nổi, di
+    // chuyển trong cha, thả sát mép dưới cha → dockRequested. ponytail: MainWindow (UIA-001) chưa có API đưa vùng dòng
+    // lệnh ra/vào ô dock; bước integration thêm rồi nối hai tín hiệu.
+    void setFloating(bool on, std::optional<QPoint> at = std::nullopt);
+    bool isFloating() const { return floating_; }
+
 signals:
     void submitted(const QString& token); // ponytail: INT-002 nhận
     void cancelRequested();               // Esc khi có prompt
     void deselectRequested();             // Esc khi không có prompt: bỏ vùng chọn
-    void commandRequested(const QString& macro); // mục menu: "^C^CLINE", "^C^C_INPUTSEARCHOPTIONS"
+    void commandRequested(const QString& macro); // mục menu: "^C^CLINE", "^C^C_INPUTSEARCHOPTIONS", "'_TEXTSCR"
+    void upgradeRequested(const QString& command); // chip của notifyLocked: EditionGate::upgrade().open(…)
+    void historyAppended(const QString& line);     // mỗi dòng mới của lịch sử (HistoryWindow theo)
+    void floatRequested(QPoint globalTopLeft);
+    void dockRequested();
 
 protected:
     bool eventFilter(QObject* watched, QEvent* e) override;
     void paintEvent(QPaintEvent* e) override;
     void contextMenuEvent(QContextMenuEvent* e) override;
     void changeEvent(QEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
+    void moveEvent(QMoveEvent* e) override;
+    void showEvent(QShowEvent* e) override;
+    void hideEvent(QHideEvent* e) override;
+    void timerEvent(QTimerEvent* e) override;
 
 private:
     class HistoryView;
     class PromptView;
+    class HistoryButton;
+    class Grip;
 
     bool ownsKey(const QKeyEvent* e) const; // Enter, Space (trừ khi là chữ), Esc, ↑, ↓
     bool completionKey(const QKeyEvent* e); // phím của danh sách tự hoàn thành đang mở; true: đã xử lý
     void pickSuggestion(const QString& typo, const QString& command); // bấm gợi ý "Ý bạn là" trong lịch sử
     bool spaceIsText() const;
+    void dismissCompletion();
+    void dragTo(QPoint global, bool done); // dải nắm
+    void placeHistory();                   // nổi: lịch sử ngay trên hàng ô nhập
+    void fitHistoryButton();               // ẩn nút lịch sử khi prompt cần chỗ
+    QPoint clampFloat(QPoint topLeft) const;
     void submit();
     void submitToken(const QString& typed);
     void escape();
@@ -151,11 +202,20 @@ private:
     QString historyText() const;
 
     std::optional<Prompt> prompt_;
-    HistoryView* history_ = nullptr;
+    QPointer<HistoryView> history_; // nổi: con của cha (anh em), hủy cùng dòng lệnh
     PromptView* promptView_ = nullptr;
     CommandInput* input_ = nullptr;
     QPointer<Autocomplete> autocomplete_; // con của cửa sổ khi hiện (nằm trên vùng vẽ); hủy cùng dòng lệnh
     QHBoxLayout* frame_ = nullptr; // .cmd-in
+    Grip* grip_ = nullptr;
+    HistoryButton* histButton_ = nullptr; // .cmd-r: mở lịch sử đầy đủ
+    QBasicTimer pending_; // độ trễ tự hoàn thành (kCompletionDelay)
+    struct Drag {
+        QPoint start, origin; // điểm nhấn (màn hình), vị trí widget lúc nhấn
+        bool moved = false;
+    };
+    std::optional<Drag> drag_;
+    double zoom_ = 1.0; // kFontSize / --fs
     // ponytail: lệnh và giá trị gần đây chỉ trong phiên; INT-017 History (lưu theo profile, theo loại prompt) thay.
     QStringList recent_, entered_;
     QString typedCommand_; // tên vừa gõ ở dấu nhắc lệnh, chờ prompt đầu của lệnh để đổi bí danh thành tên lệnh
@@ -163,6 +223,7 @@ private:
     bool compact_ = false;
     bool commaHinted_ = false;
     bool composing_ = false; // bộ gõ đang có chữ soạn dở (preedit) trong ô nhập
+    bool floating_ = false;
 };
 
 } // namespace trion::ui

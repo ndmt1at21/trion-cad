@@ -79,6 +79,7 @@ public:
     };
     struct Correction {
         QString typo, command;
+        int picks = 0; // số lần đã chọn command cho typo (≥ kLearnAfter)
     };
 
     // anchor: dòng lệnh. Popup nằm trong anchor->window(), mép dưới cách mép trên anchor --sp-1. Cần ThemeManager,

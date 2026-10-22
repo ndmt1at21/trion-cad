@@ -4814,6 +4814,18 @@ TCVN</source>
         <translation>Command history</translation>
     </message>
     <message>
+        <source>Lịch sử dòng lệnh (F2)</source>
+        <translation>Command line history (F2)</translation>
+    </message>
+    <message>
+        <source>Lịch sử đầy đủ</source>
+        <translation>Full history</translation>
+    </message>
+    <message>
+        <source>Kéo để dòng lệnh nổi trên vùng vẽ; thả sát mép dưới để bám lại</source>
+        <translation>Drag to float the command line over the drawing area; drop at the bottom edge to dock it</translation>
+    </message>
+    <message>
         <source>Chưa có</source>
         <translation>None yet</translation>
     </message>
@@ -4911,6 +4923,37 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::ui::HistoryWindow</name>
+    <message>
+        <source>Lịch sử dòng lệnh</source>
+        <translation>Command Line History</translation>
+    </message>
+    <message>
+        <source>Tìm trong nội dung</source>
+        <translation>Search contents</translation>
+    </message>
+    <message>
+        <source>Tìm trong lịch sử dòng lệnh</source>
+        <translation>Search command line history</translation>
+    </message>
+    <message>
+        <source>Sao chép</source>
+        <translation>Copy</translation>
+    </message>
+    <message>
+        <source>Sao chép các dòng đang chọn; không chọn dòng nào thì mọi dòng đang hiện</source>
+        <translation>Copies the selected lines; with no selection, all shown lines</translation>
+    </message>
+    <message>
+        <source>Không có dòng nào chứa “%1”</source>
+        <translation>No lines contain “%1”</translation>
+    </message>
+    <message>
+        <source>Tìm không phân biệt dấu và chữ hoa. Xóa ô tìm để xem toàn bộ lịch sử.</source>
+        <translation>Search ignores accents and case. Clear the search box to see the whole history.</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::InlineProgress</name>
     <message>
         <source>Đang hủy…</source>
@@ -4926,6 +4969,133 @@ TCVN</source>
     <message>
         <source>Hủy</source>
         <translation>Cancel</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::InputSearchOptions</name>
+    <message>
+        <source>Dòng lệnh</source>
+        <translation>Command line</translation>
+    </message>
+    <message>
+        <source>Số dòng lịch sử dòng lệnh</source>
+        <translation>Command line history lines</translation>
+    </message>
+    <message>
+        <source>Cỡ chữ</source>
+        <translation>Font size</translation>
+    </message>
+    <message>
+        <source>Độ trong suốt khi nổi</source>
+        <translation>Transparency when floating</translation>
+    </message>
+    <message>
+        <source>Tự hoàn thành</source>
+        <translation>AutoComplete</translation>
+    </message>
+    <message>
+        <source>Độ trễ</source>
+        <translation>Delay</translation>
+    </message>
+    <message>
+        <source>Tìm biến hệ thống</source>
+        <translation>Search system variables</translation>
+    </message>
+    <message>
+        <source>Tìm lệnh theo tiếng Việt</source>
+        <translation>Search commands in Vietnamese</translation>
+    </message>
+    <message>
+        <source>Bộ gõ tiếng Việt</source>
+        <translation>Vietnamese input method</translation>
+    </message>
+    <message>
+        <source>Khi đang chờ tên lệnh</source>
+        <translation>While waiting for a command name</translation>
+    </message>
+    <message>
+        <source>Tự sửa lỗi gõ (AutoCorrect)</source>
+        <translation>AutoCorrect</translation>
+    </message>
+    <message>
+        <source>Thiết lập dòng lệnh</source>
+        <translation>Command line settings</translation>
+    </message>
+    <message>
+        <source>Lưu</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Số dòng lịch sử</source>
+        <translation>History lines</translation>
+    </message>
+    <message>
+        <source>0–10 dòng; F2 mở lịch sử đầy đủ</source>
+        <translation>0–10 lines; F2 opens the full history</translation>
+    </message>
+    <message>
+        <source>%1 px</source>
+        <translation>%1 px</translation>
+    </message>
+    <message>
+        <source>Theo giao diện</source>
+        <translation>Match interface</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message>
+        <source>Độ trễ tự hoàn thành</source>
+        <translation>AutoComplete delay</translation>
+    </message>
+    <message>
+        <source>%1%</source>
+        <translation>%1%</translation>
+    </message>
+    <message>
+        <source>Gợi ý cả biến hệ thống</source>
+        <translation>Also suggest system variables</translation>
+    </message>
+    <message>
+        <source>Gõ “cắt” ra TRIM, “bo góc” ra FILLET</source>
+        <translation>Typing “cắt” finds TRIM, “bo góc” finds FILLET</translation>
+    </message>
+    <message>
+        <source>Bỏ qua bộ gõ để “lm” không thành “lầm”</source>
+        <translation>Bypass the input method so “lm” doesn&apos;t become “lầm”</translation>
+    </message>
+    <message>
+        <source>Gõ sai</source>
+        <translation>Typed</translation>
+    </message>
+    <message>
+        <source>Sửa thành</source>
+        <translation>Corrected to</translation>
+    </message>
+    <message>
+        <source>Số lần chọn</source>
+        <translation>Times chosen</translation>
+    </message>
+    <message>
+        <source>Xóa</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <source>Tự sửa lỗi gõ</source>
+        <translation>AutoCorrect</translation>
+    </message>
+    <message>
+        <source>Delete: xóa dòng đang chọn</source>
+        <translation>Delete: remove the selected row</translation>
+    </message>
+    <message>
+        <source>Chưa có lỗi gõ nào được tự sửa</source>
+        <translation>No AutoCorrect entries yet</translation>
+    </message>
+    <message>
+        <source>Chọn cùng một gợi ý “Ý bạn là” 3 lần thì từ đó lỗi gõ ấy được sửa tự động.</source>
+        <translation>Choose the same “Did you mean” suggestion 3 times and that typo is corrected automatically from then on.</translation>
     </message>
 </context>
 <context>

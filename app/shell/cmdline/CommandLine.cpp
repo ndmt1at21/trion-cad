@@ -1,14 +1,20 @@
 #include "app/shell/cmdline/CommandLine.h"
 
+#include "app/core/edition/EditionGate.h"
 #include "app/shell/cmdline/Autocomplete.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/cmdline/CommandInput.h"
+#include "app/widgets/controls/Paint.h"
 #include "app/widgets/menu/Menu.h"
+#include "app/widgets/tooltip/RichTooltip.h"
+#include "core/base/assert.h"
 
+#include <QAbstractButton>
 #include <QAbstractScrollArea>
 #include <QAccessible>
+#include <QApplication>
 #include <QBoxLayout>
 #include <QClipboard>
 #include <QContextMenuEvent>
@@ -22,6 +28,7 @@
 #include <algorithm>
 #include <climits>
 #include <deque>
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -56,7 +63,11 @@ constexpr int kChipH = 20;    // .chip height
 constexpr int kChevron = 9;   // mũi tên .ic.xs: 9 px, nét --sw × 1,5 trên lưới 16
 constexpr int kInputMin = 60; // .cmd-in input min-width
 constexpr int kTextInset = 2; // QLineEdit lùi chữ 2 px (QLineEditPrivate::horizontalMargin): placeholder thẳng chữ gõ
+constexpr int kIconButton = 20; // .ib.sm
 constexpr int kMaxLines = 10; // 07.1 §8: lịch sử 0–10 dòng
+// .tb-grip của prototype: chấm --c-text-3 bán kính 1 px, cách 4 px, chấm đầu ở y = 5, mờ .7
+constexpr qreal kGripPitch = 4, kGripFirst = 5, kGripDot = 1, kGripAlpha = 0.7;
+constexpr int kMaxTransparency = 90; // % (prototype: thanh trượt 0–90)
 // prototype: 12 lệnh, 20 giá trị gần đây; menu chuột phải hiện 8.
 constexpr int kRecentMax = 12;
 constexpr int kEnteredMax = 20;
@@ -64,13 +75,35 @@ constexpr int kMenuItems = 8;
 // ponytail: giữ 100.000 dòng cuối trong bộ nhớ (F2 của UIA-007 mở 100.000 dòng); INT-017 History thay.
 constexpr std::size_t kHistoryMax = 100000;
 
-// Dòng "Không có lệnh" (reportUnknown): câu đầu màu lỗi, phần sau --c-text-2 với gợi ý bấm được (.cmd-hist .chip).
-struct Unknown {
-    QString typo;    // chữ đã gõ, viết hoa: khóa AutoCorrect
-    int errorTo = 0; // hết câu "Không có lệnh “…”."
+// Chữ của dòng lệnh theo cỡ chữ người dùng chọn (kFontSize): font của vai trò nhân tỉ lệ z.
+QFont zoomed(TextRole role, double z, Weight weight = Weight::Regular)
+{
+    QFont f = theme::font(role, weight);
+    if (z != 1.0)
+        f.setPointSizeF(f.pointSizeF() * z);
+    return f;
+}
+int scaled(tok::PxId id, double z)
+{
+    return qRound(tm().px(id) * z);
+}
+
+// Nền khi nổi: --c-base trong suốt theo kFloatTransparency.
+QColor floatBase()
+{
+    QColor c = col(tok::c_base);
+    c.setAlphaF(1.0 - std::clamp(settings::Store::instance().get(kFloatTransparency), 0, kMaxTransparency) / 100.0);
+    return c;
+}
+
+// Dòng có chip bấm được (.cmd-hist .chip): "Không có lệnh “LNE”. Ý bạn là: LINE, LEN?" (reportUnknown, câu dẫn màu lỗi),
+// "Lệnh LINE có trong TrionCAD Pro. Dùng thử 30 ngày Tìm hiểu" (notifyLocked). Câu dẫn [0, headTo) màu theo Kind, phần
+// sau --c-text-2.
+struct Chips {
+    int headTo = 0;
     struct Chip {
-        int from, to;    // chữ của chip trong Line::text
-        QString command; // lệnh chạy khi bấm
+        int from, to;              // chữ của chip trong Line::text
+        std::function<void()> run; // bấm
     };
     std::vector<Chip> chips;
 };
@@ -80,7 +113,7 @@ struct Line {
     CommandLine::Kind kind = CommandLine::Kind::Message;
     int boldFrom = 0, boldTo = 0; // đoạn in đậm --c-text (tên lệnh)
     int monoFrom = -1;            // từ đây tới hết là chữ Mono (giá trị đã nhập); -1: không có
-    std::shared_ptr<const Unknown> unknown{}; // dòng "Không có lệnh"; còn lại rỗng
+    std::shared_ptr<const Chips> chips{}; // dòng có chip; còn lại rỗng
 };
 
 // Đưa lên đầu, bỏ trùng, giữ tối đa max mục.
@@ -135,10 +168,10 @@ public:
     // Chip gợi ý đang thấy, theo lần vẽ gần nhất; chip rê, nhấn theo (dòng, thứ tự chip).
     struct Hit {
         QRect rect;
-        std::shared_ptr<const Unknown> line;
+        std::shared_ptr<const Chips> line;
         int chip;
     };
-    using Key = std::pair<const Unknown*, int>;
+    using Key = std::pair<const Chips*, int>;
     std::vector<Hit> hits;
     Key hot{nullptr, -1}, down{nullptr, -1};
 
@@ -148,12 +181,13 @@ public:
         if (lines.size() > kHistoryMax)
             lines.pop_front();
         updateRange();
+        emit owner_->historyAppended(lines.back().text);
     }
 
     // Giá trị thanh cuộn = dòng trên cùng. Thêm dòng, đổi cỡ: về cuối, dòng mới nhất luôn hiện.
     void updateRange()
     {
-        const int rows = std::max(1, viewport()->height() / std::max(1, px(tok::h_cmdl)));
+        const int rows = std::max(1, viewport()->height() / std::max(1, scaled(tok::h_cmdl, owner_->zoom_)));
         QScrollBar* bar = verticalScrollBar();
         bar->setRange(0, std::max(0, int(lines.size()) - rows));
         bar->setPageStep(rows);
@@ -184,8 +218,10 @@ protected:
         const bool click = e->button() == Qt::LeftButton && at.first && at == down;
         down = {nullptr, -1};
         viewport()->update();
-        if (click) // như prototype: chip chạy lệnh
-            owner_->pickSuggestion(at.first->typo, at.first->chips[std::size_t(at.second)].command);
+        if (click) { // như prototype: chip chạy lệnh (chép hàm: lịch sử có thể đổi trong lúc chạy)
+            const std::function<void()> run = at.first->chips[std::size_t(at.second)].run;
+            run();
+        }
     }
 
 private:
@@ -214,9 +250,12 @@ private:
 void CommandLine::HistoryView::paintEvent(QPaintEvent*)
 {
     QPainter p(viewport());
-    const int h = px(tok::h_cmdl);
-    const QFont ui = theme::font(TextRole::Ui), bold = theme::font(TextRole::Ui, Weight::Bold),
-                mono = theme::font(TextRole::Mono), label = theme::font(TextRole::Label);
+    const double z = owner_->zoom_;
+    if (owner_->floating_) // nổi: nền trong suốt; dưới là vùng vẽ
+        p.fillRect(viewport()->rect(), floatBase());
+    const int h = scaled(tok::h_cmdl, z);
+    const QFont ui = zoomed(TextRole::Ui, z), bold = zoomed(TextRole::Ui, z, Weight::Bold),
+                mono = zoomed(TextRole::Mono, z), label = zoomed(TextRole::Label, z);
     const QFontMetrics fu(ui), fb(bold), fm(mono), fl(label);
     const bool enabled = isEnabled();
     const qreal radius = tm().px(tok::r);
@@ -229,7 +268,7 @@ void CommandLine::HistoryView::paintEvent(QPaintEvent*)
         const int base = y + (h + fu.ascent() - fu.descent()) / 2; // chung một đường chân chữ cho mọi font
         int x = px(tok::sp_5);
         if (error) { // biểu tượng lỗi: không chỉ bằng màu
-            const int ic = px(tok::ic);
+            const int ic = scaled(tok::ic, z);
             QPixmap icon = theme::IconProvider::instance().pixmap(u"error"_s, ic, devicePixelRatioF(),
                                                                    theme::IconState::Normal);
             QPainter tint(&icon);
@@ -249,13 +288,15 @@ void CommandLine::HistoryView::paintEvent(QPaintEvent*)
             x += metrics.horizontalAdvance(s);
         };
         const int end = int(l.text.size()), mono0 = l.monoFrom < 0 ? end : l.monoFrom;
-        if (l.unknown) { // "Không có lệnh “LNE”." màu lỗi, " Ý bạn là: [LINE], [LEN]?" --c-text-2, gợi ý là chip
-            const Unknown& u = *l.unknown;
+        if (l.chips) { // câu dẫn (tên lệnh đậm), phần sau --c-text-2, chip
+            const Chips& u = *l.chips;
             const QColor rest = enabled ? col(tok::c_text_2) : ink;
-            run(0, u.errorTo, ui, fu, ink);
-            int at = u.errorTo;
+            run(0, l.boldFrom, ui, fu, ink);
+            run(l.boldFrom, l.boldTo, bold, fb, enabled && !error ? col(tok::c_text) : ink);
+            run(l.boldTo, u.headTo, ui, fu, ink);
+            int at = u.headTo;
             for (int c = 0; c < int(u.chips.size()); ++c) {
-                const Unknown::Chip& chip = u.chips[std::size_t(c)];
+                const Chips::Chip& chip = u.chips[std::size_t(c)];
                 run(at, chip.from, ui, fu, rest);
                 const QString s = l.text.mid(chip.from, chip.to - chip.from);
                 // .cmd-hist .chip: cao bằng dòng, nền --c-active; rê, nhấn --c-press viền trong --c-border-ctl
@@ -268,7 +309,7 @@ void CommandLine::HistoryView::paintEvent(QPaintEvent*)
                 p.setFont(label);
                 p.setPen(enabled ? col(tok::c_text) : ink);
                 p.drawText(r, Qt::AlignCenter | Qt::TextSingleLine, s);
-                hits.push_back({r, l.unknown, c});
+                hits.push_back({r, l.chips, c});
                 x = r.right() + 1;
                 at = chip.to;
             }
@@ -301,8 +342,9 @@ public:
     // Đặt các phần từ trái sang trong bề rộng width; vẽ nếu có p; ô chip vào hits nếu có. Trả bề rộng cần để hiện đủ.
     int place(QPainter* p, int width, std::vector<Hit>* hits) const;
 
-    QSize sizeHint() const override { return {place(nullptr, INT_MAX, nullptr), kChipH}; }
-    QSize minimumSizeHint() const override { return {kChevron, kChipH}; }
+    QSize sizeHint() const override { return {place(nullptr, INT_MAX, nullptr), chipH()}; }
+    QSize minimumSizeHint() const override { return {kChevron, chipH()}; }
+    int chipH() const { return qRound(kChipH * owner_->zoom_); }
 
     int hot = -1, down = -1; // chip đang rê, đang nhấn (thứ tự chip)
 
@@ -371,8 +413,10 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
     const std::optional<Prompt>& pr = owner_->prompt_;
     const bool enabled = isEnabled();
     const QColor ink = col(enabled ? tok::c_text : tok::c_text_dis), faint = col(enabled ? tok::c_text_3 : tok::c_text_dis);
-    const QFont ui = theme::font(TextRole::Ui), label = theme::font(TextRole::Label),
-                keyFont = theme::font(TextRole::MonoCaption);
+    const double z = owner_->zoom_;
+    const int chipH = qRound(kChipH * z);
+    const QFont ui = zoomed(TextRole::Ui, z), label = zoomed(TextRole::Label, z),
+                keyFont = zoomed(TextRole::MonoCaption, z);
     const QFontMetrics fu(ui), fl(label), fk(keyFont);
     const int gap = px(tok::sp_3), pad = px(tok::sp_4);
     const QString dot = u"·"_s;
@@ -387,7 +431,7 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
     int textAt = -1;
     if (pr) {
         if (!pr->command.isEmpty())
-            text(pr->command, theme::font(TextRole::Ui, Weight::Bold), ink, gap);
+            text(pr->command, zoomed(TextRole::Ui, z, Weight::Bold), ink, gap);
         bool first = true; // phần đầu của .cmd-pr cách phần trước --sp-3, các phần sau 5 px
         const auto next = [&] { return std::exchange(first, false) ? gap : kItemGap; };
         const bool chips = std::any_of(pr->keywords.cbegin(), pr->keywords.cend(), [](const Keyword& k) { return !k.hidden; });
@@ -402,7 +446,7 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
                              2 * pad + fl.horizontalAdvance(k.label) + kTight + fl.horizontalAdvance(dot) + kTight
                                  + fk.horizontalAdvance(k.key)});
         if (def)
-            text(u'<' + pr->defaultValue + u'>', theme::font(TextRole::Mono), ink, next());
+            text(u'<' + pr->defaultValue + u'>', zoomed(TextRole::Mono, z), ink, next());
         if (chips || def)
             text(u":"_s, ui, ink, v.back().type == Piece::Chip ? kItemGap : 0);
     }
@@ -424,7 +468,7 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
     for (const Piece& pc : v) {
         x += pc.gap;
         if (pc.type == Piece::Chip) {
-            const QRect r(x, (h - kChipH) / 2, pc.width, kChipH);
+            const QRect r(x, (h - chipH) / 2, pc.width, chipH);
             if (hits)
                 hits->push_back({r, pc.key});
             if (p) { // .chip: nền --c-active; rê/nhấn --c-press viền trong --c-border-ctl
@@ -432,7 +476,7 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
                 p->setPen(lit ? QPen(col(tok::c_border_ctl), kBorder) : QPen(Qt::NoPen));
                 p->setBrush(col(lit ? tok::c_press : tok::c_active));
                 p->drawRoundedRect(QRectF(r).adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
-                const int cb = r.top() + (kChipH + fl.ascent() - fl.descent()) / 2;
+                const int cb = r.top() + (chipH + fl.ascent() - fl.descent()) / 2;
                 int cx = r.left() + pad;
                 p->setFont(label);
                 p->setPen(pc.color);
@@ -463,6 +507,84 @@ int CommandLine::PromptView::place(QPainter* p, int width, std::vector<Hit>* hit
     return need;
 }
 
+// .cmd-r .ib.sm (#cmd-histbtn của prototype): mũi tên lên cỡ .ic.xs, mở lịch sử đầy đủ. Không nhận Tab (bàn phím: F2,
+// ghi trong tên và tooltip); rê --c-hover chữ --c-text, nhấn --c-press, vô hiệu --c-text-dis.
+class CommandLine::HistoryButton final : public QAbstractButton {
+public:
+    explicit HistoryButton(QWidget* parent) : QAbstractButton(parent)
+    {
+        setObjectName(u"historyButton"_s);
+        setFocusPolicy(Qt::NoFocus);
+        setFixedSize(kIconButton, kIconButton);
+    }
+
+protected:
+    void enterEvent(QEnterEvent* e) override
+    {
+        update();
+        QAbstractButton::enterEvent(e);
+    }
+    void leaveEvent(QEvent* e) override
+    {
+        update();
+        QAbstractButton::leaveEvent(e);
+    }
+    void paintEvent(QPaintEvent*) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        const bool en = isEnabled(), lit = en && (isDown() || underMouse());
+        if (lit) {
+            const qreal radius = tm().px(tok::r);
+            p.setPen(Qt::NoPen);
+            p.setBrush(col(isDown() ? tok::c_press : tok::c_hover));
+            p.drawRoundedRect(QRectF(rect()), radius, radius);
+        }
+        const QColor ink = col(!en ? tok::c_text_dis : lit ? tok::c_text : tok::c_text_2);
+        const QPixmap icon = theme::IconProvider::instance().pixmap(u"up"_s, kChevron, devicePixelRatioF(),
+                                                                     theme::IconState::Normal);
+        p.drawPixmap(QRect((width() - kChevron) / 2, (height() - kChevron) / 2, kChevron, kChevron),
+                     paint::tinted(icon, ink));
+    }
+};
+
+// Dải nắm bên trái (.tb-grip của prototype), rộng --sp-3: kéo để cho dòng lệnh nổi, di chuyển khi nổi, bám lại.
+class CommandLine::Grip final : public QWidget {
+public:
+    explicit Grip(CommandLine* owner) : QWidget(owner), owner_(owner)
+    {
+        setObjectName(u"grip"_s);
+        setCursor(Qt::SizeAllCursor);
+    }
+
+protected:
+    void paintEvent(QPaintEvent*) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        QColor dot = col(isEnabled() ? tok::c_text_3 : tok::c_text_dis);
+        dot.setAlphaF(kGripAlpha);
+        p.setPen(Qt::NoPen);
+        p.setBrush(dot);
+        for (qreal y = kGripFirst; y + kGripDot <= height(); y += kGripPitch)
+            p.drawEllipse(QPointF(width() / 2.0, y), kGripDot, kGripDot);
+    }
+    void mousePressEvent(QMouseEvent* e) override
+    {
+        if (e->button() == Qt::LeftButton)
+            owner_->drag_ = Drag{e->globalPosition().toPoint(), owner_->pos()};
+    }
+    void mouseMoveEvent(QMouseEvent* e) override { owner_->dragTo(e->globalPosition().toPoint(), false); }
+    void mouseReleaseEvent(QMouseEvent* e) override
+    {
+        if (e->button() == Qt::LeftButton)
+            owner_->dragTo(e->globalPosition().toPoint(), true);
+    }
+
+private:
+    CommandLine* owner_;
+};
+
 CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -476,26 +598,38 @@ CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
     setFocusPolicy(Qt::ClickFocus);
     setFocusProxy(input_);
 
+    histButton_ = new HistoryButton(this);
     frame_ = new QHBoxLayout;
     frame_->addWidget(promptView_);
     frame_->addWidget(input_, 1);
+    frame_->addWidget(histButton_);
+    grip_ = new Grip(this);
     auto* column = new QVBoxLayout(this);
     column->addWidget(history_);
     column->addLayout(frame_);
 
     connect(input_, &QLineEdit::textChanged, this, &CommandLine::textChanged);
     connect(input_, &QLineEdit::textEdited, this, [this](const QString& text) { // gõ, dán, bộ gõ; không phải ↑↓
-        if (!prompt_)
+        if (prompt_)
+            return;
+        if (const int delay = settings::Store::instance().get(kCompletionDelay); delay > 0)
+            pending_.start(delay, this); // danh sách cũ giữ tới khi hết trễ (không nháy)
+        else
             autocomplete_->refresh(text);
     });
+    connect(histButton_, &QAbstractButton::clicked, this, [this] { emit commandRequested(u"'_TEXTSCR"_s); });
     connect(autocomplete_, &Autocomplete::accepted, this, &CommandLine::submitToken);
     connect(autocomplete_, &Autocomplete::learned, this, [this](const QString& typo, const QString& command) {
         appendHistory(
             tr("Từ nay gõ “%1” sẽ chạy %2 (AutoCorrect; xem, xóa trong Tùy chọn dòng lệnh).").arg(typo, command));
     });
     connect(&settings::Store::instance(), &settings::Store::changed, this, [this](const QString& key) {
-        if (key == QLatin1StringView(kHistoryLines.key))
+        if (key == QLatin1StringView(kHistoryLines.key) || key == QLatin1StringView(kFontSize.key))
             relayout();
+        else if (key == QLatin1StringView(kFloatTransparency.key) && floating_) {
+            update();
+            history_->viewport()->update();
+        }
     });
     connect(&tm(), &theme::ThemeManager::changed, this, &CommandLine::relayout); // mật độ: cao dòng, cao khung
     relayout();
@@ -507,6 +641,8 @@ CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
 CommandLine::~CommandLine()
 {
     delete autocomplete_.data(); // có thể đang là con của cửa sổ
+    if (floating_)
+        delete history_.data(); // anh em trên vùng vẽ
 }
 
 void CommandLine::setPrompt(const Prompt& prompt)
@@ -535,7 +671,7 @@ void CommandLine::clearPrompt()
 void CommandLine::promptChanged()
 {
     browse_ = -1;
-    autocomplete_->dismiss(); // lệnh đang chạy: không tự hoàn thành tên lệnh
+    dismissCompletion(); // lệnh đang chạy: không tự hoàn thành tên lệnh
     promptView_->hot = promptView_->down = -1;
     promptView_->updateGeometry();
     promptView_->update();
@@ -566,13 +702,18 @@ QString CommandLine::historyLine(int index) const
     return index >= 0 && index < historyCount() ? history_->lines[std::size_t(index)].text : QString();
 }
 
-QString CommandLine::historyText() const
+QStringList CommandLine::historyLines() const
 {
     QStringList all;
     all.reserve(historyCount());
     for (const Line& l : history_->lines)
         all << l.text;
-    return all.join(u'\n');
+    return all;
+}
+
+QString CommandLine::historyText() const
+{
+    return historyLines().join(u'\n');
 }
 
 void CommandLine::setCompact(bool compact)
@@ -642,7 +783,7 @@ bool CommandLine::eventFilter(QObject* watched, QEvent* e)
         case QEvent::FocusIn:
         case QEvent::FocusOut:
             if (e->type() == QEvent::FocusOut)
-                autocomplete_->dismiss(); // bấm ra ngoài, đổi cửa sổ
+                dismissCompletion(); // bấm ra ngoài, đổi cửa sổ
             update(frameRect());       // .cmd-in:focus-within
             break;
         case QEvent::InputMethod: // đang soạn chữ bằng bộ gõ (tắt bỏ qua bộ gõ): ẩn placeholder như QLineEdit
@@ -677,7 +818,18 @@ bool CommandLine::eventFilter(QObject* watched, QEvent* e)
 
 bool CommandLine::completionKey(const QKeyEvent* e)
 {
-    if (!autocomplete_->isVisible() || (e->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
+    if (e->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier))
+        return false;
+    if (pending_.isActive()) { // độ trễ chưa hết: phím của danh sách dùng danh sách tính ngay; Esc chỉ bỏ lượt chờ
+        static constexpr int kListKeys[] = {Qt::Key_Up,     Qt::Key_Down,  Qt::Key_Tab,  Qt::Key_Return,
+                                            Qt::Key_Enter,  Qt::Key_Space, Qt::Key_Escape};
+        if (std::find(std::begin(kListKeys), std::end(kListKeys), e->key()) != std::end(kListKeys)) {
+            pending_.stop();
+            if (e->key() != Qt::Key_Escape)
+                autocomplete_->refresh(input_->text());
+        }
+    }
+    if (!autocomplete_->isVisible())
         return false;
     switch (e->key()) {
     case Qt::Key_Up:
@@ -687,7 +839,7 @@ bool CommandLine::completionKey(const QKeyEvent* e)
     case Qt::Key_Tab: // nhận dòng đang chọn, chưa chọn thì dòng đầu
         return autocomplete_->accept(true);
     case Qt::Key_Escape: // đóng danh sách, giữ chữ đã gõ; Esc lần nữa mới xóa chữ, bỏ vùng chọn
-        autocomplete_->dismiss();
+        dismissCompletion();
         return true;
     case Qt::Key_Return:
     case Qt::Key_Enter:
@@ -714,7 +866,7 @@ void CommandLine::submit()
 void CommandLine::submitToken(const QString& typed)
 {
     input_->clear();
-    autocomplete_->dismiss();
+    dismissCompletion();
     browse_ = -1;
     Line echo;
     QString token = typed;
@@ -748,11 +900,10 @@ void CommandLine::submitToken(const QString& typed)
 
 void CommandLine::reportUnknown(const QString& typed)
 {
-    const QString name = typed.trimmed();
-    auto u = std::make_shared<Unknown>();
-    u->typo = name.toUpper();
+    const QString name = typed.trimmed(), typo = name.toUpper(); // typo: khóa AutoCorrect
+    auto u = std::make_shared<Chips>();
     const QString head = tr("Không có lệnh “%1”.").arg(name);
-    u->errorTo = int(head.size());
+    u->headTo = int(head.size());
     const QStringList terms = autocomplete_->suggest(name);
     const QChar mark(0xE000); // chỗ của các gợi ý trong câu đã dịch (ký tự dùng riêng)
     Line line{u"%1 %2"_s.arg(head, terms.isEmpty() ? tr("Gõ ? hoặc mở Trợ giúp (F1) để xem danh sách lệnh.")
@@ -765,11 +916,32 @@ void CommandLine::reportUnknown(const QString& typed)
                 chips += u", "_s;
             const auto from = int(at + chips.size());
             chips += term;
-            u->chips.push_back({from, int(at + chips.size()), autocomplete_->resolve(term)});
+            u->chips.push_back({from, int(at + chips.size()),
+                                [this, typo, command = autocomplete_->resolve(term)] { pickSuggestion(typo, command); }});
         }
         line.text.replace(at, 1, chips);
     }
-    line.unknown = std::move(u);
+    line.chips = std::move(u);
+    const QString say = line.text;
+    history_->append(std::move(line));
+    announce(history_, say, QAccessible::AnnouncementPoliteness::Assertive);
+}
+
+void CommandLine::notifyLocked(const QString& command, Edition need)
+{
+    const edition::EditionGate::CommandNotice n = edition::EditionGate::commandNotice(command, need);
+    Line line{n.text, Kind::Message};
+    if (const qsizetype at = n.text.indexOf(command); at >= 0) // tên lệnh đậm như prototype
+        line.boldFrom = int(at), line.boldTo = int(at + command.size());
+    auto c = std::make_shared<Chips>();
+    c->headTo = int(n.text.size());
+    for (const QString& label : {n.trial, n.learn}) {
+        line.text += u' ';
+        const int from = int(line.text.size());
+        line.text += label;
+        c->chips.push_back({from, int(line.text.size()), [this, command] { emit upgradeRequested(command); }});
+    }
+    line.chips = std::move(c);
     const QString say = line.text;
     history_->append(std::move(line));
     announce(history_, say, QAccessible::AnnouncementPoliteness::Assertive);
@@ -824,18 +996,141 @@ void CommandLine::updateAwaiting()
 
 void CommandLine::relayout()
 {
-    const int lines = std::clamp(settings::Store::instance().get(kHistoryLines), 0, kMaxLines);
+    const settings::Store& store = settings::Store::instance();
+    const int fs = store.get(kFontSize);
+    zoom_ = fs > 0 ? fs / tm().px(tok::fs) : 1.0;
+    const int lines = std::clamp(store.get(kHistoryLines), 0, kMaxLines);
     const int shown = compact_ ? std::min(lines, 1) : lines;
     const int gap = px(tok::sp_3);
-    history_->setFixedHeight(shown * px(tok::h_cmdl));
-    history_->setVisible(shown > 0);
+    history_->setFixedHeight(shown * scaled(tok::h_cmdl, zoom_));
+    history_->setVisible(shown > 0 && (!floating_ || isVisible())); // nổi: theo hàng ô nhập (showEvent)
+    history_->updateRange();
     auto* column = static_cast<QVBoxLayout*>(layout());
     column->setContentsMargins(0, kBorder + kTight, 0, gap);
     column->setSpacing(kTight);
     frame_->setContentsMargins(gap + kBorder + px(tok::sp_4), kBorder, gap + kBorder + px(tok::sp_2), kBorder);
     frame_->setSpacing(gap);
-    input_->setFixedHeight(px(tok::h_cmdin) - 2 * kBorder);
+    input_->setFixedHeight(scaled(tok::h_cmdin, zoom_) - 2 * kBorder);
     input_->setMinimumWidth(kInputMin);
+    input_->setFont(zoomed(TextRole::Mono, zoom_)); // sau CommandInput (nối ThemeManager::changed trước)
+    promptView_->updateGeometry();
+    fitHistoryButton();
+    if (floating_) { // không nằm trong bố cục nào: tự đặt cao
+        layout()->activate();
+        resize(width(), sizeHint().height());
+        placeHistory();
+    }
+}
+
+void CommandLine::dismissCompletion()
+{
+    pending_.stop();
+    autocomplete_->dismiss();
+}
+
+void CommandLine::timerEvent(QTimerEvent* e)
+{
+    if (e->timerId() != pending_.timerId()) {
+        QWidget::timerEvent(e);
+        return;
+    }
+    pending_.stop();
+    if (!prompt_)
+        autocomplete_->refresh(input_->text());
+}
+
+void CommandLine::setFloating(bool on, std::optional<QPoint> at)
+{
+    QWidget* host = parentWidget();
+    TRION_CHECK(!on || host);
+    if (on != floating_) {
+        floating_ = on;
+        dismissCompletion();
+        if (on) {
+            history_->setParent(host); // bố cục tự bỏ mục của nó
+            history_->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+            resize(std::min(width(), host->width() * 2 / 3), height());
+        } else {
+            history_->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+            history_->setParent(this);
+            static_cast<QVBoxLayout*>(layout())->insertWidget(0, history_);
+        }
+        relayout();
+    }
+    if (on) {
+        move(clampFloat(at ? host->mapFromGlobal(*at) : pos()));
+        raise();
+        placeHistory();
+    }
+    update();
+}
+
+QPoint CommandLine::clampFloat(QPoint topLeft) const
+{
+    const QWidget* host = parentWidget();
+    if (!host)
+        return topLeft;
+    const int top = history_->height(); // lịch sử nằm trên, cũng trong cha
+    return {std::clamp(topLeft.x(), 0, std::max(0, host->width() - width())),
+            std::clamp(topLeft.y(), top, std::max(top, host->height() - height()))};
+}
+
+void CommandLine::placeHistory()
+{
+    if (!floating_ || !history_)
+        return;
+    history_->setGeometry(x(), y() - history_->height(), width(), history_->height());
+    history_->raise();
+}
+
+void CommandLine::dragTo(QPoint global, bool done)
+{
+    if (!drag_)
+        return;
+    const QPoint d = global - drag_->start;
+    drag_->moved = drag_->moved || d.manhattanLength() >= QApplication::startDragDistance();
+    if (drag_->moved && floating_)
+        move(clampFloat(drag_->origin + d));
+    if (!done)
+        return;
+    const Drag was = *std::exchange(drag_, std::nullopt);
+    if (!was.moved)
+        return;
+    if (!floating_)
+        emit floatRequested(mapToGlobal(QPoint()) + d);
+    else if (parentWidget()->height() - (geometry().bottom() + 1) <= px(tok::h_cmdl)) // thả sát mép dưới vùng vẽ
+        emit dockRequested();
+}
+
+void CommandLine::resizeEvent(QResizeEvent* e)
+{
+    QWidget::resizeEvent(e);
+    grip_->setGeometry(0, kBorder, px(tok::sp_3), height() - kBorder);
+    grip_->raise(); // trên lịch sử khi dock
+    fitHistoryButton();
+    placeHistory();
+}
+
+void CommandLine::moveEvent(QMoveEvent* e)
+{
+    QWidget::moveEvent(e);
+    placeHistory();
+}
+
+void CommandLine::showEvent(QShowEvent* e)
+{
+    QWidget::showEvent(e);
+    if (floating_) {
+        history_->setVisible(history_->height() > 0);
+        placeHistory();
+    }
+}
+
+void CommandLine::hideEvent(QHideEvent* e)
+{
+    QWidget::hideEvent(e);
+    if (floating_)
+        history_->hide();
 }
 
 QString CommandLine::placeholder() const
@@ -846,8 +1141,23 @@ QString CommandLine::placeholder() const
 void CommandLine::retranslate()
 {
     history_->setAccessibleName(tr("Lịch sử dòng lệnh"));
+    histButton_->setAccessibleName(tr("Lịch sử dòng lệnh (F2)"));
+    if (RichTooltip::instance()) { // có tooltip 2 mức (main tạo); test không có thì thôi
+        RichTooltip::attach(histButton_, {tr("Lịch sử đầy đủ"), u"TEXTSCR"_s, u"hist"_s});
+        RichTooltip::attach(grip_, {tr("Kéo để dòng lệnh nổi trên vùng vẽ; thả sát mép dưới để bám lại")});
+    }
     input_->setAccessibleDescription(prompt_ ? describe(*prompt_) : placeholder());
     update(input_->geometry());
+    fitHistoryButton();
+}
+
+// Nút lịch sử nhường chỗ cho prompt: hàng hẹp (1366 px, chữ dịch dài) thì ẩn nút; F2, menu chuột phải vẫn mở lịch sử.
+// Gọi trước khi bố cục chạy (prompt, chữ, cỡ đổi) để lần bố cục kế tiếp đã tính không có nút.
+void CommandLine::fitHistoryButton()
+{
+    const QMargins m = frame_->contentsMargins();
+    const int room = width() - m.left() - m.right() - 2 * frame_->spacing() - kInputMin - kIconButton;
+    histButton_->setVisible(promptView_->sizeHint().width() <= room);
 }
 
 void CommandLine::changeEvent(QEvent* e)
@@ -855,7 +1165,7 @@ void CommandLine::changeEvent(QEvent* e)
     if (e->type() == QEvent::LanguageChange)
         retranslate();
     if (e->type() == QEvent::EnabledChange && !isEnabled())
-        autocomplete_->dismiss(); // danh sách nằm ở cửa sổ, không tự vô hiệu theo dòng lệnh
+        dismissCompletion(); // danh sách nằm ở cửa sổ, không tự vô hiệu theo dòng lệnh
     QWidget::changeEvent(e);
 }
 
@@ -868,7 +1178,7 @@ QRect CommandLine::frameRect() const
 void CommandLine::paintEvent(QPaintEvent*)
 {
     QPainter p(this);
-    p.fillRect(rect(), col(tok::c_base));
+    p.fillRect(rect(), floating_ ? floatBase() : col(tok::c_base));
     p.fillRect(QRect(0, 0, width(), kBorder), col(tok::c_border));
     // .cmd-in: nền --c-raised, viền --c-border-ctl; ô nhập có focus: viền --c-focus
     p.setRenderHint(QPainter::Antialiasing);
@@ -880,7 +1190,7 @@ void CommandLine::paintEvent(QPaintEvent*)
         // .cmd-in input::placeholder: --f-ui --c-text-3, vẽ dưới ô nhập trong suốt (QLineEdit vẽ placeholder bằng
         // font Mono của ô). Ô nhập vẽ lại (chữ, preedit đổi) thì Qt vẽ lại cả phần này bên dưới nó.
         const QRect r = input_->geometry().adjusted(kTextInset, 0, 0, 0);
-        p.setFont(theme::font(TextRole::Ui));
+        p.setFont(zoomed(TextRole::Ui, zoom_));
         p.setPen(col(isEnabled() ? tok::c_text_3 : tok::c_text_dis));
         p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter,
                    QFontMetrics(p.font()).elidedText(placeholder(), Qt::ElideRight, r.width()));
