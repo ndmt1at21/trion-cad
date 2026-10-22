@@ -5,8 +5,10 @@
 //   2  chipAndKeySameToken: bấm chip, gõ chữ tắt (thường, hoa, "_" + chữ tắt, tên toàn cục) cho cùng token trên mọi
 //      prompt mẫu (lấy từ prototype); từ khóa ẩn của grip (ST, MO, RO, SC, MI) không có chip, gõ vẫn ra token.
 //   3  scriptEquivalence: 1.000 phiên gõ ngẫu nhiên (hạt cố định) qua bàn phím cho cùng dãy token như tách cùng chuỗi
-//      theo luật .scr (Space/Enter là Enter, trừ prompt chuỗi và biểu thức LISP). Bản ghi INT-002 thật: Hoãn (cần
-//      INT-002). idleRepeat: Enter/Space khi rảnh lặp lệnh vừa dùng (cả lệnh chạy từ ribbon, bí danh thành tên lệnh).
+//      theo luật .scr (Space/Enter là Enter, trừ prompt chuỗi và biểu thức LISP); tên ở dấu nhắc lệnh mà danh sách tự
+//      hoàn thành (UIA-108) có dòng chọn sẵn thì là chữ Autocomplete::completion (như AutoCAD). Bản ghi INT-002 thật:
+//      Hoãn (cần INT-002).
+//      idleRepeat: Enter/Space khi rảnh lặp lệnh vừa dùng (cả lệnh chạy từ ribbon, bí danh thành tên lệnh).
 //   4  history10k: 10.000 dòng không thêm widget nào; thêm dòng và cuộn: lượt xử lý dài nhất của luồng UI ≤ 16,6 ms
 //      (CPU luồng; kiểm ở release).
 //   Còn lại: escapeAndBrowse, lispAndAwaiting, placeholder, commaHintOnce, compactAndLines (Q_PROPERTY compact,
@@ -18,6 +20,7 @@
 #include "app/core/i18n/TruncationProbe.h"
 #include "app/core/perf/UiProbe.h"
 #include "app/core/UiExecutor.h"
+#include "app/shell/cmdline/Autocomplete.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -323,16 +326,24 @@ private slots:
     }
 
     // Tiêu chí 1: ký tự hiện trong ô ≤ 16 ms p99 sau phím (UiProbe: từ phím tới QWindow đến hết khung kế tiếp), ở dấu
-    // nhắc lệnh (bỏ qua bộ gõ, chữ hoa) và ở prompt.
+    // nhắc lệnh (bỏ qua bộ gõ, chữ hoa; khung gồm cả danh sách tự hoàn thành UIA-108) và ở prompt. Đo trạng thái ổn
+    // định: một lượt gõ cùng dãy phím trước để danh sách hiện lần đầu, glyph và biểu tượng mới raster (một lần mỗi phiên).
     void typingLatency()
     {
+        constexpr int kN = 200;
+        for (int i = 0; i < kN; ++i) {
+            if (i % 40 == 0)
+                cmd_->input()->clear();
+            QTest::keyClick(window_->windowHandle(), char('a' + i % 26));
+            QCoreApplication::processEvents();
+        }
+        cmd_->input()->clear();
         probe::enable();
         for (const bool prompting : {false, true}) {
             probe::reset();
             std::chrono::nanoseconds worst{0}; // CPU của luồng UI từ phím tới hết khung (keyClick xử lý đồng bộ)
             if (prompting)
                 cmd_->setPrompt(make(kPrompts[0]));
-            constexpr int kN = 200;
             for (int i = 0; i < kN; ++i) {
                 if (i % 40 == 0)
                     cmd_->input()->clear();
@@ -434,7 +445,8 @@ private slots:
     }
 
     // Tiêu chí 3: 1.000 phiên gõ ngẫu nhiên cho cùng dãy token như tách cùng chuỗi theo luật .scr. Lệnh giả: mỗi token
-    // đưa dòng lệnh sang trạng thái kế tiếp (rảnh hoặc một prompt) của một vòng cố định.
+    // đưa dòng lệnh sang trạng thái kế tiếp (rảnh hoặc một prompt) của một vòng cố định. Tên ở dấu nhắc lệnh qua tự
+    // hoàn thành (UIA-108): token mong đợi tính ngay trước phím tách, theo danh sách và tần suất dùng lúc đó.
     void scriptEquivalence()
     {
         std::vector<std::optional<CommandLine::Prompt>> states = {
@@ -453,37 +465,33 @@ private slots:
 
         // Luật .scr (giống INT-002 chạy script): Space/Enter là Enter, trừ prompt chuỗi (chỉ xuống dòng) và biểu thức
         // LISP ở dấu nhắc lệnh; Enter trống khi rảnh lặp lệnh vừa dùng; chữ ở dấu nhắc lệnh viết hoa (bỏ qua bộ gõ).
+        // Token phím c gửi (nếu có), tính trước khi gõ c.
         std::size_t refStep = 0;
-        QString last;
-        const auto reference = [&](const QString& keys) {
-            QStringList out;
-            QString buffer;
-            for (const QChar c : keys) {
-                const auto& s = states[refStep % states.size()];
-                const bool spaceText = s ? s->allowSpace : buffer.startsWith(u'(');
-                if (c != u'\n' && (c != u' ' || spaceText)) {
-                    buffer += !s && !buffer.startsWith(u'(') ? c.toUpper() : c;
-                    continue;
-                }
-                QString token;
-                if (s) {
-                    token = CommandLine::resolve(*s, s->allowSpace ? buffer : buffer.trimmed());
-                } else {
-                    const QString name = buffer.trimmed();
-                    token = name.isEmpty() ? last : name;
-                    buffer.clear();
-                    if (token.isEmpty())
-                        continue;
-                    if (!token.startsWith(u'('))
-                        last = token.toUpper();
-                }
-                buffer.clear();
-                out << token;
-                const auto& next = states[++refStep % states.size()];
-                if (next && !next->nested && !next->command.isEmpty())
-                    last = next->command;
+        QString last, buffer;
+        const auto expect = [&](QChar c) -> std::optional<QString> {
+            const auto& s = states[refStep % states.size()];
+            const bool spaceText = s ? s->allowSpace : buffer.startsWith(u'(');
+            if (c != u'\n' && (c != u' ' || spaceText)) {
+                buffer += !s && !buffer.startsWith(u'(') ? c.toUpper() : c;
+                return std::nullopt;
             }
-            return out;
+            QString token;
+            if (s) {
+                token = CommandLine::resolve(*s, s->allowSpace ? buffer : buffer.trimmed());
+            } else {
+                const QString name = buffer.trimmed(), done = cmd_->autocomplete()->completion(name);
+                token = name.isEmpty() ? last : done.isEmpty() ? name : done;
+                buffer.clear();
+                if (token.isEmpty())
+                    return std::nullopt;
+                if (!token.startsWith(u'('))
+                    last = token.toUpper();
+            }
+            buffer.clear();
+            const auto& next = states[++refStep % states.size()];
+            if (next && !next->nested && !next->command.isEmpty())
+                last = next->command;
+            return token;
         };
 
         std::mt19937 rng(20261022); // mt19937 giống nhau mọi nền tảng; uniform_int_distribution thì không (libstdc++/libc++)
@@ -504,8 +512,12 @@ private slots:
             if (!keys.endsWith(u'\n'))
                 keys += u'\n';
             tokens_.clear();
-            type(keys);
-            const QStringList want = reference(keys);
+            QStringList want;
+            for (const QChar c : keys) {
+                if (const std::optional<QString> token = expect(c))
+                    want << *token;
+                type(QString(c));
+            }
             QVERIFY2(tokens_ == want, qPrintable(u"phiên %1 «%2»: %3 ≠ %4"_s.arg(session).arg(keys, tokens_.join(u'|'), want.join(u'|'))));
             total += int(want.size());
         }

@@ -12,12 +12,16 @@
 //   ↑ / ↓         không prompt: lệnh gần đây; có prompt: giá trị đã nhập gần đây.
 //   Chuột phải, phím Menu: Lệnh gần đây, Giá trị đã nhập gần đây, Sao chép lịch sử, Tùy chọn dòng lệnh.
 // Gõ "," ngay sau chữ số (trừ prompt chuỗi): một lần mỗi phiên, lịch sử nhắc dấu thập phân luôn là "." (07.1 §8).
+// Tự hoàn thành (UIA-108, Autocomplete.h): gõ ở dấu nhắc lệnh thì danh sách hiện phía trên; ↑↓ chọn dòng, Tab nhận
+// (chưa chọn thì dòng đầu), Enter/Space nhận dòng đang chọn (không có thì gửi chữ đã gõ), Esc đóng danh sách, giữ chữ.
+// Dòng được nhận gửi như gõ tên rồi Enter. Lỗi gõ đã học (AutoCorrect) được sửa khi gửi.
 // Ô nhập bỏ qua bộ gõ khi chờ tên lệnh (CommandInput::setAwaitingCommand): bật khi không có prompt, tắt khi có prompt
 // và khi chữ đang gõ bắt đầu bằng "(" (LISP: chuỗi trong biểu thức gõ được tiếng Việt).
 //
 // Token (submitted): chữ đã gõ, bỏ khoảng trắng hai đầu (trừ prompt chuỗi); khớp một từ khóa của prompt (chữ tắt,
 // "_" + chữ tắt, tên toàn cục, không phân biệt hoa/thường, cả từ khóa ẩn) thì là chữ tắt của từ khóa, đúng như bấm
-// chip (resolve). Gõ phím và chạy cùng chuỗi bằng .scr cho cùng dãy token: Space/Enter tách như dòng script.
+// chip (resolve). Gõ phím và chạy cùng chuỗi bằng .scr cho cùng dãy token: Space/Enter tách như dòng script; riêng tên
+// ở dấu nhắc lệnh có dòng tự hoàn thành chọn sẵn thì gửi Autocomplete::completion (như AutoCAD).
 //
 // Lệnh COMMANDLINE / COMMANDLINEHIDE (Ctrl+9, Keymap "cmdl"; docs/specs/commands/COMMANDLINE.md): ẩn/hiện widget này
 // là việc của cửa sổ chính (bước integration), không ở đây.
@@ -31,10 +35,12 @@
 //                   .keywords = {{tr("Đường kính"), u"D"_s, u"_Diameter"_s}}, .defaultValue = u"10.0000"_s});
 //   cmd->appendHistory(tr("Đã chọn %n đối tượng", nullptr, n));
 //   cmd->clearPrompt();                                          // lệnh xong: về dấu nhắc lệnh
+//   cmd->reportUnknown(name);                                    // INT-002 không biết lệnh: "Ý bạn là" bấm được
 
 #include "core/base/settings/Settings.h"
 
 #include <QList>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -47,6 +53,7 @@ class QKeyEvent;
 
 namespace trion::ui {
 
+class Autocomplete;
 class CommandInput;
 
 // Số dòng lịch sử hiện (CLIPROMPTLINES; 0–10, mặc định 3). Hộp INPUTSEARCHOPTIONS (UIA-007) ghi; đổi là áp ngay.
@@ -90,6 +97,11 @@ public:
 
     // Thêm một dòng vào lịch sử; dòng mới luôn hiện (cuộn về cuối). Thông báo, lỗi được báo cho trình đọc màn hình.
     void appendHistory(const QString& text, Kind kind = Kind::Message);
+    // Tên lệnh không có (07.1 §8): "Không có lệnh “LNE”. Ý bạn là: LINE, LEN?" với gợi ý bấm được
+    // (Autocomplete::suggest; bấm: commandRequested("^C^C" + lệnh), tính một lần chọn cho AutoCorrect); không có gợi ý
+    // thì chỉ cách xem danh sách lệnh. ponytail: INT-002 (hoặc bước integration với CommandRouter) gọi khi tên gõ không
+    // phải lệnh, biến, LISP; gợi ý từ INT-017 TypoSuggester khi có.
+    void reportUnknown(const QString& typed);
     int historyCount() const;
     QString historyLine(int index) const;
 
@@ -97,6 +109,7 @@ public:
     void setCompact(bool compact);
 
     CommandInput* input() const { return input_; }
+    Autocomplete* autocomplete() const; // danh sách tự hoàn thành (UIA-108)
     // Ô chip của chữ tắt key, tọa độ của widget này; rỗng nếu prompt không có chip đó (từ khóa ẩn, không có prompt).
     QRect keywordRect(const QString& key) const;
 
@@ -121,6 +134,8 @@ private:
     class PromptView;
 
     bool ownsKey(const QKeyEvent* e) const; // Enter, Space (trừ khi là chữ), Esc, ↑, ↓
+    bool completionKey(const QKeyEvent* e); // phím của danh sách tự hoàn thành đang mở; true: đã xử lý
+    void pickSuggestion(const QString& typo, const QString& command); // bấm gợi ý "Ý bạn là" trong lịch sử
     bool spaceIsText() const;
     void submit();
     void submitToken(const QString& typed);
@@ -139,6 +154,7 @@ private:
     HistoryView* history_ = nullptr;
     PromptView* promptView_ = nullptr;
     CommandInput* input_ = nullptr;
+    QPointer<Autocomplete> autocomplete_; // con của cửa sổ khi hiện (nằm trên vùng vẽ); hủy cùng dòng lệnh
     QHBoxLayout* frame_ = nullptr; // .cmd-in
     // ponytail: lệnh và giá trị gần đây chỉ trong phiên; INT-017 History (lưu theo profile, theo loại prompt) thay.
     QStringList recent_, entered_;

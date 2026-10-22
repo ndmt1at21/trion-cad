@@ -1,6 +1,7 @@
 #include "app/shell/titlebar/CommandSearch.h"
 
 #include "app/core/actions/ActionRegistry.h"
+#include "app/core/actions/SearchTerms.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/perf/UiProbe.h"
 #include "app/theme/fonts/FontRegistry.h"
@@ -59,8 +60,8 @@ QString wordsOf(QStringView folded)
 
 } // namespace
 
-// Một lệnh trong chỉ mục: nhãn gấp sẵn khi dựng; viết tắt, từ khóa là chuỗi tĩnh của search_terms.cpp (không tách,
-// không cấp phát). Mỗi phím chỉ gấp chuỗi gõ (Query).
+// Một lệnh trong chỉ mục: nhãn gấp sẵn khi dựng; viết tắt, từ khóa là chuỗi tĩnh của actions::searchTerms() (không
+// tách, không cấp phát). Mỗi phím chỉ gấp chuỗi gõ (Query).
 struct CommandSearch::Entry {
     QLatin1StringView name;     // "CIRCLE"
     QLatin1StringView aliases;  // ",C,"
@@ -353,9 +354,9 @@ const std::vector<CommandSearch::Entry>& CommandSearch::index() const
 {
     if (!index_.empty())
         return index_;
-    const auto terms = searchTerms();
+    const auto terms = actions::searchTerms();
     index_.reserve(terms.size());
-    for (const SearchTerms& t : terms) {
+    for (const actions::SearchTerms& t : terms) {
         const QLatin1StringView name(t.name);
         QAction* a = actions_.action(name);
         if (!a)

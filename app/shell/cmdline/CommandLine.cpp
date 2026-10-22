@@ -1,5 +1,6 @@
 #include "app/shell/cmdline/CommandLine.h"
 
+#include "app/shell/cmdline/Autocomplete.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/icons/IconProvider.h"
 #include "app/theme/ThemeManager.h"
@@ -21,6 +22,7 @@
 #include <algorithm>
 #include <climits>
 #include <deque>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -62,11 +64,23 @@ constexpr int kMenuItems = 8;
 // ponytail: giữ 100.000 dòng cuối trong bộ nhớ (F2 của UIA-007 mở 100.000 dòng); INT-017 History thay.
 constexpr std::size_t kHistoryMax = 100000;
 
+// Dòng "Không có lệnh" (reportUnknown): câu đầu màu lỗi, phần sau --c-text-2 với gợi ý bấm được (.cmd-hist .chip).
+struct Unknown {
+    QString typo;    // chữ đã gõ, viết hoa: khóa AutoCorrect
+    int errorTo = 0; // hết câu "Không có lệnh “…”."
+    struct Chip {
+        int from, to;    // chữ của chip trong Line::text
+        QString command; // lệnh chạy khi bấm
+    };
+    std::vector<Chip> chips;
+};
+
 struct Line {
     QString text;
     CommandLine::Kind kind = CommandLine::Kind::Message;
     int boldFrom = 0, boldTo = 0; // đoạn in đậm --c-text (tên lệnh)
     int monoFrom = -1;            // từ đây tới hết là chữ Mono (giá trị đã nhập); -1: không có
+    std::shared_ptr<const Unknown> unknown{}; // dòng "Không có lệnh"; còn lại rỗng
 };
 
 // Đưa lên đầu, bỏ trùng, giữ tối đa max mục.
@@ -105,7 +119,7 @@ QString describe(const CommandLine::Prompt& p)
 // .cmd-hist: tự vẽ các dòng đang thấy; không widget, không item theo dòng; thêm dòng O(1).
 class CommandLine::HistoryView final : public QAbstractScrollArea {
 public:
-    explicit HistoryView(QWidget* parent) : QAbstractScrollArea(parent)
+    explicit HistoryView(CommandLine* owner) : QAbstractScrollArea(owner), owner_(owner)
     {
         setObjectName(u"history"_s);
         setFrameShape(QFrame::NoFrame);
@@ -114,9 +128,19 @@ public:
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         viewport()->setAutoFillBackground(false); // nền --c-base của CommandLine
+        viewport()->setMouseTracking(true);       // rê gợi ý "Ý bạn là"
     }
 
     std::deque<Line> lines;
+    // Chip gợi ý đang thấy, theo lần vẽ gần nhất; chip rê, nhấn theo (dòng, thứ tự chip).
+    struct Hit {
+        QRect rect;
+        std::shared_ptr<const Unknown> line;
+        int chip;
+    };
+    using Key = std::pair<const Unknown*, int>;
+    std::vector<Hit> hits;
+    Key hot{nullptr, -1}, down{nullptr, -1};
 
     void append(Line line)
     {
@@ -145,6 +169,46 @@ protected:
     }
     void scrollContentsBy(int, int) override { viewport()->update(); }
     void paintEvent(QPaintEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override { setHot(keyAt(e->position().toPoint())); }
+    void leaveEvent(QEvent*) override { setHot({nullptr, -1}); }
+    void mousePressEvent(QMouseEvent* e) override
+    {
+        if (e->button() == Qt::LeftButton) {
+            down = keyAt(e->position().toPoint());
+            viewport()->update();
+        }
+    }
+    void mouseReleaseEvent(QMouseEvent* e) override
+    {
+        const Key at = keyAt(e->position().toPoint());
+        const bool click = e->button() == Qt::LeftButton && at.first && at == down;
+        down = {nullptr, -1};
+        viewport()->update();
+        if (click) // như prototype: chip chạy lệnh
+            owner_->pickSuggestion(at.first->typo, at.first->chips[std::size_t(at.second)].command);
+    }
+
+private:
+    Key keyAt(QPoint pos) const
+    {
+        for (const Hit& h : hits)
+            if (h.rect.contains(pos))
+                return {h.line.get(), h.chip};
+        return {nullptr, -1};
+    }
+    void setHot(Key key)
+    {
+        if (key == hot)
+            return;
+        hot = key;
+        if (key.first)
+            viewport()->setCursor(Qt::PointingHandCursor);
+        else
+            viewport()->unsetCursor();
+        viewport()->update();
+    }
+
+    CommandLine* owner_;
 };
 
 void CommandLine::HistoryView::paintEvent(QPaintEvent*)
@@ -152,9 +216,11 @@ void CommandLine::HistoryView::paintEvent(QPaintEvent*)
     QPainter p(viewport());
     const int h = px(tok::h_cmdl);
     const QFont ui = theme::font(TextRole::Ui), bold = theme::font(TextRole::Ui, Weight::Bold),
-                mono = theme::font(TextRole::Mono);
-    const QFontMetrics fu(ui), fb(bold), fm(mono);
+                mono = theme::font(TextRole::Mono), label = theme::font(TextRole::Label);
+    const QFontMetrics fu(ui), fb(bold), fm(mono), fl(label);
     const bool enabled = isEnabled();
+    const qreal radius = tm().px(tok::r);
+    hits.clear();
     int y = 0;
     for (auto i = std::size_t(verticalScrollBar()->value()); i < lines.size() && y < viewport()->height(); ++i, y += h) {
         const Line& l = lines[i];
@@ -183,6 +249,32 @@ void CommandLine::HistoryView::paintEvent(QPaintEvent*)
             x += metrics.horizontalAdvance(s);
         };
         const int end = int(l.text.size()), mono0 = l.monoFrom < 0 ? end : l.monoFrom;
+        if (l.unknown) { // "Không có lệnh “LNE”." màu lỗi, " Ý bạn là: [LINE], [LEN]?" --c-text-2, gợi ý là chip
+            const Unknown& u = *l.unknown;
+            const QColor rest = enabled ? col(tok::c_text_2) : ink;
+            run(0, u.errorTo, ui, fu, ink);
+            int at = u.errorTo;
+            for (int c = 0; c < int(u.chips.size()); ++c) {
+                const Unknown::Chip& chip = u.chips[std::size_t(c)];
+                run(at, chip.from, ui, fu, rest);
+                const QString s = l.text.mid(chip.from, chip.to - chip.from);
+                // .cmd-hist .chip: cao bằng dòng, nền --c-active; rê, nhấn --c-press viền trong --c-border-ctl
+                const QRect r(x, y, 2 * px(tok::sp_4) + fl.horizontalAdvance(s), h);
+                const bool lit = enabled && (Key{&u, c} == hot || Key{&u, c} == down);
+                p.setRenderHint(QPainter::Antialiasing);
+                p.setPen(lit ? QPen(col(tok::c_border_ctl), kBorder) : QPen(Qt::NoPen));
+                p.setBrush(col(lit ? tok::c_press : tok::c_active));
+                p.drawRoundedRect(QRectF(r).adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
+                p.setFont(label);
+                p.setPen(enabled ? col(tok::c_text) : ink);
+                p.drawText(r, Qt::AlignCenter | Qt::TextSingleLine, s);
+                hits.push_back({r, l.unknown, c});
+                x = r.right() + 1;
+                at = chip.to;
+            }
+            run(at, end, ui, fu, rest);
+            continue;
+        }
         run(0, l.boldFrom, ui, fu, ink);
         run(l.boldFrom, l.boldTo, bold, fb, enabled && !error ? col(tok::c_text) : ink);
         run(l.boldTo, mono0, ui, fu, ink);
@@ -377,6 +469,7 @@ CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
     history_ = new HistoryView(this);
     promptView_ = new PromptView(this);
     input_ = new CommandInput(this);
+    autocomplete_ = new Autocomplete(this);
     input_->setContextMenuPolicy(Qt::NoContextMenu); // menu của dòng lệnh thay menu sửa chữ (prototype: cả vùng .cmd)
     input_->installEventFilter(this);
     // Nhấp vào lịch sử, khung, chip: focus về ô nhập; setFocus() của cửa sổ chính cũng vào ô nhập.
@@ -391,6 +484,15 @@ CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
     column->addLayout(frame_);
 
     connect(input_, &QLineEdit::textChanged, this, &CommandLine::textChanged);
+    connect(input_, &QLineEdit::textEdited, this, [this](const QString& text) { // gõ, dán, bộ gõ; không phải ↑↓
+        if (!prompt_)
+            autocomplete_->refresh(text);
+    });
+    connect(autocomplete_, &Autocomplete::accepted, this, &CommandLine::submitToken);
+    connect(autocomplete_, &Autocomplete::learned, this, [this](const QString& typo, const QString& command) {
+        appendHistory(
+            tr("Từ nay gõ “%1” sẽ chạy %2 (AutoCorrect; xem, xóa trong Tùy chọn dòng lệnh).").arg(typo, command));
+    });
     connect(&settings::Store::instance(), &settings::Store::changed, this, [this](const QString& key) {
         if (key == QLatin1StringView(kHistoryLines.key))
             relayout();
@@ -402,7 +504,10 @@ CommandLine::CommandLine(QWidget* parent) : QWidget(parent)
     appendHistory(tr("TrionCAD đã sẵn sàng. Gõ lệnh như AutoCAD, hoặc gõ tiếng Việt (ví dụ “đo”, “in”) để tìm lệnh."));
 }
 
-CommandLine::~CommandLine() = default;
+CommandLine::~CommandLine()
+{
+    delete autocomplete_.data(); // có thể đang là con của cửa sổ
+}
 
 void CommandLine::setPrompt(const Prompt& prompt)
 {
@@ -411,6 +516,8 @@ void CommandLine::setPrompt(const Prompt& prompt)
         // ribbon, menu cũng vào đây (lặp bằng Enter). ponytail: suy từ prompt; INT-017 ghi lệnh đã chạy từ mọi nguồn.
         if (!typedCommand_.isEmpty())
             recent_.removeAll(typedCommand_);
+        else if (!prompt_ || prompt_->command != prompt.command)
+            autocomplete_->recordUse(prompt.command); // lệnh bắt đầu từ ribbon, menu…; lệnh gõ đã tính khi gửi
         remember(recent_, prompt.command, kRecentMax);
     }
     typedCommand_.clear();
@@ -428,6 +535,7 @@ void CommandLine::clearPrompt()
 void CommandLine::promptChanged()
 {
     browse_ = -1;
+    autocomplete_->dismiss(); // lệnh đang chạy: không tự hoàn thành tên lệnh
     promptView_->hot = promptView_->down = -1;
     promptView_->updateGeometry();
     promptView_->update();
@@ -471,6 +579,11 @@ void CommandLine::setCompact(bool compact)
 {
     compact_ = compact;
     relayout();
+}
+
+Autocomplete* CommandLine::autocomplete() const
+{
+    return autocomplete_; // QPointer → con trỏ cần kiểu đầy đủ: thân ở .cpp
 }
 
 QRect CommandLine::keywordRect(const QString& key) const
@@ -528,7 +641,9 @@ bool CommandLine::eventFilter(QObject* watched, QEvent* e)
         switch (e->type()) {
         case QEvent::FocusIn:
         case QEvent::FocusOut:
-            update(frameRect()); // .cmd-in:focus-within
+            if (e->type() == QEvent::FocusOut)
+                autocomplete_->dismiss(); // bấm ra ngoài, đổi cửa sổ
+            update(frameRect());       // .cmd-in:focus-within
             break;
         case QEvent::InputMethod: // đang soạn chữ bằng bộ gõ (tắt bỏ qua bộ gõ): ẩn placeholder như QLineEdit
             composing_ = !static_cast<QInputMethodEvent*>(e)->preeditString().isEmpty();
@@ -541,6 +656,8 @@ bool CommandLine::eventFilter(QObject* watched, QEvent* e)
             break;
         case QEvent::KeyPress: {
             const auto* k = static_cast<QKeyEvent*>(e);
+            if (completionKey(k))
+                return true;
             if (!ownsKey(k))
                 break;
             if (k->key() == Qt::Key_Escape)
@@ -556,6 +673,29 @@ bool CommandLine::eventFilter(QObject* watched, QEvent* e)
         }
     }
     return QWidget::eventFilter(watched, e);
+}
+
+bool CommandLine::completionKey(const QKeyEvent* e)
+{
+    if (!autocomplete_->isVisible() || (e->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
+        return false;
+    switch (e->key()) {
+    case Qt::Key_Up:
+    case Qt::Key_Down:
+        autocomplete_->step(e->key() == Qt::Key_Up ? -1 : 1);
+        return true;
+    case Qt::Key_Tab: // nhận dòng đang chọn, chưa chọn thì dòng đầu
+        return autocomplete_->accept(true);
+    case Qt::Key_Escape: // đóng danh sách, giữ chữ đã gõ; Esc lần nữa mới xóa chữ, bỏ vùng chọn
+        autocomplete_->dismiss();
+        return true;
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+    case Qt::Key_Space: // không có dòng chọn sẵn (chỉ khớp giữa chuỗi, gợi ý gõ sai): gửi chữ đã gõ
+        return ownsKey(e) && autocomplete_->accept(false);
+    default:
+        return false;
+    }
 }
 
 void CommandLine::submit()
@@ -574,6 +714,7 @@ void CommandLine::submit()
 void CommandLine::submitToken(const QString& typed)
 {
     input_->clear();
+    autocomplete_->dismiss();
     browse_ = -1;
     Line echo;
     QString token = typed;
@@ -587,6 +728,8 @@ void CommandLine::submitToken(const QString& typed)
         if (!token.isEmpty())
             remember(entered_, token, kEnteredMax);
     } else {
+        if (const QString fixed = autocomplete_->correction(token); !fixed.isEmpty())
+            token = fixed; // AutoCorrect: lỗi gõ đã học (chọn cùng gợi ý 3 lần)
         // "Lệnh: <b>LINE</b>"
         const QString pattern = tr("Lệnh: %1");
         echo.text = pattern.arg(token);
@@ -596,10 +739,48 @@ void CommandLine::submitToken(const QString& typed)
         if (!token.startsWith(u'(')) { // biểu thức LISP không phải lệnh để lặp
             typedCommand_ = token.toUpper();
             remember(recent_, typedCommand_, kRecentMax);
+            autocomplete_->recordUse(token); // tần suất cho tự hoàn thành (tên lạ bỏ qua)
         }
     }
     history_->append(std::move(echo));
     emit submitted(token);
+}
+
+void CommandLine::reportUnknown(const QString& typed)
+{
+    const QString name = typed.trimmed();
+    auto u = std::make_shared<Unknown>();
+    u->typo = name.toUpper();
+    const QString head = tr("Không có lệnh “%1”.").arg(name);
+    u->errorTo = int(head.size());
+    const QStringList terms = autocomplete_->suggest(name);
+    const QChar mark(0xE000); // chỗ của các gợi ý trong câu đã dịch (ký tự dùng riêng)
+    Line line{u"%1 %2"_s.arg(head, terms.isEmpty() ? tr("Gõ ? hoặc mở Trợ giúp (F1) để xem danh sách lệnh.")
+                                                   : tr("Ý bạn là: %1?").arg(mark)),
+              Kind::Error};
+    if (const qsizetype at = line.text.indexOf(mark, head.size()); at >= 0) {
+        QString chips;
+        for (const QString& term : terms) {
+            if (!chips.isEmpty())
+                chips += u", "_s;
+            const auto from = int(at + chips.size());
+            chips += term;
+            u->chips.push_back({from, int(at + chips.size()), autocomplete_->resolve(term)});
+        }
+        line.text.replace(at, 1, chips);
+    }
+    line.unknown = std::move(u);
+    const QString say = line.text;
+    history_->append(std::move(line));
+    announce(history_, say, QAccessible::AnnouncementPoliteness::Assertive);
+}
+
+void CommandLine::pickSuggestion(const QString& typo, const QString& command)
+{
+    if (command.isEmpty())
+        return;
+    autocomplete_->recordPick(typo, command);
+    emit commandRequested(u"^C^C"_s + command); // như "Lệnh gần đây": hủy lệnh đang chạy (nếu có) rồi chạy
 }
 
 void CommandLine::escape()
@@ -673,6 +854,8 @@ void CommandLine::changeEvent(QEvent* e)
 {
     if (e->type() == QEvent::LanguageChange)
         retranslate();
+    if (e->type() == QEvent::EnabledChange && !isEnabled())
+        autocomplete_->dismiss(); // danh sách nằm ở cửa sổ, không tự vô hiệu theo dòng lệnh
     QWidget::changeEvent(e);
 }
 

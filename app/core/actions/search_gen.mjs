@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Sinh search_terms.cpp (viết tắt, từ khóa tiếng Việt của lệnh cho ô Tìm lệnh, UIA-002) từ danh mục RAW của
-// prototype (design/prototype/js/cmd.js). Đoạn RAW và HIDDEN được chạy nguyên văn, không chép tay.
-//   node app/shell/titlebar/search_gen.mjs          ghi lại search_terms.cpp
-//   node app/shell/titlebar/search_gen.mjs --check  so với tệp trong kho (ctest titlebar_prototype_check)
+// Sinh search_terms.cpp (viết tắt, từ khóa tiếng Việt của lệnh cho ô Tìm lệnh UIA-002 và tự hoàn thành dòng lệnh
+// UIA-108; SearchTerms.h) từ danh mục RAW của prototype (design/prototype/js/cmd.js). Đoạn RAW và HIDDEN được chạy
+// nguyên văn, không chép tay.
+//   node app/core/actions/search_gen.mjs          ghi lại search_terms.cpp
+//   node app/core/actions/search_gen.mjs --check  so với tệp trong kho (ctest actions_search_terms_check)
 // ponytail: chỉ mục tạm thay INT-017 (cmd/data/commands/*.json: alias, từ khóa); bỏ khi có.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,21 +35,21 @@ const rows = RAW.map(r => r.split('|')).filter(([name]) => !HIDDEN[name]).map(([
 const q = JSON.stringify;
 const text = '// Sinh bởi search_gen.mjs từ danh mục RAW của design/prototype/js/cmd.js, không sửa tay.\n' +
   '// ponytail: chỉ mục tìm lệnh tạm thay INT-017; bỏ tệp này khi có.\n' +
-  '#include "app/shell/titlebar/CommandSearch.h"\n\nnamespace trion::shell {\n\n' +
+  '#include "app/core/actions/SearchTerms.h"\n\nnamespace trion::actions {\n\n' +
   'std::span<const SearchTerms> searchTerms()\n{\n    // clang-format off\n' +
   '    static constexpr SearchTerms kAll[] = {\n' +
   rows.map(r => `        {${q(r.name)}, ${q(r.alias)}, ${q(r.keywords)}},\n`).join('') +
-  '    };\n    // clang-format on\n    return kAll;\n}\n\n} // namespace trion::shell\n';
+  '    };\n    // clang-format on\n    return kAll;\n}\n\n} // namespace trion::actions\n';
 
 const file = path.join(here, 'search_terms.cpp');
 if (!process.argv.includes('--check')) {
   fs.writeFileSync(file, text);
-  console.log(`titlebar: ghi ${rows.length} lệnh vào search_terms.cpp`);
+  console.log(`actions: ghi ${rows.length} lệnh vào search_terms.cpp`);
   process.exit(0);
 }
 const disk = fs.existsSync(file) ? fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n') : '';
 if (disk !== text) {
-  console.error('search_terms.cpp cũ so với RAW của prototype → chạy lại: node app/shell/titlebar/search_gen.mjs');
+  console.error('search_terms.cpp cũ so với RAW của prototype → chạy lại: node app/core/actions/search_gen.mjs');
   process.exit(1);
 }
-console.log(`titlebar: search_terms.cpp khớp ${rows.length} dòng RAW của prototype`);
+console.log(`actions: search_terms.cpp khớp ${rows.length} dòng RAW của prototype`);

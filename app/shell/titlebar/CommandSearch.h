@@ -13,8 +13,8 @@
 //   auto* search = new CommandSearch(actions);
 //   search->setLocator([&](const QString& cmd) { return ribbonModel.location(cmd); }); // UIA-102
 //
-// ponytail: chỉ mục tạm thay INT-017: searchTerms() (viết tắt, từ khóa sinh từ RAW của prototype bằng
-// search_gen.mjs) + nhãn của QAction; chưa có tần suất dùng, bài trợ giúp, thiết lập (nhóm "Bài trợ giúp",
+// ponytail: chỉ mục tạm thay INT-017: actions::searchTerms() (app/core/actions/SearchTerms.h: viết tắt, từ khóa sinh
+// từ RAW của prototype) + nhãn của QAction; chưa có tần suất dùng, bài trợ giúp, thiết lập (nhóm "Bài trợ giúp",
 // "Thiết lập" của prototype) và lệnh LISP, plugin. Dựng lần đầu khi tìm (đo < 2 ms, không cần dựng nền), dựng lại
 // khi đổi ngôn ngữ.
 
@@ -25,7 +25,6 @@
 #include <QStringList>
 
 #include <functional>
-#include <span>
 #include <vector>
 
 class QAbstractItemView;
@@ -37,15 +36,6 @@ class ActionRegistry;
 }
 
 namespace trion::shell {
-
-// Viết tắt, từ khóa của một lệnh (sinh vào search_terms.cpp), Latin-1, mỗi mục kẹp giữa hai dấu phẩy để khớp ngay
-// trên chuỗi tĩnh (contains(",C,") trùng, contains(",C") đầu mục).
-struct SearchTerms {
-    const char* name;     // "CIRCLE"
-    const char* aliases;  // ",C,": viết tắt (không gồm tên lệnh); rỗng nếu không có
-    const char* keywords; // ",duong tron,hinh tron,vong tron,": từ khóa tiếng Việt đã gấp (foldForSearch)
-};
-std::span<const SearchTerms> searchTerms(); // thứ tự danh mục của prototype (gần với độ thông dụng)
 
 class CommandSearch : public ui::SearchField {
     Q_OBJECT

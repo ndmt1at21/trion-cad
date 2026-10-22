@@ -1,8 +1,8 @@
 // Sinh bởi search_gen.mjs từ danh mục RAW của design/prototype/js/cmd.js, không sửa tay.
 // ponytail: chỉ mục tìm lệnh tạm thay INT-017; bỏ tệp này khi có.
-#include "app/shell/titlebar/CommandSearch.h"
+#include "app/core/actions/SearchTerms.h"
 
-namespace trion::shell {
+namespace trion::actions {
 
 std::span<const SearchTerms> searchTerms()
 {
@@ -373,4 +373,4 @@ std::span<const SearchTerms> searchTerms()
     return kAll;
 }
 
-} // namespace trion::shell
+} // namespace trion::actions

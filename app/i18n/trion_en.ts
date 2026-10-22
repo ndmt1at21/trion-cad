@@ -4237,6 +4237,33 @@ TCVN</source>
     </message>
 </context>
 <context>
+    <name>trion::ui::Autocomplete</name>
+    <message>
+        <source>Lệnh LISP hoặc plugin</source>
+        <translation>LISP or plug-in command</translation>
+    </message>
+    <message>
+        <source>Biến hệ thống</source>
+        <translation>System variable</translation>
+    </message>
+    <message>
+        <source>↑↓ chọn · Enter hoặc Tab để chạy</source>
+        <translation>↑↓ select · Enter or Tab to run</translation>
+    </message>
+    <message>
+        <source>Không có lệnh “%1”. Gợi ý gần nhất ở trên: ↓ chọn rồi Enter, hoặc Tab nhận gợi ý đầu.</source>
+        <translation>Unknown command “%1”. Closest matches above: press ↓ then Enter, or Tab for the first one.</translation>
+    </message>
+    <message>
+        <source>↑↓ chọn · Enter hoặc Tab để chạy · tìm cả theo tiếng Việt: “cắt”, “bo góc”, “in”</source>
+        <translation>↑↓ select · Enter or Tab to run · Vietnamese keywords work too: “cắt”, “bo góc”, “in”</translation>
+    </message>
+    <message>
+        <source>Gợi ý lệnh</source>
+        <translation>Command suggestions</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::CanvasBanner</name>
     <message>
         <source>Đóng banner</source>
@@ -4271,12 +4298,28 @@ TCVN</source>
 <context>
     <name>trion::ui::CommandLine</name>
     <message>
+        <source>Từ nay gõ “%1” sẽ chạy %2 (AutoCorrect; xem, xóa trong Tùy chọn dòng lệnh).</source>
+        <translation>From now on, typing “%1” runs %2 (AutoCorrect; view or remove it in Command Line Options).</translation>
+    </message>
+    <message>
         <source>TrionCAD đã sẵn sàng. Gõ lệnh như AutoCAD, hoặc gõ tiếng Việt (ví dụ “đo”, “in”) để tìm lệnh.</source>
         <translation>TrionCAD is ready. Type commands as in AutoCAD, or type Vietnamese (e.g. “đo”, “in”) to find a command.</translation>
     </message>
     <message>
         <source>Lệnh: %1</source>
         <translation>Command: %1</translation>
+    </message>
+    <message>
+        <source>Không có lệnh “%1”.</source>
+        <translation>Unknown command “%1”.</translation>
+    </message>
+    <message>
+        <source>Gõ ? hoặc mở Trợ giúp (F1) để xem danh sách lệnh.</source>
+        <translation>Type ? or open Help (F1) to see the list of commands.</translation>
+    </message>
+    <message>
+        <source>Ý bạn là: %1?</source>
+        <translation>Did you mean: %1?</translation>
     </message>
     <message>
         <source>Trong bản vẽ, dấu thập phân luôn là dấu chấm: gõ 12.5, không gõ 12,5.</source>
