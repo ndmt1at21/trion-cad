@@ -3827,6 +3827,25 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::files::FilePreviewService</name>
+    <message>
+        <source>Không tìm thấy tệp. Tệp có thể đã bị xóa, đổi tên hoặc ổ mạng đang ngắt.</source>
+        <translation>File not found. It may have been deleted or renamed, or the network drive is disconnected.</translation>
+    </message>
+    <message>
+        <source>Không đọc được tệp: không có quyền đọc hoặc tệp đang bị chương trình khác khóa.</source>
+        <translation>Cannot read the file: no read permission, or another program has locked it.</translation>
+    </message>
+    <message>
+        <source>Tệp không phải bản vẽ DWG hay DXF.</source>
+        <translation>The file is not a DWG or DXF drawing.</translation>
+    </message>
+    <message>
+        <source>Tệp có thể bị hỏng: phần đầu tệp sai hoặc tệp bị cắt cụt.</source>
+        <translation>The file may be damaged: its header is invalid or the file is truncated.</translation>
+    </message>
+</context>
+<context>
     <name>trion::layers::LayerTableModel</name>
     <message>
         <source>Đỏ</source>
