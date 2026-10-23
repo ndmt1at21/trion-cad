@@ -67,6 +67,7 @@ trion_component(app/shell/start)
 trion_component(app/shell/appmenu)
 trion_component(app/shell/viewer)
 trion_component(app/shell/canvas)
+trion_component(app/shell/onboarding)
 trion_component(app/main)
 trion_component(tests/integration)
 

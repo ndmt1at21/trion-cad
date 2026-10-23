@@ -4290,6 +4290,157 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::shell::Onboarding</name>
+    <message>
+        <source>Chọn ngôn ngữ</source>
+        <translation>Choose a language</translation>
+    </message>
+    <message>
+        <source>Đổi được bất cứ lúc nào trong Tùy chọn › Hệ thống, không cần cài lại.</source>
+        <translation>You can change it any time in Options › System, without reinstalling.</translation>
+    </message>
+    <message>
+        <source>Chọn chủ đề</source>
+        <translation>Choose a theme</translation>
+    </message>
+    <message>
+        <source>Nền vùng vẽ đặt riêng; mặc định tối cho Model, trắng cho Layout.</source>
+        <translation>The drawing area background is set separately: dark for Model and white for Layout by default.</translation>
+    </message>
+    <message>
+        <source>Tối</source>
+        <translation>Dark</translation>
+    </message>
+    <message>
+        <source>Đỡ mỏi mắt khi vẽ lâu. Mặc định.</source>
+        <translation>Easier on the eyes during long sessions. Default.</translation>
+    </message>
+    <message>
+        <source>Sáng</source>
+        <translation>Light</translation>
+    </message>
+    <message>
+        <source>Hợp phòng sáng, máy chiếu.</source>
+        <translation>Suits bright rooms and projectors.</translation>
+    </message>
+    <message>
+        <source>Gửi dữ liệu sử dụng ẩn danh?</source>
+        <translation>Send anonymous usage data?</translation>
+    </message>
+    <message>
+        <source>Giúp TrionCAD sửa lỗi và chạy nhanh hơn trên phần cứng phổ biến ở Việt Nam. Không gửi nội dung bản vẽ. Máy chủ đặt tại Việt Nam.</source>
+        <translation>Helps TrionCAD fix bugs and run faster on hardware common in Vietnam. Drawing content is never sent. Servers are located in Vietnam.</translation>
+    </message>
+    <message>
+        <source>Đồng ý gửi báo lỗi và số liệu hiệu năng ẩn danh</source>
+        <translation>Send anonymous error reports and performance data</translation>
+    </message>
+    <message>
+        <source>Mặc định tắt. Xem chi tiết dữ liệu thu thập ở Tùy chọn › Hệ thống › Quyền riêng tư.</source>
+        <translation>Off by default. See exactly what is collected in Options › System › Privacy.</translation>
+    </message>
+    <message>
+        <source>Bạn muốn dùng phiên bản nào?</source>
+        <translation>Which edition would you like to use?</translation>
+    </message>
+    <message>
+        <source>TrionCAD Viewer · miễn phí</source>
+        <translation>TrionCAD Viewer · free</translation>
+    </message>
+    <message>
+        <source>Mở, xem, đo, in, xuất PDF. Bác sĩ Font hiển thị đúng chữ tiếng Việt.</source>
+        <translation>Open, view, measure, print, export PDF. Font Doctor shows Vietnamese text correctly.</translation>
+    </message>
+    <message>
+        <source>Dùng thử TrionCAD Pro 30 ngày</source>
+        <translation>Try TrionCAD Pro free for 30 days</translation>
+    </message>
+    <message>
+        <source>Vẽ, sửa, lưu DWG, LISP. Cần email; hết hạn tự về Viewer, không khóa dữ liệu.</source>
+        <translation>Draw, edit, save DWG, LISP. Requires an email; when the trial ends you return to Viewer and your data stays open.</translation>
+    </message>
+    <message>
+        <source>Kích hoạt bằng key</source>
+        <translation>Activate with a key</translation>
+    </message>
+    <message>
+        <source>Đã mua giấy phép hoặc dùng giấy phép công ty.</source>
+        <translation>You bought a license or use a company license.</translation>
+    </message>
+    <message>
+        <source>Hướng dẫn nhanh 5 bước</source>
+        <translation>5-step quick tour</translation>
+    </message>
+    <message>
+        <source>Trên bản vẽ mẫu: mở, xem, đo, đọc thuộc tính, in PDF. Mất khoảng 2 phút.</source>
+        <translation>On a sample drawing: open, view, measure, read properties, print to PDF. Takes about 2 minutes.</translation>
+    </message>
+    <message>
+        <source>Lăn chuột để zoom, giữ chuột giữa để pan</source>
+        <translation>Scroll to zoom, hold the middle button to pan</translation>
+    </message>
+    <message>
+        <source>Bấm Đo › Đo nhanh rồi bấm vào một phòng</source>
+        <translation>Click Measure › Quick measure, then click inside a room</translation>
+    </message>
+    <message>
+        <source>Chọn một đối tượng để xem Thuộc tính</source>
+        <translation>Select an object to see its Properties</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font: chữ TCVN3 đã hiện đúng</source>
+        <translation>Font Doctor: TCVN3 text already displays correctly</translation>
+    </message>
+    <message>
+        <source>In &amp; Xuất › PDF</source>
+        <translation>Print &amp; Export › PDF</translation>
+    </message>
+    <message>
+        <source>Ngôn ngữ</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <source>Chủ đề</source>
+        <translation>Theme</translation>
+    </message>
+    <message>
+        <source>Quyền riêng tư</source>
+        <translation>Privacy</translation>
+    </message>
+    <message>
+        <source>Phiên bản</source>
+        <translation>Edition</translation>
+    </message>
+    <message>
+        <source>Hướng dẫn nhanh</source>
+        <translation>Quick tour</translation>
+    </message>
+    <message>
+        <source>Chào mừng đến với TrionCAD</source>
+        <translation>Welcome to TrionCAD</translation>
+    </message>
+    <message>
+        <source>Bỏ qua, xem lại trong Tùy chọn</source>
+        <translation>Skip, review later in Options</translation>
+    </message>
+    <message>
+        <source>Quay lại</source>
+        <translation>Back</translation>
+    </message>
+    <message>
+        <source>Bắt đầu hướng dẫn</source>
+        <translation>Start the tour</translation>
+    </message>
+    <message>
+        <source>Tiếp</source>
+        <translation>Next</translation>
+    </message>
+    <message>
+        <source>Bước %1 / %2 · %3</source>
+        <translation>Step %1 of %2 · %3</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::Qat</name>
     <message>
         <source>Mở</source>
@@ -4397,6 +4548,57 @@ conversion</translation>
     <message>
         <source>Danh sách làm lại</source>
         <translation>Redo list</translation>
+    </message>
+</context>
+<context>
+    <name>trion::shell::QuickTour</name>
+    <message>
+        <source>Lăn chuột để zoom quanh con trỏ, giữ chuột giữa để pan. Nhấp đúp chuột giữa để xem toàn bộ.</source>
+        <translation>Scroll to zoom around the cursor, hold the middle button to pan. Double-click the middle button to see everything.</translation>
+    </message>
+    <message>
+        <source>Tab Đo › Đo nhanh: rê chuột thấy khoảng cách, bấm trong một phòng để có diện tích.</source>
+        <translation>Measure tab › Quick measure: hover to see distances, click inside a room to get its area.</translation>
+    </message>
+    <message>
+        <source>Chọn một đối tượng: palette Thuộc tính hiện thông tin, bấm vào giá trị để sao chép.</source>
+        <translation>Select an object: the Properties palette shows its details; click a value to copy it.</translation>
+    </message>
+    <message>
+        <source>Chỉ báo Bác sĩ Font: chữ TCVN3 và font thiếu đã được hiển thị đúng.</source>
+        <translation>Font Doctor indicator: TCVN3 text and missing fonts are already displayed correctly.</translation>
+    </message>
+    <message>
+        <source>Dòng lệnh nhận mọi phím gõ. Gõ “in” hoặc PLOT để in, xuất PDF.</source>
+        <translation>The command line takes every keystroke. Type “in” or PLOT to print or export to PDF.</translation>
+    </message>
+    <message>
+        <source>Palette Thuộc tính</source>
+        <translation>Properties palette</translation>
+    </message>
+    <message>
+        <source>Bước %1 / %2</source>
+        <translation>Step %1 of %2</translation>
+    </message>
+    <message>
+        <source>Kết thúc</source>
+        <translation>End tour</translation>
+    </message>
+    <message>
+        <source>Xong</source>
+        <translation>Done</translation>
+    </message>
+    <message>
+        <source>Tiếp</source>
+        <translation>Next</translation>
+    </message>
+    <message>
+        <source>Hướng dẫn nhanh</source>
+        <translation>Quick tour</translation>
+    </message>
+    <message>
+        <source>Hướng dẫn nhanh, bước %1 / %2: %3. %4</source>
+        <translation>Quick tour, step %1 of %2: %3. %4</translation>
     </message>
 </context>
 <context>
