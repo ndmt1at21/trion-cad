@@ -35,6 +35,15 @@
     </message>
 </context>
 <context>
+    <name>trion::files::FilePreviewPane</name>
+    <message numerus="yes">
+        <source>%n tệp sẽ mở thành %n tab</source>
+        <translation>
+            <numerusform>%n tệp sẽ mở thành %n tab</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::options::OptionsDialog</name>
     <message numerus="yes">
         <source>Đặt lại %1 tùy chọn</source>

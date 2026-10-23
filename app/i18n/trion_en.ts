@@ -3827,6 +3827,48 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::files::FilePreviewPane</name>
+    <message>
+        <source>Xem trước</source>
+        <translation>Preview</translation>
+    </message>
+    <message>
+        <source>Phiên bản</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>Lưu lần cuối bởi</source>
+        <translation>Last saved by</translation>
+    </message>
+    <message>
+        <source>Ngày sửa</source>
+        <translation>Date modified</translation>
+    </message>
+    <message>
+        <source>Kích thước</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Chọn một tệp để xem trước. Giữ Ctrl để chọn nhiều tệp, mỗi tệp mở thành một tab.</source>
+        <translation>Select a file to preview it. Hold Ctrl to select several files; each opens in its own tab.</translation>
+    </message>
+    <message>
+        <source>Không có ảnh xem trước</source>
+        <translation>No preview image</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n tệp sẽ mở thành %n tab</source>
+        <translation>
+            <numerusform>%n file will open in %n tab</numerusform>
+            <numerusform>%n files will open in %n tabs</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Không rõ</source>
+        <translation>Unknown</translation>
+    </message>
+</context>
+<context>
     <name>trion::files::FilePreviewService</name>
     <message>
         <source>Không tìm thấy tệp. Tệp có thể đã bị xóa, đổi tên hoặc ổ mạng đang ngắt.</source>
@@ -3843,6 +3885,77 @@ conversion</translation>
     <message>
         <source>Tệp có thể bị hỏng: phần đầu tệp sai hoặc tệp bị cắt cụt.</source>
         <translation>The file may be damaged: its header is invalid or the file is truncated.</translation>
+    </message>
+</context>
+<context>
+    <name>trion::files::OpenFileDialog</name>
+    <message>
+        <source>Mở bản vẽ</source>
+        <translation>Open Drawing</translation>
+    </message>
+    <message>
+        <source>Mở</source>
+        <translation>Open</translation>
+    </message>
+    <message>
+        <source>Mở chỉ đọc</source>
+        <translation>Open Read-Only</translation>
+    </message>
+    <message>
+        <source>Bản vẽ</source>
+        <translation>Drawing</translation>
+    </message>
+    <message>
+        <source>Mẫu bản vẽ</source>
+        <translation>Drawing Template</translation>
+    </message>
+    <message>
+        <source>Mọi tệp CAD</source>
+        <translation>All CAD Files</translation>
+    </message>
+    <message>
+        <source>Tìm trong:</source>
+        <translation>Look in:</translation>
+    </message>
+    <message>
+        <source>Tên tệp:</source>
+        <translation>File name:</translation>
+    </message>
+    <message>
+        <source>Loại tệp:</source>
+        <translation>Files of type:</translation>
+    </message>
+    <message>
+        <source>Hủy</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Mũi tên: Mở chỉ đọc</source>
+        <translation>Arrow: Open Read-Only</translation>
+    </message>
+    <message>
+        <source>Quay lại</source>
+        <translation>Back</translation>
+    </message>
+    <message>
+        <source>Tiến tới</source>
+        <translation>Forward</translation>
+    </message>
+    <message>
+        <source>Thư mục cha</source>
+        <translation>Parent Folder</translation>
+    </message>
+    <message>
+        <source>Tạo thư mục mới</source>
+        <translation>Create New Folder</translation>
+    </message>
+    <message>
+        <source>Dạng danh sách</source>
+        <translation>List View</translation>
+    </message>
+    <message>
+        <source>Dạng chi tiết</source>
+        <translation>Detail View</translation>
     </message>
 </context>
 <context>

@@ -1,0 +1,45 @@
+# UIB-002 · Hộp thoại Mở tệp (UI-B01) — kịch bản QA-011 (mô tả bước, dạng văn bản; QA-011 chuyển thành kịch bản chạy).
+# Máy: Windows 10/11 (hộp gốc IFileOpenDialog); Linux: hộp của Qt. Chủ đề Tối và Sáng; 100 %, 150 %, 200 %; 1366×768
+# và 1920×1080. Đo: --ui-probe=<tệp.json> (dialog_open ≤ 150 ms p99; xem trước ≤ 50 ms p99 sau khi đổi lựa chọn).
+# Chuẩn bị: thư mục D:\QA\UIB-002 có
+#   Bản vẽ nhà phố.dwg (DWG 2018, có ảnh nhúng), KET-CAU.DWG (DWG 2013, chữ hoa), mau.Dwt (DWG 2018),
+#   thong-ke.dxf (DXF 2013), hong.dwg (tệp PDF đổi đuôi), ghi-chu.pdf, khóa.dwg (mở độc quyền bằng chương trình khác),
+#   thư mục con "con"; chia sẻ mạng \\<máy QA>\QA\UIB-002 trỏ cùng thư mục.
+
+## 1. Mở hộp, khung đầu, bộ lọc (tiêu chí 4, 5)
+1. Bản Pro, vùng vẽ có focus. Bấm Ctrl+O.                         → hộp "Mở bản vẽ" hiện ≤ 150 ms; thư mục là thư mục lần
+                                                                      mở trước (lần đầu: Tài liệu); loại tệp "Bản vẽ (*.dwg)".
+2. Xem danh sách.                                                   → chỉ Bản vẽ nhà phố.dwg, KET-CAU.DWG, hong.dwg.
+3. Chọn lần lượt "DXF (*.dxf)", "Mẫu bản vẽ (*.dwt)", "Mọi tệp CAD". → thong-ke.dxf; mau.Dwt; cả 5 tệp CAD, không có .pdf.
+
+## 2. Xem trước (tiêu chí 3)
+4. Bấm KET-CAU.DWG.                                                 → nhóm thông tin (Windows: dưới ô tên tệp; Linux: cột
+                                                                      phải có ảnh) ghi "Phiên bản: DWG 2013", Lưu lần cuối
+                                                                      bởi, Ngày sửa, Kích thước, ≤ 50 ms sau cú bấm.
+5. Giữ ↓ lướt qua danh sách.                                        → thông tin theo tệp đang chọn, không khựng, không
+                                                                      hiện thông tin của tệp cũ sau tệp mới.
+6. Bấm thong-ke.dxf (không có ảnh).                                 → Linux: ô ảnh ghi "Không có ảnh xem trước".
+7. Bấm hong.dwg; bấm khóa.dwg.                                      → "Tệp không phải bản vẽ DWG hay DXF."; "Không đọc được
+                                                                      tệp: … đang bị chương trình khác khóa."
+
+## 3. Mở nhiều tệp (tiêu chí 1)
+8. Ctrl+bấm Bản vẽ nhà phố.dwg, thong-ke.dxf, mau.Dwt; bấm Mở.     → hộp đóng; 3 tab mới theo thứ tự chọn, tab cuối hiện
+                                                                      hành; F2: lịch sử dòng lệnh có 3 lệnh OPEN.
+                                                                      (Hoãn tới DOC-018, INT-002, CMD-240.)
+
+## 4. Mở chỉ đọc, Viewer (tiêu chí 2, 5)
+9. Ctrl+O, chọn KET-CAU.DWG, bấm mũi tên của nút Mở → "Mở chỉ đọc". → tab có ổ khóa, tiêu đề cửa sổ "[Chỉ đọc]".
+10. Ctrl+O lần nữa, chọn KET-CAU.DWG, Enter.                        → mở thường (không chỉ đọc).
+11. Đổi sang bản Viewer; Ctrl+O.                                    → nút Mở không có mũi tên; DWG, DXF, DWT đều mở được và
+                                                                      đều chỉ đọc.
+
+## 5. Bàn phím, focus, tiếng Việt, UNC (tiêu chí 4, 5)
+12. Ctrl+O, Esc.                                                    → hộp đóng, không mở gì, focus về vùng vẽ (gõ lệnh được
+                                                                      ngay).
+13. Ctrl+O, Tab qua các điều khiển, Alt+↓ trên nút Mở (Linux).      → đủ điều khiển nhận focus, viền focus thấy rõ; menu
+                                                                      Mở / Mở chỉ đọc.
+14. Ctrl+O, gõ \\<máy QA>\QA\UIB-002 vào ô tên tệp, Enter; mở
+    Bản vẽ nhà phố.dwg.                                             → tệp tên có dấu qua đường dẫn UNC mở được; lần sau hộp
+                                                                      mở ở thư mục UNC đó.
+15. Ngôn ngữ giả vi-XL (Tùy chọn › Ngôn ngữ), lặp bước 4 và 9.      → không chữ nào bị cắt ở nhóm thông tin, nút Mở, menu.
+16. Trình đọc màn hình (Narrator/NVDA) ở bước 4.                    → đọc tên tệp, rồi phiên bản và kích thước.
