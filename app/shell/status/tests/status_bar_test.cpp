@@ -640,7 +640,8 @@ private slots:
         for (QToolButton* b : bar_->findChild<shell::ModeToggles*>()->findChildren<QToolButton*>(Qt::FindDirectChildrenOnly))
             if (b->isVisible())
                 shown << b->defaultAction()->objectName();
-        QCOMPARE(shown, (QStringList{u"osnap"_s, u"LWDISPLAY"_s, u"TRANSPARENCYDISPLAY"_s}));
+        QCOMPARE(shown, (QStringList{u"osnap"_s, u"LWDISPLAY"_s})); // UIA-017: UI-M01, prototype
+        QVERIFY(item("scale")->isVisible()); // tỉ lệ chỉ xem (viewer_test kiểm chi tiết)
         QMenu* m = menuOf("customize");
         emit m->aboutToShow();
         for (QAction* a : m->actions())
@@ -652,6 +653,7 @@ private slots:
         gate_->setEdition(edition::Edition::Pro);
         settle();
         QVERIFY(bar_->findChild<shell::ModeToggles*>()->button(u"grid"_s)->isVisible());
+        QVERIFY(!item("scale")->isVisible()); // ponytail: hồ sơ Full chưa có dropdown tỉ lệ (StatusBar.h)
     }
 
     // DoD-U: dùng hoàn toàn bằng bàn phím, tên cho trình đọc màn hình.

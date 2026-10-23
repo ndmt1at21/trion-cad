@@ -3467,6 +3467,181 @@ TCVN</source>
         <source>Thời gian sửa</source>
         <translation>Edit Time</translation>
     </message>
+    <message>
+        <source>Xem</source>
+        <translation>View</translation>
+    </message>
+    <message>
+        <source>Quản lý
+layer</source>
+        <translation>Layer
+manager</translation>
+    </message>
+    <message>
+        <source>Tắt layer</source>
+        <translation>Turn layer off</translation>
+    </message>
+    <message>
+        <source>Đóng băng layer</source>
+        <translation>Freeze layer</translation>
+    </message>
+    <message>
+        <source>Đo nhanh</source>
+        <translation>Quick measure</translation>
+    </message>
+    <message>
+        <source>Khoảng
+cách</source>
+        <translation>Distance</translation>
+    </message>
+    <message>
+        <source>Thông tin</source>
+        <translation>Inquiry</translation>
+    </message>
+    <message>
+        <source>Cửa sổ văn bản</source>
+        <translation>Text window</translation>
+    </message>
+    <message>
+        <source>Tìm chữ</source>
+        <translation>Find text</translation>
+    </message>
+    <message>
+        <source>Tổng hợp</source>
+        <translation>Totals</translation>
+    </message>
+    <message>
+        <source>Tổng
+chiều dài</source>
+        <translation>Total
+length</translation>
+    </message>
+    <message>
+        <source>Tổng
+diện tích</source>
+        <translation>Total
+area</translation>
+    </message>
+    <message>
+        <source>Xuất ra Excel</source>
+        <translation>Export to Excel</translation>
+    </message>
+    <message>
+        <source>Ghi chú</source>
+        <translation>Markup</translation>
+    </message>
+    <message>
+        <source>Mũi tên</source>
+        <translation>Arrow</translation>
+    </message>
+    <message>
+        <source>Đường thẳng</source>
+        <translation>Line</translation>
+    </message>
+    <message>
+        <source>Nét tự do</source>
+        <translation>Freehand</translation>
+    </message>
+    <message>
+        <source>Bút dạ</source>
+        <translation>Highlighter</translation>
+    </message>
+    <message>
+        <source>Chữ</source>
+        <translation>Text</translation>
+    </message>
+    <message>
+        <source>Chữ
+ghi chú</source>
+        <translation>Note
+text</translation>
+    </message>
+    <message>
+        <source>Ghi chú có đường dẫn</source>
+        <translation>Note with leader</translation>
+    </message>
+    <message>
+        <source>Dấu tick</source>
+        <translation>Tick mark</translation>
+    </message>
+    <message>
+        <source>Duyệt</source>
+        <translation>Review</translation>
+    </message>
+    <message>
+        <source>Con dấu</source>
+        <translation>Stamp</translation>
+    </message>
+    <message>
+        <source>Đã duyệt</source>
+        <translation>Approved</translation>
+    </message>
+    <message>
+        <source>Cần sửa</source>
+        <translation>Needs revision</translation>
+    </message>
+    <message>
+        <source>Không duyệt</source>
+        <translation>Rejected</translation>
+    </message>
+    <message>
+        <source>Chụp
+vùng</source>
+        <translation>Capture
+area</translation>
+    </message>
+    <message>
+        <source>Màu markup</source>
+        <translation>Markup color</translation>
+    </message>
+    <message>
+        <source>Độ mờ</source>
+        <translation>Opacity</translation>
+    </message>
+    <message>
+        <source>Cỡ chữ</source>
+        <translation>Text size</translation>
+    </message>
+    <message>
+        <source>Danh sách
+markup</source>
+        <translation>Markup
+list</translation>
+    </message>
+    <message>
+        <source>In &amp; Xuất</source>
+        <translation>Print &amp; Export</translation>
+    </message>
+    <message>
+        <source>Cửa sổ…</source>
+        <translation>Window…</translation>
+    </message>
+    <message>
+        <source>Bản vẽ</source>
+        <translation>Drawing</translation>
+    </message>
+    <message>
+        <source>So sánh</source>
+        <translation>Compare</translation>
+    </message>
+    <message>
+        <source>Chuyển font
+hàng loạt</source>
+        <translation>Batch font
+conversion</translation>
+    </message>
+    <message>
+        <source>Xuất bảng thống kê</source>
+        <translation>Export schedule</translation>
+    </message>
+    <message>
+        <source>Hệ thống</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <source>Gửi bản vẽ lỗi</source>
+        <translation>Send faulty drawing</translation>
+    </message>
 </context>
 <context>
     <name>trion::app::Application</name>
@@ -3594,6 +3769,22 @@ TCVN</source>
 </context>
 <context>
     <name>trion::ribbon::RibbonBar</name>
+    <message>
+        <source>Sửa bản vẽ</source>
+        <translation>Edit drawings</translation>
+    </message>
+    <message>
+        <source>Sửa bản vẽ?</source>
+        <translation>Need to edit?</translation>
+    </message>
+    <message>
+        <source>Dùng thử TrionCAD Pro 30 ngày, không cần thẻ.</source>
+        <translation>Try TrionCAD Pro free for 30 days, no card required.</translation>
+    </message>
+    <message>
+        <source>Dùng thử Pro 30 ngày</source>
+        <translation>Try Pro for 30 days</translation>
+    </message>
     <message>
         <source>Thêm vào thanh truy cập nhanh</source>
         <translation>Add to Quick Access Toolbar</translation>
@@ -4513,6 +4704,10 @@ TCVN</source>
         <translation>Model / Paper</translation>
     </message>
     <message>
+        <source>Tỉ lệ chú thích / viewport</source>
+        <translation>Annotation scale / viewport scale</translation>
+    </message>
+    <message>
         <source>Tác vụ nền</source>
         <translation>Background tasks</translation>
     </message>
@@ -4545,8 +4740,24 @@ TCVN</source>
         <translation>Autosave, batch plotting, font conversion and file loading appear here with progress and a cancel button.</translation>
     </message>
     <message>
+        <source>Viewer chỉ xem tỉ lệ. Đổi tỉ lệ có trong TrionCAD Pro.</source>
+        <translation>Viewer only shows the scale. Changing it is available in TrionCAD Pro.</translation>
+    </message>
+    <message>
         <source>Tọa độ tắt</source>
         <translation>Coordinates off</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ viewport</source>
+        <translation>Viewport scale</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ chú thích</source>
+        <translation>Annotation scale</translation>
+    </message>
+    <message>
+        <source>Viewer chỉ xem tỉ lệ, không đổi được.</source>
+        <translation>Viewer shows the scale read-only; it cannot be changed.</translation>
     </message>
     <message>
         <source>Đồ họa: %1</source>

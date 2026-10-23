@@ -96,7 +96,7 @@ constexpr ModeToggles::Spec kSpecs[] = {
     {"otrack", "AUTOSNAP", "otrack", 2, {}, false},
     {"osnap", "OSMODE", "osnap", 2, kOsnap, true},
     {"LWDISPLAY", "LWDISPLAY", "", kLweight, {}, true},
-    {"TRANSPARENCYDISPLAY", "TRANSPARENCYDISPLAY", "", kNoSettings, {}, true},
+    {"TRANSPARENCYDISPLAY", "TRANSPARENCYDISPLAY", "", kNoSettings, {}, false}, // Viewer: không (UI-M01, prototype)
 };
 
 bool is(const ModeToggles::Spec* s, const char* id)

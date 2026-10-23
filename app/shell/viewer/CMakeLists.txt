@@ -15,3 +15,13 @@ trion_add_test(viewer_layers_test SOURCES tests/viewer_layers_test.cpp
 file(COPY fuzz/corpus DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/fuzz)
 trion_add_fuzz(viewer_state_fuzz SOURCES fuzz/view_state_fuzz.cpp LIBS trion_viewstate
   CORPUS ${CMAKE_CURRENT_BINARY_DIR}/fuzz/corpus)
+
+# UIA-017: ribbon Viewer, panel nâng cấp, thanh trạng thái giản lược, chế độ chỉ xem tới chỗ nối (RibbonBar, StatusBar ở
+# hồ sơ Viewer). Ảnh baseline theo nền tảng × chủ đề nhúng vào test; ghi lại: TRION_UPDATE_BASELINE=<thư mục> chạy
+# viewer_test, chép viewer-*-<nền tảng>.png vào tests/baseline.
+trion_add_test(viewer_test SOURCES tests/viewer_test.cpp
+  LIBS trion_ribbon trion_status trion_a11y trion_jobs trion_i18n trion_icons trion_fonts trion_appcore LABELS viewer)
+file(GLOB viewer_baseline CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} tests/baseline/*.png)
+if(viewer_baseline)
+  qt_add_resources(viewer_test viewer_baseline PREFIX /baseline BASE tests/baseline FILES ${viewer_baseline})
+endif()

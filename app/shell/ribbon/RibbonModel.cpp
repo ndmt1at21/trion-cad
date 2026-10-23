@@ -154,8 +154,10 @@ struct Reader {
 
     Tab tab(const QJsonObject& o) const
     {
-        known(o, {u"id", u"name", u"panels"}, u"tab"_s);
-        Tab t{text(o, u"id", u"tab"_s, true), text(o, u"name", u"tab"_s, true), {}};
+        known(o, {u"id", u"name", u"need", u"panels"}, u"tab"_s);
+        Tab t{text(o, u"id", u"tab"_s, true), text(o, u"name", u"tab"_s, true), {}, text(o, u"need", u"tab"_s)};
+        if (!t.need.isEmpty() && t.need != u"VP" && t.need != u"PRO")
+            error(u"tab"_s, u"\"need\" phải là VP hoặc PRO"_s);
         const QJsonArray panels = o.value(u"panels").toArray();
         for (qsizetype i = 0; i < panels.size(); ++i) {
             const QJsonObject p = panels[i].toObject();
@@ -200,7 +202,17 @@ RibbonModel::RibbonModel(const QStringList& files)
             r.error(u"vị trí %1"_s.arg(e.offset), e.errorString());
             continue;
         }
-        tabs_.push_back(r.tab(doc.object()));
+        const QJsonObject o = doc.object();
+        if (!o.contains(u"tabs")) {
+            tabs_.push_back(r.tab(o));
+            continue;
+        }
+        r.known(o, {u"tabs"}, u"tệp"_s); // nhiều tab một tệp (viewer.json)
+        const QJsonArray list = o.value(u"tabs").toArray();
+        if (list.isEmpty())
+            r.error(u"tabs"_s, u"cần mảng không rỗng"_s);
+        for (const QJsonValue& t : list)
+            tabs_.push_back(r.tab(t.toObject()));
     }
 }
 
@@ -210,6 +222,11 @@ QStringList RibbonModel::defaultFiles()
     for (const char* t : kTabs)
         out << kDir + QLatin1StringView(t) + u".json"_s;
     return out;
+}
+
+QStringList RibbonModel::viewerFiles()
+{
+    return {kDir + u"viewer.json"_s};
 }
 
 QStringList RibbonModel::resourceFiles()

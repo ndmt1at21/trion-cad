@@ -2,6 +2,7 @@
 
 #include "app/core/actions/ActionRegistry.h"
 #include "app/core/edition/EditionGate.h"
+#include "app/core/edition/LockBadge.h"
 #include "app/shell/ribbon/controls/RibbonControls.h"
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/generated/Tokens.h"
@@ -102,6 +103,12 @@ QStringList iconNames(const RibbonModel& model)
     return out << u"pin"_s << u"up"_s << u"down"_s << u"idpoint"_s << u"lock"_s << u"check"_s;
 }
 
+// Tên tab cho QTabBar, mục menu: "&" là chữ, không phải dấu phím tắt ("In & Xuất" của ribbon Viewer).
+QString tabLabel(const QString& name)
+{
+    return RibbonModel::text(name).replace(u'&', u"&&"_s);
+}
+
 bool inside(const QWidget* root, const QWidget* w)
 {
     return root && w && (w == root || root->isAncestorOf(w));
@@ -150,12 +157,100 @@ public:
     using TabBar::TabBar;
 
 protected:
-    QSize tabSizeHint(int index) const override
+    QSize tabSizeHint(int index) const override // huy hiệu khóa (UIA-017) sau chữ, cách --sp-2
     {
-        return {fontMetrics().horizontalAdvance(tabText(index)) + 2 * px(tok::sp_5), px(tok::h_tab)};
+        const QWidget* badge = tabButton(index, QTabBar::RightSide);
+        return {fontMetrics().horizontalAdvance(tabText(index)) + 2 * px(tok::sp_5) +
+                    (badge ? badge->sizeHint().width() + px(tok::sp_2) : 0),
+                px(tok::h_tab)};
     }
     QSize minimumTabSizeHint(int index) const override { return tabSizeHint(index); }
     void paintEvent(QPaintEvent* e) override { QTabBar::paintEvent(e); } // bỏ nét dưới của ui::TabBar
+};
+
+// Panel nâng cấp cố định cuối thân ribbon Viewer (prototype .rb-up: nền --c-accent-soft, nét trái --c-border, lề
+// 6 px 12 px 0, khe 6 px; "Sửa bản vẽ?" đậm, câu phụ --fs-s --c-text-2, nút .btn.sm.primary). Mức chỉ tên panel (cao
+// --h-lbl + 8 px): một hàng "Sửa bản vẽ? [Dùng thử Pro 30 ngày]", bỏ câu phụ, để không cắt chữ.
+// ponytail: min-width 190 px của prototype không có token: rộng theo nội dung (câu phụ đã rộng hơn).
+class Upsell final : public QWidget {
+public:
+    explicit Upsell(QWidget* parent)
+        : QWidget(parent), title_(new QLabel(this)), text_(new QLabel(this)),
+          trial_(new ui::Button({}, ui::Button::Kind::Primary, this)), box_(new QBoxLayout(QBoxLayout::TopToBottom, this))
+    {
+        setObjectName(u"upsell"_s);
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        title_->setObjectName(u"upsellTitle"_s);
+        text_->setObjectName(u"upsellText"_s);
+        trial_->setObjectName(u"trial"_s);
+        trial_->setControlSize(ui::Button::Size::Small);
+        trial_->setFocusPolicy(Qt::TabFocus);
+        connect(trial_, &QAbstractButton::clicked, this, [] {
+            if (auto* g = edition::EditionGate::instance()) // trang nâng cấp UI-L04 (chưa có: trang mua trên web)
+                g->upgrade().open({.feature = u"trial"_s, .need = ui::Edition::Pro, .name = RibbonBar::tr("Sửa bản vẽ")});
+        });
+        box_->addStretch();
+        box_->addWidget(title_);
+        box_->addWidget(text_);
+        box_->addWidget(trial_, 0, Qt::AlignLeft);
+        box_->addStretch();
+        retranslate();
+        applyStyle();
+    }
+
+    void setCompact(bool compact)
+    {
+        if (compact == compact_)
+            return;
+        compact_ = compact;
+        text_->setVisible(!compact);
+        applyStyle();
+    }
+
+protected:
+    void changeEvent(QEvent* e) override
+    {
+        if (e->type() == QEvent::LanguageChange)
+            retranslate();
+        else if (e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange)
+            applyStyle();
+        QWidget::changeEvent(e);
+    }
+    void paintEvent(QPaintEvent*) override
+    {
+        QPainter p(this);
+        p.fillRect(rect(), col(tok::c_accent_soft));
+        p.fillRect(QRect(0, 0, kBorder, height()), col(tok::c_border));
+    }
+
+private:
+    void retranslate()
+    {
+        title_->setText(RibbonBar::tr("Sửa bản vẽ?"));
+        text_->setText(RibbonBar::tr("Dùng thử TrionCAD Pro 30 ngày, không cần thẻ."));
+        trial_->setText(RibbonBar::tr("Dùng thử Pro 30 ngày"));
+        setAccessibleName(title_->text());
+        updateGeometry();
+    }
+    void applyStyle()
+    {
+        title_->setFont(theme::font(TextRole::Ui, theme::Weight::Bold));
+        text_->setFont(theme::font(TextRole::Label));
+        QPalette p = text_->palette();
+        p.setColor(QPalette::WindowText, col(tok::c_text_2));
+        text_->setPalette(p);
+        box_->setDirection(compact_ ? QBoxLayout::LeftToRight : QBoxLayout::TopToBottom);
+        box_->setSpacing(px(tok::sp_3));
+        box_->setContentsMargins(px(tok::sp_5) + kBorder, compact_ ? 0 : px(tok::sp_3), px(tok::sp_5), 0);
+        for (QWidget* w : {static_cast<QWidget*>(title_), static_cast<QWidget*>(trial_)})
+            box_->setAlignment(w, compact_ ? Qt::AlignVCenter : Qt::AlignLeft);
+    }
+
+    QLabel* title_;
+    QLabel* text_;
+    ui::Button* trial_;
+    QBoxLayout* box_;
+    bool compact_ = false;
 };
 
 // Nét chia giữa nhóm mục của panel mở rộng (.ms: --c-border, lề --sp-1).
@@ -715,10 +810,10 @@ void RibbonPanel::paintEvent(QPaintEvent*)
 // --------------------------------------------------------------------------------------------------- RibbonBar
 
 RibbonBar::RibbonBar(const RibbonModel& model, RibbonControls& controls, settings::Store& store, QWidget* parent)
-    : QWidget(parent), model_(model), controls_(controls), store_(store), tabs_(new RibbonTabs(this)),
+    : QWidget(parent), full_(model), model_(&model), controls_(controls), store_(store), tabs_(new RibbonTabs(this)),
       collapseButton_(new ui::Button({}, ui::Button::Kind::Icon, this)),
-      pages_(new RibbonPages(int(model.tabs().size()), [this](int i) { return buildPage(i); }, this)),
-      collapse_(Collapse(std::clamp(store.get(kCollapse), 0, 2)))
+      pages_(new RibbonPages(int(model.tabs().size()), [this, &model](int i) { return buildPage(model, i); }, this)),
+      profilePages_{pages_, nullptr}, collapse_(Collapse(std::clamp(store.get(kCollapse), 0, 2)))
 {
     // Lần đầu mở tab không raster SVG trên luồng UI (0,1–0,2 ms mỗi biểu tượng): raster trước cả 8 tab ở nền.
     IconProvider::instance().prewarm(devicePixelRatio(), iconNames(model));
@@ -731,7 +826,7 @@ RibbonBar::RibbonBar(const RibbonModel& model, RibbonControls& controls, setting
     collapseButton_->setFocusPolicy(Qt::TabFocus);
     const QStringList hidden = store.get(kHiddenTabs);
     for (const Tab& t : model.tabs())
-        tabs_->setTabVisible(tabs_->addTab(RibbonModel::text(t.name)), !hidden.contains(t.id));
+        tabs_->setTabVisible(tabs_->addTab(tabLabel(t.name)), !hidden.contains(t.id));
 
     auto* column = new QVBoxLayout(this);
     column->setContentsMargins(0, 0, 0, kBorder); // .rb: nét dưới
@@ -756,8 +851,11 @@ RibbonBar::RibbonBar(const RibbonModel& model, RibbonControls& controls, setting
         connect(a, &QAction::triggered, this, &RibbonBar::closeTransient);
     connect(&controls, &RibbonControls::macroRequested, this, &RibbonBar::closeTransient);
     connect(&controls, &RibbonControls::picked, this, &RibbonBar::closeTransient);
-    if (auto* g = edition::EditionGate::instance()) // huy hiệu khóa đổi bề rộng nút
-        connect(g, &edition::EditionGate::editionChanged, this, [this] { scheduleFit(true); });
+    if (auto* g = edition::EditionGate::instance()) // huy hiệu khóa đổi bề rộng nút, tab
+        connect(g, &edition::EditionGate::editionChanged, this, [this] {
+            syncTabBadges();
+            scheduleFit(true);
+        });
 
     retranslate();
     applyCollapse();
@@ -819,9 +917,9 @@ void RibbonBar::setCurrentTab(int index)
         tabs_->setCurrentIndex(index);
 }
 
-QWidget* RibbonBar::buildPage(int index)
+QWidget* RibbonBar::buildPage(const RibbonModel& model, int index)
 {
-    const Tab& t = model_.tabs()[size_t(index)];
+    const Tab& t = model.tabs()[size_t(index)];
     auto* page = new QWidget;
     page->setObjectName(t.id);
     auto* row = new QHBoxLayout(page);
@@ -835,7 +933,84 @@ QWidget* RibbonBar::buildPage(int index)
         row->addWidget(panel);
     }
     row->addStretch();
+    if (&model == viewer_.get()) // .rb-up: margin-left auto, cuối thân
+        row->addWidget(new Upsell(page));
     return page;
+}
+
+QWidget* RibbonBar::upsell() const
+{
+    QWidget* page = pages_->currentWidget();
+    return page ? page->findChild<QWidget*>(u"upsell"_s, Qt::FindDirectChildrenOnly) : nullptr; // Upsell
+}
+
+edition::UiProfile RibbonBar::profile() const
+{
+    return model_ == &full_ ? edition::UiProfile::Full : edition::UiProfile::Viewer;
+}
+
+void RibbonBar::setProfile(edition::UiProfile profile)
+{
+    if (profile == this->profile())
+        return;
+    const bool viewer = profile == edition::UiProfile::Viewer;
+    if (viewer && !viewer_) {
+        viewer_ = std::make_unique<RibbonModel>(RibbonModel::viewerFiles());
+        IconProvider::instance().prewarm(devicePixelRatio(), iconNames(*viewer_));
+    }
+    // Trang của hồ sơ cũ ra khỏi cột/thân nổi, ẩn (giữ để đổi lại không dựng lại); panel mở rộng của nó ẩn theo.
+    setFloating(false);
+    RibbonPages* old = pages_;
+    layout()->removeWidget(old);
+    if (old->parentWidget() != this)
+        old->setParent(this);
+    old->hide();
+    for (RibbonPanel* p : old->findChildren<RibbonPanel*>())
+        p->syncExpansion();
+    model_ = viewer ? viewer_.get() : &full_;
+    RibbonPages*& next = profilePages_[viewer ? 1 : 0];
+    if (!next) {
+        const RibbonModel* m = model_;
+        next = new RibbonPages(int(m->tabs().size()), [this, m](int i) { return buildPage(*m, i); }, this);
+        next->hide();
+    }
+    pages_ = next;
+    {
+        const QSignalBlocker block(tabs_);
+        while (tabs_->count())
+            tabs_->removeTab(0);
+        const QStringList hidden = store_.get(kHiddenTabs);
+        for (const Tab& t : model_->tabs())
+            tabs_->setTabVisible(tabs_->addTab(tabLabel(t.name)), !hidden.contains(t.id));
+        for (int i = 0; i < tabs_->count(); ++i)
+            if (tabs_->isTabVisible(i)) {
+                tabs_->setCurrentIndex(i);
+                break;
+            }
+    }
+    syncTabBadges();
+    applyCollapse(); // trang mới vào cột (hoặc chờ thân nổi), cao theo mức thu gọn giữ nguyên
+    showTab(tabs_->currentIndex());
+}
+
+void RibbonBar::syncTabBadges()
+{
+    const auto& tabs = model_->tabs();
+    for (int i = 0; i < tabs_->count() && i < int(tabs.size()); ++i) {
+        const QString& need = tabs[size_t(i)].need;
+        const ui::Edition e = need == u"PRO" ? ui::Edition::Pro : need == u"VP" ? ui::Edition::ViewerPro : ui::Edition::None;
+        const bool locked = RibbonControls::locked(e);
+        auto* badge = qobject_cast<edition::LockBadge*>(tabs_->tabButton(i, QTabBar::RightSide));
+        if (locked && !badge)
+            tabs_->setTabButton(i, QTabBar::RightSide, new edition::LockBadge(e, edition::LockBadge::Style::Ribbon, tabs_));
+        else if (!locked && badge) {
+            tabs_->setTabButton(i, QTabBar::RightSide, nullptr);
+            badge->deleteLater();
+        }
+        const QString name = RibbonModel::text(tabs[size_t(i)].name);
+        tabs_->setAccessibleTabName(i, locked ? u"%1, %2"_s.arg(name, edition::EditionGate::availableIn(e)) : name);
+    }
+    tabs_->updateGeometry();
 }
 
 void RibbonBar::showTab(int index)
@@ -860,6 +1035,14 @@ void RibbonBar::showTab(int index)
 void RibbonBar::fit()
 {
     fitPending_ = false;
+    // Huy hiệu khóa trên tab đổi cỡ (ngôn ngữ, mật độ; con nhận LanguageChange sau cha): QTabBar đặt nút theo cỡ hiện
+    // tại của nó, nên đặt cỡ mới rồi gắn lại để dải tab bố cục lại.
+    for (int i = 0; i < tabs_->count(); ++i)
+        if (QWidget* badge = tabs_->tabButton(i, QTabBar::RightSide); badge && badge->size() != badge->sizeHint()) {
+            badge->resize(badge->sizeHint());
+            tabs_->setTabButton(i, QTabBar::RightSide, nullptr);
+            tabs_->setTabButton(i, QTabBar::RightSide, badge);
+        }
     QWidget* page = pages_->currentWidget();
     if (!page)
         return;
@@ -872,8 +1055,11 @@ void RibbonBar::fit()
             list << p;
     const qsizetype n = list.size();
     std::vector<State> st(static_cast<size_t>(n), collapse_ == Collapse::PanelTitles ? State::Title : State::Full);
+    auto* up = static_cast<Upsell*>(upsell());
+    if (up)
+        up->setCompact(collapse_ == Collapse::PanelTitles);
     if (collapse_ != Collapse::PanelTitles) {
-        const int avail = width() - 2 * px(tok::sp_1);
+        const int avail = width() - 2 * px(tok::sp_1) - (up ? up->sizeHint().width() : 0);
         int total = 0;
         for (const RibbonPanel* p : list)
             total += p->widthFor(State::Full);
@@ -960,7 +1146,7 @@ bool RibbonBar::isTabHidden(const QString& tab) const
 
 void RibbonBar::setTabHidden(const QString& tab, bool hidden)
 {
-    const auto& tabs = model_.tabs();
+    const auto& tabs = model_->tabs();
     const auto it = std::ranges::find(tabs, tab, &Tab::id);
     if (it == tabs.end() || hidden == isTabHidden(tab))
         return;
@@ -1109,8 +1295,8 @@ QMenu* RibbonBar::contextMenu(QWidget* at)
     int shown = 0;
     for (int i = 0; i < tabs_->count(); ++i)
         shown += tabs_->isTabVisible(i);
-    for (const Tab& t : model_.tabs()) {
-        QAction* a = tabsMenu->addAction(RibbonModel::text(t.name));
+    for (const Tab& t : model_->tabs()) {
+        QAction* a = tabsMenu->addAction(tabLabel(t.name));
         a->setCheckable(true);
         a->setChecked(!isTabHidden(t.id));
         a->setEnabled(!a->isChecked() || shown > 1); // không ẩn tab cuối cùng
@@ -1119,7 +1305,7 @@ QMenu* RibbonBar::contextMenu(QWidget* at)
     if (const int cur = tabs_->currentIndex(); cur >= 0) {
         auto* panelsMenu = new ui::Menu(tr("Hiện panel"), m);
         m->addMenu(panelsMenu);
-        const Tab& t = model_.tabs()[size_t(cur)];
+        const Tab& t = model_->tabs()[size_t(cur)];
         for (const Panel& p : t.panels) {
             QAction* a = panelsMenu->addAction(RibbonModel::line(p.name));
             const QString key = t.id + u'/' + p.id;
@@ -1273,7 +1459,8 @@ void RibbonBar::paintEvent(QPaintEvent*)
 void RibbonBar::retranslate()
 {
     for (int i = 0; i < tabs_->count(); ++i)
-        tabs_->setTabText(i, RibbonModel::text(model_.tabs()[size_t(i)].name));
+        tabs_->setTabText(i, tabLabel(model_->tabs()[size_t(i)].name));
+    syncTabBadges();
     setAccessibleName(tr("Ribbon"));
     tabs_->setAccessibleName(tr("Tab ribbon"));
     const QString name = tr("Thu gọn ribbon");

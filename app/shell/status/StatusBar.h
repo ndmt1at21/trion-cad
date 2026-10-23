@@ -2,7 +2,7 @@
 // UIA-009 · Thanh trạng thái UI-A08 (07.1 §10, §12 Tiến trình; design/README.md Quy ước "Tác vụ nền"; prototype
 // js/shell.js renderStatus, updateCoord, A.setTask; js/screens2.js SC.tasks; css/app.css .sb .sb-coord .sb-txt .sb-sep
 // .sb-chip .sb-task .sbt .ed):
-//   [x, y, z][MODEL] | nút chế độ UIA-112 |    …    [tác vụ chính][⚠ Font: 3 thay thế][đồ họa][tác vụ][chuông][Pro][⛶][»][≡]
+//   [x, y, z][MODEL] | nút chế độ UIA-112 | [tỉ lệ]    …    [tác vụ chính][⚠ Font: 3 thay thế][đồ họa][tác vụ][chuông][Pro][⛶][»][≡]
 //
 // - Tọa độ theo COORDS (Sysvars): 1 tuyệt đối "x, y, z"; 2 tương đối "khoảng cách<góc, z" khi lệnh đang hỏi điểm có
 //   điểm gốc, không có thì tuyệt đối (như AutoCAD); 0 "Tọa độ tắt". Số chỉ qua RGN-013 (formatLinear, formatAngle; dấu
@@ -20,6 +20,10 @@
 // - Chuông: chấm khi NotificationCenter còn thông báo chưa đọc (số chưa đọc ở mô tả tiếp cận); bấm: screenRequested
 //   ("notifications", UI-L14). Huy hiệu phiên bản edition::EditionBadge theo EditionGate (phiên bản, dùng thử còn N
 //   ngày, cảnh báo offline: EditionGate::setTrialDays/setOfflineDays); bấm: screenRequested("license", UI-L03).
+// - Viewer (UIA-017, UI-M01; prototype renderStatus khi viewer): nút chế độ còn Bắt điểm (khi đo), lineweight; sau dải
+//   nút là tỉ lệ chỉ xem: tỉ lệ chú thích (Model, biểu tượng anno) hoặc tỉ lệ viewport đang kích hoạt (Layout,
+//   vplock; không có viewport kích hoạt: "Paper"), không mũi tên; bấm: toast "Viewer chỉ xem tỉ lệ…" (ToastHost).
+//   ponytail: hồ sơ Full chưa có dropdown tỉ lệ chú thích/viewport (EA, 07.1 §10): mục ẩn.
 // - Tùy biến (≡): chọn mục hiện, lưu Store "ui/statusbar/hidden"; menu mở tiếp để đổi nhiều mục liền.
 // - Thiếu chỗ (1366 px, vi-XL, mật độ thoáng): mục ưu tiên thấp vào menu tràn (») trước; không mục nào bị nén dưới cỡ
 //   của nó nên không cắt chữ. Viewer: nút chế độ theo ModeToggles; Tùy biến, menu tràn chỉ có mục của hồ sơ.
@@ -85,6 +89,10 @@ public:
 
     enum class Space : std::uint8_t { Model, Paper, ModelInViewport };
     void setSpace(Space space); // ponytail: UIA-011 (tab layout, viewport kích hoạt) gọi; mặc định Model
+    // ponytail: chỗ nối tạm. DOC-010 (CANNOSCALE của bản vẽ) đặt tỉ lệ chú thích, mặc định "1:1"; UIA-011 đặt tỉ lệ
+    // viewport đang kích hoạt ("1:50"), rỗng khi không có. Chữ của bản vẽ, không dịch.
+    void setAnnotationScale(const QString& scale);
+    void setViewportScale(const QString& scale);
 
     struct GraphicsInfo {
         QString backend; // "D3D11", "Vulkan"…
@@ -131,6 +139,7 @@ private:
     void applyProfile();
     void openTasks(QWidget* anchor);
     void toggleSpace();
+    void syncScale();
     void setCoords(int value); // 'COORDS n
     void syncCoordMenu();
     void syncEdition();
@@ -155,6 +164,8 @@ private:
     CoordButton* coord_;
     TextButton* spaceButton_;
     ModeToggles* modes_;
+    TextButton* scale_; // tỉ lệ chỉ xem (Viewer)
+    QString annoScale_ = QStringLiteral("1:1"), vpScale_;
     QWidget* taskBox_;           // chứa task_: InlineProgress tự hiện/ẩn theo việc, thanh hiện/ẩn hộp
     ui::InlineProgress* task_;   // tác vụ chính
     TextButton* font_;

@@ -1,7 +1,8 @@
 #pragma once
 // UIA-102 · Mô hình ribbon (07.1 §7.1): tab → panel → hàng/cột → điều khiển, đọc từ JSON. Khóa của tệp:
-// resources/schema.json. Nội dung 8 tab của workspace Soạn thảo 2D (resources/<tab>.json) sinh từ prototype bằng
-// ribbon_gen.mjs; UIA-006 hoàn thiện theo 07.1.
+// resources/schema.json. Nội dung 8 tab của workspace Soạn thảo 2D (resources/<tab>.json) và 5 tab của ribbon Viewer
+// UI-M01 (resources/viewer.json, một tệp nhiều tab; UIA-017) sinh từ prototype bằng ribbon_gen.mjs; UIA-006 hoàn thiện
+// theo 07.1.
 //
 // Điều khiển trỏ tới hành động của ActionRegistry (UI0-015) bằng cmd: tên lệnh (danh mục tạm thay INT-001) hoặc id
 // hành động gắn sysvar ("LWDISPLAY", "PICKSTYLE"). Ribbon chỉ tham chiếu tên biểu tượng (IconProvider), không vẽ.
@@ -81,15 +82,17 @@ struct Panel {
 struct Tab {
     QString id, name;
     std::vector<Panel> panels;
+    QString need{}; // "VP" | "PRO": cả tab cần bản đó (huy hiệu khóa trên tab, UIA-017); rỗng: không
 };
 
 class RibbonModel {
 public:
-    // Đọc các tệp JSON (đường dẫn hoặc resource ":/…"), mỗi tệp một tab theo thứ tự. Tệp, mục sai khóa hay sai kiểu:
-    // ghi vào errors() rồi bỏ qua phần đó (lint chặn ở CI), không dừng.
+    // Đọc các tệp JSON (đường dẫn hoặc resource ":/…") theo thứ tự: tệp là một tab, hoặc {"tabs": [tab…]}. Tệp, mục
+    // sai khóa hay sai kiểu: ghi vào errors() rồi bỏ qua phần đó (lint chặn ở CI), không dừng.
     explicit RibbonModel(const QStringList& files = defaultFiles());
 
     static QStringList defaultFiles();  // 8 tab của workspace Soạn thảo 2D
+    static QStringList viewerFiles();   // 5 tab của ribbon Viewer UI-M01 (hồ sơ Viewer, UIA-017)
     static QStringList resourceFiles(); // mọi tệp tab trong :/trion/ribbon/ (lint)
 
     const std::vector<Tab>& tabs() const { return tabs_; }

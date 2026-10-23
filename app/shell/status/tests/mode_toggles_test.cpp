@@ -10,7 +10,7 @@
 //                      '_+DSETTINGS <tab>, '_LWEIGHT
 //   tooltips           tiêu chí 3: tên, sysvar · phím, mô tả; tên cho trình đọc màn hình
 //   withoutColor       tiêu chí 3: bật/tắt khác nhau ở ảnh xám (gạch dưới); trợ năng báo trạng thái chọn
-//   viewerProfile      tiêu chí 4: Viewer còn 3 nút; "Thiết lập…" khóa → trang nâng cấp, không gửi lệnh
+//   viewerProfile      tiêu chí 4: Viewer còn 2 nút (UIA-017: bỏ độ trong suốt); "Thiết lập…" khóa → trang nâng cấp, không gửi lệnh
 //   keyboard           DoD-U: Tab tới nút, Space/Enter bật tắt, Shift+F10 / phím Menu mở menu, Esc đóng
 //   baseline           DoD-U: ảnh Tối/Sáng × 100/200% (tắt, bật, rê, nhấn, focus bàn phím, vô hiệu); ghi lại:
 //                      TRION_UPDATE_BASELINE=<thư mục>
@@ -635,7 +635,7 @@ private slots:
             return ids;
         };
         gate_->setEdition(edition::Edition::Viewer); // profileChanged → setProfile(Viewer)
-        QCOMPARE(visible(), (QStringList{u"osnap"_s, u"LWDISPLAY"_s, u"TRANSPARENCYDISPLAY"_s}));
+        QCOMPARE(visible(), (QStringList{u"osnap"_s, u"LWDISPLAY"_s})); // UI-M01, prototype: không có độ trong suốt
         QToolButton* osnap = button("osnap");
         QCOMPARE(osnap->accessibleName(), u"Bắt điểm (khi đo)"_s);
 

@@ -49,6 +49,7 @@ const settings::Setting<QStringList> kHidden{"ui/statusbar/hidden", {}};
 constexpr std::pair<const char*, const char*> kLabels[] = {
     {"coord", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Tọa độ")},
     {"space", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Model / Paper")},
+    {"scale", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Tỉ lệ chú thích / viewport")},
     {"tasks", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Tác vụ nền")},
     {"fontDoctor", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Chỉ báo Bác sĩ Font")},
     {"graphics", QT_TRANSLATE_NOOP("trion::shell::StatusBar", "Chỉ báo đồ họa")},
@@ -62,7 +63,7 @@ constexpr std::pair<const char*, const char*> kLabels[] = {
 constexpr std::pair<const char*, int> kRanks[] = {
     {"coord", 100},      {"space", 90},     {"osnap", 85},         {"taskProgress", 80},
     {"ortho", 75},       {"polar", 70},     {"tasks", 65},         {"notifications", 60},
-    {"otrack", 55},      {"fontDoctor", 50}, {"dyn", 45},           {"snap", 40},
+    {"otrack", 55},      {"fontDoctor", 50}, {"scale", 48},         {"dyn", 45},          {"snap", 40},
     {"grid", 35},        {"edition", 30},   {"LWDISPLAY", 25},     {"TRANSPARENCYDISPLAY", 20},
     {"cleanScreen", 15}, {"graphics", 10},
 };
@@ -114,7 +115,7 @@ struct StatusBar::Item {
 // Shift+F10.
 class StatusBar::TextButton : public QToolButton {
 public:
-    enum class Look : std::uint8_t { Coord, Space, Chip, Edition };
+    enum class Look : std::uint8_t { Coord, Space, Chip, Edition, Scale };
 
     TextButton(Look look, QWidget* parent) : QToolButton(parent), look_(look)
     {
@@ -124,6 +125,7 @@ public:
 
     ui::Menu* menu = nullptr;
     const edition::EditionGate* gate = nullptr; // Look::Edition: huy hiệu theo cổng
+    QString icon;                               // Look::Scale: anno | vplock
 
     virtual QString label() const { return text(); }
 
@@ -135,8 +137,8 @@ public:
         if (look_ == Look::Edition)
             return edition::EditionBadge::sizeFor(*gate).width() + 2 * px(tok::sp_2); // .sb .ed margin 0 4px
         int w = QFontMetrics(textFont()).horizontalAdvance(s) + 2 * pad();
-        if (look_ == Look::Chip)
-            w += px(tok::ic) + px(tok::sp_2); // biểu tượng warn, gap
+        if (look_ == Look::Chip || look_ == Look::Scale)
+            w += px(tok::ic) + px(tok::sp_2); // biểu tượng warn, anno, vplock; gap
         return w;
     }
 
@@ -150,6 +152,7 @@ protected:
             return theme::font(TextRole::Label);
         case Look::Space:
         case Look::Edition:
+        case Look::Scale:
             break;
         }
         return theme::font(TextRole::Caption, Weight::Bold);
@@ -183,6 +186,7 @@ protected:
         }
         case Look::Coord:
         case Look::Space:
+        case Look::Scale:
             if (hot) {
                 p.setBrush(tm().color(isDown() ? tok::c_press : tok::c_hover));
                 p.drawRoundedRect(face, r, r);
@@ -191,10 +195,10 @@ protected:
             break;
         }
         QRectF text = face.adjusted(pad(), 0, -pad(), 0);
-        if (look_ == Look::Chip) {
+        if (look_ == Look::Chip || look_ == Look::Scale) {
             const int ic = px(tok::ic);
-            const QPixmap icon = theme::IconProvider::instance().pixmap(u"warn"_s, ic, devicePixelRatioF(),
-                                                                        theme::IconState::Normal);
+            const QPixmap icon = theme::IconProvider::instance().pixmap(look_ == Look::Chip ? u"warn"_s : this->icon, ic,
+                                                                        devicePixelRatioF(), theme::IconState::Normal);
             p.drawPixmap(QPointF(text.left(), (height() - ic) / 2.0), ui::paint::tinted(icon, tm().color(ink)));
             text.setLeft(text.left() + ic + px(tok::sp_2));
         }
@@ -385,6 +389,7 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
     : QWidget(parent), actions_(actions), sysvars_(sysvars), gate_(gate), progress_(progress), notes_(notes),
       store_(store), hidden_(store.get(kHidden)), coord_(new CoordButton(this)),
       spaceButton_(new TextButton(TextButton::Look::Space, this)), modes_(new ModeToggles(actions, sysvars, this)),
+      scale_(new TextButton(TextButton::Look::Scale, this)),
       taskBox_(new QWidget(this)),
       task_(new ui::InlineProgress(progress, 0, taskBox_, ui::InlineProgress::Style::Compact)),
       font_(new TextButton(TextButton::Look::Chip, this)), gpu_(new StatusButton(this)), tasks_(new StatusButton(this)),
@@ -419,6 +424,11 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
     });
     connect(spaceButton_, &QToolButton::clicked, this, &StatusBar::toggleSpace);
     connect(spaceAction_, &QAction::triggered, this, &StatusBar::toggleSpace);
+    connect(scale_, &QToolButton::clicked, this, [] { // prototype: sb-vpscale, sb-anno khi viewer
+        if (auto* toasts = ui::ToastHost::instance())
+            toasts->post(ui::Severity::Info, StatusBar::tr("Viewer chỉ xem tỉ lệ. Đổi tỉ lệ có trong TrionCAD Pro."), {},
+                         u"tip"_s);
+    });
     connect(font_, &QToolButton::clicked, this, [this] {
         if (QAction* a = actions_.action(u"FIXFONT"_s))
             a->trigger();
@@ -445,6 +455,7 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
         const QString id = b->defaultAction()->objectName(); // id hành động của registry ("ortho")
         items_.push_back({id, id, rankOf(id), false, b, b->defaultAction(), true});
     }
+    add(u"scale"_s, u"scale"_s, false, scale_, nullptr); // sau dải nút chế độ
     add(u"taskProgress"_s, u"tasks"_s, true, taskBox_, tasksAction_);
     add(u"fontDoctor"_s, u"fontDoctor"_s, true, font_, actions.action(u"FIXFONT"_s));
     add(u"graphics"_s, u"graphics"_s, true, gpu_, gpu_->defaultAction());
@@ -499,8 +510,9 @@ StatusBar::StatusBar(actions::ActionRegistry& actions, actions::Sysvars& sysvars
                 continue;
             a->setChecked(!hidden_.contains(key));
             for (const Item& it : items_)
-                if (it.key == key && it.toggle) { // tên nút chế độ theo hồ sơ ("Bắt điểm (khi đo)")
-                    a->setText(it.widget->accessibleName());
+                if (it.key == key) {
+                    if (it.toggle) // tên nút chế độ theo hồ sơ ("Bắt điểm (khi đo)")
+                        a->setText(it.widget->accessibleName());
                     a->setVisible(it.inProfile);
                 }
         }
@@ -584,6 +596,33 @@ void StatusBar::setSpace(Space space)
     spaceButton_->setEnabled(space != Space::Model);
     spaceAction_->setText(spaceButton_->text());
     spaceAction_->setEnabled(spaceButton_->isEnabled());
+    syncScale();
+}
+
+void StatusBar::setAnnotationScale(const QString& scale)
+{
+    annoScale_ = scale;
+    syncScale();
+}
+
+void StatusBar::setViewportScale(const QString& scale)
+{
+    vpScale_ = scale;
+    syncScale();
+}
+
+// Model: tỉ lệ chú thích; Layout: tỉ lệ viewport đang kích hoạt, hoặc "Paper" (prototype vpScale || 'Paper').
+void StatusBar::syncScale()
+{
+    const bool layout = space_ != Space::Model;
+    scale_->icon = layout ? u"vplock"_s : u"anno"_s;
+    scale_->setText(!layout ? annoScale_ : vpScale_.isEmpty() ? u"Paper"_s : vpScale_); // i18n-ok: tên của AutoCAD
+    const QString name = layout ? tr("Tỉ lệ viewport") : tr("Tỉ lệ chú thích");
+    scale_->setAccessibleName(u"%1 %2"_s.arg(name, scale_->text()));
+    scale_->setAccessibleDescription(tr("Viewer chỉ xem tỉ lệ, không đổi được."));
+    ui::RichTooltip::attach(scale_, {.name = name, .description = scale_->accessibleDescription()});
+    scale_->updateGeometry();
+    scale_->update();
 }
 
 void StatusBar::toggleSpace()
@@ -645,6 +684,8 @@ void StatusBar::applyProfile()
     for (Item& it : items_)
         if (it.toggle)
             it.inProfile = !it.widget->isHidden(); // ModeToggles vừa đặt theo hồ sơ
+        else if (it.widget == scale_)
+            it.inProfile = gate_.profile() == edition::UiProfile::Viewer;
     syncEdition();
     relayout();
 }
@@ -664,7 +705,7 @@ bool StatusBar::wanted(const Item& it) const
 {
     if (hidden_.contains(it.key))
         return false;
-    if (it.toggle)
+    if (it.toggle || !it.inProfile)
         return it.inProfile;
     if (it.widget == taskBox_)
         return task_->current() != 0;
@@ -727,13 +768,17 @@ void StatusBar::relayout()
         w->setGeometry(x, top + (height() - top - h) / 2, width, h);
     };
     int x = px(tok::sp_2), toggles = 0, strip = 0;
-    bool spilled = false;
+    bool spilled = false, afterStrip = false;
+    std::vector<const Item*> after; // mục trái nằm sau dải nút chế độ (tỉ lệ)
     for (Item& it : items_) {
         spilled |= it.wanted && !it.shown;
         it.widget->setVisible(it.shown);
+        afterStrip |= it.toggle;
         if (it.toggle && it.shown) {
             strip += it.width;
             ++toggles;
+        } else if (!it.right && it.shown && afterStrip) {
+            after.push_back(&it);
         } else if (!it.right && it.shown) {
             place(it.widget, x, it.width);
             x += it.width + gap;
@@ -748,6 +793,11 @@ void StatusBar::relayout()
         place(modes_, x, w);
         x += w + gap;
         seps[1] = x + px(tok::sp_2);
+        x += 1 + 2 * px(tok::sp_2) + gap;
+    }
+    for (const Item* it : after) {
+        place(it->widget, x, it->width);
+        x += it->width + gap;
     }
     int r = width() - px(tok::sp_2);
     const auto right = [&](QWidget* w, int width) {

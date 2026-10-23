@@ -72,7 +72,7 @@ public:
     // actions, sysvars sống lâu hơn dải nút.
     ModeToggles(actions::ActionRegistry& actions, actions::Sysvars& sysvars, QWidget* parent = nullptr);
 
-    // Viewer: chỉ OSNAP ("Bắt điểm (khi đo)"), lineweight, độ trong suốt (07.1 §10, UI0-011). Mặc định Full.
+    // Viewer: chỉ OSNAP ("Bắt điểm (khi đo)"), lineweight (UI-M01, prototype renderStatus; UIA-017). Mặc định Full.
     void setProfile(edition::UiProfile profile);
 
     // Nút theo id hành động của ActionRegistry ("ortho", "LWDISPLAY"); nullptr nếu không có. Menu là con của nút.

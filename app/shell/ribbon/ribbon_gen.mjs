@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-// Sinh nội dung 8 tab ribbon của workspace Soạn thảo 2D (07.1 §7.2–§7.10, trừ tab Tham số P2) từ TC.RIBBON_PRO của
-// prototype (design/prototype/js/ribbons.js; UIA-102). Thân IIFE của ribbons.js được chạy nguyên văn với TC giả: hàm
+// Sinh nội dung 8 tab ribbon của workspace Soạn thảo 2D (07.1 §7.2–§7.10, trừ tab Tham số P2) từ TC.RIBBON_PRO và
+// 5 tab ribbon Viewer (UI-M01, UIA-017; resources/viewer.json) từ TC.RIBBON_VIEWER của prototype
+// (design/prototype/js/ribbons.js; UIA-102). Thân IIFE của ribbons.js được chạy nguyên văn với TC giả: hàm
 // act, menu của điều khiển được gọi thật, TC.cmd.run ghi lại lệnh và tham số; TC.toast (prototype báo "có ở v1.0,
-// sau v1.0") nghĩa là chưa có lệnh: bỏ điều khiển đó.
+// sau v1.0") nghĩa là chưa có lệnh: bỏ điều khiển đó. Nút mà act chỉ mở TC.menu (Con dấu của Viewer) thành split
+// menuOnly với các mục của menu đó.
 //   node app/shell/ribbon/ribbon_gen.mjs          ghi lại resources/<tab>.json, ribbon_strings.cpp
 //   node app/shell/ribbon/ribbon_gen.mjs --check  so với tệp trong kho (ctest ribbon_prototype_check)
 // ponytail: nội dung tạm theo prototype; UIA-006 hoàn thiện theo bảng 07.1 (cột Phát hành), khi đó tệp JSON sửa tay
@@ -14,6 +16,12 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '../../..');
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
+// Một khai báo "var NAME = …;" (một dòng) của tệp prototype, chạy riêng.
+const decl = (f, name) => {
+  const m = read(f).match(new RegExp(`var ${name} = (.*);\\n`));
+  if (!m) throw new Error(`${f}: không thấy var ${name} = …;`);
+  return new Function(`return ${m[1]};`)();
+};
 
 // Danh mục lệnh RAW (như actions_gen.mjs): TC.CMDS của prototype.
 const cmdSrc = read('design/prototype/js/cmd.js');
@@ -38,28 +46,36 @@ const screens = new Proxy({}, { get: (_, k) => (...a) => { if (SCREEN_CMD[k]) ru
 const doc = { blocks: {}, views: [], layouts: [], styles: [], dimstyles: [], sel: [], layerMap: {}, byId: {} };
 let menus = [];
 const TC = {
-  $: () => ({ hidden: false, classList: { toggle() {} } }), $$: () => [], esc: String, ic: () => '', CMDS,
+  $: () => ({ hidden: false, classList: { toggle() {} }, click() {} }), $$: () => [], esc: String, ic: () => '', CMDS,
   S: { toggles: {}, pickstyle: 0 }, cmd: { run }, toast: () => rec.push({ later: true }), menu: items => menus.push(items),
   app: { doc: () => doc, view, renderRibbon() {}, refreshPalettes() {}, showPalette() {}, toggle() {}, setSpace() {} },
-  screens, markup: { props: {}, STAMPS: {}, MCOL: [] }, layers: {}, ed: { cur: () => ({}), clayer: () => '', saveAs() {} },
+  screens, markup: { props: {}, STAMPS: decl('design/prototype/js/screens3.js', 'STAMPS'), MCOL: [] },
+  layers: { restore() {} }, ed: { cur: () => ({}), clayer: () => '', saveAs() {} },
   clamp: (v, a, b) => Math.min(b, Math.max(a, v)), d: String, tileMenu: () => [], save() {}, emit() {}, ACI: [],
   aciName: String,
 };
 const rbSrc = read('design/prototype/js/ribbons.js');
 const bb = rbSrc.indexOf("'use strict';"), be = rbSrc.lastIndexOf('})();');
 if (bb < 0 || be < bb) throw new Error('ribbons.js: không thấy thân IIFE');
-const P = new Function('window', rbSrc.slice(bb, be) + '\nreturn { insertGal, viewsMenu, M_ };')({ TC });
-if (!TC.RIBBON_PRO) throw new Error('ribbons.js: không có TC.RIBBON_PRO');
+// setTimeout rỗng: act của prototype hẹn việc giao diện (mở palette rồi bấm nút) không chạy sau khi sinh xong.
+const P = new Function('window', 'setTimeout', rbSrc.slice(bb, be) + '\nreturn { insertGal, viewsMenu, M_ };')(
+  { TC }, () => {});
+if (!TC.RIBBON_PRO || !TC.RIBBON_VIEWER) throw new Error('ribbons.js: không có TC.RIBBON_PRO, TC.RIBBON_VIEWER');
 
 // Phần chọn tay, có lý do:
 const TAB_ID = { // 8 tab của 07.1 §7.2–§7.10; tab Tham số (§7.5) là P2, sau v1.0
   'Trang chủ': 'home', 'Chèn': 'insert', 'Chú thích': 'annotate', 'Hiển thị': 'view', 'Quản lý': 'manage',
   'Xuất': 'output', 'Công cụ VN': 'vntools', 'Mở rộng': 'express',
 };
+const VIEWER_TAB_ID = { // 5 tab của UI-M01; id riêng để tab, panel ẩn (Store) không lẫn với ribbon đầy đủ
+  'Xem': 'viewer-view', 'Đo': 'viewer-measure', 'Ghi chú': 'viewer-markup', 'In & Xuất': 'viewer-output',
+  'Công cụ': 'viewer-tools',
+};
 const CMD = { 'Dòng lệnh': 'COMMANDLINE' }; // prototype bật/tắt vùng dòng lệnh (Ctrl+9 = COMMANDLINE của Keymap)
 const SOURCE = { // dropdown: nguồn danh sách động (model do UIA-104, INT-… đặt qua RibbonControls::setModel)
   layerdd: 'layers', vstyle: 'visualstyles', 'rb-ts': 'textstyles', 'rb-ds': 'dimstyles', 'rb-ms': 'mleaderstyles',
   'rb-bs': 'tablestyles', 'rb-color': 'colors', 'rb-lt': 'linetypes', 'rb-lw': 'lineweights', 'rb-anno': 'annoscales',
+  'mk-color': 'markupcolors', 'mk-w': 'markupwidths', 'mk-a': 'markupopacity', 'mk-size': 'markupsizes', // UI-M02
 };
 const MENU_SOURCE = new Map([[P.insertGal, 'blocks'], [P.viewsMenu, 'views']]); // menu theo bản vẽ
 const NUMERIC = { // ô số của prototype → sysvar AutoCAD tương ứng; độ trong suốt là thanh trượt theo 07.1 §7.2
@@ -125,9 +141,10 @@ function control(c, where) {
   if (!['lg', 's', 'io'].includes(c.t)) throw new Error(`${at}: loại điều khiển lạ ${c.t}`);
   const r = c.act ? call(c.act, at) : [];
   const ran = r.find(x => x.cmd);
+  const opened = c.act && !c.menu && !ran && menus.length ? menus.at(-1) : null; // act chỉ mở TC.menu
   const cmd = c.cmd || CMD[c.label] || ran?.cmd;
   if (c.feature || r.some(x => x.later) || !cmd) { dropped.push(at); return null; }
-  const out = { type: c.toggle ? 'toggle' : c.menu ? 'split' : 'button',
+  const out = { type: c.toggle ? 'toggle' : c.menu || opened ? 'split' : 'button',
     size: { lg: 'large', s: 'small', io: 'icon' }[c.t], label: label(c.label), icon: c.icon, cmd };
   if (ran && ran.cmd === cmd && ran.args) out.args = ran.args;
   if (c.id) out.id = c.id;
@@ -136,6 +153,9 @@ function control(c, where) {
     if (MENU_SOURCE.has(c.menu)) out.source = MENU_SOURCE.get(c.menu);
     else out.menu = menuItems(c.menu(), at);
     if (c.menuOnly) out.menuOnly = true;
+  } else if (opened) {
+    out.menu = menuItems(opened, at);
+    out.menuOnly = true;
   }
   return out;
 }
@@ -145,9 +165,10 @@ function slug(s) { // "Định nghĩa block" → "dinh-nghia-block"
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function build(ribbon, ids) {
 const tabs = [];
-for (const t of TC.RIBBON_PRO.tabs) {
-  if (!TAB_ID[t.name]) { dropped.push(`tab ${t.name}`); continue; }
+for (const t of ribbon.tabs) {
+  if (!ids[t.name]) { dropped.push(`tab ${t.name}`); continue; }
   const panels = [];
   for (const p of t.panels) {
     const where = `${t.name} › ${p.name}`;
@@ -159,18 +180,23 @@ for (const t of TC.RIBBON_PRO.tabs) {
     if (panels.some(x => x.id === panel.id)) throw new Error(`${where}: trùng id panel ${panel.id}`);
     panels.push(panel);
   }
-  tabs.push({ id: TAB_ID[t.name], name: label(t.name), panels });
+  tabs.push({ id: ids[t.name], name: label(t.name), ...(t.need ? { need: t.need } : {}), panels });
 }
-if (tabs.length !== Object.keys(TAB_ID).length) throw new Error('RIBBON_PRO: thiếu tab của TAB_ID');
+if (tabs.length !== Object.keys(ids).length) throw new Error('ribbons.js: thiếu tab của bảng id tab');
+return tabs;
+}
+const tabs = build(TC.RIBBON_PRO, TAB_ID);
+const viewerTabs = build(TC.RIBBON_VIEWER, VIEWER_TAB_ID);
 
-// Lựa chọn gần nhất của split nhớ theo id (mặc định là lệnh), chung cho mọi tab: split cùng id phải cùng danh sách.
+// Lựa chọn gần nhất của split nhớ theo id (mặc định là lệnh), chung cho mọi tab của cả hai ribbon: split cùng id phải
+// cùng danh sách lệnh (nhãn có thể khác: "Cửa sổ…" của Viewer).
 const splits = new Map();
 const walk = x => x.row || x.column ? (x.row || x.column).forEach(walk) : x.type === 'split' && x.menu && (() => {
-  const key = x.id || x.cmd, menu = JSON.stringify(x.menu);
+  const key = x.id || x.cmd, menu = JSON.stringify(x.menu.map(m => m.separator ? '|' : `${m.cmd} ${m.args ?? ''}`));
   if (splits.has(key) && splits.get(key) !== menu) throw new Error(`split ${key}: cùng id nhưng khác danh sách`);
   splits.set(key, menu);
 })();
-tabs.forEach(t => t.panels.forEach(p => p.items.forEach(walk)));
+[...tabs, ...viewerTabs].forEach(t => t.panels.forEach(p => p.items.forEach(walk)));
 
 // Nhãn cho lupdate: nhãn trùng nhãn lệnh (ngữ cảnh "actions", commands.cpp) dùng bản dịch đã có; còn lại "ribbon".
 const actionLabels = new Set([...read('app/core/actions/commands.cpp')
@@ -182,7 +208,7 @@ const collect = x => {
   add(x.label);
   (x.menu || []).forEach(m => add(m.label));
 };
-for (const t of tabs) {
+for (const t of [...tabs, ...viewerTabs]) {
   add(t.name);
   for (const p of t.panels) { add(p.name); p.items.forEach(collect); (p.more || []).forEach(m => add(m.label)); }
 }
@@ -197,10 +223,11 @@ const text = {
       `    QT_TRANSLATE_NOOP("ribbon", ${q(s)}),\n`).join('') + '};\n',
 };
 for (const t of tabs) text[`resources/${t.id}.json`] = JSON.stringify(t, null, 2) + '\n';
+text['resources/viewer.json'] = JSON.stringify({ tabs: viewerTabs }, null, 2) + '\n';
 
 if (!process.argv.includes('--check')) {
   for (const [f, t] of Object.entries(text)) fs.writeFileSync(path.join(here, f), t);
-  console.log(`ribbon: ghi ${tabs.length} tab, ${labels.length} nhãn ngữ cảnh "ribbon"; bỏ ${dropped.length} mục chưa có ` +
+  console.log(`ribbon: ghi ${tabs.length} tab, viewer.json ${viewerTabs.length} tab, ${labels.length} nhãn ngữ cảnh "ribbon"; bỏ ${dropped.length} mục chưa có ` +
     `lệnh (prototype báo v1.0, sau v1.0, hoặc chỉ là thao tác giao diện):\n  ${dropped.join('\n  ')}`);
   process.exit(0);
 }
@@ -212,4 +239,5 @@ if (stale.length) {
   console.error(`${stale.join(', ')} cũ so với prototype → chạy lại: node app/shell/ribbon/ribbon_gen.mjs`);
   process.exit(1);
 }
-console.log(`ribbon: ${tabs.length} tab và ${labels.length} nhãn khớp TC.RIBBON_PRO của prototype`);
+console.log(`ribbon: ${tabs.length} + ${viewerTabs.length} tab và ${labels.length} nhãn khớp TC.RIBBON_PRO, ` +
+  'TC.RIBBON_VIEWER của prototype');

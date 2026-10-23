@@ -2,13 +2,15 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "trion/ribbon/tab.schema.json",
   "title": "Tab ribbon (UIA-102)",
-  "description": "Một tệp là một tab: tab → panel → hàng/cột → điều khiển (07.1 §7.1). RibbonModel đọc đúng các khóa này; khóa lạ, sai kiểu là lỗi (ribbon_lint_test). Nhãn viết bằng tiếng Việt gốc; bản English trong app/i18n/trion_en.ts (nhãn trùng nhãn lệnh: ngữ cảnh \"actions\", còn lại \"ribbon\").",
+  "description": "Một tệp là một tab, hoặc {\"tabs\": [tab…]} (viewer.json: 5 tab của ribbon Viewer UI-M01): tab → panel → hàng/cột → điều khiển (07.1 §7.1). RibbonModel đọc đúng các khóa này; khóa lạ, sai kiểu là lỗi (ribbon_lint_test). Nhãn viết bằng tiếng Việt gốc; bản English trong app/i18n/trion_en.ts (nhãn trùng nhãn lệnh: ngữ cảnh \"actions\", còn lại \"ribbon\").",
   "type": "object",
-  "required": ["id", "name", "panels"],
+  "oneOf": [{"required": ["id", "name", "panels"]}, {"required": ["tabs"]}],
   "additionalProperties": false,
   "properties": {
-    "id": {"type": "string", "description": "home, insert, annotate, view, manage, output, vntools, express"},
+    "id": {"type": "string", "description": "home, insert, annotate, view, manage, output, vntools, express; viewer-…"},
     "name": {"type": "string", "description": "Tên tab"},
+    "need": {"enum": ["VP", "PRO"], "description": "Cả tab cần bản đó: huy hiệu khóa trên tab (UIA-017)"},
+    "tabs": {"type": "array", "minItems": 1, "description": "Tệp nhiều tab: chỉ có khóa này, mỗi phần tử là một tab như trên"},
     "panels": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/panel"}}
   },
   "$defs": {

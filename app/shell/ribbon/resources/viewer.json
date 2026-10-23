@@ -1,0 +1,876 @@
+{
+  "tabs": [
+    {
+      "id": "viewer-view",
+      "name": "Xem",
+      "panels": [
+        {
+          "id": "dieu-huong",
+          "name": "Điều hướng",
+          "icon": "pan",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Pan",
+              "icon": "pan",
+              "cmd": "PAN"
+            },
+            {
+              "type": "split",
+              "size": "large",
+              "label": "Zoom",
+              "icon": "zoom",
+              "cmd": "ZOOM",
+              "menu": [
+                {
+                  "label": "Toàn bộ đối tượng",
+                  "cmd": "ZOOM",
+                  "args": "E",
+                  "icon": "zext"
+                },
+                {
+                  "label": "Cửa sổ",
+                  "cmd": "ZOOM",
+                  "args": "W",
+                  "icon": "zwin"
+                },
+                {
+                  "label": "Trước đó",
+                  "cmd": "ZOOM",
+                  "args": "P",
+                  "icon": "zprev"
+                },
+                {
+                  "label": "Thời gian thực",
+                  "cmd": "ZOOM",
+                  "args": "R"
+                },
+                {
+                  "label": "Tất cả",
+                  "cmd": "ZOOM",
+                  "args": "A"
+                },
+                {
+                  "label": "Tỉ lệ…",
+                  "cmd": "ZOOM"
+                },
+                {
+                  "label": "Đối tượng",
+                  "cmd": "ZOOM",
+                  "args": "O"
+                },
+                {
+                  "separator": true
+                },
+                {
+                  "label": "Phóng to",
+                  "cmd": "ZOOM",
+                  "args": "2X"
+                },
+                {
+                  "label": "Thu nhỏ",
+                  "cmd": "ZOOM",
+                  "args": ".5X",
+                  "icon": "zoomout"
+                }
+              ]
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Toàn bộ",
+                  "icon": "zext",
+                  "cmd": "ZOOM",
+                  "args": "E"
+                },
+                {
+                  "type": "split",
+                  "size": "small",
+                  "label": "View đã lưu",
+                  "icon": "views",
+                  "cmd": "VIEW",
+                  "source": "views",
+                  "menuOnly": true
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Tạo lại hình",
+                  "icon": "regen",
+                  "cmd": "REGEN"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "layer",
+          "name": "Layer",
+          "icon": "layers",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Quản lý\nlayer",
+              "icon": "layers",
+              "cmd": "LAYER"
+            },
+            {
+              "column": [
+                {
+                  "type": "dropdown",
+                  "id": "layerdd",
+                  "label": "Layer hiện hành",
+                  "source": "layers",
+                  "width": 220
+                },
+                {
+                  "row": [
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Cô lập layer",
+                      "icon": "isolate",
+                      "cmd": "LAYISO"
+                    },
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Bỏ cô lập",
+                      "icon": "unisolate",
+                      "cmd": "LAYUNISO"
+                    },
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Tắt layer",
+                      "icon": "bulboff",
+                      "cmd": "LAYOFF"
+                    },
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Đóng băng layer",
+                      "icon": "snow",
+                      "cmd": "LAYFRZ"
+                    },
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Bật tất cả",
+                      "icon": "bulb",
+                      "cmd": "LAYON"
+                    },
+                    {
+                      "type": "button",
+                      "size": "icon",
+                      "label": "Rã đông tất cả",
+                      "icon": "sun",
+                      "cmd": "LAYTHW"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hien-thi",
+          "name": "Hiển thị",
+          "icon": "vstyle",
+          "shrink": 3,
+          "items": [
+            {
+              "column": [
+                {
+                  "type": "dropdown",
+                  "id": "vstyle",
+                  "label": "Kiểu hiển thị",
+                  "source": "visualstyles",
+                  "width": 130
+                },
+                {
+                  "type": "toggle",
+                  "size": "small",
+                  "label": "Độ dày nét",
+                  "icon": "lw",
+                  "cmd": "LWDISPLAY",
+                  "id": "lwtgl"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "palette",
+          "name": "Palette",
+          "icon": "props",
+          "shrink": 2,
+          "items": [
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Thuộc tính",
+                  "icon": "props",
+                  "cmd": "PROPERTIES"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Bác sĩ Font",
+                  "icon": "fontdoc",
+                  "cmd": "FIXFONT"
+                }
+              ]
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Tham chiếu ngoài",
+                  "icon": "xref",
+                  "cmd": "EXTERNALREFERENCES"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Đếm",
+                  "icon": "count",
+                  "cmd": "COUNT",
+                  "need": "VP"
+                }
+              ]
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Clean Screen",
+                  "icon": "fullscreen",
+                  "cmd": "CLEANSCREENON"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viewer-measure",
+      "name": "Đo",
+      "panels": [
+        {
+          "id": "do",
+          "name": "Đo",
+          "icon": "measure",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Đo nhanh",
+              "icon": "mquick",
+              "cmd": "MEASUREGEOM",
+              "args": "Q"
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Khoảng\ncách",
+              "icon": "dist",
+              "cmd": "DIST"
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Diện tích",
+              "icon": "area",
+              "cmd": "AREA"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Góc",
+                  "icon": "angle",
+                  "cmd": "MEASUREGEOM",
+                  "args": "A",
+                  "id": "m-ang"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Bán kính",
+                  "icon": "radius",
+                  "cmd": "MEASUREGEOM",
+                  "args": "R",
+                  "id": "m-rad"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Tọa độ điểm",
+                  "icon": "idpoint",
+                  "cmd": "ID"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "thong-tin",
+          "name": "Thông tin",
+          "icon": "list",
+          "shrink": 2,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Liệt kê",
+              "icon": "list",
+              "cmd": "LIST"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Cửa sổ văn bản",
+                  "icon": "list",
+                  "cmd": "TEXTSCR"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Tìm chữ",
+                  "icon": "findtext",
+                  "cmd": "FIND"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tong-hop",
+          "name": "Tổng hợp",
+          "icon": "sigma",
+          "shrink": 2,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Tổng\nchiều dài",
+              "icon": "sigma",
+              "cmd": "TCLENGTH",
+              "need": "VP"
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Tổng\ndiện tích",
+              "icon": "area",
+              "cmd": "TCAREA",
+              "need": "VP"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Đếm block",
+                  "icon": "count",
+                  "cmd": "COUNT",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Xuất ra Excel",
+                  "icon": "stats",
+                  "cmd": "TCATTOUT",
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viewer-markup",
+      "name": "Ghi chú",
+      "need": "VP",
+      "panels": [
+        {
+          "id": "danh-dau",
+          "name": "Đánh dấu",
+          "icon": "markup",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Đám mây",
+              "icon": "cloud",
+              "cmd": "TCMARKUP",
+              "args": "cloud",
+              "id": "mk-cloud",
+              "need": "VP"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Chữ nhật",
+                  "icon": "rect",
+                  "cmd": "TCMARKUP",
+                  "args": "rect",
+                  "id": "mk-rect",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Ellipse",
+                  "icon": "ellipse",
+                  "cmd": "TCMARKUP",
+                  "args": "ellipse",
+                  "id": "mk-ellipse",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Mũi tên",
+                  "icon": "arrow",
+                  "cmd": "TCMARKUP",
+                  "args": "arrow",
+                  "id": "mk-arrow",
+                  "need": "VP"
+                }
+              ]
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Đường thẳng",
+                  "icon": "line",
+                  "cmd": "TCMARKUP",
+                  "args": "line",
+                  "id": "mk-line",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Nét tự do",
+                  "icon": "freehand",
+                  "cmd": "TCMARKUP",
+                  "args": "free",
+                  "id": "mk-free",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Bút dạ",
+                  "icon": "highlight",
+                  "cmd": "TCMARKUP",
+                  "args": "hl",
+                  "id": "mk-hl",
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "chu",
+          "name": "Chữ",
+          "icon": "textnote",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Chữ\nghi chú",
+              "icon": "textnote",
+              "cmd": "TCMARKUP",
+              "args": "text",
+              "id": "mk-text",
+              "need": "VP"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Ghi chú có đường dẫn",
+                  "icon": "leader",
+                  "cmd": "TCMARKUP",
+                  "args": "leader",
+                  "id": "mk-leader",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Dấu tick",
+                  "icon": "tick",
+                  "cmd": "TCMARKUP",
+                  "args": "tick",
+                  "id": "mk-tick",
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "do",
+          "name": "Đo",
+          "icon": "dist",
+          "shrink": 2,
+          "items": [
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Khoảng cách",
+                  "icon": "dist",
+                  "cmd": "TCMARKUP",
+                  "args": "dist",
+                  "id": "mk-dist",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Diện tích",
+                  "icon": "area",
+                  "cmd": "TCMARKUP",
+                  "args": "area",
+                  "id": "mk-area",
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "duyet",
+          "name": "Duyệt",
+          "icon": "stamp",
+          "shrink": 2,
+          "items": [
+            {
+              "type": "split",
+              "size": "large",
+              "label": "Con dấu",
+              "icon": "stamp",
+              "cmd": "TCMARKUP",
+              "id": "mk-stamp",
+              "need": "VP",
+              "menu": [
+                {
+                  "label": "Đã duyệt",
+                  "cmd": "TCMARKUP",
+                  "args": "stamp:ok"
+                },
+                {
+                  "label": "Cần sửa",
+                  "cmd": "TCMARKUP",
+                  "args": "stamp:fix"
+                },
+                {
+                  "label": "Không duyệt",
+                  "cmd": "TCMARKUP",
+                  "args": "stamp:no"
+                }
+              ],
+              "menuOnly": true
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Chụp\nvùng",
+              "icon": "snapshot",
+              "cmd": "TCMARKUP",
+              "args": "snap",
+              "id": "mk-snap",
+              "need": "VP"
+            }
+          ]
+        },
+        {
+          "id": "thuoc-tinh",
+          "name": "Thuộc tính",
+          "icon": "plotstyle",
+          "shrink": 3,
+          "items": [
+            {
+              "column": [
+                {
+                  "type": "dropdown",
+                  "id": "mk-color",
+                  "label": "Màu markup",
+                  "source": "markupcolors",
+                  "width": 118,
+                  "need": "VP"
+                },
+                {
+                  "type": "dropdown",
+                  "id": "mk-w",
+                  "label": "Độ dày nét",
+                  "source": "markupwidths",
+                  "width": 118,
+                  "need": "VP"
+                },
+                {
+                  "type": "dropdown",
+                  "id": "mk-a",
+                  "label": "Độ mờ",
+                  "source": "markupopacity",
+                  "width": 118,
+                  "need": "VP"
+                }
+              ]
+            },
+            {
+              "column": [
+                {
+                  "type": "dropdown",
+                  "id": "mk-size",
+                  "label": "Cỡ chữ",
+                  "source": "markupsizes",
+                  "width": 96,
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "markup",
+          "name": "Markup",
+          "icon": "list",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Danh sách\nmarkup",
+              "icon": "list",
+              "cmd": "TCMARKUP",
+              "id": "mk-list",
+              "need": "VP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viewer-output",
+      "name": "In & Xuất",
+      "panels": [
+        {
+          "id": "in",
+          "name": "In",
+          "icon": "print",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "In",
+              "icon": "print",
+              "cmd": "PLOT"
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Xem trước",
+              "icon": "preview",
+              "cmd": "PREVIEW"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Thiết lập trang",
+                  "icon": "print",
+                  "cmd": "PAGESETUP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "In nhiều layout",
+                  "icon": "publish",
+                  "cmd": "PUBLISH",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "In hàng loạt theo khung tên",
+                  "icon": "batchplot",
+                  "cmd": "TCBATCHPLOT",
+                  "need": "VP"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "xuat",
+          "name": "Xuất",
+          "icon": "pdf",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "split",
+              "size": "large",
+              "label": "PDF",
+              "icon": "pdf",
+              "cmd": "EXPORTPDF",
+              "menu": [
+                {
+                  "label": "Layout hiện tại",
+                  "cmd": "EXPORTPDF",
+                  "args": "cur"
+                },
+                {
+                  "label": "Tất cả layout",
+                  "cmd": "EXPORTPDF",
+                  "args": "all"
+                },
+                {
+                  "label": "Vùng đang xem",
+                  "cmd": "EXPORTPDF",
+                  "args": "view"
+                },
+                {
+                  "label": "Cửa sổ…",
+                  "cmd": "EXPORTPDF",
+                  "args": "win"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Ảnh",
+              "icon": "image",
+              "cmd": "PNGOUT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viewer-tools",
+      "name": "Công cụ",
+      "panels": [
+        {
+          "id": "ban-ve",
+          "name": "Bản vẽ",
+          "icon": "compare",
+          "shrink": 1,
+          "items": [
+            {
+              "type": "button",
+              "size": "large",
+              "label": "So sánh",
+              "icon": "compare",
+              "cmd": "COMPARE",
+              "need": "VP"
+            },
+            {
+              "type": "button",
+              "size": "large",
+              "label": "Chuyển font\nhàng loạt",
+              "icon": "fontbatch",
+              "cmd": "FIXFONTBATCH",
+              "need": "VP"
+            },
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Đếm block",
+                  "icon": "count",
+                  "cmd": "COUNT",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Xuất bảng thống kê",
+                  "icon": "stats",
+                  "cmd": "TCATTOUT",
+                  "need": "VP"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Tìm chữ",
+                  "icon": "findtext",
+                  "cmd": "FIND"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "he-thong",
+          "name": "Hệ thống",
+          "icon": "gpu",
+          "shrink": 2,
+          "items": [
+            {
+              "column": [
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Thiết lập đồ họa",
+                  "icon": "gpu",
+                  "cmd": "GRAPHICSCONFIG"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Kiểm tra hiệu năng",
+                  "icon": "gauge",
+                  "cmd": "TRIONBENCH"
+                },
+                {
+                  "type": "button",
+                  "size": "small",
+                  "label": "Gửi bản vẽ lỗi",
+                  "icon": "send",
+                  "cmd": "TCREPORT"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

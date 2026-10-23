@@ -29,6 +29,11 @@
 //   thân về dải tab, Esc ở dải tab trả focus nơi trước đó. F10 là POLAR (keymap.json, 07.1 §11) nên không dùng.
 // - Tooltip 2 mức cho mọi điều khiển qua RichTooltip (RibbonControls; nút của khung đặt ở đây): mức 1 tên, tên lệnh
 //   tiếng Anh, phím; mức 2 sau 1,5 s mô tả, "Nhấn F1 để xem trợ giúp"; F1 khi rê → RichTooltip::helpRequested(lệnh).
+// - Hồ sơ (UI0-011, UIA-017; prototype ribbonData, .rb-up): Full là model của ctor; Viewer là ribbon giản lược UI-M01
+//   (RibbonModel::viewerFiles(), nạp lần đầu cần) và panel cố định cuối thân "Sửa bản vẽ? … [Dùng thử Pro 30 ngày]"
+//   (bấm: EditionGate::upgrade().open, trang nâng cấp UI-L04; mức chỉ tên panel: một hàng tên + nút, không cắt chữ).
+//   Đổi hồ sơ giữ mức thu gọn, về tab đầu chưa ẩn; trang đã dựng của mỗi hồ sơ giữ lại. Tab có need (Ghi chú: VP) hiện
+//   huy hiệu khóa LockBadge khi bản hiện tại chưa có, đổi ngay khi giấy phép đổi (không dựng lại).
 // Màu, cỡ đọc token mỗi lần vẽ, đo. Rảnh không timer. Luồng UI.
 //
 // Dùng (bước integration, sau ThemeManager, IconProvider, RichTooltip, ActionRegistry, EditionGate):
@@ -36,6 +41,9 @@
 //   mainWindow.setRegion(MainWindow::Region::Ribbon, ribbon);
 //   connect(&controls, &RibbonControls::macroRequested, router, &CommandRouter::submit);
 //   connect(ribbon, &RibbonBar::addToQatRequested, titleBar->qat(), …);  // UIA-101
+//   ribbon->setProfile(gate.profile());                                  // UIA-017: ribbon Viewer hay đầy đủ
+//   connect(&gate, &edition::EditionGate::profileChanged, ribbon, &RibbonBar::setProfile);
+//   titleBar->search()->setLocator([=](const QString& c) { return ribbon->locate(c); }); // theo hồ sơ
 //   router.add(u"RIBBON"_s, [&] { mainWindow.setRegionVisible(Region::Ribbon, true); });       // RIBBON.md
 //   router.add(u"RIBBONCLOSE"_s, [&] { mainWindow.setRegionVisible(Region::Ribbon, false); }); // RIBBONCLOSE.md
 //
@@ -51,6 +59,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 
 class QLabel;
 class QMenu;
@@ -58,6 +67,9 @@ class QTabBar;
 
 namespace trion::ui {
 class Button;
+}
+namespace trion::edition {
+enum class UiProfile : std::uint8_t;
 }
 
 namespace trion::ribbon {
@@ -144,7 +156,7 @@ class RibbonBar : public QWidget {
 public:
     enum class Collapse : std::uint8_t { Full, PanelTitles, TabNames };
 
-    // model, controls, store sống lâu hơn RibbonBar. Tab đầu tiên chưa ẩn dựng ngay.
+    // model (hồ sơ Full), controls, store sống lâu hơn RibbonBar. Tab đầu tiên chưa ẩn dựng ngay.
     RibbonBar(const RibbonModel& model, RibbonControls& controls, settings::Store& store = settings::Store::instance(),
               QWidget* parent = nullptr);
     ~RibbonBar() override;
@@ -172,6 +184,13 @@ public:
     // Menu chuột phải tại widget at của ribbon (nullptr: chỗ trống); tự hủy khi đóng. contextMenuEvent mở nó.
     QMenu* contextMenu(QWidget* at);
 
+    // Hồ sơ đang hiện (mặc định Full). Viewer: 5 tab UI-M01 và panel nâng cấp.
+    void setProfile(edition::UiProfile profile);
+    edition::UiProfile profile() const;
+    const RibbonModel& model() const { return *model_; } // của hồ sơ đang hiện
+    QString locate(const QString& cmd) const { return model_->locate(cmd); } // ô Tìm lệnh: "Tab › Panel" theo hồ sơ
+    QWidget* upsell() const; // panel nâng cấp của tab đang mở; nullptr nếu không có (hồ sơ Full)
+
     QSize sizeHint() const override;
 
 signals:
@@ -188,7 +207,8 @@ protected:
     void showEvent(QShowEvent* e) override;
 
 private:
-    QWidget* buildPage(int index);
+    QWidget* buildPage(const RibbonModel& model, int index);
+    void syncTabBadges(); // huy hiệu khóa, tên tiếp cận của tab có need
     void showTab(int index);
     void fit();
     void scheduleFit(bool remeasure);
@@ -201,12 +221,15 @@ private:
     void retranslate();
     QStringList hiddenPanels() const;
 
-    const RibbonModel& model_;
+    const RibbonModel& full_;
+    std::unique_ptr<RibbonModel> viewer_; // ribbon Viewer, nạp lần đầu cần
+    const RibbonModel* model_;            // của hồ sơ đang hiện
     RibbonControls& controls_;
     settings::Store& store_;
     QTabBar* tabs_;
     ui::Button* collapseButton_;
-    RibbonPages* pages_;
+    RibbonPages* pages_;                       // của hồ sơ đang hiện
+    std::array<RibbonPages*, 2> profilePages_; // Full, Viewer; nullptr: chưa dựng
     QPointer<Floating> float_; // con của cửa sổ: hủy cùng ribbon
     QPointer<QWidget> returnFocus_;
     QPointer<QWidget> filtered_; // cửa sổ đang cài bộ lọc phím Alt
