@@ -31,6 +31,8 @@
 //   actions.addViewport(canvas);                      // phím phạm vi Vùng vẽ (Delete → ERASE, Ctrl+C…)
 //   canvas->setKeySink(shell.commandLine->input());   // chữ gõ trên vùng vẽ vào dòng lệnh (UIA-111 đổi sang ô DYN)
 //   connect(canvas, &CanvasWidget::picked, …);         // ponytail: INT-008 chọn thật; boxSelected, hovered tương tự
+// Điều hướng (lăn, chuột giữa, touchpad, trạng thái Pan/Zoom kéo trái): Navigation.h (UIA-008); hiển thị dần khi mở tệp
+// lớn, lệnh sửa chờ nạp xong: LoadGate.h. Trạng thái Pan: nhấn trái hoặc giữa đổi bàn tay mở → nắm.
 
 #include "app/shell/canvas/CanvasOverlay.h"
 
@@ -81,7 +83,8 @@ public:
 
     // ponytail: Sysvars tạm (INT-005) chưa có mặc định (biến chưa đặt đọc là 0): đặt mặc định AutoCAD cho các biến
     // vùng vẽ đọc mà đang là 0 (CURSORSIZE 5, PICKBOX 3, APERTURE 10, SELECTIONPREVIEW 3, PICKDRAG 2, PICKAUTO 5,
-    // CURSORBADGE 2, ROLLOVERTIPS 1). INT-107 (bảng sysvar có mặc định) thay.
+    // CURSORBADGE 2, ROLLOVERTIPS 1; Navigation: ZOOMFACTOR 60, MBUTTONPAN 1, UNDOCTL 53). INT-107 (bảng sysvar có
+    // mặc định) thay.
     static void initSysvars(actions::Sysvars& sysvars);
 
     // Con trỏ (07.1 §9.1). Đổi trạng thái hủy khung đang kéo nếu trạng thái mới không chọn được.

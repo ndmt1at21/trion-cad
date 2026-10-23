@@ -4638,6 +4638,29 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::shell::LoadGate</name>
+    <message>
+        <source>Đang nạp</source>
+        <translation>Loading</translation>
+    </message>
+    <message>
+        <source>Đang nạp tệp lớn ở nền. Bạn đã xem, pan, zoom được; lệnh sửa chờ đến khi nạp xong.</source>
+        <translation>Loading the large file in the background. You can already view, pan and zoom; editing commands wait until loading finishes.</translation>
+    </message>
+    <message>
+        <source>Đã bỏ %1: bản vẽ chưa nạp xong.</source>
+        <translation>%1 discarded: the drawing did not finish loading.</translation>
+    </message>
+    <message>
+        <source>%1 sẽ chạy khi nạp xong. Esc để hủy.</source>
+        <translation>%1 will run when loading finishes. Press Esc to cancel.</translation>
+    </message>
+    <message>
+        <source>Đã hủy %1.</source>
+        <translation>%1 cancelled.</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::MainWindow</name>
     <message>
         <source>Thuộc tính</source>

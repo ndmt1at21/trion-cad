@@ -37,6 +37,10 @@ const QString kPickDrag = u"PICKDRAG"_s;                 // 0 hai cú nhấp, 1 
 const QString kPickAuto = u"PICKAUTO"_s;                 // bit 4: nhấn-kéo lasso (bit 1, 2 thuộc INT-155)
 const QString kCursorBadge = u"CURSORBADGE"_s;           // 1 tắt, 2 bật
 const QString kRolloverTips = u"ROLLOVERTIPS"_s;         // 0 tắt, 1 bật
+// Điều hướng (Navigation.cpp đọc): mặc định đặt ở initSysvars.
+const QString kZoomFactor = u"ZOOMFACTOR"_s; // 3–100
+const QString kMButtonPan = u"MBUTTONPAN"_s; // 0 theo CUI, 1 giữ chuột giữa pan
+const QString kUndoCtl = u"UNDOCTL"_s;       // bit 16: gộp zoom, pan liên tiếp thành một bước hoàn tác
 
 constexpr int kLassoAuto = 4;    // bit PICKAUTO cho lasso
 constexpr int kLassoStepPx = 2;  // lấy mẫu đường lasso như nét kéo của prototype (cad.js stroke: > 2 px)
@@ -137,8 +141,9 @@ CanvasWidget::~CanvasWidget()
 void CanvasWidget::initSysvars(actions::Sysvars& sysvars)
 {
     const std::pair<const QString&, int> defaults[] = {
-        {kCursorSize, 5}, {kPickbox, 3},    {kAperture, 10},   {kSelectionPreview, 3},
-        {kPickDrag, 2},   {kPickAuto, 5},   {kCursorBadge, 2}, {kRolloverTips, 1},
+        {kCursorSize, 5},  {kPickbox, 3},    {kAperture, 10},   {kSelectionPreview, 3},
+        {kPickDrag, 2},    {kPickAuto, 5},   {kCursorBadge, 2}, {kRolloverTips, 1},
+        {kZoomFactor, 60}, {kMButtonPan, 1}, {kUndoCtl, 53},
     };
     for (const auto& [name, value] : defaults)
         if (sysvars.get(name) == 0)
@@ -209,7 +214,8 @@ void CanvasWidget::applyCursor()
         setCursor(panning_ ? Qt::ClosedHandCursor : Qt::OpenHandCursor); // prototype: cursor grab / grabbing
         break;
     case CursorState::Zoom: { // Qt không có kính lúp: biểu tượng "zoom" của bộ, điểm nóng ở tâm kính (7, 7 trên lưới 16)
-        // ponytail: kính lúp có dấu +; dạng +/− riêng khi INT-016 có zoom thời gian thực (UIA-008).
+        // ponytail: kính lúp có dấu +; AutoCAD vẽ kính lúp +/− khi zoom thời gian thực (kéo do Navigation làm): cần
+        // biểu tượng mới trong bộ app/theme/icons.
         const int size = qRound(theme::ThemeManager::instance().px(tok::ic_lg));
         const QPixmap icon = theme::IconProvider::instance().pixmap(u"zoom"_s, size, devicePixelRatio(),
                                                                    theme::IconState::Normal);
@@ -285,10 +291,14 @@ void CanvasWidget::mousePressEvent(QMouseEvent* e)
         setOverlay(next);
     }
     if (e->button() != Qt::LeftButton) {
-        if (selecting() && gesture_ != Gesture::Polygon) // chuột phải, giữa hủy khung đang kéo (prototype contextmenu)
+        if (e->button() == Qt::MiddleButton && ov_.cursor == CursorState::Pan) { // pan chuột giữa (Navigation)
+            panning_ = true;
+            applyCursor();
+        } else if (selecting() && gesture_ != Gesture::Polygon) { // chuột phải, giữa hủy khung đang kéo
             cancelSelection();
-        else
-            e->ignore(); // điều hướng (UIA-008), menu ngữ cảnh
+        } else {
+            e->ignore(); // menu ngữ cảnh
+        }
         return;
     }
     if (gesture_ == Gesture::Polygon) {
@@ -305,7 +315,7 @@ void CanvasWidget::mousePressEvent(QMouseEvent* e)
     case CursorState::PickPoint: // lệnh chờ điểm: lấy điểm lúc nhấn như prototype (cad.down)
         emit picked(QPointF(p), e->modifiers());
         return;
-    case CursorState::Pan: // kéo pan do UIA-008 (Navigation) làm; ở đây chỉ đổi bàn tay mở → nắm
+    case CursorState::Pan: // kéo pan do Navigation (UIA-008) làm; ở đây chỉ đổi bàn tay mở → nắm
         panning_ = true;
         applyCursor();
         return;
@@ -363,6 +373,8 @@ void CanvasWidget::mouseMoveEvent(QMouseEvent* e)
 void CanvasWidget::mouseReleaseEvent(QMouseEvent* e)
 {
     if (e->button() != Qt::LeftButton) {
+        if (e->button() == Qt::MiddleButton && std::exchange(panning_, false))
+            applyCursor();
         e->ignore();
         return;
     }
