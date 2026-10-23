@@ -6466,6 +6466,235 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::ui::FindDialog</name>
+    <message>
+        <source>Tìm</source>
+        <translation>Find</translation>
+    </message>
+    <message>
+        <source>Thay bằng</source>
+        <translation>Replace with</translation>
+    </message>
+    <message>
+        <source>Phạm vi</source>
+        <translation>Find where</translation>
+    </message>
+    <message>
+        <source>Phân biệt hoa thường</source>
+        <translation>Match case</translation>
+    </message>
+    <message>
+        <source>Nguyên từ</source>
+        <translation>Whole words only</translation>
+    </message>
+    <message>
+        <source>Wildcard (* ?)</source>
+        <translation>Use wildcards (* ?)</translation>
+    </message>
+    <message>
+        <source>Phân biệt dấu tiếng Việt</source>
+        <translation>Match Vietnamese diacritics</translation>
+    </message>
+    <message>
+        <source>Tìm trong tham chiếu ngoài (Xref)</source>
+        <translation>Search xrefs</translation>
+    </message>
+    <message>
+        <source>Tìm trong block</source>
+        <translation>Search blocks</translation>
+    </message>
+    <message>
+        <source>Bỏ qua đối tượng ẩn</source>
+        <translation>Skip hidden objects</translation>
+    </message>
+    <message>
+        <source>Tìm cả chữ mã TCVN3, VNI</source>
+        <translation>Also find TCVN3, VNI encoded text</translation>
+    </message>
+    <message>
+        <source>Attribute</source>
+        <translation>Attribute</translation>
+    </message>
+    <message>
+        <source>Chữ kích thước, đường dẫn</source>
+        <translation>Dimension and leader text</translation>
+    </message>
+    <message>
+        <source>Text, MText</source>
+        <translation>Text, MText</translation>
+    </message>
+    <message>
+        <source>Chữ trong bảng</source>
+        <translation>Table text</translation>
+    </message>
+    <message>
+        <source>Hyperlink</source>
+        <translation>Hyperlink</translation>
+    </message>
+    <message>
+        <source>Loại chữ</source>
+        <translation>Text types</translation>
+    </message>
+    <message>
+        <source>Từ mọi kết quả (%1)</source>
+        <translation>From all results (%1)</translation>
+    </message>
+    <message>
+        <source>Từ các dòng đang chọn (%1)</source>
+        <translation>From selected rows (%1)</translation>
+    </message>
+    <message>
+        <source>Tìm và thay thế chữ</source>
+        <translation>Find and replace text</translation>
+    </message>
+    <message>
+        <source>Tìm chữ</source>
+        <translation>Find Text</translation>
+    </message>
+    <message>
+        <source>Tìm và thay thế</source>
+        <translation>Find and Replace</translation>
+    </message>
+    <message>
+        <source>Thay chữ cần TrionCAD Pro</source>
+        <translation>Replacing text requires TrionCAD Pro</translation>
+    </message>
+    <message>
+        <source>Để trống để xóa đoạn chữ tìm được</source>
+        <translation>Leave empty to delete the found text</translation>
+    </message>
+    <message>
+        <source>Gõ chữ cần tìm</source>
+        <translation>Type the text to find</translation>
+    </message>
+    <message>
+        <source>Đang phân biệt dấu tiếng Việt: “duong” không khớp “đường”. Tắt tùy chọn này để tìm không dấu.</source>
+        <translation>Matching Vietnamese diacritics: “duong” does not match “đường”. Turn this option off to search without diacritics.</translation>
+    </message>
+    <message>
+        <source>Không phân biệt dấu: gõ “duong” cũng ra “đường”, “ĐƯỜNG”.</source>
+        <translation>Ignoring diacritics: typing “duong” also finds “đường” and “ĐƯỜNG”.</translation>
+    </message>
+    <message>
+        <source>Không tìm thấy “%1”</source>
+        <translation>No results for “%1”</translation>
+    </message>
+    <message>
+        <source>Thử tắt “Phân biệt dấu tiếng Việt” hoặc mở rộng phạm vi.</source>
+        <translation>Try turning off “Match Vietnamese diacritics” or searching a wider area.</translation>
+    </message>
+    <message>
+        <source>Vùng chọn đang trống: bấm nút chọn cạnh Phạm vi để chọn đối tượng.</source>
+        <translation>The selection is empty: click the select button next to Find where to select objects.</translation>
+    </message>
+    <message>
+        <source>Thử mở rộng phạm vi hoặc bật thêm loại chữ trong Tùy chọn tìm.</source>
+        <translation>Try searching a wider area or turning on more text types in Search options.</translation>
+    </message>
+    <message>
+        <source>Đang tìm…</source>
+        <translation>Searching…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Đang tìm… %1 kết quả</source>
+        <translation>
+            <numerusform>Searching… %1 result</numerusform>
+            <numerusform>Searching… %1 results</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 kết quả</source>
+        <translation>
+            <numerusform>%1 result</numerusform>
+            <numerusform>%1 results</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ví dụ: tường, cua di, KT-12</source>
+        <translation>e.g. wall, door, KT-12</translation>
+    </message>
+    <message>
+        <source>Toàn bản vẽ</source>
+        <translation>Entire drawing</translation>
+    </message>
+    <message>
+        <source>Không gian hiện tại</source>
+        <translation>Current space</translation>
+    </message>
+    <message>
+        <source>Vùng chọn</source>
+        <translation>Selected objects</translation>
+    </message>
+    <message>
+        <source>Chọn đối tượng</source>
+        <translation>Select objects</translation>
+    </message>
+    <message>
+        <source>Tùy chọn tìm</source>
+        <translation>Search options</translation>
+    </message>
+    <message>
+        <source>Kết quả tìm</source>
+        <translation>Search results</translation>
+    </message>
+    <message>
+        <source>Enter: zoom tới đối tượng của dòng</source>
+        <translation>Enter: zoom to the object in this row</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Text</translation>
+    </message>
+    <message>
+        <source>MText</source>
+        <translation>MText</translation>
+    </message>
+    <message>
+        <source>Chữ kích thước</source>
+        <translation>Dimension text</translation>
+    </message>
+    <message>
+        <source>Multileader</source>
+        <translation>Multileader</translation>
+    </message>
+    <message>
+        <source>Ô bảng</source>
+        <translation>Table cell</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>Vị trí</source>
+        <translation>Location</translation>
+    </message>
+    <message>
+        <source>Loại</source>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <source>Đoạn chữ</source>
+        <translation>Text</translation>
+    </message>
+    <message>
+        <source>Tạo tập chọn</source>
+        <translation>Create selection set</translation>
+    </message>
+    <message>
+        <source>Chọn đối tượng của mọi kết quả; mũi tên: chỉ các dòng đang chọn</source>
+        <translation>Select the objects of all results; arrow: only the selected rows</translation>
+    </message>
+    <message>
+        <source>Thay</source>
+        <translation>Replace</translation>
+    </message>
+    <message>
+        <source>Thay tất cả</source>
+        <translation>Replace all</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::HistoryWindow</name>
     <message>
         <source>Lịch sử dòng lệnh</source>

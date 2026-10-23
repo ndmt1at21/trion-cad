@@ -200,6 +200,21 @@
     </message>
 </context>
 <context>
+    <name>trion::ui::FindDialog</name>
+    <message numerus="yes">
+        <source>Đang tìm… %1 kết quả</source>
+        <translation>
+            <numerusform>Đang tìm… %1 kết quả</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 kết quả</source>
+        <translation>
+            <numerusform>%1 kết quả</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::InlineProgress</name>
     <message numerus="yes">
         <source>%1 · %n tác vụ khác</source>
