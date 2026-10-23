@@ -7,9 +7,10 @@
 // trong StartupTrace:
 //   Store (tệp cài đặt của --settings) → UiExecutor → Translator → loadFonts → ThemeManager → IconProvider → Keymap →
 //   [ready] → BackgroundJobs (NT-013) → cửa sổ chính (UIA-001: Sysvars, ActionRegistry, EditionGate, CommandRouter,
-//   RecentFiles (UIA-004), MainWindow + CleanScreen; ShellAssembly lắp vùng thật của đợt 5, 6 và nối lệnh; khôi phục
-//   hình học, palette, workspace) → DisplayContext (raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình; lớp
-//   màn hình cho MainWindow) → hiện cửa sổ (tab Start).
+//   RecentFiles (UIA-004), MainWindow + CleanScreen, hồ sơ của Workspace; ShellAssembly lắp vùng thật của đợt 5, 6, 7
+//   và nối lệnh; khôi phục hình học, palette, workspace, dòng lệnh nổi) → DisplayContext (raster trước bộ biểu tượng
+//   Viewer ở nền cho DPR mọi màn hình; lớp màn hình cho MainWindow) → hiện cửa sổ (tab Start) → sau khung đầu: raster
+//   trước mọi biểu tượng ở nền (tự hoàn thành).
 // Thoát (hàm hủy): hủy token toàn ứng dụng, lưu hình học và bố cục của cửa sổ chính, hủy cửa sổ (widget trước
 // ShellAssembly, ActionRegistry, Sysvars, EditionGate, RecentFiles), hủy BackgroundJobs (yêu cầu hủy mọi tác vụ) và
 // IconProvider (hủy việc raster còn chờ), chờ mọi việc nền dừng (sched::waitIdle), rồi hủy phần còn lại theo thứ tự
@@ -17,10 +18,11 @@
 //
 // Luồng UI sở hữu document (UiExecutor.h: kết quả nền về luồng UI, requireUiThread chặn API ghi gọi sai luồng).
 // ponytail: chưa có phiên nhiều bản vẽ DOC-018 và input pipeline INT-002, nên chưa có CoreSession; đường dẫn cần mở
-// (dòng lệnh, lần chạy sau, thả tệp lên tab tệp, tệp gần đây của trang Start) chỉ tới openRequested(), DOC-018/UIB-002
-// nối (rồi RecentFiles::add). Lệnh từ hành động (ActionRegistry), ribbon, dòng lệnh, tab tệp, trang Start, thanh
-// trạng thái tới bộ định tuyến tạm shell::CommandRouter (Clean Screen, COMMANDLINE/HIDE, RIBBON/RIBBONCLOSE, NEWTAB,
-// sysvar trong suốt chạy; lệnh khác ghi log); vùng vẽ, tab layout còn là ô giữ chỗ (ShellAssembly.h).
+// (dòng lệnh, lần chạy sau, thả tệp lên tab tệp, tệp gần đây của trang Start và menu ứng dụng) chỉ tới openRequested(),
+// DOC-018/UIB-002 nối (rồi RecentFiles::add). Lệnh từ hành động (ActionRegistry), ribbon, dòng lệnh, tab tệp, trang
+// Start, menu ứng dụng, QAT, palette Layer của Viewer, thanh trạng thái tới bộ định tuyến tạm shell::CommandRouter
+// (Clean Screen, COMMANDLINE/HIDE, RIBBON/RIBBONCLOSE, NEWTAB, TEXTSCR, INPUTSEARCHOPTIONS, sysvar trong suốt chạy;
+// lệnh khác ghi log); vùng vẽ, tab layout còn là ô giữ chỗ (ShellAssembly.h).
 
 #include "core/base/sched/Scheduler.h"
 

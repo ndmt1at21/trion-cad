@@ -20,8 +20,16 @@
 //
 // Lưu, khôi phục qua Store (NT-010): "ui/window/geometry" (saveGeometry: hình học thường, phóng to, màn hình; màn hình
 // đã lưu không còn thì Qt đặt về màn hình chính, trong vùng làm việc), "ui/window/workspace" (Workspace),
-// "ui/window/customLayout" (bố cục palette người dùng đã đổi); dock, ghim, dải: "ui/palettes/…" của PaletteHost.
+// "ui/window/customLayout" (bố cục palette người dùng đã đổi), "ui/window/commandLineFloat" (dòng lệnh nổi: chỗ, rộng
+// theo tọa độ vùng vẽ; rỗng: ở cột); dock, ghim, dải: "ui/palettes/…" của PaletteHost.
 // Lưu khi đóng cửa sổ (closeEvent) hoặc save(); trước khi lưu phát aboutToSave (Clean Screen tắt, lưu bố cục thật).
+//
+// Dòng lệnh nổi (07.1 §8; UIA-007 CommandLine::setFloating, floatRequested, dockRequested): setCommandLineFloating
+// đưa widget của vùng CommandLine ra khỏi cột thành con của vùng vẽ, hoặc về lại ô của nó; bên lắp nối
+// commandLineFloatChanged tới CommandLine::setFloating. Vùng vẽ đổi cỡ: dòng lệnh nổi được kẹp lại trong vùng vẽ; đổi
+// widget vùng vẽ (setRegion): dòng lệnh chuyển sang vùng vẽ mới, giữ chỗ và rộng.
+// Hàng dưới ribbon (UIA-101 "Hiện bên dưới ribbon"): addBelowRibbon(QAT); hàng theo thanh tiêu đề (Clean Screen ẩn
+// cả hai; RIBBONCLOSE chỉ ẩn ribbon, QAT vẫn dùng được như RIBBONCLOSE.md mục 4).
 //
 // Dùng (luồng UI, sau ThemeManager, IconProvider, Translator):
 //   shell::MainWindow window(store);
@@ -40,10 +48,13 @@
 #include "app/core/display/DisplayContext.h"
 #include "core/base/settings/Settings.h"
 
+#include <QHash>
 #include <QMainWindow>
 #include <QPoint>
+#include <QRect>
 
 #include <array>
+#include <functional>
 #include <optional>
 
 class QVBoxLayout;
@@ -89,15 +100,38 @@ public:
     void setScreenClass(ui::ScreenClass c);
 
     // Khôi phục hình học (lần đầu: phóng to trên màn hình chính), lớp màn hình theo màn hình chứa cửa sổ, bố cục
-    // palette đã lưu (chưa có, hỏng, hoặc chưa từng đổi: bố cục mặc định của workspace theo lớp màn hình). Gọi trước
-    // show().
+    // palette đã lưu (chưa có, hỏng, hoặc chưa từng đổi: bố cục mặc định của workspace theo lớp màn hình), dòng lệnh
+    // nổi (chỗ, rộng đã lưu, kẹp theo vùng vẽ mỗi lần nó đổi cỡ). Gọi trước show().
     void restore();
-    void save(); // aboutToSave, rồi ghi hình học, bố cục palette; chưa restore() thì không ghi
+    void save(); // aboutToSave, rồi ghi hình học, bố cục palette, dòng lệnh nổi; chưa restore() thì không ghi
+
+    // Dòng lệnh nổi trên vùng vẽ. true: widget của vùng CommandLine rời cột, thành con của region(Canvas), phát
+    // commandLineFloatChanged(true, at) rồi hiện (trừ khi vùng bị ẩn tường minh: COMMANDLINEHIDE); đang nổi thì chỉ phát
+    // lại (dời tới at, kẹp trong vùng vẽ). false: phát commandLineFloatChanged(false, …) rồi widget về ô của nó trong
+    // cột (giữa tab layout và thanh trạng thái). at: góc trên trái, tọa độ màn hình. Ẩn/hiện, Clean Screen như khi ở cột.
+    // Chỗ đã chọn (cả khi người dùng kéo) được giữ: vùng vẽ nhỏ lại thì kẹp, lớn lại thì về đúng chỗ.
+    void setCommandLineFloating(bool floating, QPoint at = {});
+    bool isCommandLineFloating() const { return floating_; }
+
+    // Hàng dưới ribbon: w vào hàng (cha thành hàng, xếp từ trái). Hàng hiện khi có widget và thanh tiêu đề không bị ẩn;
+    // widget rời hàng (layout khác lấy, setParent) thì hàng rỗng tự ẩn.
+    void addBelowRibbon(QWidget* w);
+    QWidget* belowRibbon() const { return belowRibbon_; } // hàng (test, thứ tự Tab)
+
+    // Nội dung thật cho palette giữ chỗ (props, layers, fontdoc, tcvnlib, blocks): create dựng ở lần palette hiện đầu,
+    // nhận ô giữ chỗ (EmptyState "có ở bản sau") để dùng tiếp khi tính năng chưa có ở hồ sơ đang dùng; không dùng thì
+    // hủy nó. Gọi trước lần hiện đầu (trước restore()). ponytail: palette thật đăng ký thay ô giữ chỗ khi UIC-002,
+    // UIC-009, UIJ-002, UIJ-011, UIG-015 có (bỏ API này).
+    void setPaletteContent(const QString& id, std::function<QWidget*(QWidget* placeholder)> create);
 
 signals:
     void aboutToSave();
+    // Bên lắp nối tới CommandLine::setFloating(floating, at), đồng bộ: true khi widget đã là con của vùng vẽ (cũng khi
+    // dời, kẹp lại); false trước khi widget về cột (gom phần nó đặt vào vùng vẽ).
+    void commandLineFloatChanged(bool floating, QPoint at);
 
 protected:
+    bool eventFilter(QObject* watched, QEvent* e) override; // vùng vẽ đổi cỡ; dòng lệnh dời; widget rời hàng dưới ribbon
     void closeEvent(QCloseEvent* e) override;
     // Vùng trống của thanh tiêu đề (sự kiện widget con không nhận): kéo → di chuyển cửa sổ, nhấp đúp → phóng to.
     void mousePressEvent(QMouseEvent* e) override;
@@ -108,15 +142,24 @@ protected:
 private:
     bool onTitleBar(QPoint p) const; // p: tọa độ của MainWindow
     void registerPalettes();
+    void floatCommandLine(const QRect& want); // nổi (rời cột nếu chưa) ở chỗ, rộng want của vùng vẽ (rộng 0: mặc định)
+    void placeFloating();                     // dòng lệnh nổi về floatAt_, kẹp trong vùng vẽ hiện tại
+    void syncBelowRibbon();
 
     settings::Store& store_;
     QVBoxLayout* column_ = nullptr;
     QMainWindow* docks_ = nullptr;
     std::array<QWidget*, kRegionCount> regions_{};
+    QWidget* belowRibbon_ = nullptr;
     ui::PaletteHost* palettes_ = nullptr;
     Workspace* workspace_ = nullptr;
     ui::ScreenClass screenClass_ = ui::ScreenClass::Wide;
     bool restored_ = false;
+    bool floating_ = false;
+    bool placing_ = false; // đang đặt dòng lệnh nổi (bỏ qua Move, Resize do chính mình gây ra)
+    QRect floatAt_;        // dòng lệnh nổi: chỗ (tọa độ vùng vẽ) người dùng chọn hoặc đã lưu, rộng; chỉ topLeft, width
+    QPoint placed_;        // chỗ vừa đặt (đã kẹp): Move tới chỗ khác là người dùng kéo
+    QHash<QString, std::function<QWidget*(QWidget*)>> contents_; // nội dung thật của palette giữ chỗ
     std::optional<QPoint> pressAt_; // nhấn trái trên thanh tiêu đề, chờ kéo đủ xa
 };
 

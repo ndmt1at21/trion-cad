@@ -18,6 +18,9 @@
 //      bố cục + vẽ mỗi lần đổi cỡ (khung 60 fps thật: QA-011).
 //   5  titleBar (nhấp đúp phóng to, sự kiện từ widget con), setRegion, accessibility, pseudoNoTruncation (vi-XL),
 //      idleNoTimers. nativeTitleBar: chỉ chạy với -platform windows (đo Qt::ExpandedClientAreaHint trên máy thật).
+//   6  Integration nhóm 7: commandLineFloating (dòng lệnh nổi: rời cột, về đúng ô, kẹp khi vùng vẽ đổi cỡ, giữ chỗ
+//      khi đổi widget vùng vẽ, Clean Screen, ẩn vùng, lưu và dựng lại với cùng Store), belowRibbon (hàng dưới ribbon
+//      theo thanh tiêu đề, tự ẩn khi rỗng), paletteContent (nội dung thật thay ô giữ chỗ), layoutApplied.
 #include "app/shell/CleanScreen.h"
 #include "app/shell/CommandRouter.h"
 #include "app/shell/MainWindow.h"
@@ -42,6 +45,7 @@
 #include <QAbstractButton>
 #include <QAccessible>
 #include <QApplication>
+#include <QBoxLayout>
 #include <QDockWidget>
 #include <QFile>
 #include <QJsonArray>
@@ -217,6 +221,7 @@ class ShellTest : public QObject {
     std::unique_ptr<ui::DisplayContext> display_;
     CleanScreen* clean_ = nullptr;
     int stores_ = 0;
+    std::function<void()> setup_; // build(): sau khi dựng cửa sổ, trước restore() (vùng thật, nối tín hiệu)
 
     int px(tok::PxId id) const { return qRound(tm_->px(id)); }
     // Cao mong đợi của vùng (prototype app.css), tính độc lập với MainWindow.cpp.
@@ -267,6 +272,8 @@ class ShellTest : public QObject {
         clean_ = new CleanScreen(*win_, *sysvars_, *router_);
         actions_->install(win_.get());
         actions_->addViewport(canvas());
+        if (setup_)
+            setup_();
         win_->restore();
         if (geometry) {
             win_->setWindowState(Qt::WindowNoState);
@@ -397,6 +404,7 @@ private slots:
         if (QWidget* p = QApplication::activePopupWidget())
             p->close();
         closeWindow();
+        setup_ = nullptr;
         window_.reset();
         if (!qEnvironmentVariableIsSet("TRION_NATIVE_PROBE") &&
             QGuiApplication::screens().size() != qsizetype(std::size(kScreens)))
@@ -1005,6 +1013,193 @@ private slots:
         loop.exec();
         qApp->removeEventFilter(&counter);
         QVERIFY2(counter.seen.isEmpty(), qPrintable(counter.seen.join(u", "_s)));
+    }
+
+    // Dòng lệnh nổi (UIA-007) với widget giả làm như CommandLine::setFloating: vừa rời cột thì rộng 2/3 vùng vẽ, chỗ kẹp
+    // trong vùng vẽ.
+    void commandLineFloating()
+    {
+        QWidget* cmd = nullptr;
+        QList<bool> calls; // commandLineFloatChanged theo thứ tự
+        bool floating = false;
+        setup_ = [&] {
+            cmd = new QWidget;
+            cmd->setObjectName(u"cmd"_s);
+            cmd->setFixedHeight(expectedHeight(Region::CommandLine));
+            win_->setRegion(Region::CommandLine, cmd);
+            floating = false;
+            connect(win_.get(), &MainWindow::commandLineFloatChanged, cmd, [&](bool on, QPoint at) {
+                calls << on;
+                QWidget* host = cmd->parentWidget();
+                if (on && !floating)
+                    cmd->resize(std::min(cmd->width(), host->width() * 2 / 3), cmd->height());
+                floating = on;
+                if (!on)
+                    return;
+                const QPoint p = host->mapFromGlobal(at);
+                cmd->move(std::clamp(p.x(), 0, std::max(0, host->width() - cmd->width())),
+                          std::clamp(p.y(), 0, std::max(0, host->height() - cmd->height())));
+                cmd->raise();
+            });
+        };
+        QVERIFY(build());
+        auto* column = static_cast<QBoxLayout*>(win_->centralWidget()->layout());
+        const int slot = column->indexOf(cmd);
+        QVERIFY(slot > column->indexOf(win_->region(Region::LayoutTabs)));
+        const int canvasHeight = canvas()->height();
+        QVERIFY(!win_->isCommandLineFloating() && calls.isEmpty());
+
+        // Nổi: rời cột (vùng vẽ giãn ra phần đó), con của vùng vẽ, hiện, đúng chỗ, rộng 2/3 vùng vẽ
+        win_->setCommandLineFloating(true, canvas()->mapToGlobal(QPoint(200, 150)));
+        settle();
+        QVERIFY(win_->isCommandLineFloating());
+        QCOMPARE(cmd->parentWidget(), canvas());
+        QCOMPARE(column->indexOf(cmd), -1);
+        QVERIFY(cmd->isVisible() && win_->isRegionVisible(Region::CommandLine));
+        QCOMPARE(cmd->pos(), QPoint(200, 150));
+        QCOMPARE(cmd->width(), canvas()->width() * 2 / 3);
+        QCOMPARE(canvas()->height(), canvasHeight + expectedHeight(Region::CommandLine));
+        QVERIFY(!calls.isEmpty() && !calls.contains(false)); // nổi, rồi kẹp lại khi vùng vẽ giãn
+
+        // Ẩn/hiện vùng (COMMANDLINEHIDE / COMMANDLINE) và Clean Screen khi nổi: vẫn nổi, đúng chỗ
+        win_->setRegionVisible(Region::CommandLine, false);
+        QVERIFY(!cmd->isVisible() && !win_->isRegionVisible(Region::CommandLine));
+        win_->setRegionVisible(Region::CommandLine, true);
+        QVERIFY(cmd->isVisible() && win_->isRegionVisible(Region::CommandLine));
+        router_->submit(u"'_CLEANSCREENON"_s);
+        settle();
+        QVERIFY(clean_->isOn() && cmd->isVisible() && win_->isCommandLineFloating());
+        QCOMPARE(cmd->pos(), QPoint(200, 150)); // vùng vẽ lớn ra: chỗ đã chọn vẫn vừa
+        router_->submit(u"'_CLEANSCREENOFF"_s);
+        settle();
+        QCOMPARE(cmd->pos(), QPoint(200, 150));
+
+        // Góc dưới phải; cửa sổ nhỏ lại: kẹp trong vùng vẽ; lớn lại: về đúng chỗ đã chọn
+        const QPoint corner(canvas()->width() - cmd->width(), canvas()->height() - cmd->height());
+        win_->setCommandLineFloating(true, canvas()->mapToGlobal(corner));
+        QCOMPARE(cmd->pos(), corner);
+        win_->resize(win_->width() - 200, win_->height() - 150);
+        settle();
+        QCOMPARE(cmd->pos(), QPoint(canvas()->width() - cmd->width(), canvas()->height() - cmd->height()));
+        win_->setGeometry(kFull);
+        settle();
+        QCOMPARE(cmd->pos(), corner);
+
+        // Người dùng kéo (widget tự dời): chỗ mới là chỗ đã chọn, đổi cỡ vùng vẽ không kéo về chỗ cũ
+        cmd->move(300, 120);
+        win_->resize(win_->width() - 1, win_->height());
+        settle();
+        QCOMPARE(cmd->pos(), QPoint(300, 120));
+
+        // Đổi widget vùng vẽ: dòng lệnh không bị hủy theo, thôi nổi rồi nổi lại trên vùng vẽ mới đúng chỗ, rộng
+        const QRect g = cmd->geometry();
+        calls.clear();
+        QPointer<QWidget> old = canvas();
+        auto* viewport = new QWidget;
+        viewport->setFocusPolicy(Qt::StrongFocus);
+        win_->setRegion(Region::Canvas, viewport);
+        settle();
+        QVERIFY(old.isNull() && cmd);
+        QCOMPARE(cmd->parentWidget(), viewport);
+        QVERIFY(cmd->isVisible());
+        QCOMPARE(cmd->geometry(), g);
+        QCOMPARE(calls.first(), false);
+        QVERIFY(calls.size() >= 2 && calls.mid(1) == QList<bool>(calls.size() - 1, true));
+
+        // Lưu, dựng lại với cùng Store: nổi lại đúng chỗ, rộng (sau khi cửa sổ hiện, vùng vẽ có cỡ thật)
+        closeWindow();
+        calls.clear();
+        QVERIFY(build());
+        QVERIFY(win_->isCommandLineFloating());
+        QCOMPARE(cmd->parentWidget(), canvas());
+        column = static_cast<QBoxLayout*>(win_->centralWidget()->layout()); // cột của cửa sổ mới
+        QCOMPARE(column->indexOf(cmd), -1);
+        QCOMPARE(cmd->geometry(), g);
+        QVERIFY(cmd->isVisible());
+
+        // Bám lại: về đúng ô trong cột, mọi vùng như lúc chưa nổi
+        calls.clear();
+        win_->setCommandLineFloating(false);
+        settle();
+        QVERIFY(!win_->isCommandLineFloating());
+        QCOMPARE(calls, QList<bool>{false});
+        QCOMPARE(column->indexOf(cmd), slot);
+        QCOMPARE(cmd->parentWidget(), win_->centralWidget());
+        QCOMPARE(cmd->geometry().top(), win_->region(Region::LayoutTabs)->geometry().bottom() + 1);
+        QCOMPARE(canvas()->height(), canvasHeight);
+        closeWindow();
+        QVERIFY(build()); // đã bám khi lưu: khởi động ở cột
+        QVERIFY(!win_->isCommandLineFloating());
+        QCOMPARE(static_cast<QBoxLayout*>(win_->centralWidget()->layout())->indexOf(cmd), slot);
+    }
+
+    // Hàng dưới ribbon (QAT "Hiện bên dưới ribbon", UIA-101): giữa ribbon và tab tệp, theo thanh tiêu đề (Clean Screen
+    // ẩn), không theo ribbon (RIBBONCLOSE); widget rời hàng thì hàng tự ẩn.
+    void belowRibbon()
+    {
+        QVERIFY(build());
+        QWidget* row = win_->belowRibbon();
+        QVERIFY(row && !row->isVisible());
+        const QStringList before = snapshot();
+        auto* qat = new QLabel(u"QAT"_s); // i18n-ok: widget mẫu của test
+        win_->addBelowRibbon(qat);
+        settle();
+        QVERIFY(row->isVisible() && qat->isVisible());
+        const QWidget* ribbon = win_->region(Region::Ribbon);
+        const QWidget* tabs = win_->region(Region::FileTabs);
+        QCOMPARE(row->geometry().top(), ribbon->geometry().bottom() + 1);
+        QCOMPARE(tabs->geometry().top(), row->geometry().bottom() + 1);
+        QCOMPARE(qat->x(), px(tok::sp_2)); // xếp từ trái, lề như thanh tiêu đề
+        QVERIFY(row->height() >= qat->sizeHint().height() + kLine);
+
+        router_->submit(u"'_CLEANSCREENON"_s); // ẩn cùng thanh tiêu đề
+        QVERIFY(!row->isVisible());
+        router_->submit(u"'_CLEANSCREENOFF"_s);
+        QVERIFY(row->isVisible());
+        win_->setRegionVisible(Region::Ribbon, false); // RIBBONCLOSE: QAT vẫn dùng được
+        QVERIFY(row->isVisible());
+        win_->setRegionVisible(Region::Ribbon, true);
+
+        QWidget other;
+        auto* layout = new QHBoxLayout(&other);
+        layout->addWidget(qat); // về chỗ khác (thanh tiêu đề lấy lại): hàng rỗng tự ẩn
+        QVERIFY(!row->isVisible());
+        QCOMPARE(snapshot(), before);
+    }
+
+    // Nội dung thật của palette giữ chỗ (setPaletteContent): dựng ở lần hiện đầu, nhận ô giữ chỗ; palette khác giữ ô giữ
+    // chỗ. Workspace::layoutApplied khi khôi phục và khi đổi workspace.
+    void paletteContent()
+    {
+        QPointer<QWidget> placeholder;
+        int built = 0, applied = 0;
+        setup_ = [&] {
+            connect(&win_->workspace(), &Workspace::layoutApplied, win_.get(), [&] { ++applied; });
+            win_->setPaletteContent(u"layers"_s, [&](QWidget* p) {
+                ++built;
+                placeholder = p;
+                auto* box = new QWidget;
+                auto* column = new QVBoxLayout(box);
+                column->addWidget(p); // dùng tiếp ô giữ chỗ (như palette Layer của Viewer ở hồ sơ đầy đủ)
+                box->setObjectName(u"realLayers"_s);
+                return box;
+            });
+        };
+        QVERIFY(build());
+        QCOMPARE(applied, 1); // khôi phục lần đầu (chưa có bố cục đã lưu): áp bố cục mặc định
+        host().showPalette(u"layers"_s);
+        QVERIFY(spinUntil([&] { return host().content(u"layers"_s) != nullptr; }));
+        QCOMPARE(host().content(u"layers"_s)->objectName(), u"realLayers"_s);
+        QCOMPARE(built, 1);
+        QVERIFY(placeholder && host().content(u"layers"_s)->isAncestorOf(placeholder));
+        host().showPalette(u"props"_s);
+        QVERIFY(spinUntil([&] { return host().content(u"props"_s) != nullptr; }));
+        QVERIFY(host().content(u"props"_s)->objectName() != u"realLayers"_s);
+
+        win_->workspace().apply(u"viewer"_s);
+        QCOMPARE(applied, 2);
+        win_->workspace().apply(u"2d"_s);
+        QCOMPARE(applied, 3);
     }
 
     // Khung cửa sổ thật (07.1 §13.6): Qt::ExpandedClientAreaHint có đưa vùng client lên hàng tiêu đề không. Chạy tay:

@@ -11,12 +11,16 @@
 #include <QAccessibleWidget>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QHBoxLayout>
+#include <QJsonObject>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScreen>
 #include <QStyle>
 #include <QVBoxLayout>
 #include <QWindow>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -28,6 +32,8 @@ namespace {
 
 const settings::Setting<QByteArray> kGeometry{"ui/window/geometry", {}};
 const settings::Setting<bool> kCustomLayout{"ui/window/customLayout", false};
+// Dòng lệnh nổi: {"x", "y", "width"} theo tọa độ vùng vẽ; rỗng: ở cột.
+const settings::Setting<QJsonObject> kCommandLineFloat{"ui/window/commandLineFloat", {}};
 
 // Số prototype viết thẳng (app.css), không có token: nét chia 1 px; .cmd-hist padding-top 3 px; .cmd-in margin-top
 // 3 px (margin-bottom 6 px là --sp-3).
@@ -135,6 +141,33 @@ private:
     Region region_;
 };
 
+// Hàng dưới ribbon (QAT "Hiện bên dưới ribbon"): nền --c-chrome, nét dưới --c-border như các hàng trên vùng vẽ; lề
+// trái --sp-2 như .tb, trên/dưới --sp-1 (đọc lúc dựng: --sp-* như nhau ở mọi chế độ). ponytail: prototype không vẽ
+// hàng này (chỉ có mục menu "Hiện bên dưới ribbon"); theo .tb.
+class BelowRibbon final : public QWidget {
+public:
+    explicit BelowRibbon(QWidget* parent) : QWidget(parent)
+    {
+        setAttribute(Qt::WA_OpaquePaintEvent);
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        const auto& t = theme::ThemeManager::instance();
+        const int sp1 = qRound(t.px(tok::sp_1)), sp2 = qRound(t.px(tok::sp_2));
+        auto* row = new QHBoxLayout(this);
+        row->setContentsMargins(sp2, sp1, sp2, sp1 + kLine);
+        row->setSpacing(0);
+        row->addStretch(1); // widget chèn trước stretch: xếp từ trái
+    }
+
+protected:
+    void paintEvent(QPaintEvent*) override
+    {
+        const auto& t = theme::ThemeManager::instance();
+        QPainter p(this);
+        p.fillRect(rect(), t.color(tok::c_chrome));
+        p.fillRect(QRect(0, height() - kLine, width(), kLine), t.color(tok::c_border));
+    }
+};
+
 // Palette giữ chỗ trong bố cục mặc định của prototype (core.js TC.S.pal: phải Thuộc tính, Layer, Bác sĩ Font; trái
 // Thư viện TCVN, Blocks). ponytail: nội dung EmptyState; UIC-002 (Thuộc tính), UIC-009 (Layer), UIJ-002 (Bác sĩ Font),
 // UIJ-011 (Thư viện TCVN), UIG-015 (Blocks) thay hàm dựng.
@@ -182,6 +215,12 @@ MainWindow::MainWindow(settings::Store& store, QWidget* parent) : QMainWindow(pa
             column_->addWidget(w);
         }
     }
+    belowRibbon_ = new BelowRibbon(frame);
+    column_->insertWidget(column_->indexOf(regions_[size_t(Region::Ribbon)]) + 1, belowRibbon_);
+    belowRibbon_->hide();
+    belowRibbon_->installEventFilter(this);
+    regions_[size_t(Region::Canvas)]->installEventFilter(this);
+    regions_[size_t(Region::CommandLine)]->installEventFilter(this);
     setCentralWidget(frame);
     palettes_ = new ui::PaletteHost(docks_, store_);
     registerPalettes();
@@ -194,10 +233,15 @@ void MainWindow::registerPalettes()
 {
     for (const PaletteInfo& p : kPalettes) {
         const std::function<QString()> title = [t = p.title] { return tr(t); };
-        // Đóng, ghim: Workspace đặt bố cục khi khôi phục.
-        palettes_->registerPalette({QString::fromLatin1(p.id), title,
-                                    [title, icon = p.icon] { return placeholderPalette(icon, title); }, p.area, false,
-                                    true});
+        const QString id = QString::fromLatin1(p.id);
+        // Đóng, ghim: Workspace đặt bố cục khi khôi phục. Nội dung thật (setPaletteContent) nếu có.
+        palettes_->registerPalette({id, title,
+                                    [this, id, title, icon = p.icon] {
+                                        QWidget* placeholder = placeholderPalette(icon, title);
+                                        const auto it = contents_.constFind(id);
+                                        return it == contents_.cend() ? placeholder : (*it)(placeholder);
+                                    },
+                                    p.area, false, true});
     }
 }
 
@@ -228,23 +272,126 @@ void MainWindow::setRegion(Region r, QWidget* widget)
     QWidget*& slot = regions_[size_t(r)];
     if (!widget || widget == slot)
         return;
+    if (r == Region::CommandLine)
+        setCommandLineFloating(false); // widget cũ về ô của nó trong cột rồi mới thay
     const bool hidden = slot->isHidden();
     if (r == Region::Canvas) {
+        // Dòng lệnh nổi là con của vùng vẽ cũ: thôi nổi (gom lịch sử về widget), giữ tạm ở vùng dock (cùng cửa sổ: giữ
+        // chỗ trong chuỗi focus), rồi nổi lại trên vùng vẽ mới ở chỗ đã chọn; đổi cỡ của vùng vẽ mới kẹp lại theo đó.
+        QWidget* cmd = floating_ ? region(Region::CommandLine) : nullptr;
+        const bool cmdHidden = cmd && cmd->isHidden();
+        if (cmd) {
+            emit commandLineFloatChanged(false, {});
+            cmd->setParent(docks_);
+        }
         delete docks_->takeCentralWidget(); // setCentralWidget chỉ deleteLater widget cũ
         docks_->setCentralWidget(widget);
-    } else {
-        delete column_->replaceWidget(slot, widget);
-        delete slot;
+        slot = widget;
+        widget->setVisible(!hidden);
+        if (cmd) {
+            cmd->setParent(widget);
+            placeFloating();
+            cmd->setVisible(!cmdHidden);
+        }
+        widget->installEventFilter(this);
+        return;
     }
+    delete column_->replaceWidget(slot, widget);
+    delete slot;
     slot = widget;
     widget->setVisible(!hidden);
-    if (r == Region::CommandLine)
+    if (r == Region::CommandLine) {
         widget->setProperty("compact", screenClass_ != ui::ScreenClass::Wide);
+        widget->installEventFilter(this);
+    }
 }
 
 void MainWindow::setRegionVisible(Region r, bool visible)
 {
     region(r)->setVisible(visible);
+    if (r == Region::TitleBar)
+        syncBelowRibbon();
+}
+
+void MainWindow::setCommandLineFloating(bool floating, QPoint at)
+{
+    QWidget* cmd = region(Region::CommandLine);
+    if (floating) {
+        floatCommandLine(QRect(region(Region::Canvas)->mapFromGlobal(at), QSize(floating_ ? cmd->width() : 0, 0)));
+        floatAt_ = QRect(cmd->pos(), QSize(cmd->width(), 0)); // chỗ đã kẹp, rộng thật
+    } else if (floating_) {
+        const bool hidden = cmd->isHidden();
+        floating_ = false;
+        emit commandLineFloatChanged(false, {});
+        column_->insertWidget(column_->indexOf(region(Region::LayoutTabs)) + 1, cmd);
+        cmd->setVisible(!hidden);
+    }
+}
+
+void MainWindow::floatCommandLine(const QRect& want)
+{
+    QWidget* cmd = region(Region::CommandLine);
+    const bool entering = !floating_;
+    const bool hidden = cmd->isHidden();
+    if (entering) {
+        column_->removeWidget(cmd);
+        cmd->setParent(region(Region::Canvas)); // setParent ẩn widget: hiện lại theo trạng thái của vùng
+        floating_ = true;
+    }
+    floatAt_ = want;
+    placeFloating();
+    if (entering)
+        cmd->setVisible(!hidden);
+}
+
+void MainWindow::placeFloating()
+{
+    QWidget* cmd = region(Region::CommandLine);
+    const QPoint at = region(Region::Canvas)->mapToGlobal(floatAt_.topLeft());
+    placing_ = true;
+    emit commandLineFloatChanged(true, at); // vừa rời cột: rộng mặc định (CommandLine: 2/3 vùng vẽ)
+    if (floatAt_.width() > 0 && cmd->width() != floatAt_.width()) {
+        cmd->resize(floatAt_.width(), cmd->height());
+        emit commandLineFloatChanged(true, at); // kẹp lại với rộng đã chọn
+    }
+    placing_ = false;
+    placed_ = cmd->pos();
+}
+
+void MainWindow::addBelowRibbon(QWidget* w)
+{
+    auto* row = static_cast<QHBoxLayout*>(belowRibbon_->layout());
+    row->insertWidget(row->count() - 1, w); // trước stretch cuối; hàng đang ẩn: w hiện cùng hàng
+    syncBelowRibbon();
+}
+
+void MainWindow::syncBelowRibbon()
+{
+    const QObjectList& kids = belowRibbon_->children();
+    const bool used = std::any_of(kids.cbegin(), kids.cend(), [](const QObject* o) { return o->isWidgetType(); });
+    belowRibbon_->setVisible(used && isRegionVisible(Region::TitleBar));
+}
+
+void MainWindow::setPaletteContent(const QString& id, std::function<QWidget*(QWidget* placeholder)> create)
+{
+    contents_.insert(id, std::move(create));
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* e)
+{
+    if (watched == belowRibbon_) {
+        if (e->type() == QEvent::ChildRemoved) // layout khác lấy widget đi (QAT về thanh tiêu đề)
+            syncBelowRibbon();
+    } else if (floating_ && !placing_) {
+        // Vùng vẽ đổi cỡ (cả lúc khôi phục: cửa sổ hiện, phóng to): về chỗ đã chọn, kẹp trong vùng vẽ. Dòng lệnh dời tới
+        // chỗ khác chỗ vừa đặt: người dùng kéo dải nắm, đó là chỗ đã chọn mới.
+        QWidget* cmd = region(Region::CommandLine);
+        if (watched == region(Region::Canvas) && e->type() == QEvent::Resize)
+            placeFloating();
+        else if (watched == cmd && e->type() == QEvent::Move && cmd->pos() != placed_)
+            floatAt_.moveTopLeft(placed_ = cmd->pos());
+    }
+    return QMainWindow::eventFilter(watched, e);
 }
 
 bool MainWindow::isRegionVisible(Region r) const
@@ -275,6 +422,10 @@ void MainWindow::restore()
     region(Region::CommandLine)->setProperty("compact", screenClass_ != ui::ScreenClass::Wide);
     // Bố cục đã lưu mà người dùng chưa từng đổi: áp lại mặc định theo lớp màn hình lúc này (có thể khác lần trước).
     workspace_->restore(palettes_->restoreLayout(screenClass_) && store_.get(kCustomLayout));
+    // Dòng lệnh nổi: rời cột ngay (khung đầu đúng bố cục); chỗ, rộng đã lưu áp lại mỗi lần vùng vẽ đổi cỡ (hiện,
+    // phóng to) tới khi người dùng kéo.
+    if (const QJsonObject f = store_.get(kCommandLineFloat); !f.isEmpty())
+        floatCommandLine({f[u"x"_s].toInt(), f[u"y"_s].toInt(), std::max(0, f[u"width"_s].toInt()), 0});
     restored_ = true;
     region(Region::Canvas)->setFocus(); // vùng vẽ nhận phím gõ (07.1 §3)
 }
@@ -287,6 +438,10 @@ void MainWindow::save()
     store_.set(kGeometry, saveGeometry());
     palettes_->saveLayout();
     store_.set(kCustomLayout, !workspace_->isDefaultLayout());
+    QJsonObject f;
+    if (floating_)
+        f = {{u"x"_s, floatAt_.x()}, {u"y"_s, floatAt_.y()}, {u"width"_s, floatAt_.width()}};
+    store_.set(kCommandLineFloat, f);
 }
 
 void MainWindow::closeEvent(QCloseEvent* e)

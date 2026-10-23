@@ -51,6 +51,9 @@ public:
 
 signals:
     void changed(const QString& id);
+    // applyLayout xong (khôi phục, đổi workspace, đổi lớp màn hình): vùng hiện theo mô tả. Bên lắp áp lại trạng thái
+    // lệnh đặt cho vùng (RIBBONSTATE của RIBBON/RIBBONCLOSE).
+    void layoutApplied();
 
 private:
     QString signature() const;

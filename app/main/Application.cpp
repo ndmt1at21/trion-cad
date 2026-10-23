@@ -8,6 +8,7 @@
 #include "app/core/UiExecutor.h"
 #include "app/main/ShellAssembly.h"
 #include "app/main/StartupTrace.h"
+#include "app/shell/appmenu/AppMenu.h"
 #include "app/shell/CleanScreen.h"
 #include "app/shell/CommandRouter.h"
 #include "app/shell/filetabs/FileTabBar.h"
@@ -33,6 +34,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace trion::app {
@@ -46,6 +49,19 @@ Application* g_instance = nullptr; // chỉ luồng UI
 QString absolute(const QString& path)
 {
     return QDir::cleanPath(QFileInfo(path).absoluteFilePath());
+}
+
+// Raster trước theo lô, mỗi lô một lượt sự kiện: lượt của luồng UI (xét cache, gửi việc nền cho từng tên) ngắn hơn
+// 2 ms cả khi máy tải (lô 64 tên đo được 2,1 ms ở release khi tải nặng; 16 tên ~0,5 ms). context hủy (thoát) thì lô
+// còn chờ bị bỏ.
+void prewarmBatches(theme::IconProvider& icons, QObject* context, qreal dpr, const QStringList& names)
+{
+    constexpr qsizetype kBatch = 16;
+    icons.prewarm(dpr, names.first(std::min(kBatch, names.size())));
+    if (names.size() > kBatch)
+        QMetaObject::invokeMethod(
+            context, [&icons, context, dpr, rest = names.mid(kBatch)] { prewarmBatches(icons, context, dpr, rest); },
+            Qt::QueuedConnection);
 }
 
 } // namespace
@@ -138,15 +154,17 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
         auto* clean = new shell::CleanScreen(*main, *sysvars_, *router_); // con của cửa sổ; CLEANSCREENON/OFF, Ctrl+0
         actions_->install(main);
         actions_->addViewport(main->region(shell::MainWindow::Region::Canvas));
+        // Hồ sơ trước khi khôi phục (bố cục của workspace đang dùng áp một lần) và trước vùng thật (RIBBONSTATE đã lưu
+        // theo workspace đang dùng).
+        main->workspace().setProfile(gate_->profile());
+        connect(gate_.get(), &edition::EditionGate::profileChanged, &main->workspace(), &shell::Workspace::setProfile);
         // Vùng thật trước khi khôi phục: hình học, bố cục áp lên widget thật.
         shell_ = std::make_unique<ShellAssembly>(*main, *keymap_, *actions_, *sysvars_, *gate_, *router_, *clean, *jobs_,
                                                  *recent_);
         connect(shell_->fileTabs, &shell::FileTabBar::openRequested, this, &Application::requestOpen);
         connect(shell_->start, &shell::StartPage::openRequested, this, &Application::requestOpen);
-        // Hồ sơ trước khi khôi phục: bố cục của workspace đang dùng áp một lần.
-        main->workspace().setProfile(gate_->profile());
-        connect(gate_.get(), &edition::EditionGate::profileChanged, &main->workspace(), &shell::Workspace::setProfile);
-        main->restore(); // hình học (phóng to, màn hình), palette, workspace đã lưu
+        connect(shell_->appMenu, &shell::AppMenu::openRequested, this, &Application::requestOpen);
+        main->restore(); // hình học (phóng to, màn hình), palette, workspace, dòng lệnh nổi đã lưu
         window_ = std::move(window);
     }
     // Raster trước bộ biểu tượng Viewer ở nền cho DPR mọi màn hình (IconProvider::prewarm). Không gọi prewarm riêng ở
@@ -162,6 +180,14 @@ Application::Application(const Options& options, StartupTrace& trace, QObject* p
     }
     trace_.mark(u"window"_s);
     trace_.watchFirstFrame(window_.get());
+    // Sau khung đầu (lượt sự kiện sau, không kéo dài lượt giao khung đầu), ở nền: mặt nạ mọi biểu tượng (tự hoàn thành
+    // của dòng lệnh, menu, ribbon tab khác) ở DPR của cửa sổ, để lần hiện đầu không raster trên luồng UI.
+    // ponytail: đổi DPR thì chỉ bộ Viewer được raster trước (DisplayContext).
+    if (main)
+        connect(
+            &trace_, &StartupTrace::firstFrame, this,
+            [this] { prewarmBatches(*icons_, this, window_->devicePixelRatioF(), theme::IconProvider::names()); },
+            Qt::QueuedConnection);
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, [this] { trace_.mark(u"quit"_s); });
     if (options.quitAfterFirstFrame) // thoát sau khi khung đầu đã giao xong, không thoát ngay trong lúc giao

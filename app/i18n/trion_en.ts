@@ -3736,6 +3736,10 @@ conversion</translation>
 <context>
     <name>trion::app::ShellAssembly</name>
     <message>
+        <source>Đã ẩn ribbon. Gõ RIBBON để hiện lại.</source>
+        <translation>Ribbon hidden. Type RIBBON to show it again.</translation>
+    </message>
+    <message>
         <source>&lt;Clean Screen tắt&gt;</source>
         <translation>&lt;Clean Screen off&gt;</translation>
     </message>
@@ -3746,6 +3750,10 @@ conversion</translation>
     <message>
         <source>&lt;Clean Screen bật · %1 để tắt&gt;</source>
         <translation>&lt;Clean Screen on · %1 to turn off&gt;</translation>
+    </message>
+    <message>
+        <source>Đã lưu trạng thái hiển thị vào %1.</source>
+        <translation>Saved the display state to %1.</translation>
     </message>
 </context>
 <context>

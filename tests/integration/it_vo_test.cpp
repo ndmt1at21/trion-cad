@@ -28,6 +28,7 @@
 #include "app/core/a11y/AccessibilityAudit.h"
 #include "app/core/actions/ActionRegistry.h"
 #include "app/core/display/DisplayContext.h"
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
@@ -1104,18 +1105,18 @@ private slots:
         settle();
     }
 
-    // Kịch bản 12 — Viewer: workspace viewer, thanh trạng thái còn đúng 3 nút chế độ của hồ sơ (OSNAP, lineweight, độ
-    // trong suốt) và huy hiệu Viewer, lệnh Pro trong ô Tìm lệnh có huy hiệu khóa, Enter mở trang nâng cấp thay vì gửi
+    // Kịch bản 12 — Viewer: workspace viewer, thanh trạng thái còn đúng 2 nút chế độ của hồ sơ UI-M01 (OSNAP, lineweight)
+    // và huy hiệu Viewer (EditionBadge), lệnh Pro trong ô Tìm lệnh có huy hiệu khóa, Enter mở trang nâng cấp thay vì gửi
     // lệnh.
     void viewer()
     {
         shell_->gate.setEdition(Edition::Viewer);
         QCOMPARE(window_->workspace().current(), u"viewer"_s);
         settle();
-        QCOMPARE(visibleModes(), (QStringList{u"osnap"_s, u"LWDISPLAY"_s, u"TRANSPARENCYDISPLAY"_s}));
+        QCOMPARE(visibleModes(), (QStringList{u"osnap"_s, u"LWDISPLAY"_s})); // UI-M01 (UIA-017)
         auto* badge = shell_->statusBar->findChild<QToolButton*>(u"edition"_s);
         QVERIFY(badge);
-        QCOMPARE(badge->text(), QCoreApplication::translate("trion::shell::TitleBar", "Viewer"));
+        QCOMPARE(badge->text(), trion::edition::EditionBadge::label(shell_->gate));
 
         shell::CommandSearch* search = shell_->titleBar->search();
         QVERIFY(focusOn(search));
@@ -1135,7 +1136,7 @@ private slots:
         QCOMPARE(window_->workspace().current(), u"2d"_s);
         settle();
         QCOMPARE(visibleModes().size(), qsizetype(10)); // 9 nút EA + Isometric (P1, hành động "iso" gắn SNAPSTYL)
-        QCOMPARE(badge->text(), QCoreApplication::translate("trion::shell::TitleBar", "Pro"));
+        QCOMPARE(badge->text(), trion::edition::EditionBadge::label(shell_->gate));
     }
 
     // Kịch bản 13 — tác vụ nền lỗi trên registry của ứng dụng (BackgroundJobs::instance()): ProgressPresenter (cha là

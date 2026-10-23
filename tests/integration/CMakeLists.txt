@@ -30,3 +30,6 @@ trion_integration_test(it_khung_test
 # UIA-005 khung ribbon, UIA-107 dòng lệnh, UIA-108 tự hoàn thành, UIA-112 nút chế độ, UIA-009 thanh trạng thái, UIA-004
 # tab Start, UI0-013 trợ năng — lắp bằng Application (app/main/ShellAssembly) như exe trion.
 trion_integration_test(it_vo_test trion_application trion_a11y)
+# Nhóm 7 (khung ứng dụng đợt 7): UIA-007 dòng lệnh (lệnh khóa, F2, thiết lập, dạng nổi), UIA-003 menu ứng dụng, UIA-118
+# Layer của Viewer, UIA-101 QAT dưới ribbon, RIBBONSTATE qua lần chạy; tệp riêng để mỗi bộ < 60 s ở mọi preset.
+trion_integration_test(it_lap_test trion_application trion_a11y)

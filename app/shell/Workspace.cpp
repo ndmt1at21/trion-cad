@@ -141,6 +141,7 @@ void Workspace::applyLayout()
         if (!wide || !p.pinned)
             host.setPinned(p.id, false); // vào dải tự ẩn ở cạnh của nó
     defaultSignature_ = signature();
+    emit layoutApplied();
 }
 
 bool Workspace::isDefaultLayout() const
