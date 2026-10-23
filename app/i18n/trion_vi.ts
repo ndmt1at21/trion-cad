@@ -44,6 +44,60 @@
     </message>
 </context>
 <context>
+    <name>trion::fontdoctor::FontDoctorBanner</name>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã TCVN3</source>
+        <translation>
+            <numerusform>%1 đối tượng chữ mã TCVN3</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 chữ VNI</source>
+        <translation>
+            <numerusform>%1 chữ VNI</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã VNI</source>
+        <translation>
+            <numerusform>%1 đối tượng chữ mã VNI</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 font không có trên máy</source>
+        <translation>
+            <numerusform>%1 font không có trên máy</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>trion::fontdoctor::FontStatusChip</name>
+    <message numerus="yes">
+        <source>Font: %1 thay thế</source>
+        <translation>
+            <numerusform>Font: %1 thay thế</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 chữ mã cũ</source>
+        <translation>
+            <numerusform>Font: %1 chữ mã cũ</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 font đã thay thế</source>
+        <translation>
+            <numerusform>%1 font đã thay thế</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã cũ</source>
+        <translation>
+            <numerusform>%1 đối tượng chữ mã cũ</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::options::OptionsDialog</name>
     <message numerus="yes">
         <source>Đặt lại %1 tùy chọn</source>

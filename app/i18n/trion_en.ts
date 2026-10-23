@@ -3959,6 +3959,128 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::fontdoctor::FontDoctorBanner</name>
+    <message>
+        <source>Chuyển chữ mã cũ sang Unicode</source>
+        <translation>Convert legacy-encoded text to Unicode</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã TCVN3</source>
+        <translation>
+            <numerusform>%1 TCVN3-encoded text object</numerusform>
+            <numerusform>%1 TCVN3-encoded text objects</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 chữ VNI</source>
+        <translation>
+            <numerusform>%1 VNI text</numerusform>
+            <numerusform>%1 VNI texts</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã VNI</source>
+        <translation>
+            <numerusform>%1 VNI-encoded text object</numerusform>
+            <numerusform>%1 VNI-encoded text objects</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Bản vẽ có %1. TrionCAD đã tự hiển thị đúng.</source>
+        <translation>The drawing has %1. TrionCAD already displays it correctly.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 font không có trên máy</source>
+        <translation>
+            <numerusform>%1 font not installed on this computer</numerusform>
+            <numerusform>%1 fonts not installed on this computer</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Bản vẽ dùng %1. TrionCAD đã tự hiển thị đúng.</source>
+        <translation>The drawing uses %1. TrionCAD already displays it correctly.</translation>
+    </message>
+    <message>
+        <source>Bản vẽ dùng %1 và %2. TrionCAD đã tự hiển thị đúng.</source>
+        <translation>The drawing uses %1 and has %2. TrionCAD already displays it correctly.</translation>
+    </message>
+    <message>
+        <source>Xem chi tiết</source>
+        <translation>View details</translation>
+    </message>
+    <message>
+        <source>Chuyển sang Unicode</source>
+        <translation>Convert to Unicode</translation>
+    </message>
+    <message>
+        <source>Không nhắc lại với tệp này</source>
+        <translation>Don&apos;t remind me for this file</translation>
+    </message>
+    <message>
+        <source>Đóng banner</source>
+        <translation>Close banner</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font:</source>
+        <translation>Font Doctor:</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font: %1</source>
+        <translation>Font Doctor: %1</translation>
+    </message>
+</context>
+<context>
+    <name>trion::fontdoctor::FontStatusChip</name>
+    <message numerus="yes">
+        <source>Font: %1 thay thế</source>
+        <translation>
+            <numerusform>Fonts: %1 substituted</numerusform>
+            <numerusform>Fonts: %1 substituted</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Font: %1 chữ mã cũ</source>
+        <translation>
+            <numerusform>Fonts: %1 legacy text</numerusform>
+            <numerusform>Fonts: %1 legacy texts</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 font đã thay thế</source>
+        <translation>
+            <numerusform>%1 substituted font</numerusform>
+            <numerusform>%1 substituted fonts</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 đối tượng chữ mã cũ</source>
+        <translation>
+            <numerusform>%1 legacy-encoded text object</numerusform>
+            <numerusform>%1 legacy-encoded text objects</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1. Bấm để mở Bác sĩ Font.</source>
+        <translation>%1. Click to open Font Doctor.</translation>
+    </message>
+    <message>
+        <source>Đang quét font</source>
+        <translation>Scanning fonts</translation>
+    </message>
+    <message>
+        <source>Đã quét %1%</source>
+        <translation>%1% scanned</translation>
+    </message>
+    <message>
+        <source>Đang quét font và bảng mã chữ của bản vẽ. Bấm để mở Bác sĩ Font.</source>
+        <translation>Scanning the drawing&apos;s fonts and text encodings. Click to open Font Doctor.</translation>
+    </message>
+    <message>
+        <source>Bác sĩ Font</source>
+        <translation>Font Doctor</translation>
+    </message>
+</context>
+<context>
     <name>trion::layers::LayerTableModel</name>
     <message>
         <source>Đỏ</source>
