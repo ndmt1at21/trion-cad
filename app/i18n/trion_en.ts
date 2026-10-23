@@ -3827,6 +3827,249 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::layers::LayerTableModel</name>
+    <message>
+        <source>Đỏ</source>
+        <translation>Red</translation>
+    </message>
+    <message>
+        <source>Vàng</source>
+        <translation>Yellow</translation>
+    </message>
+    <message>
+        <source>Xanh lá</source>
+        <translation>Green</translation>
+    </message>
+    <message>
+        <source>Xanh lơ</source>
+        <translation>Cyan</translation>
+    </message>
+    <message>
+        <source>Xanh dương</source>
+        <translation>Blue</translation>
+    </message>
+    <message>
+        <source>Tím</source>
+        <translation>Magenta</translation>
+    </message>
+    <message>
+        <source>Trắng</source>
+        <translation>White</translation>
+    </message>
+    <message>
+        <source>Mặc định</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>%1 mm</source>
+        <translation>%1 mm</translation>
+    </message>
+    <message>
+        <source>TT</source>
+        <translation>St.</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Bật</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Băng</source>
+        <translation>Freeze</translation>
+    </message>
+    <message>
+        <source>Khóa</source>
+        <translation>Lock</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Plot</translation>
+    </message>
+    <message>
+        <source>Màu</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Kiểu đường</source>
+        <translation>Linetype</translation>
+    </message>
+    <message>
+        <source>Độ dày nét</source>
+        <translation>Lineweight</translation>
+    </message>
+    <message>
+        <source>Trong suốt</source>
+        <translation>Transparency</translation>
+    </message>
+    <message>
+        <source>Kiểu in</source>
+        <translation>Plot Style</translation>
+    </message>
+    <message>
+        <source>VP mới</source>
+        <translation>New VP</translation>
+    </message>
+    <message>
+        <source>Mô tả</source>
+        <translation>Description</translation>
+    </message>
+    <message>
+        <source>Số đối tượng</source>
+        <translation>Objects</translation>
+    </message>
+    <message>
+        <source>Băng VP</source>
+        <translation>VP Freeze</translation>
+    </message>
+    <message>
+        <source>Màu VP</source>
+        <translation>VP Color</translation>
+    </message>
+    <message>
+        <source>Kiểu đường VP</source>
+        <translation>VP Linetype</translation>
+    </message>
+    <message>
+        <source>Độ dày nét VP</source>
+        <translation>VP Lineweight</translation>
+    </message>
+    <message>
+        <source>Trong suốt VP</source>
+        <translation>VP Transparency</translation>
+    </message>
+    <message>
+        <source>Kiểu in VP</source>
+        <translation>VP Plot Style</translation>
+    </message>
+    <message>
+        <source>Trạng thái</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Bật/Tắt</source>
+        <translation>On/Off</translation>
+    </message>
+    <message>
+        <source>Đóng băng</source>
+        <translation>Freeze</translation>
+    </message>
+    <message>
+        <source>In / Không in</source>
+        <translation>Plot / No Plot</translation>
+    </message>
+    <message>
+        <source>Kiểu đường (Linetype)</source>
+        <translation>Linetype</translation>
+    </message>
+    <message>
+        <source>Độ trong suốt</source>
+        <translation>Transparency</translation>
+    </message>
+    <message>
+        <source>Kiểu in (Plot style)</source>
+        <translation>Plot Style</translation>
+    </message>
+    <message>
+        <source>Đóng băng ở viewport mới</source>
+        <translation>Frozen in new viewports</translation>
+    </message>
+    <message>
+        <source>Số đối tượng trên layer</source>
+        <translation>Number of objects on the layer</translation>
+    </message>
+    <message>
+        <source>Đóng băng ở viewport hiện hành</source>
+        <translation>Frozen in current viewport</translation>
+    </message>
+    <message>
+        <source>Màu ở viewport hiện hành</source>
+        <translation>Color in current viewport</translation>
+    </message>
+    <message>
+        <source>Kiểu đường ở viewport hiện hành</source>
+        <translation>Linetype in current viewport</translation>
+    </message>
+    <message>
+        <source>Độ dày nét ở viewport hiện hành</source>
+        <translation>Lineweight in current viewport</translation>
+    </message>
+    <message>
+        <source>Độ trong suốt ở viewport hiện hành</source>
+        <translation>Transparency in current viewport</translation>
+    </message>
+    <message>
+        <source>Kiểu in ở viewport hiện hành</source>
+        <translation>Plot style in current viewport</translation>
+    </message>
+    <message>
+        <source>Hiện %1/%2 layer · %3 đang chọn</source>
+        <translation>Showing %1/%2 layers · %3 selected</translation>
+    </message>
+    <message>
+        <source>Hiện %1/%2 layer</source>
+        <translation>Showing %1/%2 layers</translation>
+    </message>
+    <message>
+        <source>Layer hiện hành</source>
+        <translation>Current layer</translation>
+    </message>
+    <message>
+        <source>Đang dùng</source>
+        <translation>In use</translation>
+    </message>
+    <message>
+        <source>Không có đối tượng</source>
+        <translation>No objects</translation>
+    </message>
+    <message>
+        <source>Đang đếm đối tượng…</source>
+        <translation>Counting objects…</translation>
+    </message>
+    <message>
+        <source>Đang bật</source>
+        <translation>On</translation>
+    </message>
+    <message>
+        <source>Đang tắt</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <source>Đang đóng băng</source>
+        <translation>Frozen</translation>
+    </message>
+    <message>
+        <source>Không đóng băng</source>
+        <translation>Thawed</translation>
+    </message>
+    <message>
+        <source>Đang khóa</source>
+        <translation>Locked</translation>
+    </message>
+    <message>
+        <source>Không khóa</source>
+        <translation>Unlocked</translation>
+    </message>
+    <message>
+        <source>Không in</source>
+        <translation>No plot</translation>
+    </message>
+    <message>
+        <source>Không đóng băng ở viewport mới</source>
+        <translation>Thawed in new viewports</translation>
+    </message>
+    <message>
+        <source>Không đóng băng ở viewport hiện hành</source>
+        <translation>Thawed in current viewport</translation>
+    </message>
+    <message>
+        <source>%1 · ghi đè của viewport</source>
+        <translation>%1 · viewport override</translation>
+    </message>
+</context>
+<context>
     <name>trion::options::OptionsDialog</name>
     <message>
         <source>Tùy chọn</source>
