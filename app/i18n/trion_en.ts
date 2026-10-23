@@ -2352,6 +2352,57 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
     </message>
 </context>
 <context>
+    <name>options</name>
+    <message>
+        <source>Tệp</source>
+        <translation>Files</translation>
+    </message>
+    <message>
+        <source>Hiển thị</source>
+        <translation>Display</translation>
+    </message>
+    <message>
+        <source>Mở &amp; Lưu</source>
+        <translation>Open and Save</translation>
+    </message>
+    <message>
+        <source>In &amp; Xuất</source>
+        <translation>Plot and Publish</translation>
+    </message>
+    <message>
+        <source>Hệ thống</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <source>Dòng lệnh</source>
+        <translation>Command Line</translation>
+    </message>
+    <message>
+        <source>Người dùng</source>
+        <translation>User Preferences</translation>
+    </message>
+    <message>
+        <source>Vẽ</source>
+        <translation>Drafting</translation>
+    </message>
+    <message>
+        <source>Mô hình 3D</source>
+        <translation>3D Modeling</translation>
+    </message>
+    <message>
+        <source>Chọn</source>
+        <translation>Selection</translation>
+    </message>
+    <message>
+        <source>Hồ sơ</source>
+        <translation>Profiles</translation>
+    </message>
+    <message>
+        <source>Tài khoản</source>
+        <translation>Account</translation>
+    </message>
+</context>
+<context>
     <name>ribbon</name>
     <message>
         <source>Trang chủ</source>
@@ -3765,6 +3816,110 @@ conversion</translation>
     <message>
         <source>%1 có trong TrionCAD %2.</source>
         <translation>%1 is available in TrionCAD %2.</translation>
+    </message>
+</context>
+<context>
+    <name>trion::options::OptionsDialog</name>
+    <message>
+        <source>Tùy chọn</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Lưu và đóng</source>
+        <translation>Save and close</translation>
+    </message>
+    <message>
+        <source>Đặt lại mặc định</source>
+        <translation>Reset to defaults</translation>
+    </message>
+    <message>
+        <source>Áp dụng</source>
+        <translation>Apply</translation>
+    </message>
+    <message>
+        <source>Tìm thiết lập, ví dụ: autosave, chủ đề</source>
+        <translation>Search settings, e.g. autosave, theme</translation>
+    </message>
+    <message>
+        <source>Tìm thiết lập</source>
+        <translation>Search settings</translation>
+    </message>
+    <message>
+        <source>Không thấy thiết lập</source>
+        <translation>No matching setting</translation>
+    </message>
+    <message>
+        <source>Các tab tùy chọn</source>
+        <translation>Options tabs</translation>
+    </message>
+    <message>
+        <source>Tab “%1” có trong TrionCAD %2</source>
+        <translation>The “%1” tab is available in TrionCAD %2</translation>
+    </message>
+    <message>
+        <source>Viewer có các tab %1.</source>
+        <translation>Viewer includes these tabs: %1.</translation>
+    </message>
+    <message>
+        <source>Dùng thử Pro 30 ngày</source>
+        <translation>Try Pro for 30 days</translation>
+    </message>
+    <message>
+        <source>Tùy chọn đầy đủ</source>
+        <translation>Full options</translation>
+    </message>
+    <message>
+        <source>Tab “%1” chưa có thiết lập</source>
+        <translation>The “%1” tab has no settings yet</translation>
+    </message>
+    <message>
+        <source>Các thiết lập của tab này có ở bản cập nhật sau.</source>
+        <translation>Settings for this tab will come in a later update.</translation>
+    </message>
+    <message>
+        <source>Mọi tùy chọn đang ở giá trị mặc định.</source>
+        <translation>All options are already at their defaults.</translation>
+    </message>
+    <message>
+        <source>Đặt lại tùy chọn</source>
+        <translation>Reset options</translation>
+    </message>
+    <message numerus="yes">
+        <source>Đặt lại %1 tùy chọn</source>
+        <translation>
+            <numerusform>Reset %1 option</numerusform>
+            <numerusform>Reset %1 options</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Đặt lại %1 tùy chọn về mặc định của TrionCAD?</source>
+        <translation>
+            <numerusform>Reset %1 option to the TrionCAD default?</numerusform>
+            <numerusform>Reset %1 options to the TrionCAD defaults?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Hồ sơ hiện hành, viết tắt lệnh và bảng thay thế font không đổi. Hủy hộp Tùy chọn để giữ như cũ.</source>
+        <translation>The current profile, command aliases and font substitution table are not changed. Cancel the Options dialog to keep everything as it was.</translation>
+    </message>
+    <message>
+        <source>&lt;&lt;Mặc định&gt;&gt;</source>
+        <translation>&lt;&lt;Default&gt;&gt;</translation>
+    </message>
+    <message>
+        <source>Hồ sơ hiện hành: %1 · Bản vẽ: %2</source>
+        <translation>Current profile: %1 · Drawing: %2</translation>
+    </message>
+</context>
+<context>
+    <name>trion::options::OptionsPage</name>
+    <message>
+        <source>Lưu trong bản vẽ</source>
+        <translation>Saved in the drawing</translation>
+    </message>
+    <message>
+        <source>Không có bản vẽ đang mở</source>
+        <translation>No drawing is open</translation>
     </message>
 </context>
 <context>

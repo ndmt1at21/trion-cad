@@ -35,6 +35,21 @@
     </message>
 </context>
 <context>
+    <name>trion::options::OptionsDialog</name>
+    <message numerus="yes">
+        <source>Đặt lại %1 tùy chọn</source>
+        <translation>
+            <numerusform>Đặt lại %1 tùy chọn</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Đặt lại %1 tùy chọn về mặc định của TrionCAD?</source>
+        <translation>
+            <numerusform>Đặt lại %1 tùy chọn về mặc định của TrionCAD?</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::FileTabBar</name>
     <message numerus="yes">
         <source>TrionCAD mở được tệp DWG, DXF, DWT. %1 không phải bản vẽ.</source>
