@@ -7099,6 +7099,403 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::ui::PlotDialog</name>
+    <message>
+        <source>A3 kéo dài</source>
+        <translation>A3 extended</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <source>Toàn bộ đối tượng</source>
+        <translation>Extents</translation>
+    </message>
+    <message>
+        <source>Màn hình hiện tại</source>
+        <translation>Display</translation>
+    </message>
+    <message>
+        <source>Giới hạn bản vẽ</source>
+        <translation>Limits</translation>
+    </message>
+    <message>
+        <source>View đã đặt tên</source>
+        <translation>Named view</translation>
+    </message>
+    <message>
+        <source>Cửa sổ</source>
+        <translation>Window</translation>
+    </message>
+    <message>
+        <source>In ở nền</source>
+        <translation>Plot in background</translation>
+    </message>
+    <message>
+        <source>In độ dày nét</source>
+        <translation>Plot object lineweights</translation>
+    </message>
+    <message>
+        <source>In độ trong suốt</source>
+        <translation>Plot transparency</translation>
+    </message>
+    <message>
+        <source>In theo kiểu in</source>
+        <translation>Plot with plot styles</translation>
+    </message>
+    <message>
+        <source>In Paper space sau cùng</source>
+        <translation>Plot paper space last</translation>
+    </message>
+    <message>
+        <source>Ẩn đối tượng Paper space</source>
+        <translation>Hide paper space objects</translation>
+    </message>
+    <message>
+        <source>Bật dấu in</source>
+        <translation>Plot stamp on</translation>
+    </message>
+    <message>
+        <source>Lưu thay đổi vào layout</source>
+        <translation>Save changes to layout</translation>
+    </message>
+    <message>
+        <source>Thiết lập trang</source>
+        <translation>Page setup</translation>
+    </message>
+    <message>
+        <source>Tên</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Vị trí</source>
+        <translation>Where</translation>
+    </message>
+    <message>
+        <source>Máy in</source>
+        <translation>Printer/plotter</translation>
+    </message>
+    <message>
+        <source>Số bản</source>
+        <translation>Number of copies</translation>
+    </message>
+    <message>
+        <source>X / Y</source>
+        <translation>X / Y</translation>
+    </message>
+    <message>
+        <source>Vùng in</source>
+        <translation>Plot area</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ</source>
+        <translation>Plot scale</translation>
+    </message>
+    <message>
+        <source>Offset</source>
+        <translation>Plot offset</translation>
+    </message>
+    <message>
+        <source>Khổ giấy</source>
+        <translation>Paper size</translation>
+    </message>
+    <message>
+        <source>In shade</source>
+        <translation>Shade plot</translation>
+    </message>
+    <message>
+        <source>Chất lượng</source>
+        <translation>Quality</translation>
+    </message>
+    <message>
+        <source>Kiểu in (Plot style)</source>
+        <translation>Plot style table</translation>
+    </message>
+    <message>
+        <source>Viewport có shade</source>
+        <translation>Shaded viewport options</translation>
+    </message>
+    <message>
+        <source>Tùy chọn in</source>
+        <translation>Plot options</translation>
+    </message>
+    <message>
+        <source>Hướng giấy</source>
+        <translation>Drawing orientation</translation>
+    </message>
+    <message>
+        <source>Lưu thiết lập trang vào bản vẽ</source>
+        <translation>Save page setup to the drawing</translation>
+    </message>
+    <message>
+        <source>Cấu hình máy in (PC3)</source>
+        <translation>Printer configuration (PC3)</translation>
+    </message>
+    <message>
+        <source>Sửa kiểu in (Plot style)</source>
+        <translation>Edit plot style</translation>
+    </message>
+    <message>
+        <source>Lưu thiết lập in vào layout</source>
+        <translation>Save plot settings to layout</translation>
+    </message>
+    <message>
+        <source>&lt;Không&gt;</source>
+        <translation>&lt;None&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Lần in trước&gt;</source>
+        <translation>&lt;Previous plot&gt;</translation>
+    </message>
+    <message>
+        <source>Tệp trên máy · vector, giữ layer</source>
+        <translation>Local file · vector, keeps layers</translation>
+    </message>
+    <message>
+        <source>Tệp trên máy · %1 DPI</source>
+        <translation>Local file · %1 DPI</translation>
+    </message>
+    <message>
+        <source>Máy in hệ thống</source>
+        <translation>System printer</translation>
+    </message>
+    <message>
+        <source>Không tìm thấy máy in “%1”. Chọn máy in khác hoặc kiểm tra kết nối.</source>
+        <translation>Printer “%1” not found. Choose another printer or check the connection.</translation>
+    </message>
+    <message>
+        <source>Đang tìm máy in…</source>
+        <translation>Looking for printers…</translation>
+    </message>
+    <message>
+        <source>Chưa chọn cửa sổ in.</source>
+        <translation>No plot window selected.</translation>
+    </message>
+    <message>
+        <source>%1 – %2</source>
+        <translation>%1 – %2</translation>
+    </message>
+    <message>
+        <source>Tùy chỉnh</source>
+        <translation>Custom</translation>
+    </message>
+    <message>
+        <source>Tỉ lệ tự tính theo vùng in và khổ giấy</source>
+        <translation>Scale calculated from the plot area and paper size</translation>
+    </message>
+    <message>
+        <source>1 mm = %1 đơn vị bản vẽ</source>
+        <translation>1 mm = %1 drawing units</translation>
+    </message>
+    <message>
+        <source>Không (in theo màu đối tượng)</source>
+        <translation>None (plot object colors)</translation>
+    </message>
+    <message>
+        <source>Như hiển thị</source>
+        <translation>As displayed</translation>
+    </message>
+    <message>
+        <source>Wireframe</source>
+        <translation>Wireframe</translation>
+    </message>
+    <message>
+        <source>Ẩn nét</source>
+        <translation>Hidden</translation>
+    </message>
+    <message>
+        <source>Render</source>
+        <translation>Rendered</translation>
+    </message>
+    <message>
+        <source>Bản nháp</source>
+        <translation>Draft</translation>
+    </message>
+    <message>
+        <source>Chất lượng thường</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Cao nhất</source>
+        <translation>Maximum</translation>
+    </message>
+    <message>
+        <source>Tùy chỉnh (DPI)</source>
+        <translation>Custom (DPI)</translation>
+    </message>
+    <message>
+        <source>Thuộc tính máy in</source>
+        <translation>Printer properties</translation>
+    </message>
+    <message>
+        <source>Sửa cấu hình PC3 của máy in đang chọn: cổng, khổ giấy tùy chỉnh, vùng in được, hiệu chỉnh tỉ lệ.</source>
+        <translation>Edit the PC3 configuration of the selected printer: port, custom paper sizes, printable area, scale calibration.</translation>
+    </message>
+    <message>
+        <source>Sửa kiểu in</source>
+        <translation>Edit plot style</translation>
+    </message>
+    <message>
+        <source>Sửa bảng kiểu in đang chọn: màu in, độ dày nét, kiểu tô.</source>
+        <translation>Edit the selected plot style table: plot colors, lineweights, fill styles.</translation>
+    </message>
+    <message>
+        <source>Xem trước bản in</source>
+        <translation>Plot preview</translation>
+    </message>
+    <message>
+        <source>Xem tờ giấy với vùng in được và độ dày nét theo kiểu in.</source>
+        <translation>View the sheet with its printable area and the lineweights of the plot style.</translation>
+    </message>
+    <message>
+        <source>In · %1</source>
+        <translation>Plot · %1</translation>
+    </message>
+    <message>
+        <source>Thêm…</source>
+        <translation>Add…</translation>
+    </message>
+    <message>
+        <source>Thuộc tính…</source>
+        <translation>Properties…</translation>
+    </message>
+    <message>
+        <source>In ra tệp</source>
+        <translation>Plot to file</translation>
+    </message>
+    <message>
+        <source>Xem trước vị trí in trên giấy</source>
+        <translation>Preview of the plot on paper</translation>
+    </message>
+    <message>
+        <source>Chọn cửa sổ &lt;</source>
+        <translation>Window &lt;</translation>
+    </message>
+    <message>
+        <source>Vừa khổ giấy</source>
+        <translation>Fit to paper</translation>
+    </message>
+    <message>
+        <source>Milimét trên giấy</source>
+        <translation>Millimeters on paper</translation>
+    </message>
+    <message>
+        <source>mm =</source>
+        <translation>mm =</translation>
+    </message>
+    <message>
+        <source>Đơn vị bản vẽ</source>
+        <translation>Drawing units</translation>
+    </message>
+    <message>
+        <source>đơn vị</source>
+        <translation>units</translation>
+    </message>
+    <message>
+        <source>Co giãn độ dày nét theo tỉ lệ</source>
+        <translation>Scale lineweights</translation>
+    </message>
+    <message>
+        <source>Canh giữa</source>
+        <translation>Center the plot</translation>
+    </message>
+    <message>
+        <source>Offset X</source>
+        <translation>Offset X</translation>
+    </message>
+    <message>
+        <source>Offset Y</source>
+        <translation>Offset Y</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <source>Sửa…</source>
+        <translation>Edit…</translation>
+    </message>
+    <message>
+        <source>Hiện kiểu in trên layout</source>
+        <translation>Display plot styles on layout</translation>
+    </message>
+    <message>
+        <source>DPI</source>
+        <translation>DPI</translation>
+    </message>
+    <message>
+        <source>Dọc</source>
+        <translation>Portrait</translation>
+    </message>
+    <message>
+        <source>Ngang</source>
+        <translation>Landscape</translation>
+    </message>
+    <message>
+        <source>In ngược</source>
+        <translation>Plot upside-down</translation>
+    </message>
+    <message>
+        <source>Xem trước…</source>
+        <translation>Preview…</translation>
+    </message>
+    <message>
+        <source>Ít tùy chọn ◂</source>
+        <translation>Fewer options ◂</translation>
+    </message>
+    <message>
+        <source>Thêm tùy chọn ▸</source>
+        <translation>More options ▸</translation>
+    </message>
+    <message>
+        <source>Áp dụng cho layout</source>
+        <translation>Apply to layout</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Plot</translation>
+    </message>
+    <message>
+        <source>%1 (%2 × %3 mm)</source>
+        <translation>%1 (%2 × %3 mm)</translation>
+    </message>
+    <message>
+        <source>PDF của TrionCAD</source>
+        <translation>TrionCAD PDF</translation>
+    </message>
+    <message>
+        <source>PNG của TrionCAD</source>
+        <translation>TrionCAD PNG</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::PlotRunner</name>
+    <message>
+        <source>Đang in %1/%2</source>
+        <translation>Plotting %1/%2</translation>
+    </message>
+    <message>
+        <source>Đã in ra %1</source>
+        <translation>Plotted to %1</translation>
+    </message>
+    <message>
+        <source>Mở thư mục</source>
+        <translation>Open folder</translation>
+    </message>
+    <message numerus="yes">
+        <source>Đã gửi %n tờ tới %1</source>
+        <translation>
+            <numerusform>Sent %n sheet to %1</numerusform>
+            <numerusform>Sent %n sheets to %1</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Đã hủy in.</source>
+        <translation>Plot cancelled.</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ProgressPresenter</name>
     <message>
         <source>%1 · %2%</source>

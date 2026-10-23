@@ -223,4 +223,13 @@
         </translation>
     </message>
 </context>
+<context>
+    <name>trion::ui::PlotRunner</name>
+    <message numerus="yes">
+        <source>Đã gửi %n tờ tới %1</source>
+        <translation>
+            <numerusform>Đã gửi %n tờ tới %1</numerusform>
+        </translation>
+    </message>
+</context>
 </TS>
