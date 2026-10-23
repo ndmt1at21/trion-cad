@@ -7546,4 +7546,58 @@ conversion</translation>
         <translation>%1 — done</translation>
     </message>
 </context>
+<context>
+    <name>trion::upgrade::UpgradeDialog</name>
+    <message>
+        <source>Nâng cấp TrionCAD</source>
+        <translation>Upgrade TrionCAD</translation>
+    </message>
+    <message>
+        <source>Từ %1 đ/năm</source>
+        <translation>From %1 VND/year</translation>
+    </message>
+    <message>
+        <source>%1 đ/tháng</source>
+        <translation>%1 VND/month</translation>
+    </message>
+    <message>
+        <source>%1 đ vĩnh viễn</source>
+        <translation>%1 VND perpetual</translation>
+    </message>
+    <message>
+        <source>hoặc %1</source>
+        <translation>or %1</translation>
+    </message>
+    <message>
+        <source>Không mở được trình duyệt. Mở địa chỉ này để mua: %1</source>
+        <translation>Could not open the browser. Open this address to buy: %1</translation>
+    </message>
+    <message>
+        <source>Để sau</source>
+        <translation>Later</translation>
+    </message>
+    <message>
+        <source>Đã có key? Kích hoạt</source>
+        <translation>Have a key? Activate</translation>
+    </message>
+    <message>
+        <source>Mua</source>
+        <translation>Buy</translation>
+    </message>
+    <message>
+        <source>Dùng thử 30 ngày</source>
+        <translation>30-day free trial</translation>
+    </message>
+    <message>
+        <source>Mở trang mua trên web</source>
+        <translation>Opens the purchase page on the web</translation>
+    </message>
+</context>
+<context>
+    <name>trion::upgrade::UpgradePage</name>
+    <message>
+        <source>Xem</source>
+        <translation>View</translation>
+    </message>
+</context>
 </TS>

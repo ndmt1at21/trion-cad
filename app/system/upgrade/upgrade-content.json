@@ -1,0 +1,143 @@
+{
+  "_note": "UIL-014 · Nội dung trang nâng cấp UI-L04, cập nhật theo bản phát hành. editions: nội dung chung của phiên bản (Pro, ViewerPro): giá theo đồng (year bắt buộc; month, perpetual tùy, 0 hoặc thiếu = không bán), lợi ích vi/en, ảnh. features: theo mã tính năng (id hành động của ActionRegistry hoặc mã màn hình đặt): phiên bản cần (khớp danh mục lệnh, upgrade_test kiểm), lợi ích vi/en 1–2 câu, ảnh. Tính năng không có mục dùng nội dung chung của phiên bản. image: tên biểu tượng của bộ (app/theme/icons/src); ponytail: chưa có ảnh minh họa riêng.",
+  "editions": {
+    "ViewerPro": {
+      "image": "batchplot",
+      "price": { "year": 690000, "perpetual": 1990000 },
+      "benefit": {
+        "vi": "In hàng loạt theo khung tên, so sánh bản vẽ, chuyển font hàng loạt, đếm block và ghi chú markup. Dành cho người chỉ cần xem, in, đo.",
+        "en": "Batch plot by title block, compare drawings, convert fonts in batch, count blocks and add markup. Made for people who only view, plot and measure."
+      }
+    },
+    "Pro": {
+      "image": "pline",
+      "price": { "year": 2990000, "month": 349000, "perpetual": 7990000 },
+      "benefit": {
+        "vi": "Vẽ, sửa và lưu DWG như AutoCAD: lệnh vẽ, sửa, kích thước, block, LISP. Bản vẽ của bạn giữ nguyên, mở được bằng AutoCAD.",
+        "en": "Draw, edit and save DWG as in AutoCAD: drawing and editing commands, dimensions, blocks, LISP. Your drawings stay intact and open in AutoCAD."
+      }
+    }
+  },
+  "features": {
+    "QSAVE": {
+      "need": "Pro",
+      "image": "save",
+      "benefit": {
+        "vi": "Lưu thay đổi vào chính tệp DWG, giữ nguyên phiên bản tệp và mọi đối tượng. Đồng nghiệp mở lại bằng AutoCAD thấy đúng như bạn thấy.",
+        "en": "Save changes back to the same DWG file, keeping its file version and every object. Colleagues who reopen it in AutoCAD see exactly what you see."
+      }
+    },
+    "SAVEAS": {
+      "need": "Pro",
+      "image": "saveas",
+      "benefit": {
+        "vi": "Lưu bản vẽ thành DWG hoặc DXF ở phiên bản cũ hơn để gửi cho đối tác chưa nâng cấp phần mềm.",
+        "en": "Save the drawing as DWG or DXF in an older version for partners who have not upgraded their software."
+      }
+    },
+    "LINE": {
+      "need": "Pro",
+      "image": "line",
+      "benefit": {
+        "vi": "Vẽ bằng bộ lệnh quen thuộc: đoạn thẳng, polyline, đường tròn, cung, cùng bắt điểm, theo dõi và nhập tọa độ như AutoCAD.",
+        "en": "Draw with the familiar command set: lines, polylines, circles and arcs, with object snap, tracking and coordinate input as in AutoCAD."
+      }
+    },
+    "TRIM": {
+      "need": "Pro",
+      "image": "trim",
+      "benefit": {
+        "vi": "Sửa hình nhanh bằng TRIM, EXTEND, OFFSET, FILLET và grip; thao tác nào cũng hoàn tác được.",
+        "en": "Edit geometry quickly with TRIM, EXTEND, OFFSET, FILLET and grips; every step can be undone."
+      }
+    },
+    "HATCH": {
+      "need": "Pro",
+      "image": "hatch",
+      "benefit": {
+        "vi": "Tô vật liệu theo mẫu TCVN, biên giữ nguyên cung và spline; bấm vào trong vùng kín là nhận biên.",
+        "en": "Fill areas with TCVN hatch patterns; boundaries keep true arcs and splines, and a click inside a closed area finds its boundary."
+      }
+    },
+    "DIM": {
+      "need": "Pro",
+      "image": "dim",
+      "benefit": {
+        "vi": "Ghi kích thước thông minh theo kiểu kích thước TCVN; kích thước tự cập nhật khi hình thay đổi.",
+        "en": "Smart dimensions with TCVN dimension styles that update when the geometry changes."
+      }
+    },
+    "TCLIB": {
+      "need": "Pro",
+      "image": "lib",
+      "benefit": {
+        "vi": "Thư viện block TCVN: ký hiệu kiến trúc, kết cấu, điện nước dùng ngay, kéo thả vào bản vẽ.",
+        "en": "TCVN block library: ready-to-use architectural, structural and MEP symbols you drag into the drawing."
+      }
+    },
+    "APPLOAD": {
+      "need": "Pro",
+      "image": "pkg",
+      "benefit": {
+        "vi": "Chạy LISP, script và plugin bạn đang dùng; các hàm AutoLISP và hộp thoại DCL thông dụng chạy không cần sửa.",
+        "en": "Run the LISP routines, scripts and plugins you already use; common AutoLISP functions and DCL dialogs work without changes."
+      }
+    },
+    "QSELECT": {
+      "need": "Pro",
+      "image": "qselect",
+      "benefit": {
+        "vi": "Chọn đối tượng trong cả bản vẽ theo loại, layer, màu hay giá trị thuộc tính chỉ với vài cú nhấp.",
+        "en": "Select objects across the drawing by type, layer, color or property value in a few clicks."
+      }
+    },
+    "QUICKCALC": {
+      "need": "Pro",
+      "image": "calc",
+      "benefit": {
+        "vi": "Máy tính ngay trong ô nhập: tính biểu thức, đổi đơn vị, lấy khoảng cách và góc từ bản vẽ.",
+        "en": "A calculator inside input fields: evaluate expressions, convert units, pick distances and angles from the drawing."
+      }
+    },
+    "TCBATCHPLOT": {
+      "need": "ViewerPro",
+      "image": "batchplot",
+      "benefit": {
+        "vi": "In cả trăm tờ một lần: tự nhận khung tên trong Model, đặt khổ giấy, tỉ lệ và đặt tên tệp PDF theo số hiệu bản vẽ.",
+        "en": "Plot hundreds of sheets at once: title blocks in Model are found automatically, with paper size, scale and PDF names taken from drawing numbers."
+      }
+    },
+    "COMPARE": {
+      "need": "ViewerPro",
+      "image": "compare",
+      "benefit": {
+        "vi": "So sánh hai lần sửa của bản vẽ, tô màu phần thêm, bớt và đổi để kiểm tra thay đổi trong vài giây.",
+        "en": "Compare two revisions of a drawing with added, removed and changed parts in color, to review changes in seconds."
+      }
+    },
+    "COUNT": {
+      "need": "ViewerPro",
+      "image": "count",
+      "benefit": {
+        "vi": "Đếm block theo tên và attribute, xuất bảng thống kê ra Excel để lập dự toán.",
+        "en": "Count blocks by name and attribute, and export the schedule to Excel for cost estimates."
+      }
+    },
+    "FIXFONTBATCH": {
+      "need": "ViewerPro",
+      "image": "fontbatch",
+      "benefit": {
+        "vi": "Chuyển font VNI, TCVN3 sang Unicode cho cả thư mục bản vẽ, lưu thành bản sao, không đụng tệp gốc.",
+        "en": "Convert VNI and TCVN3 fonts to Unicode for a whole folder of drawings, saved as copies with the originals untouched."
+      }
+    },
+    "TCMARKUP": {
+      "need": "ViewerPro",
+      "image": "markup",
+      "benefit": {
+        "vi": "Ghi chú markup (đám mây, mũi tên, chữ) lưu ra tệp riêng để gửi lại người vẽ mà không sửa bản vẽ.",
+        "en": "Markup (clouds, arrows, text) saved to a separate file you send back to the drafter without changing the drawing."
+      }
+    }
+  }
+}
