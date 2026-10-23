@@ -5579,6 +5579,208 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::ui::Color</name>
+    <message>
+        <source>ByLayer</source>
+        <translation>ByLayer</translation>
+    </message>
+    <message>
+        <source>ByBlock</source>
+        <translation>ByBlock</translation>
+    </message>
+    <message>
+        <source>Màu %1</source>
+        <translation>Color %1</translation>
+    </message>
+    <message>
+        <source>Đỏ</source>
+        <translation>Red</translation>
+    </message>
+    <message>
+        <source>Vàng</source>
+        <translation>Yellow</translation>
+    </message>
+    <message>
+        <source>Xanh lá</source>
+        <translation>Green</translation>
+    </message>
+    <message>
+        <source>Xanh lơ</source>
+        <translation>Cyan</translation>
+    </message>
+    <message>
+        <source>Xanh dương</source>
+        <translation>Blue</translation>
+    </message>
+    <message>
+        <source>Tím</source>
+        <translation>Magenta</translation>
+    </message>
+    <message>
+        <source>Trắng</source>
+        <translation>White</translation>
+    </message>
+</context>
+<context>
+    <name>trion::ui::ColorPickerDialog</name>
+    <message>
+        <source>Sắc độ</source>
+        <translation>Hue</translation>
+    </message>
+    <message>
+        <source>Bão hòa</source>
+        <translation>Saturation</translation>
+    </message>
+    <message>
+        <source>Độ sáng</source>
+        <translation>Luminance</translation>
+    </message>
+    <message>
+        <source>Đỏ</source>
+        <translation>Red</translation>
+    </message>
+    <message>
+        <source>Xanh lá</source>
+        <translation>Green</translation>
+    </message>
+    <message>
+        <source>Xanh dương</source>
+        <translation>Blue</translation>
+    </message>
+    <message>
+        <source>Mã màu là # và 6 chữ số hex, ví dụ #3CC8C0.</source>
+        <translation>A color code is # followed by 6 hex digits, e.g. #3CC8C0.</translation>
+    </message>
+    <message>
+        <source>Cũ: %1 · Mới: %2</source>
+        <translation>Old: %1 · New: %2</translation>
+    </message>
+    <message>
+        <source>Sắc độ %1°, bão hòa %2 %</source>
+        <translation>Hue %1°, saturation %2 %</translation>
+    </message>
+    <message>
+        <source>Chỉ số màu %1 (%2) · RGB %3, %4, %5</source>
+        <translation>Color index %1 (%2) · RGB %3, %4, %5</translation>
+    </message>
+    <message>
+        <source>Chỉ số màu %1 · RGB %2, %3, %4</source>
+        <translation>Color index %1 · RGB %2, %3, %4</translation>
+    </message>
+    <message>
+        <source>%1 · RGB %2, %3, %4</source>
+        <translation>%1 · RGB %2, %3, %4</translation>
+    </message>
+    <message>
+        <source>Không đọc được màu này. Gõ mã #RRGGBB, số 1–255 hoặc tên màu (đỏ, red).</source>
+        <translation>Unrecognized color. Type #RRGGBB, a number 1–255 or a color name (red, đỏ).</translation>
+    </message>
+    <message>
+        <source>Không đọc được màu này. Gõ số 1–255, tên màu (đỏ, red), ByLayer, ByBlock hoặc #RRGGBB.</source>
+        <translation>Unrecognized color. Type a number 1–255, a color name (red, đỏ), ByLayer, ByBlock or #RRGGBB.</translation>
+    </message>
+    <message>
+        <source>Bấm vào một đối tượng để lấy màu (Esc để quay lại).</source>
+        <translation>Click an object to pick its color (Esc to go back).</translation>
+    </message>
+    <message>
+        <source>Chọn màu</source>
+        <translation>Select Color</translation>
+    </message>
+    <message>
+        <source>Dùng màu này</source>
+        <translation>Use This Color</translation>
+    </message>
+    <message>
+        <source>Loại màu</source>
+        <translation>Color type</translation>
+    </message>
+    <message>
+        <source>Màu chỉ số</source>
+        <translation>Index Color</translation>
+    </message>
+    <message>
+        <source>True Color</source>
+        <translation>True Color</translation>
+    </message>
+    <message>
+        <source>Color Book</source>
+        <translation>Color Book</translation>
+    </message>
+    <message>
+        <source>Bảng màu chỉ số AutoCAD (ACI)</source>
+        <translation>AutoCAD Color Index (ACI)</translation>
+    </message>
+    <message>
+        <source>Bảng màu chỉ số</source>
+        <translation>Color index palette</translation>
+    </message>
+    <message>
+        <source>Màu chuẩn 1–9</source>
+        <translation>Standard colors 1–9</translation>
+    </message>
+    <message>
+        <source>Màu xám 250–255</source>
+        <translation>Gray shades 250–255</translation>
+    </message>
+    <message>
+        <source>Rê lên ô màu để xem số và RGB</source>
+        <translation>Hover a swatch to see its index and RGB</translation>
+    </message>
+    <message>
+        <source>Vùng chọn sắc độ và độ bão hòa</source>
+        <translation>Hue and saturation area</translation>
+    </message>
+    <message>
+        <source>Mô hình</source>
+        <translation>Color model</translation>
+    </message>
+    <message>
+        <source>Mã màu</source>
+        <translation>Color code</translation>
+    </message>
+    <message>
+        <source>Color Book (Pantone, RAL)</source>
+        <translation>Color Book (Pantone, RAL)</translation>
+    </message>
+    <message>
+        <source>Có sau v1.0. Bản vẽ dùng màu từ Color Book vẫn hiển thị đúng màu.</source>
+        <translation>Available after v1.0. Drawings that use Color Book colors still display correctly.</translation>
+    </message>
+    <message>
+        <source>Dùng gần đây</source>
+        <translation>Recently used</translation>
+    </message>
+    <message>
+        <source>Chưa có màu nào</source>
+        <translation>No colors yet</translation>
+    </message>
+    <message>
+        <source>Lấy màu từ bản vẽ</source>
+        <translation>Pick color from drawing</translation>
+    </message>
+    <message>
+        <source>Ẩn hộp thoại, bấm vào một đối tượng để lấy màu của nó.</source>
+        <translation>Hides the dialog; click an object to take its color.</translation>
+    </message>
+    <message>
+        <source>Màu</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>So sánh màu cũ và mới</source>
+        <translation>Compare old and new color</translation>
+    </message>
+    <message>
+        <source>Gõ mã #RRGGBB, số 1–255 hoặc tên màu (đỏ, red)</source>
+        <translation>Type #RRGGBB, a number 1–255 or a color name (red, đỏ)</translation>
+    </message>
+    <message>
+        <source>Gõ số 1–255, tên màu (đỏ, red) hoặc ByLayer</source>
+        <translation>Type a number 1–255, a color name (red, đỏ) or ByLayer</translation>
+    </message>
+</context>
+<context>
     <name>trion::ui::ComboBox</name>
     <message>
         <source>Lọc…</source>
@@ -5943,6 +6145,14 @@ conversion</translation>
     <message>
         <source>%1 phải lớn hơn %2.</source>
         <translation>%1 must be greater than %2.</translation>
+    </message>
+    <message>
+        <source>Không được lớn hơn %1.</source>
+        <translation>Must not be greater than %1.</translation>
+    </message>
+    <message>
+        <source>%1 không được lớn hơn %2.</source>
+        <translation>%1 must not be greater than %2.</translation>
     </message>
     <message>
         <source>inch</source>

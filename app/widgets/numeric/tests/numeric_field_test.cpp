@@ -428,6 +428,51 @@ private slots:
         QCOMPARE(f->value(), 300.0);
     }
 
+    // Chặn trên (UIC-017 kênh màu 0–255, UIA-007 số dòng 0–10): gồm cả cận; ngoài cận lỗi khi gõ, ↑ ↓; bỏ chặn.
+    void upperBound()
+    {
+        NumericField* f = make(mm(ValueKind::Integer), 250);
+        f->setLabel(u"Đỏ"_s); // i18n-ok: dữ liệu thử
+        f->setLowerBound(-1);
+        f->setUpperBound(255);
+        QCOMPARE(f->upperBound(), std::optional<double>(255));
+        QSignalSpy committed(f, &NumericField::valueCommitted);
+
+        typeInto(f, u"255"_s);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(committed.size(), 1);
+        QCOMPARE(f->value(), 255.0);
+        QVERIFY(!f->hasError());
+
+        QTest::keyClick(edit(f), Qt::Key_Up); // 256: lỗi, giá trị giữ 255
+        QCOMPARE(f->errorMessage(), u"Đỏ không được lớn hơn 255."_s);
+        QVERIFY(near(edge(f), tm_->color(tok::c_danger)));
+        QCOMPARE(committed.size(), 1);
+        QCOMPARE(f->value(), 255.0);
+        QTest::keyClick(edit(f), Qt::Key_Escape);
+        QVERIFY(!f->hasError());
+
+        typeInto(f, u"300"_s);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(f->errorMessage(), u"Đỏ không được lớn hơn 255."_s);
+        typeInto(f, u"-1"_s);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(f->errorMessage(), u"Đỏ phải lớn hơn -1."_s);
+        typeInto(f, u"0"_s);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(f->value(), 0.0);
+        QCOMPARE(committed.size(), 2);
+
+        f->setLabel({});
+        typeInto(f, u"256"_s);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(f->errorMessage(), u"Không được lớn hơn 255."_s);
+        f->setUpperBound(std::nullopt);
+        QTest::keyClick(edit(f), Qt::Key_Return);
+        QCOMPARE(f->value(), 256.0);
+        QCOMPARE(committed.size(), 3);
+    }
+
     // Tiêu chí 3.
     void stepKeys()
     {

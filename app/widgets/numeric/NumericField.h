@@ -12,9 +12,10 @@
 //   hiển thị     formatValue theo spec(): 1250.00, 4'-1 1/2". setSpec (UNITS đổi) hiển thị lại ngay trong lượt gọi,
 //                khung kế tiếp đã đúng; giá trị không đổi, không phát tín hiệu.
 //   nhận         Enter, hoặc rời ô (trừ khi focus sang popup). Chữ chưa sửa: không đọc lại, không phát. Sai: viền lỗi,
-//                câu dưới ô (errorText của UI0-109, hoặc "… phải lớn hơn …" khi có setLowerBound), trình đọc màn hình
-//                đọc câu đó; không phát; Enter sai không tới hộp thoại. Đúng: định dạng lại, phát valueCommitted đúng
-//                1 lần; Enter đi tiếp tới nút xác nhận của hộp thoại như ô thường.
+//                câu dưới ô (errorText của UI0-109, "… phải lớn hơn …" của setLowerBound hoặc "… không được lớn hơn …"
+//                của setUpperBound), trình đọc màn hình đọc câu đó; không phát; Enter sai không tới hộp thoại. Đúng:
+//                định dạng lại, phát valueCommitted đúng 1 lần; Enter đi tiếp tới nút xác nhận của hộp thoại như ô
+//                thường.
 //   ↑ ↓          ± step() (Shift ×10), cả nút bước: từ chữ đang gõ nếu đọc được, không thì từ value(); nhận và phát
 //                ngay như prototype.
 //   Esc          đang sửa hoặc đang lỗi: trả chữ của giá trị trước khi sửa, bỏ lỗi. Không thì Esc tới hộp thoại.
@@ -36,8 +37,9 @@
 //
 // ponytail: ⌖ nối tạm qua tín hiệu pickRequested + finishPick/cancelPick; INT-003 (prompt lấy khoảng cách 2 điểm hoặc
 // góc trên vùng vẽ, Esc hủy) nối vào đây, giữ ô bằng QPointer. Chưa ai nối pickRequested thì ⌖ không làm gì.
-// ponytail: chỉ chặn dưới (setLowerBound, như data-min của prototype); kiểm khác (chặn trên, theo ô khác) thêm khi
-// màn hình cần. Gõ ',' chỉ gợi ý trong câu lỗi lúc nhận, chưa có toast nhắc ngay khi gõ như prototype (cần UIA toast).
+// ponytail: chặn dưới ngặt (setLowerBound, như data-min của prototype) và chặn trên gồm cả cận (setUpperBound); kiểm
+// khác (theo ô khác) thêm khi màn hình cần. Gõ ',' chỉ gợi ý trong câu lỗi lúc nhận, chưa có toast nhắc ngay khi gõ như
+// prototype (cần UIA toast).
 
 #include "app/widgets/numeric/ValueParser.h"
 
@@ -79,6 +81,10 @@ public:
     // Giá trị phải lớn hơn bound (prototype data-min); nullopt: không chặn.
     std::optional<double> lowerBound() const { return lowerBound_; }
     void setLowerBound(std::optional<double> bound);
+    // Giá trị không được lớn hơn bound (gồm cả cận: kênh màu 0–255 thì 255, số dòng 0–10 thì 10); nullopt: không chặn.
+    // Ngoài cận: lỗi như chặn dưới (gõ, ↑ ↓, ⌖), câu "… không được lớn hơn …". Ô số nguyên 0–255: setLowerBound(-1).
+    std::optional<double> upperBound() const { return upperBound_; }
+    void setUpperBound(std::optional<double> bound);
 
     bool hasError() const { return !error_.isEmpty(); }
     QString errorMessage() const { return error_; } // câu đang hiện dưới ô
@@ -134,6 +140,7 @@ private:
     double value_ = 0;
     double step_ = 0;
     std::optional<double> lowerBound_;
+    std::optional<double> upperBound_;
     QString shown_; // chữ của value_ (rỗng khi *Khác nhau*): chữ trong ô khác shown_ là đang sửa
     QString error_;
     bool mixed_ = false;

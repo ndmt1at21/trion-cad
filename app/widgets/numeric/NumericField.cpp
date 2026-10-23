@@ -331,6 +331,11 @@ void NumericField::setLowerBound(std::optional<double> bound)
     lowerBound_ = bound;
 }
 
+void NumericField::setUpperBound(std::optional<double> bound)
+{
+    upperBound_ = bound;
+}
+
 void NumericField::setPickEnabled(bool on)
 {
     pickEnabled_ = on;
@@ -378,10 +383,16 @@ QString NumericField::check(const QString& text, double& value) const
     if (!r)
         return errorText(r.error, s, spec_);
     value = r.value;
-    if (!lowerBound_ || r.value > *lowerBound_)
-        return {};
-    const QString bound = *lowerBound_ == 0 ? u"0"_s : format(*lowerBound_);
-    return label_.isEmpty() ? tr("Phải lớn hơn %1.").arg(bound) : tr("%1 phải lớn hơn %2.").arg(label_, bound);
+    if (lowerBound_ && !(r.value > *lowerBound_)) {
+        const QString bound = *lowerBound_ == 0 ? u"0"_s : format(*lowerBound_);
+        return label_.isEmpty() ? tr("Phải lớn hơn %1.").arg(bound) : tr("%1 phải lớn hơn %2.").arg(label_, bound);
+    }
+    if (upperBound_ && r.value > *upperBound_) {
+        const QString bound = *upperBound_ == 0 ? u"0"_s : format(*upperBound_);
+        return label_.isEmpty() ? tr("Không được lớn hơn %1.").arg(bound)
+                                : tr("%1 không được lớn hơn %2.").arg(label_, bound);
+    }
+    return {};
 }
 
 // Đơn vị cho tên đọc (chữ trong ô chỉ có số, trừ feet-inch).
