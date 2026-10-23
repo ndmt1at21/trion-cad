@@ -1,0 +1,99 @@
+{
+  "_note": "UIL-011 · Thư viện bên thứ ba vào sản phẩm (05 §2: hạ tầng phổ thông được phép; công cụ dev không vào sản phẩm nên không liệt kê) và văn bản giấy phép, đầu vào của gen_licenses.py. ponytail: danh sách tĩnh tới khi có vcpkg manifest (NT-001); khi có, gen_licenses.py đọc vcpkg.json và share/<port>/copyright (đúng phiên bản) thay cho tệp này. texts: mã văn bản → đường dẫn từ gốc kho; components[].texts: các văn bản của thành phần (LGPL-3.0 kèm GPL-3.0 vì LGPL v3 là phần bổ sung của GPL v3). link: chỉ ghi khi giấy phép đòi (Qt: liên kết động, người dùng thay được thư viện).",
+  "texts": {
+    "LGPL-3.0-only": "app/system/about/licenses/LGPL-3.0-only.txt",
+    "GPL-3.0-only": "app/system/about/licenses/GPL-3.0-only.txt",
+    "FTL": "app/system/about/licenses/FTL.txt",
+    "MIT-Modern-Variant": "app/system/about/licenses/MIT-Modern-Variant.txt",
+    "Zlib": "app/system/about/licenses/Zlib.txt",
+    "MIT": "app/system/about/licenses/MIT.txt",
+    "BSD-3-Clause": "app/system/about/licenses/BSD-3-Clause.txt",
+    "ISC": "app/system/about/licenses/ISC.txt",
+    "Apache-2.0": "app/system/about/licenses/Apache-2.0.txt",
+    "OFL-1.1": "app/theme/fonts/OFL.txt"
+  },
+  "components": [
+    {
+      "id": "qt",
+      "name": "Qt 6",
+      "license": "LGPL-3.0",
+      "spdx": "LGPL-3.0-only",
+      "texts": ["LGPL-3.0-only", "GPL-3.0-only"],
+      "link": "dynamic",
+      "url": "https://www.qt.io/",
+      "notice": "Copyright (C) The Qt Company Ltd. and other contributors."
+    },
+    {
+      "id": "freetype",
+      "name": "FreeType",
+      "license": "FreeType License",
+      "spdx": "FTL",
+      "texts": ["FTL"],
+      "url": "https://freetype.org/",
+      "notice": "Portions of this software are copyright © The FreeType Project (www.freetype.org). All rights reserved."
+    },
+    {
+      "id": "harfbuzz",
+      "name": "HarfBuzz",
+      "license": "MIT",
+      "spdx": "MIT-Modern-Variant",
+      "texts": ["MIT-Modern-Variant"],
+      "url": "https://harfbuzz.github.io/",
+      "notice": "Copyright © Google, Inc., Red Hat, Inc., Behdad Esfahbod and other HarfBuzz contributors."
+    },
+    {
+      "id": "zlib",
+      "name": "zlib",
+      "license": "zlib",
+      "spdx": "Zlib",
+      "texts": ["Zlib"],
+      "url": "https://zlib.net/",
+      "notice": "Copyright (C) 1995-2024 Jean-loup Gailly and Mark Adler."
+    },
+    {
+      "id": "libdeflate",
+      "name": "libdeflate",
+      "license": "MIT",
+      "spdx": "MIT",
+      "texts": ["MIT"],
+      "url": "https://github.com/ebiggers/libdeflate",
+      "notice": "Copyright 2016 Eric Biggers."
+    },
+    {
+      "id": "pdfium",
+      "name": "PDFium",
+      "license": "BSD-3-Clause",
+      "spdx": "BSD-3-Clause",
+      "texts": ["BSD-3-Clause"],
+      "url": "https://pdfium.googlesource.com/pdfium/",
+      "notice": "Copyright 2014 The PDFium Authors."
+    },
+    {
+      "id": "libsodium",
+      "name": "libsodium",
+      "license": "ISC",
+      "spdx": "ISC",
+      "texts": ["ISC"],
+      "url": "https://libsodium.org/",
+      "notice": "Copyright (c) 2013-2024 Frank Denis <j at pureftpd dot org>."
+    },
+    {
+      "id": "crashpad",
+      "name": "Crashpad",
+      "license": "Apache-2.0",
+      "spdx": "Apache-2.0",
+      "texts": ["Apache-2.0"],
+      "url": "https://chromium.googlesource.com/crashpad/crashpad/",
+      "notice": "Copyright 2014 The Crashpad Authors."
+    },
+    {
+      "id": "plex",
+      "name": "IBM Plex Sans, IBM Plex Mono",
+      "license": "SIL Open Font License 1.1",
+      "spdx": "OFL-1.1",
+      "texts": ["OFL-1.1"],
+      "url": "https://github.com/IBM/plex",
+      "notice": "Copyright © 2017 IBM Corp. with Reserved Font Name \"Plex\"."
+    }
+  ]
+}

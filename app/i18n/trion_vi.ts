@@ -20,6 +20,15 @@
     </message>
 </context>
 <context>
+    <name>trion::about::AboutDialog</name>
+    <message numerus="yes">
+        <source>%1, %n luồng</source>
+        <translation>
+            <numerusform>%1, %n luồng</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>trion::edition::EditionBadge</name>
     <message numerus="yes">
         <source>Dùng thử: còn %n ngày</source>

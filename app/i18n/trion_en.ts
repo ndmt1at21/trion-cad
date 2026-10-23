@@ -3695,6 +3695,164 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::about::AboutDialog</name>
+    <message>
+        <source>%1 · bản build %2 · kênh %3</source>
+        <translation>%1 · build %2 · %3 channel</translation>
+    </message>
+    <message>
+        <source>Giấy phép: %1</source>
+        <translation>License: %1</translation>
+    </message>
+    <message>
+        <source>Đóng</source>
+        <translation>Close</translation>
+    </message>
+    <message>
+        <source>Ổn định</source>
+        <translation>Stable</translation>
+    </message>
+    <message>
+        <source>Beta</source>
+        <translation>Beta</translation>
+    </message>
+    <message>
+        <source>Nội bộ</source>
+        <translation>Internal</translation>
+    </message>
+    <message>
+        <source>Đã sao chép thông tin hệ thống</source>
+        <translation>System information copied</translation>
+    </message>
+    <message>
+        <source>Đang đọc…</source>
+        <translation>Reading…</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1, %n luồng</source>
+        <translation>
+            <numerusform>%1, %n thread</numerusform>
+            <numerusform>%1, %n threads</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 RAM</source>
+        <translation>%1 RAM</translation>
+    </message>
+    <message>
+        <source>RAM chưa rõ</source>
+        <translation>RAM unknown</translation>
+    </message>
+    <message>
+        <source>chưa rõ</source>
+        <translation>unknown</translation>
+    </message>
+    <message>
+        <source>&lt;&lt;Mặc định&gt;&gt;</source>
+        <translation>&lt;&lt;Default&gt;&gt;</translation>
+    </message>
+    <message>
+        <source>Đồ họa: %1</source>
+        <translation>Graphics: %1</translation>
+    </message>
+    <message>
+        <source>Ngôn ngữ: %1 · Hồ sơ: %2</source>
+        <translation>Language: %1 · Profile: %2</translation>
+    </message>
+    <message>
+        <source>TrionCAD %1 · %2</source>
+        <translation>TrionCAD %1 · %2</translation>
+    </message>
+    <message>
+        <source>đóng TrionCAD, chép các tệp Qt6*.dll và thư mục plugins của bản Qt đó đè lên thư mục cài TrionCAD</source>
+        <translation>close TrionCAD and copy that Qt build&apos;s Qt6*.dll files and plugins folder over the TrionCAD installation folder</translation>
+    </message>
+    <message>
+        <source>đóng TrionCAD, thay các thư mục Qt*.framework trong TrionCAD.app/Contents/Frameworks</source>
+        <translation>close TrionCAD and replace the Qt*.framework folders in TrionCAD.app/Contents/Frameworks</translation>
+    </message>
+    <message>
+        <source>đóng TrionCAD, thay các tệp libQt6*.so.6 trong thư mục lib của TrionCAD, hoặc chạy TrionCAD với LD_LIBRARY_PATH trỏ tới thư mục chứa bản Qt đó</source>
+        <translation>close TrionCAD and replace the libQt6*.so.6 files in TrionCAD&apos;s lib folder, or run TrionCAD with LD_LIBRARY_PATH pointing to that Qt build&apos;s folder</translation>
+    </message>
+    <message>
+        <source>%1 được dùng theo GNU Lesser General Public License phiên bản 3 (LGPL-3.0), liên kết động: TrionCAD gọi Qt qua thư viện dùng chung và không sửa mã của Qt. Bạn có quyền thay thư viện Qt bằng bản khác tương thích nhị phân, kể cả bản tự build từ mã nguồn đã sửa: %2. Mã nguồn Qt %3: https://download.qt.io/archive/qt/. Văn bản LGPL-3.0 và GPL-3.0 ở dưới.</source>
+        <translation>%1 is used under the GNU Lesser General Public License version 3 (LGPL-3.0), dynamically linked: TrionCAD calls Qt through shared libraries and does not modify Qt&apos;s code. You may replace the Qt libraries with another binary-compatible version, including one you build from modified source: %2. Qt %3 source code: https://download.qt.io/archive/qt/. The LGPL-3.0 and GPL-3.0 texts follow.</translation>
+    </message>
+    <message>
+        <source>Giới thiệu TrionCAD</source>
+        <translation>About TrionCAD</translation>
+    </message>
+    <message>
+        <source>Thông tin hệ thống</source>
+        <translation>System information</translation>
+    </message>
+    <message>
+        <source>Đã sao chép</source>
+        <translation>Copied</translation>
+    </message>
+    <message>
+        <source>Sao chép</source>
+        <translation>Copy</translation>
+    </message>
+    <message>
+        <source>Chép phiên bản và thông tin hệ thống để gửi bộ phận hỗ trợ</source>
+        <translation>Copies the version and system information to send to support</translation>
+    </message>
+    <message>
+        <source>Thư viện mã nguồn mở</source>
+        <translation>Open-source libraries</translation>
+    </message>
+    <message>
+        <source>Thư viện</source>
+        <translation>Library</translation>
+    </message>
+    <message>
+        <source>Giấy phép</source>
+        <translation>License</translation>
+    </message>
+    <message>
+        <source>%1, liên kết động</source>
+        <translation>%1, dynamically linked</translation>
+    </message>
+    <message>
+        <source>Enter: xem văn bản giấy phép</source>
+        <translation>Enter: view the license text</translation>
+    </message>
+    <message>
+        <source>Văn bản giấy phép…</source>
+        <translation>License text…</translation>
+    </message>
+    <message>
+        <source>AutoCAD® là nhãn hiệu của Autodesk, Inc. Các nhãn hiệu khác thuộc chủ sở hữu tương ứng. TrionCAD là tên làm việc.</source>
+        <translation>AutoCAD® is a trademark of Autodesk, Inc. Other trademarks belong to their respective owners. TrionCAD is a working name.</translation>
+    </message>
+    <message>
+        <source>Điều khoản sử dụng</source>
+        <translation>Terms of use</translation>
+    </message>
+    <message>
+        <source>Chính sách riêng tư</source>
+        <translation>Privacy policy</translation>
+    </message>
+    <message>
+        <source>Liên hệ hỗ trợ</source>
+        <translation>Contact support</translation>
+    </message>
+    <message>
+        <source>Mở trang web</source>
+        <translation>Opens a web page</translation>
+    </message>
+    <message>
+        <source>Không mở được trình duyệt. Địa chỉ: %1</source>
+        <translation>Could not open the browser. Address: %1</translation>
+    </message>
+    <message>
+        <source>Không đọc được danh sách giấy phép.</source>
+        <translation>Could not read the license list.</translation>
+    </message>
+</context>
+<context>
     <name>trion::app::Application</name>
     <message>
         <source>tệp</source>
