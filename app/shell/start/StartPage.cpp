@@ -1,5 +1,6 @@
 #include "app/shell/start/StartPage.h"
 
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/UiFormat.h"
 #include "app/shell/filetabs/FileTabBar.h"
@@ -11,11 +12,11 @@
 #include "app/widgets/menu/Menu.h"
 #include "app/widgets/message/Messages.h"
 #include "app/widgets/tooltip/RichTooltip.h"
+#include "app/widgets/views/TextCache.h"
 #include "app/widgets/views/VirtualTableView.h"
 #include "core/base/settings/Settings.h"
 
 #include <QAbstractButton>
-#include <QCache>
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QDir>
@@ -34,7 +35,6 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QStackedWidget>
-#include <QStaticText>
 #include <QUrl>
 
 #include <algorithm>
@@ -169,46 +169,6 @@ void drawCardBox(QPainter& p, const QRect& r, bool hover)
     p.drawRoundedRect(QRectF(r).adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
     p.restore();
 }
-
-// Một dòng chữ đã shaping (QStaticText) theo bề rộng và chữ, cho một font: lọc, cuộn vẽ lại thẻ và dòng không shaping
-// lại (~20–40 µs mỗi chuỗi; thẻ 3 chuỗi, dòng bảng 5). Đổi font (theme) thì bỏ hết.
-// ponytail: QCache bỏ chuỗi lâu không dùng khi quá kTextCache mục (200 tệp × vài chuỗi, hai bề rộng thẻ/cột).
-class TextCache {
-public:
-    static constexpr int kTextCache = 2000;
-
-    // Căn trái, giữa theo chiều dọc trong box, bút của p; không vừa thì rút gọn theo mode. Trả bề rộng đã vẽ.
-    qreal draw(QPainter& p, const QFont& font, const QRect& box, const QString& text,
-               Qt::TextElideMode mode = Qt::ElideRight)
-    {
-        if (box.width() <= 0)
-            return 0;
-        if (font != font_) {
-            cache_.clear();
-            font_ = font;
-        }
-        const QFontMetricsF fm(font);
-        const QString key = QString::number(box.width()) + u'|' + QString::number(int(mode)) + u'|' + text;
-        QStaticText* line = cache_.object(key);
-        if (!line) {
-            line = new QStaticText(text);
-            line->setTextFormat(Qt::PlainText);
-            line->prepare(QTransform(), font);
-            if (line->size().width() > box.width()) {
-                line->setText(fm.elidedText(text, mode, box.width()));
-                line->prepare(QTransform(), font);
-            }
-            cache_.insert(key, line);
-        }
-        p.setFont(font);
-        p.drawStaticText(QPointF(box.left(), box.top() + (box.height() - fm.height()) / 2), *line);
-        return line->size().width();
-    }
-
-private:
-    QFont font_;
-    QCache<QString, QStaticText> cache_{kTextCache};
-};
 
 void toast(Severity severity, const QString& text, ui::MessageAction action = {})
 {
@@ -621,7 +581,7 @@ private:
     Grid* grid_;
     ThumbnailQueue& thumbs_;
     mutable Background background_[2]; // thường, rê
-    mutable TextCache names_, metas_;
+    mutable ui::TextCache names_, metas_;
 };
 
 // Bảng .rf-list: cột Tên vẽ biểu tượng tệp, tên --fw-m rồi thư mục --c-text-3; tệp không tìm thấy: biểu tượng cảnh báo ở
@@ -700,7 +660,7 @@ public:
     }
 
 private:
-    mutable TextCache names_, cells_;
+    mutable ui::TextCache names_, cells_;
 };
 
 // ------------------------------------------------------------------------------------------------- StartPage
@@ -720,8 +680,10 @@ StartPage::StartPage(RecentFiles& recent, QWidget* parent)
     syncEmpty();
 
     connect(&tm(), &theme::ThemeManager::changed, this, &StartPage::applyTheme);
-    if (auto* gate = edition::EditionGate::instance())
+    if (auto* gate = edition::EditionGate::instance()) {
         connect(gate, &edition::EditionGate::editionChanged, this, [this] { syncEdition(); });
+        connect(gate, &edition::EditionGate::statusChanged, this, [this] { syncEdition(); }); // ngày dùng thử
+    }
     connect(&thumbs_, &ThumbnailQueue::ready, grid_->viewport(), qOverload<>(&QWidget::update));
     connect(&recent_, &RecentFiles::fileChanged, &thumbs_, &ThumbnailQueue::forget);
     for (auto signal : {&QAbstractItemModel::rowsInserted, &QAbstractItemModel::rowsRemoved})
@@ -827,21 +789,18 @@ void StartPage::build()
         openBox->addWidget(c);
 
     edition_ = new Box;
-    auto* editionRow = new QHBoxLayout;
-    editionRow->setSpacing(px(tok::sp_4));
+    editionRow_ = new QHBoxLayout;
+    editionRow_->setSpacing(px(tok::sp_4));
     editionName_ = textLabel();
     editionName_->setObjectName(u"editionName"_s);
     editionName_->setFont(theme::font(TextRole::Ui, Weight::Bold));
-    editionBadge_ = new QLabel;
-    editionBadge_->setObjectName(u"editionBadge"_s);
-    editionBadge_->setTextFormat(Qt::PlainText);
-    editionBadge_->setWordWrap(true); // chữ dài (vi-XL) xuống dòng trong huy hiệu thay vì bị cắt
-    editionBadge_->setFont(theme::font(TextRole::Badge, Weight::Medium));
-    editionBadge_->setAutoFillBackground(true);
-    editionBadge_->setContentsMargins(px(tok::sp_3), px(tok::sp_1), px(tok::sp_3), px(tok::sp_1));
-    editionRow->addWidget(editionName_, 1);
-    editionRow->addWidget(editionBadge_, 0, Qt::AlignTop);
-    edition_->box()->addLayout(editionRow);
+    editionRow_->addWidget(editionName_, 1);
+    if (auto* gate = edition::EditionGate::instance()) { // huy hiệu .ed chung với thanh tiêu đề, thanh trạng thái
+        editionBadge_ = new edition::EditionBadge(*gate);
+        editionBadge_->setObjectName(u"editionBadge"_s);
+        editionRow_->addWidget(editionBadge_);
+    }
+    edition_->box()->addLayout(editionRow_);
     editionText_ = textLabel();
     editionText_->setObjectName(u"editionText"_s);
     editionText_->setFont(theme::font(TextRole::Label));
@@ -1054,7 +1013,7 @@ void StartPage::applyTheme()
     setInk(tipText_, col(tok::c_text_2));
     setInk(dropHint_, col(tok::c_text));
     grid_->relayout();
-    syncEdition(); // màu huy hiệu
+    syncEdition(); // cỡ chữ theo mật độ: huy hiệu cùng dòng với tên hay xuống dòng
     update();
 }
 
@@ -1063,34 +1022,25 @@ void StartPage::syncEdition()
     auto* gate = edition::EditionGate::instance();
     const Edition e = gate ? gate->edition() : Edition::Viewer;
     create_->setVisible(edition::EditionGate::profile(e) == edition::UiProfile::Full); // Viewer không có Tạo mới
-    // Tên, huy hiệu như thanh tiêu đề (edBadge của prototype).
-    QString name, badge, text, action;
-    tok::ColorId bg = tok::c_ed_pro, fg = tok::c_ed_pro_t;
+    const int days = gate ? gate->trialDays() : 0;
+    // Tên như thanh tiêu đề; huy hiệu (edBadge của prototype) tự theo EditionGate.
+    QString name, text, action;
     bool primary = true;
     switch (e) {
     case Edition::Viewer:
         name = tr("TrionCAD Viewer");
-        badge = tr("Viewer");
-        bg = tok::c_ed_viewer;
-        fg = tok::c_ed_viewer_t;
         text = tr("Xem, đo, in và xuất PDF miễn phí. Sửa bản vẽ cần TrionCAD Pro.");
         action = tr("Dùng thử Pro 30 ngày");
         break;
     case Edition::ViewerPro:
         name = tr("TrionCAD Viewer Pro");
-        badge = tr("Viewer Pro");
-        bg = tok::c_ed_vp;
-        fg = tok::c_ed_vp_t;
         text = tr("Xem, in hàng loạt, so sánh bản vẽ, markup. Sửa bản vẽ cần TrionCAD Pro.");
         action = tr("Dùng thử Pro 30 ngày");
         break;
     case Edition::Trial:
         name = tr("TrionCAD Pro");
-        badge = tr("Dùng thử: còn %n ngày", nullptr, trialDays_);
-        bg = tok::c_ed_trial;
-        fg = tok::c_ed_trial_t;
         text = tr("Còn %n ngày dùng thử. Hết hạn, phần mềm chuyển về Viewer; bản vẽ vẫn mở và in được.", nullptr,
-                  trialDays_);
+                  days);
         action = tr("Mua TrionCAD Pro");
         break;
     case Edition::Pro:
@@ -1098,9 +1048,6 @@ void StartPage::syncEdition()
     case Edition::Enterprise:
         name = e == Edition::Pro ? tr("TrionCAD Pro")
                                  : e == Edition::Education ? tr("TrionCAD Giáo dục") : tr("TrionCAD Doanh nghiệp");
-        badge = e == Edition::Pro ? tr("Pro") : e == Edition::Education ? tr("Giáo dục") : tr("Doanh nghiệp");
-        bg = e == Edition::Pro ? tok::c_ed_pro : e == Edition::Education ? tok::c_ed_edu : tok::c_ed_ent;
-        fg = e == Edition::Pro ? tok::c_ed_pro_t : e == Edition::Education ? tok::c_ed_edu_t : tok::c_ed_ent_t;
         if (expiry_.isValid())
             text = tr("Thuê bao còn hạn đến %1.").arg(i18n::formatDate(expiry_));
         action = tr("Trạng thái giấy phép");
@@ -1108,16 +1055,24 @@ void StartPage::syncEdition()
         break;
     }
     editionName_->setText(name);
-    editionBadge_->setText(badge);
-    QPalette p = editionBadge_->palette();
-    p.setColor(QPalette::Window, col(bg));
-    p.setColor(QPalette::WindowText, col(fg));
-    editionBadge_->setPalette(p);
+    if (editionBadge_ && gate) {
+        // .hrow (flex-wrap, space-between, căn giữa dọc): tên và huy hiệu cùng dòng khi đủ chỗ, huy hiệu sát phải;
+        // thiếu chỗ (vi-XL) thì huy hiệu xuống dòng dưới tên. Cỡ huy hiệu theo EditionGate (sizeFor), không theo chữ
+        // đang hiện: LanguageChange tới trang trước huy hiệu. Thẻ rộng bằng cột trái (kSideWidth).
+        // ponytail: huy hiệu một dòng (.ed nowrap) rộng hơn thẻ thì bị cắt, chỉ khi có cảnh báo offline ("Dùng thử: còn
+        // 12 ngày · còn 5 ngày offline" cần 223 px ở vi, thẻ có 216 px); UIL-018 chốt cách hiện (huy hiệu xuống dòng).
+        const QMargins m = edition_->box()->contentsMargins();
+        const bool oneRow = QFontMetrics(editionName_->font()).horizontalAdvance(name) + editionRow_->spacing() +
+                                edition::EditionBadge::sizeFor(*gate).width() <=
+                            kSideWidth - m.left() - m.right();
+        editionRow_->setDirection(oneRow ? QBoxLayout::LeftToRight : QBoxLayout::TopToBottom);
+        editionRow_->setAlignment(editionBadge_, oneRow ? Qt::AlignVCenter : Qt::AlignLeft);
+    }
     editionText_->setText(text);
     editionText_->setVisible(!text.isEmpty());
     trial_->setVisible(e == Edition::Trial);
-    trial_->setValue(std::clamp(trialDays_, 0, kTrialLength));
-    trial_->setAccessibleName(badge);
+    trial_->setValue(std::clamp(days, 0, kTrialLength));
+    trial_->setAccessibleName(gate ? edition::EditionBadge::label(*gate) : QString()); // "Dùng thử: còn 12 ngày"
     editionAction_->setText(action);
     editionAction_->setKind(primary ? Button::Kind::Primary : Button::Kind::Normal);
 }
@@ -1170,12 +1125,6 @@ QAbstractItemView* StartPage::recentView() const
 QSize StartPage::thumbnailSize() const
 {
     return grid_->thumbPixels();
-}
-
-void StartPage::setTrialDays(int days)
-{
-    trialDays_ = days;
-    syncEdition();
 }
 
 void StartPage::setExpiry(QDate date)

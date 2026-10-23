@@ -115,8 +115,8 @@ Qat::Qat(actions::ActionRegistry& actions, edition::EditionGate& gate, QWidget* 
     below_ = menu_->addAction(QString());
     below_->setCheckable(true);
     below_->setChecked(isBelowRibbon());
-    menuBar_ = menu_->addAction(QString());
-    menuBar_->setCheckable(true);
+    if (QAction* m = actions.action(u"MENUBAR"_s)) // "Hiện thanh menu": gắn sysvar MENUBAR, gửi 'MENUBAR qua sink
+        menu_->addAction(m);
     menu_->addSeparator();
     reset_ = menu_->addAction(QString());
 
@@ -136,8 +136,6 @@ Qat::Qat(actions::ActionRegistry& actions, edition::EditionGate& gate, QWidget* 
         store().set(kBelowRibbon, on);
         emit belowRibbonChanged(on);
     });
-    connect(menuBar_, &QAction::triggered, this,
-            [this](bool on) { emit macroRequested(u"'MENUBAR %1"_s.arg(on ? 1 : 0)); });
     connect(reset_, &QAction::triggered, this, &Qat::reset);
     connect(&gate, &edition::EditionGate::editionChanged, this, &Qat::sync);
     connect(&gate, &edition::EditionGate::profileChanged, this, &Qat::apply);
@@ -210,11 +208,6 @@ void Qat::reset()
 {
     store().reset(shownSetting());
     apply();
-}
-
-void Qat::setMenuBarShown(bool shown)
-{
-    menuBar_->setChecked(shown);
 }
 
 void Qat::setShown(const QString& command, bool shown)
@@ -297,7 +290,6 @@ void Qat::sync()
     setAccessibleName(tr("Thanh truy cập nhanh"));
     heading_->setText(tr("Thêm vào thanh truy cập nhanh"));
     below_->setText(tr("Hiện bên dưới ribbon"));
-    menuBar_->setText(tr("Hiện thanh menu"));
     reset_->setText(tr("Đặt lại mặc định"));
     const QString customize = tr("Tùy biến thanh truy cập nhanh");
     menu_->setAccessibleName(customize);

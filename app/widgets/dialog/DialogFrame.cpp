@@ -3,6 +3,7 @@
 #include "app/theme/fonts/FontRegistry.h"
 #include "app/theme/generated/Tokens.h"
 #include "app/theme/ThemeManager.h"
+#include "app/widgets/progress/Spinner.h"
 
 #include <QAbstractButton>
 #include <QApplication>
@@ -15,7 +16,6 @@
 #include <QPlainTextEdit>
 #include <QTextEdit>
 #include <QtMath>
-#include <QVariantAnimation>
 #include <QVBoxLayout>
 #include <QWindow>
 
@@ -42,53 +42,12 @@ int px(tok::PxId id)
     return qRound(tm().px(id));
 }
 
-// Giá trị của prototype không có token riêng (css/app.css .dlg*, .spin).
+// Giá trị của prototype không có token riêng (css/app.css .dlg*).
 constexpr int kBorder = 1;    // viền thẻ, nét chia đầu/chân
 constexpr int kHeaderH = 34;  // .dlg-h height (gồm nét chia dưới)
 constexpr int kBodyPad = 14;  // .dlg-b padding
 constexpr int kFootPadV = 10; // .dlg-f padding: 10px 14px
 constexpr int kFootPadH = 14;
-constexpr int kSpin = 14; // .spin: 14×14, viền 2 px, quay 0,8 s
-constexpr int kSpinPen = 2;
-constexpr int kSpinMs = 800;
-
-// Vòng quay đang tải (.spin): vòng --c-active, cung trên --c-accent. Chỉ chạy khi đang hiện; Giao diện nhẹ, giảm
-// chuyển động (--t về 0) thì đứng yên.
-class Spinner final : public QWidget {
-public:
-    explicit Spinner(QWidget* parent) : QWidget(parent)
-    {
-        setFixedSize(kSpin, kSpin);
-        anim_.setStartValue(0.0);
-        anim_.setEndValue(360.0);
-        anim_.setDuration(kSpinMs);
-        anim_.setLoopCount(-1);
-        connect(&anim_, &QVariantAnimation::valueChanged, this, qOverload<>(&QWidget::update));
-    }
-
-protected:
-    void showEvent(QShowEvent*) override
-    {
-        if (tm().ms(tok::t) > 0)
-            anim_.start();
-    }
-    void hideEvent(QHideEvent*) override { anim_.stop(); }
-    void paintEvent(QPaintEvent*) override
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::Antialiasing);
-        const qreal h = kSpinPen / 2.0;
-        const QRectF r = QRectF(rect()).adjusted(h, h, -h, -h);
-        p.setPen(QPen(col(tok::c_active), kSpinPen));
-        p.drawEllipse(r);
-        p.setPen(QPen(col(tok::c_accent), kSpinPen, Qt::SolidLine, Qt::FlatCap));
-        const double turn = anim_.state() == QAbstractAnimation::Running ? anim_.currentValue().toDouble() : 0;
-        p.drawArc(r, qRound((45 - turn) * 16), 90 * 16); // border-top của vòng: cung 45°–135°, quay chiều kim đồng hồ
-    }
-
-private:
-    QVariantAnimation anim_{this}; // có cha: ThemeManager tìm thấy để dừng khi bật giảm chuyển động
-};
 
 // Làm mờ Gauss độ lệch sigma (px thiết bị) cho kênh alpha w×h, ngoài ảnh là 0: 3 lượt box blur mỗi chiều, bề rộng
 // hộp theo "boxes for Gauss" (Kovesi).

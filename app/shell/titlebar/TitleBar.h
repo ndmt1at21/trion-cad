@@ -3,9 +3,10 @@
 // helpMenu trong js/shell.js; .tb .tb-app .tb-doc .ed trong css/app.css):
 //   [≡ TrionCAD ▾] [QAT] … Banve-01.dwg* [Chỉ đọc] [Đã phục hồi] — TrionCAD Pro [Dùng thử: còn 12 ngày] … [Tìm lệnh] [👤] [?]
 // Nút menu ứng dụng phát appMenuRequested (UIA-003 dựng menu; macOS dùng thanh menu hệ thống, nút ẩn, 07.1 §13.6).
-// Tên bản vẽ cắt giữa khi thiếu chỗ, tooltip có đủ đường dẫn. Huy hiệu phiên bản như edBadge (dùng thử còn N ngày,
-// cảnh báo giấy phép offline). Menu tài khoản (tên, email, phiên bản, Trạng thái giấy phép, Kích hoạt, Quản lý tài
-// khoản, Đăng xuất) và menu trợ giúp như prototype. Viewer, Viewer Pro: "[Chỉ xem]" (07.1 §2, EditionGate::profile).
+// Tên bản vẽ cắt giữa khi thiếu chỗ, tooltip có đủ đường dẫn. Huy hiệu phiên bản edition::EditionBadge (dùng thử còn
+// N ngày, cảnh báo giấy phép offline: EditionGate::setTrialDays/setOfflineDays). Menu tài khoản (tên, email, phiên
+// bản, Trạng thái giấy phép, Kích hoạt, Quản lý tài khoản, Đăng xuất) và menu trợ giúp như prototype. Viewer, Viewer
+// Pro: "[Chỉ xem]" (07.1 §2, EditionGate::profile).
 //
 // Khung cửa sổ là của MainWindow (UIA-001): thanh không vẽ nút cửa sổ; MainWindow chừa chỗ cho nút cửa sổ bằng
 // setContentsMargins (bố cục ở trong contentsRect). Vùng trống và chữ tên bản vẽ không nhận mousePress,
@@ -30,8 +31,9 @@ namespace trion::actions {
 class ActionRegistry;
 }
 namespace trion::edition {
+class EditionBadge;
 class EditionGate;
-}
+} // namespace trion::edition
 namespace trion::ui {
 class Button;
 class Menu;
@@ -67,10 +69,6 @@ public:
 
     void setDocument(const DocInfo& doc);
     void setAccount(const Account& account);
-    // ponytail: số ngày tạm thay PLF-002 và task giấy phép (UI-L03): ngày dùng thử còn lại (phiên bản Dùng thử),
-    // ngày còn dùng offline khi lâu chưa xác minh giấy phép (< 0: không cảnh báo).
-    void setTrialDays(int days);
-    void setOfflineDays(int days);
     // Mở trang web (Quản lý tài khoản). Mặc định QDesktopServices::openUrl; test thay hàm giả.
     void setUrlOpener(std::function<bool(const QUrl&)> opener);
 
@@ -95,23 +93,20 @@ protected:
 private:
     class AppButton;
     class DocTitle;
-    class EditionBadge;
 
-    void sync(); // chữ, menu theo bản vẽ, tài khoản, phiên bản, ngôn ngữ
+    void sync(); // chữ, menu theo bản vẽ, tài khoản, phiên bản, ngày dùng thử, ngôn ngữ
     void popupBelow(ui::Menu* menu, QWidget* button);
 
     actions::ActionRegistry& actions_;
     edition::EditionGate& gate_;
     DocInfo doc_;
     Account account_;
-    int trialDays_ = 0;
-    int offlineDays_ = -1;
     std::function<bool(const QUrl&)> openUrl_;
 
     AppButton* app_;
     Qat* qat_;
     DocTitle* title_;
-    EditionBadge* badge_;
+    edition::EditionBadge* badge_;
     CommandSearch* search_;
     ui::Button* user_;
     ui::Button* help_;

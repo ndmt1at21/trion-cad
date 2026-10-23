@@ -4,7 +4,6 @@
 #include "app/core/perf/UiProbe.h"
 #include "app/theme/ThemeManager.h"
 #include "app/widgets/controls/Controls.h"
-#include "app/widgets/controls/Paint.h"
 #include "app/widgets/dock/AutoHideStrip.h"
 #include "app/widgets/dock/PaletteHeader.h"
 #include "core/base/assert.h"
@@ -16,7 +15,6 @@
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QMenu>
-#include <QPainter>
 #include <QScreen>
 #include <QTabBar>
 
@@ -539,16 +537,7 @@ bool PaletteHost::eventFilter(QObject* watched, QEvent* e)
                 focusCanvas();
             bar->setFocusPolicy(away ? Qt::NoFocus : Qt::TabFocus); // TabFocus: mặc định của QTabBar
         }
-        if (e->type() != QEvent::Paint || !paint::focusVisible(bar) || bar->currentIndex() < 0)
-            return false;
-        // Viền focus quanh tab đang mở như ui::TabBar (QCommonStyle vẽ focus của tab bằng Fusion, không qua
-        // TrionStyle): dải tự vẽ xong rồi vẽ đè. ponytail: khung focus mờ của Fusion vẫn còn bên trong viền; bỏ khi
-        // TrionStyle vẽ focus của tab.
-        watched->event(e);
-        QPainter p(bar);
-        p.setRenderHint(QPainter::Antialiasing);
-        paint::drawRing(p, bar->tabRect(bar->currentIndex()), theme::ThemeManager::instance().color(tok::c_focus));
-        return true;
+        return false; // viền focus quanh tab đang mở: TrionStyle vẽ (như mọi QTabBar)
     }
     if (watched == window_ && e->type() == QEvent::Close) {
         saveLayout();

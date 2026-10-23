@@ -17,18 +17,17 @@
 //   bước; 12 dòng không cần ảo hóa (DoD-U 4: > 200 dòng).
 // - Menu tùy biến (nút ▾): bật/tắt các mục có sẵn (7 mục mặc định, Khớp thuộc tính, In hàng loạt, Xem trước bản in,
 //   Thuộc tính, Chuyển không gian làm việc, Bác sĩ Font) và lệnh đã thêm từ ribbon; "Hiện bên dưới ribbon"; "Hiện
-//   thanh menu" ('MENUBAR 1|0 qua macroRequested); "Đặt lại mặc định" (danh sách của bộ giao diện đang dùng).
+//   thanh menu" (QAction "MENUBAR" của ActionRegistry: dấu chọn theo sysvar MENUBAR, bấm gửi 'MENUBAR 1|0 qua sink);
+//   "Đặt lại mặc định" (danh sách của bộ giao diện đang dùng).
 // - "Hiện bên dưới ribbon": QAT không tự dời; lưu lựa chọn rồi phát belowRibbonChanged. Cửa sổ chính đặt widget này
 //   vào hàng dưới ribbon khi true; khi false TitleBar lấy lại về chỗ cũ trên thanh tiêu đề.
 //
 // Dùng (bước integration, luồng UI; TitleBar tạo Qat, Store::instance() là kho của ứng dụng):
 //   Qat* qat = titleBar->qat();
-//   connect(qat, &Qat::macroRequested, &router, &CommandRouter::submit);        // UNDO k, MREDO k, 'MENUBAR
+//   connect(qat, &Qat::macroRequested, &router, &CommandRouter::submit);        // UNDO k, MREDO k
 //   connect(ribbon, &RibbonBar::addToQatRequested, qat, &Qat::add);             // chuột phải ribbon
 //   qat->setUndoSource([&](int n) { return steps(history.undo(n)); });         // DOC-008, CMD-232 UndoHistory
 //   qat->setRedoSource([&](int n) { return steps(history.redo(n)); });
-//   connect(&sysvars, &Sysvars::changed, qat, [qat](const QString& n, int v) {
-//       if (n == u"MENUBAR"_s) qat->setMenuBarShown(v != 0); });                // UIA-006 hiện thanh menu theo MENUBAR
 //   const auto place = [=](bool below) { if (below) strip->layout()->addWidget(qat); strip->setVisible(below); };
 //   connect(qat, &Qat::belowRibbonChanged, strip, place);                       // strip: hàng dưới ribbon
 //   place(qat->isBelowRibbon());
@@ -94,10 +93,9 @@ public:
 public slots:
     void add(const QString& command);   // "Thêm vào thanh truy cập nhanh" của ribbon; đã có hay không có lệnh: bỏ qua
     void reset();                       // danh sách của bộ giao diện đang dùng về mặc định
-    void setMenuBarShown(bool shown);   // dấu chọn "Hiện thanh menu" theo sysvar MENUBAR; không phát lệnh
 
 signals:
-    void macroRequested(const QString& macro); // "^C^C_UNDO 3", "^C^C_MREDO 1", "'MENUBAR 1" → CommandRouter
+    void macroRequested(const QString& macro); // "^C^C_UNDO 3", "^C^C_MREDO 1" → CommandRouter
     void belowRibbonChanged(bool below);
 
 protected:
@@ -125,7 +123,6 @@ private:
     QAction* heading_;
     QAction* itemsEnd_; // vạch chia sau các mục bật/tắt; mục của lệnh thêm chèn trước nó
     QAction* below_;
-    QAction* menuBar_;
     QAction* reset_;
     QWidget* seps_[2] = {}; // vạch chia trước và sau nhóm Hoàn tác
     ui::Menu* printMenu_ = nullptr;

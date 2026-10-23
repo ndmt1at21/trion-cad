@@ -16,7 +16,8 @@
 //      trình đọc màn hình của palette (tiêu đề) và nút đầu palette, đổi theo trạng thái ghim và ngôn ngữ.
 //      groupAccessibility: a11y::audit của cửa sổ mẫu 0 vi phạm (dải tab của
 //      nhóm có viền --c-focus khi Tab tới); palette ở tab nền và dải tab bị Qt cất không nhận Tab (đổi tab, đóng,
-//      mở, nhóm nổi).
+//      mở, nhóm nổi). tabFocusRing: viền đó do TrionStyle vẽ, PaletteHost không vẽ đè: 2 px --c-focus ở mép tab đang
+//      mở, bên trong không đổi (không khung focus mờ của Fusion), focus do chuột không viền.
 //   5  header: ảnh baseline đầu palette Tối/Sáng × 100/150/200% theo nền tảng, màu token ở chỗ không có chữ, cỡ theo
 //      token. Ghi lại baseline: TRION_UPDATE_BASELINE=<thư mục> chạy test, chép header-*-<nền tảng>.png vào
 //      tests/baseline. pseudoNoTruncation: vi-XL, findTruncations = 0; idleNoTimers: rảnh không timer nào chạy.
@@ -709,8 +710,7 @@ private slots:
     }
 
     // Nhóm tab (DoD-U 7; integration nhóm 5 bắt trên cửa sổ chính): Qt cất palette ở tab nền và dải tab của nhóm còn
-    // dưới hai palette mở ra tọa độ âm mà vẫn isVisible() — điểm dừng Tab không thấy, dải rỗng không tên; focus của
-    // tab vẽ bằng Fusion, không qua TrionStyle.
+    // dưới hai palette mở ra tọa độ âm mà vẫn isVisible() — điểm dừng Tab không thấy, dải rỗng không tên.
     void groupAccessibility()
     {
         tm_->setReducedMotion(true); // như drag: thả palette không animation
@@ -767,6 +767,43 @@ private slots:
         const bool countFront = bars[0]->tabText(bars[0]->currentIndex()) == dock("count")->windowTitle();
         QVERIFY(stops(countFront ? "count" : "tcvn") >= 3);
         QCOMPARE(stops(countFront ? "tcvn" : "count"), 0);
+    }
+
+    // Viền focus của dải tab nhóm: TrionStyle vẽ như mọi QTabBar (style_test::tabFocusRing), PaletteHost không vẽ đè.
+    void tabFocusRing()
+    {
+        QVERIFY(build());
+        host_->showPalette(u"layers"_s); // nhóm Thuộc tính + Layer ở phải
+        QTabBar* bar = groupBar();
+        QVERIFY(bar);
+        QCOMPARE(bar->focusPolicy(), Qt::TabFocus);
+        const auto shot = [bar] { return bar->grab().toImage().convertToFormat(QImage::Format_RGB32); };
+        win_->setAttribute(Qt::WA_KeyboardFocusChange, false);
+        const QImage plain = shot();
+        QCOMPARE(plain.size(), bar->size()); // offscreen 100%: điểm ảnh ảnh = tọa độ dải
+        bar->setFocus(Qt::MouseFocusReason);
+        QTRY_VERIFY(bar->hasFocus());
+        QCOMPARE(shot(), plain);                        // focus do chuột: không viền
+        win_->setAttribute(Qt::WA_KeyboardFocusChange); // như vừa Tab tới (a11y::checkFocus)
+        const QImage focused = shot();
+        const QRect tab = bar->tabRect(bar->currentIndex());
+        const QColor focus = tm_->color(tok::c_focus);
+        for (int x : {tab.left(), tab.left() + 1, tab.right() - 1, tab.right()}) // nét 2 px ở hai mép đứng
+            QCOMPARE(focused.pixelColor(x, tab.center().y()), focus);
+        int inner = 0; // trong viền, trừ 4 điểm ảnh góc mà nét bo của viền chạm tới
+        const QRect in = tab.adjusted(2, 2, -2, -2);
+        for (int y = in.top(); y <= in.bottom(); ++y)
+            for (int x = in.left(); x <= in.right(); ++x)
+                inner += (x != in.left() && x != in.right()) || (y != in.top() && y != in.bottom())
+                             ? focused.pixel(x, y) != plain.pixel(x, y)
+                             : 0;
+        QCOMPARE(inner, 0);
+        int outside = 0; // ngoài tab đang mở (tab khác, nền dải) không đổi
+        for (int y = 0; y < focused.height(); ++y)
+            for (int x = 0; x < focused.width(); ++x)
+                outside += !tab.contains(x, y) && focused.pixel(x, y) != plain.pixel(x, y);
+        QCOMPARE(outside, 0);
+        win_->setAttribute(Qt::WA_KeyboardFocusChange, false);
     }
 
     // Tiêu chí 5 (DoD-U 1, 2).

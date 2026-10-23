@@ -14,6 +14,7 @@
 #include "app/shell/start/StartPage.h"
 
 #include "app/core/UiExecutor.h"
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
@@ -431,6 +432,7 @@ private slots:
         tm_->setTheme(Theme::Dark);
         tm_->setDensity(Density::Compact);
         gate_->setEdition(edition::Edition::Pro);
+        gate_->setTrialDays(0);
         fake_.reset();
         folderOpened_.clear();
         for (const char* key : {"recent/files", "recent/limit", "start/view", "start/sort"})
@@ -875,8 +877,9 @@ private slots:
         QVERIFY(!child(u"browseTemplates"_s)->isVisible());
     }
 
-    // Tiêu chí 5: thẻ phiên bản theo phiên bản (tên, huy hiệu như thanh tiêu đề), số ngày dùng thử (PLF-002 qua
-    // setTrialDays), hạn thuê bao; nút: Dùng thử/Mua mở trang nâng cấp, Trạng thái giấy phép → screenRequested.
+    // Tiêu chí 5: thẻ phiên bản theo phiên bản (tên; huy hiệu edition::EditionBadge chung với thanh tiêu đề, cả cảnh
+    // báo offline), số ngày dùng thử (PLF-002 qua EditionGate::setTrialDays), hạn thuê bao; nút: Dùng thử/Mua mở trang
+    // nâng cấp, Trạng thái giấy phép → screenRequested.
     void editionCard()
     {
         QList<edition::UpgradeRequest> upgrades;
@@ -887,10 +890,18 @@ private slots:
         auto* bar = child<QProgressBar>(u"trialProgress"_s);
 
         gate_->setEdition(edition::Edition::Trial);
-        page_->setTrialDays(12);
+        gate_->setTrialDays(12);
         QCOMPARE(label(u"editionName"_s), StartPage::tr("TrionCAD Pro"));
-        QCOMPARE(label(u"editionBadge"_s), StartPage::tr("Dùng thử: còn %n ngày", nullptr, 12));
+        QVERIFY(qobject_cast<edition::EditionBadge*>(child(u"editionBadge"_s)));
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::label(*gate_));
         QVERIFY(label(u"editionBadge"_s).contains(u"12"_s));
+        // .hrow: đủ chỗ thì tên và huy hiệu cùng dòng, căn giữa dọc, huy hiệu sát phải thẻ.
+        const auto sameRow = [this] {
+            const QRect n = child(u"editionName"_s)->geometry(), b = child(u"editionBadge"_s)->geometry();
+            return std::abs(n.center().y() - b.center().y()) <= 1 && b.left() > n.left() &&
+                   b.right() == child(u"editionAction"_s)->parentWidget()->contentsRect().right() - px(tok::sp_5);
+        };
+        QTRY_VERIFY(sameRow());
         QVERIFY(label(u"editionText"_s).contains(u"12"_s));
         QVERIFY(bar->isVisible());
         QCOMPARE(bar->value(), 12);
@@ -898,13 +909,19 @@ private slots:
         action->click();
         QCOMPARE(upgrades.size(), 1);
         QCOMPARE(upgrades[0].feature, u"buy"_s);
-        page_->setTrialDays(3);
+        gate_->setTrialDays(3);
         QVERIFY(label(u"editionBadge"_s).contains(u"3"_s));
+        QVERIFY(label(u"editionText"_s).contains(u"3"_s));
         QCOMPARE(bar->value(), 3);
+        QCOMPARE(bar->accessibleName(), label(u"editionBadge"_s));
+        gate_->setOfflineDays(5); // lâu chưa xác minh giấy phép: cảnh báo như thanh tiêu đề
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::label(*gate_));
+        QVERIFY(label(u"editionBadge"_s).contains(u"5"_s));
+        gate_->setOfflineDays(-1);
 
         gate_->setEdition(edition::Edition::Viewer);
         QCOMPARE(label(u"editionName"_s), StartPage::tr("TrionCAD Viewer"));
-        QCOMPARE(label(u"editionBadge"_s), StartPage::tr("Viewer"));
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::tr("Viewer"));
         QVERIFY(!bar->isVisible());
         QCOMPARE(action->text(), StartPage::tr("Dùng thử Pro 30 ngày"));
         action->click();
@@ -914,14 +931,14 @@ private slots:
 
         gate_->setEdition(edition::Edition::ViewerPro);
         QCOMPARE(label(u"editionName"_s), StartPage::tr("TrionCAD Viewer Pro"));
-        QCOMPARE(label(u"editionBadge"_s), StartPage::tr("Viewer Pro"));
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::tr("Viewer Pro"));
 
         gate_->setEdition(edition::Edition::Education);
         QCOMPARE(label(u"editionName"_s), StartPage::tr("TrionCAD Giáo dục"));
         gate_->setEdition(edition::Edition::Enterprise);
-        QCOMPARE(label(u"editionBadge"_s), StartPage::tr("Doanh nghiệp"));
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::tr("Doanh nghiệp"));
         gate_->setEdition(edition::Edition::Pro);
-        QCOMPARE(label(u"editionBadge"_s), StartPage::tr("Pro"));
+        QCOMPARE(label(u"editionBadge"_s), edition::EditionBadge::tr("Pro"));
         QVERIFY(!child(u"editionText"_s)->isVisible()); // chưa có hạn
         page_->setExpiry(QDate(2027, 10, 18));
         QVERIFY(label(u"editionText"_s).contains(u"18/10/2027"_s));
@@ -1232,7 +1249,7 @@ private slots:
         for (const QSize size : {QSize(1366, 768), QSize(1920, 1080)}) {
             makePage(size);
             QVERIFY(child(u"recentFolders"_s)->toolTip().contains(QDir::toNativeSeparators(longDir)));
-            page_->setTrialDays(12);
+            gate_->setTrialDays(12);
             page_->setExpiry(QDate(2027, 10, 18));
             page_->setNotifications({{u"update"_s, StartPage::tr("Thông báo"), StartPage::tr("Mẹo"), u"update"_s}});
             QVERIFY(spinUntil([&] { return refreshed(); }));
@@ -1244,6 +1261,8 @@ private slots:
                 QCoreApplication::processEvents();
                 QCOMPARE(truncations(window_.get()), QString());
             }
+            // .hrow xuống dòng: tên và huy hiệu "Dùng thử" không vừa một dòng của thẻ, huy hiệu dưới tên.
+            QVERIFY(child(u"editionBadge"_s)->geometry().top() > child(u"editionName"_s)->geometry().bottom());
             QVERIFY(page_->width() == size.width());
         }
         child<QLineEdit>(u"recentSearch"_s)->setText(u"zzz"_s); // i18n-ok: chữ gõ thử

@@ -8,7 +8,8 @@
 //   3  lockedCommand: Viewer: dòng của lệnh Pro có huy hiệu (vẽ ra, trợ năng đọc "Có trong TrionCAD Pro"); Enter mở
 //      trang nâng cấp, không gửi lệnh; lệnh có trong Viewer chạy.
 //   4  dirtyWithinFrame ("*" trong 1 khung), longNameElided (cắt giữa, tooltip đủ đường dẫn), keyboard (Tab qua mọi
-//      nút; Enter, Alt+↓, Esc), popupKeys (↑↓, Esc trả focus, bấm chuột chạy).
+//      nút; Enter, Alt+↓, Esc; bấm nút logo không lấy focus của vùng vẽ), popupKeys (↑↓, Esc trả focus, bấm chuột
+//      chạy).
 //   DoD-U: emptyAreaPassesMouse (hợp đồng kéo cửa sổ với MainWindow), editionBadge, accountMenu, helpMenu, qatMenu,
 //   idleNoTimer, pseudoNoTruncation (vi-XL, 1366 px, cả popup và menu), baseline (Tối/Sáng; ghi lại:
 //   TRION_UPDATE_BASELINE=<thư mục>).
@@ -310,8 +311,8 @@ private slots:
         gate_->setEdition(Edition::Pro);
         bar_->setDocument({.name = u"Banve-01.dwg"_s, .path = u"D:/Du an/Banve-01.dwg"_s});
         bar_->setAccount({});
-        bar_->setTrialDays(0);
-        bar_->setOfflineDays(-1);
+        gate_->setTrialDays(0);
+        gate_->setOfflineDays(-1);
         bar_->setContentsMargins({});
         resizeHost(1366);
         sent_.clear();
@@ -518,6 +519,12 @@ private slots:
         key(Qt::Key_Return);
         QCOMPARE(app.size(), 1);
         QCOMPARE(app[0][0].toPoint(), appButton->mapToGlobal(QPoint(0, appButton->height())));
+        // Bấm chuột vào nút logo không lấy focus (chỉ nhận bằng Tab): focus còn ở vùng vẽ, nên Esc của menu ứng dụng
+        // (UIA-003 trả focus về widget có focus trước khi mở) về vùng vẽ.
+        focus(canvas_);
+        QTest::mouseClick(appButton, Qt::LeftButton);
+        QCOMPARE(app.size(), 2);
+        QCOMPARE(QApplication::focusWidget(), canvas_);
 
         focus(open);
         key(Qt::Key_Return);
@@ -634,14 +641,14 @@ private slots:
         gate_->setEdition(Edition::Viewer); // Viewer: chỉ xem
         QCOMPARE(title->text(), text("A.dwg [Chỉ xem] [Đã phục hồi] — TrionCAD Viewer"));
         QCOMPARE(badge->text(), text("Viewer"));
-        bar_->setOfflineDays(5); // Viewer không cần xác minh giấy phép
+        gate_->setOfflineDays(5); // Viewer không cần xác minh giấy phép
         QCOMPARE(badge->text(), text("Viewer"));
 
         gate_->setEdition(Edition::Trial);
-        bar_->setTrialDays(12);
-        bar_->setOfflineDays(-1);
+        gate_->setTrialDays(12);
+        gate_->setOfflineDays(-1);
         QCOMPARE(badge->text(), text("Dùng thử: còn 12 ngày"));
-        bar_->setOfflineDays(5);
+        gate_->setOfflineDays(5);
         QCOMPARE(badge->text(), text("Dùng thử: còn 12 ngày · còn 5 ngày offline"));
         gate_->setEdition(Edition::Education);
         QCOMPARE(badge->text(), text("Giáo dục · còn 5 ngày offline"));
@@ -665,7 +672,7 @@ private slots:
         const auto text = [](const char* s) { return QString::fromUtf8(s); };
 
         gate_->setEdition(Edition::Trial);
-        bar_->setTrialDays(12);
+        gate_->setTrialDays(12);
         bar_->setAccount({.name = text("Nguyễn Minh An"), .email = u"an.nguyen@example.com"_s, .signedIn = true});
         QStringList items;
         for (QAction* a : menu->actions())
@@ -791,8 +798,8 @@ private slots:
         QVERIFY(translator_->setLanguage(i18n::kPseudoLanguage.toString()));
         QVERIFY(spinUntil([&] { return child<QLabel>("editionBadge")->text() != before; }));
         gate_->setEdition(Edition::Trial);
-        bar_->setTrialDays(12);
-        bar_->setOfflineDays(5);
+        gate_->setTrialDays(12);
+        gate_->setOfflineDays(5);
         bar_->setAccount({.name = u"Nguyễn Minh An"_s, .email = u"an.nguyen@example.com"_s, .signedIn = true});
         bar_->setDocument({.name = u"Banve-01.dwg"_s, .path = u"D:/Banve-01.dwg"_s, .dirty = true, .recovered = true});
         bar_->setContentsMargins(0, 0, 3 * 46, 0); // ponytail: nút cửa sổ của prototype (.win button 44 px + lề)
@@ -823,7 +830,7 @@ private slots:
         tm_->setTheme(light ? theme::Theme::Light : theme::Theme::Dark);
         QCoreApplication::processEvents(); // Qt 6.11 gửi ApplicationPaletteChange qua hàng đợi
         gate_->setEdition(Edition::Trial);
-        bar_->setTrialDays(12);
+        gate_->setTrialDays(12);
         bar_->setDocument({.name = u"Banve-01.dwg"_s, .path = u"D:/Banve-01.dwg"_s, .dirty = true, .recovered = true});
         search()->setLocator([](const QString& c) { return c == u"CIRCLE"_s ? u"Trang chủ › Vẽ"_s : QString(); });
         focus(search());

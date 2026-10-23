@@ -691,6 +691,10 @@ Tooltip: level 1 after 0.45 s; hover 1.5 s more for level 2 with description and
         <translation>Transparency display</translation>
     </message>
     <message>
+        <source>Hiện thanh menu</source>
+        <translation>Show menu bar</translation>
+    </message>
+    <message>
         <source>Vẽ đoạn thẳng</source>
         <translation>Line</translation>
     </message>
@@ -4177,10 +4181,6 @@ TCVN</source>
         <translation>Show below the ribbon</translation>
     </message>
     <message>
-        <source>Hiện thanh menu</source>
-        <translation>Show menu bar</translation>
-    </message>
-    <message>
         <source>Đặt lại mặc định</source>
         <translation>Reset to defaults</translation>
     </message>
@@ -4391,10 +4391,6 @@ TCVN</source>
         <translation>TrionCAD Viewer</translation>
     </message>
     <message>
-        <source>Viewer</source>
-        <translation>Viewer</translation>
-    </message>
-    <message>
         <source>Xem, đo, in và xuất PDF miễn phí. Sửa bản vẽ cần TrionCAD Pro.</source>
         <translation>View, measure, print and export PDF for free. Editing drawings requires TrionCAD Pro.</translation>
     </message>
@@ -4407,23 +4403,12 @@ TCVN</source>
         <translation>TrionCAD Viewer Pro</translation>
     </message>
     <message>
-        <source>Viewer Pro</source>
-        <translation>Viewer Pro</translation>
-    </message>
-    <message>
         <source>Xem, in hàng loạt, so sánh bản vẽ, markup. Sửa bản vẽ cần TrionCAD Pro.</source>
         <translation>View, batch print, compare drawings, markup. Editing drawings requires TrionCAD Pro.</translation>
     </message>
     <message>
         <source>TrionCAD Pro</source>
         <translation>TrionCAD Pro</translation>
-    </message>
-    <message numerus="yes">
-        <source>Dùng thử: còn %n ngày</source>
-        <translation>
-            <numerusform>Trial: %n day left</numerusform>
-            <numerusform>Trial: %n days left</numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>Còn %n ngày dùng thử. Hết hạn, phần mềm chuyển về Viewer; bản vẽ vẫn mở và in được.</source>
@@ -4443,18 +4428,6 @@ TCVN</source>
     <message>
         <source>TrionCAD Doanh nghiệp</source>
         <translation>TrionCAD Enterprise</translation>
-    </message>
-    <message>
-        <source>Pro</source>
-        <translation>Pro</translation>
-    </message>
-    <message>
-        <source>Giáo dục</source>
-        <translation>Education</translation>
-    </message>
-    <message>
-        <source>Doanh nghiệp</source>
-        <translation>Enterprise</translation>
     </message>
     <message>
         <source>Thuê bao còn hạn đến %1.</source>
@@ -4702,54 +4675,20 @@ TCVN</source>
         <translation>TrionCAD Viewer</translation>
     </message>
     <message>
-        <source>Viewer</source>
-        <translation>Viewer</translation>
-    </message>
-    <message>
         <source>TrionCAD Viewer Pro</source>
         <translation>TrionCAD Viewer Pro</translation>
-    </message>
-    <message>
-        <source>Viewer Pro</source>
-        <translation>Viewer Pro</translation>
     </message>
     <message>
         <source>TrionCAD Pro</source>
         <translation>TrionCAD Pro</translation>
     </message>
     <message>
-        <source>Pro</source>
-        <translation>Pro</translation>
-    </message>
-    <message numerus="yes">
-        <source>Dùng thử: còn %n ngày</source>
-        <translation>
-            <numerusform>Trial: %n day left</numerusform>
-            <numerusform>Trial: %n days left</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>TrionCAD Giáo dục</source>
         <translation>TrionCAD Education</translation>
     </message>
     <message>
-        <source>Giáo dục</source>
-        <translation>Education</translation>
-    </message>
-    <message>
         <source>TrionCAD Doanh nghiệp</source>
         <translation>TrionCAD Enterprise</translation>
-    </message>
-    <message>
-        <source>Doanh nghiệp</source>
-        <translation>Enterprise</translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 · còn %n ngày offline</source>
-        <translation>
-            <numerusform>%1 · %n offline day left</numerusform>
-            <numerusform>%1 · %n offline days left</numerusform>
-        </translation>
     </message>
     <message>
         <source>[Chỉ xem]</source>

@@ -8,7 +8,8 @@
 //      khung, số đo luôn in).
 //   3  persistence: thêm (menu tùy biến, "Thêm vào QAT"), bớt, dưới ribbon giữ sau khi dựng lại với cùng Store và với
 //      Store mới đọc cùng tệp; về trên ribbon; "Đặt lại mặc định" đúng 7 mục; Viewer danh sách riêng (Mở, In).
-//   DoD-U: addFromRibbon (nút, mục bật/tắt, trùng, lệnh khóa mở trang nâng cấp, bớt), menuBar ('MENUBAR), keyboard
+//   DoD-U: addFromRibbon (nút, mục bật/tắt, trùng, lệnh khóa mở trang nâng cấp, bớt), menuBar (QAction MENUBAR gắn
+//   sysvar của ActionRegistry), keyboard
 //   (Tab qua nút, Enter chạy lệnh, menu tùy biến bằng phím, Esc trả focus), pseudoNoTruncation (vi-XL, gọn và thoáng,
 //   cả menu tùy biến và danh sách hoàn tác).
 #include "app/shell/titlebar/CommandSearch.h"
@@ -509,18 +510,24 @@ private slots:
         QVERIFY(spinUntil([&] { return gone.isNull(); }));
     }
 
-    // "Hiện thanh menu": sysvar MENUBAR qua chuỗi lệnh; dấu chọn theo setMenuBarShown (không phát lệnh).
+    // "Hiện thanh menu": QAction MENUBAR của ActionRegistry (gắn sysvar): bấm gửi 'MENUBAR qua sink như mọi lệnh, dấu
+    // chọn chỉ theo sysvar MENUBAR (lõi đặt), không qua Qat::macroRequested.
     void menuBar()
     {
         QAction* t = toggle(u"Hiện thanh menu"_s);
-        QVERIFY(t && !t->isChecked());
+        QVERIFY(t);
+        QCOMPARE(t, reg_->action(u"MENUBAR"_s));
+        QVERIFY(t->isCheckable() && !t->isChecked());
         t->trigger();
-        t->trigger();
-        QCOMPARE(macros_, (QStringList{u"'MENUBAR 1"_s, u"'MENUBAR 0"_s}));
-        qat()->setMenuBarShown(true);
+        QCOMPARE(sent_, QStringList{u"'MENUBAR 1"_s});
+        QVERIFY(!t->isChecked()); // lõi chưa đổi sysvar: không tự đảo
+        sysvars_->set(u"MENUBAR"_s, 1);
         QVERIFY(t->isChecked());
-        qat()->setMenuBarShown(false);
-        QCOMPARE(macros_.size(), 2);
+        t->trigger();
+        QCOMPARE(sent_, (QStringList{u"'MENUBAR 1"_s, u"'MENUBAR 0"_s}));
+        sysvars_->set(u"MENUBAR"_s, 0);
+        QVERIFY(!t->isChecked());
+        QVERIFY(macros_.isEmpty());
     }
 
     void keyboard()

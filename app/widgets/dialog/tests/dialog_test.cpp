@@ -2,7 +2,8 @@
 //   1  firstFrame: mở bằng phím (như lệnh gõ ở dòng lệnh) rồi đóng 20 lần qua DialogHost; UiProbe dialog_open tính từ
 //      phím đến hết khung đầu, p50/p99 (ngưỡng 150 ms chỉ kiểm ở release, tests/timing.h). lazyBody: loadBody với dữ
 //      liệu do test thả: khung đầu hiện "Đang tải…" khi dữ liệu còn chặn ở luồng nền (luồng UI vẫn chạy), nút xác nhận
-//      vô hiệu; dữ liệu về thì thân mới; đóng khi đang tải thì token hủy, không dựng.
+//      vô hiệu; dữ liệu về thì thân mới; đóng khi đang tải thì token hủy, không dựng. loadingSpinner: vòng quay của
+//      thân đang tải là ui::Spinner dùng chung.
 //   2  enterEsc, helpKey, tabCycle, focusReturn: Enter = nút xác nhận, không khi ô nhiều dòng hoặc nút xác nhận vô
 //      hiệu; Esc hủy; F1 và nút Trợ giúp phát tên lệnh, thắng phím tắt F1 toàn cục; Tab/Shift+Tab vòng trong hộp thoại;
 //      đóng thì focus về chỗ cũ, cả khi xếp chồng (modal mở từ modal chặn hộp thoại mở nó).
@@ -19,6 +20,7 @@
 //      được, hiện lại đúng chỗ, focus cũ.
 #include "app/widgets/dialog/DialogFrame.h"
 #include "app/widgets/dialog/DialogHost.h"
+#include "app/widgets/progress/Spinner.h"
 
 #include "app/core/i18n/Translator.h"
 #include "app/core/i18n/TruncationProbe.h"
@@ -412,6 +414,23 @@ private slots:
         QVERIFY(sawCancel->load());
         QCOMPARE(built2, 0);
         QVERIFY(g && g->isLoading());
+    }
+
+    // Thân "Đang tải…" dùng vòng quay chung ui::Spinner (app/widgets/progress): quay khi hiện, dừng khi giảm chuyển
+    // động hoặc khi thân mới thay thân đang tải.
+    void loadingSpinner()
+    {
+        DialogFrame* f = plainFrame(u"spin"_s, main_.get());
+        f->setLoading();
+        f->show();
+        const QPointer<Spinner> spin = f->body()->findChild<Spinner*>();
+        QVERIFY(spin && spin->isVisible());
+        QVERIFY(spin->spinning());
+        tm_->setReducedMotion(true);
+        QVERIFY(!spin->spinning());
+        tm_->setReducedMotion(false);
+        f->setBody(new QLabel(sampleTr(kTitle)));
+        QVERIFY(!spin); // thân đang tải xóa ngay, cùng vòng quay
     }
 
     // Tiêu chí 2.

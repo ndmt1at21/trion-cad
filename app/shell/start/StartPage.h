@@ -22,9 +22,9 @@
 //   trong Store ("start/view", "start/sort"). Trống: EmptyState "Mở bản vẽ mẫu", "Xem video 2 phút".
 // - Ảnh xem trước: ThumbnailQueue cho thẻ đang thấy (đổi theo cuộn, cỡ cửa sổ, bộ lọc), điền dần khi xong; rời tab
 //   (hideEvent) hủy mọi việc. Hiện tab (showEvent) kiểm lại tệp ở nền (RecentFiles::refresh).
-// - Học tập, Mẹo, Thông báo (setNotifications, PLF-006), thẻ phiên bản (EditionGate: tên, huy hiệu, số ngày dùng thử
-//   setTrialDays, hạn thuê bao setExpiry; nút Dùng thử/Mua mở trang nâng cấp qua EditionGate::upgrade(), Trạng thái giấy
-//   phép → screenRequested("license")).
+// - Học tập, Mẹo, Thông báo (setNotifications, PLF-006), thẻ phiên bản (EditionGate: tên, huy hiệu
+//   edition::EditionBadge, số ngày dùng thử EditionGate::setTrialDays, hạn thuê bao setExpiry; nút Dùng thử/Mua mở
+//   trang nâng cấp qua EditionGate::upgrade(), Trạng thái giấy phép → screenRequested("license")).
 // - Thả tệp lên trang: gợi ý "Thả tệp DWG, DXF để mở" (.drop-hint) trong lúc kéo; DWG, DXF, DWT → openRequested(đường
 //   dẫn theo thứ tự thả), tệp khác bị từ chối kèm toast lỗi nêu tên (quy tắc và câu chung: FileTabBar::readDrop).
 // Màu, cỡ đọc token lúc vẽ/khi ThemeManager::changed; chữ dịch lại khi LanguageChange. Rảnh không timer. Luồng UI.
@@ -108,9 +108,7 @@ public:
     // Ô ảnh của thẻ lưới: px logic (theo bề rộng thẻ hiện tại) và px thiết bị (cỡ xin ThumbnailQueue).
     QSize thumbnailSize() const;
 
-    // ponytail: PLF-002 thay: ngày dùng thử còn lại (phiên bản Dùng thử), hạn thuê bao (Pro, Giáo dục, Doanh nghiệp;
-    // không hợp lệ: không hiện câu hạn).
-    void setTrialDays(int days);
+    // ponytail: PLF-002 thay: hạn thuê bao (Pro, Giáo dục, Doanh nghiệp; không hợp lệ: không hiện câu hạn).
     void setExpiry(QDate date);
     // ponytail: PLF-006 (feed cập nhật, tin cộng đồng) thay; rỗng: ẩn mục Thông báo.
     void setNotifications(const QList<News>& items);
@@ -159,7 +157,6 @@ private:
     ThumbnailQueue thumbs_;
     FolderOpener opener_;
     View view_ = View::Grid;
-    int trialDays_ = 0;
     QDate expiry_;
 
     QScrollArea* scroll_ = nullptr;
@@ -172,8 +169,9 @@ private:
     Card* folders_ = nullptr;
     Card* recover_ = nullptr;
     Box* edition_ = nullptr;
+    QBoxLayout* editionRow_ = nullptr; // tên + huy hiệu: một dòng, hoặc huy hiệu dưới tên khi thiếu chỗ
     QLabel* editionName_ = nullptr;
-    QLabel* editionBadge_ = nullptr;
+    QLabel* editionBadge_ = nullptr; // edition::EditionBadge; không có EditionGate thì không có
     QLabel* editionText_ = nullptr;
     QProgressBar* trial_ = nullptr;
     ui::Button* editionAction_ = nullptr;

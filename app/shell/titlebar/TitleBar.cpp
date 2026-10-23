@@ -1,6 +1,7 @@
 #include "app/shell/titlebar/TitleBar.h"
 
 #include "app/core/actions/ActionRegistry.h"
+#include "app/core/edition/EditionBadge.h"
 #include "app/core/edition/EditionGate.h"
 #include "app/shell/titlebar/CommandSearch.h"
 #include "app/shell/titlebar/Qat.h"
@@ -58,10 +59,11 @@ QUrl accountUrl()
 } // namespace
 
 // Nút menu ứng dụng .tb-app: logo --c-accent (cỡ --ic + --sp-1 = 18 px), "TrionCAD" đậm, mũi tên .ic.xs; cao bằng
-// thanh trừ --sp-3; rê --c-hover, nhấn --c-press; viền focus khi focus đến từ bàn phím.
+// thanh trừ --sp-3; rê --c-hover, nhấn --c-press; viền focus khi focus đến từ bàn phím. Chỉ nhận focus bằng Tab: bấm
+// chuột không lấy focus của vùng vẽ, nên Esc của menu ứng dụng (UIA-003) trả focus về vùng vẽ.
 class TitleBar::AppButton final : public ui::Button {
 public:
-    AppButton() : Button({}, Kind::Ghost) {}
+    AppButton() : Button({}, Kind::Ghost) { setFocusPolicy(Qt::TabFocus); }
 
     QSize sizeHint() const override
     {
@@ -185,55 +187,9 @@ private:
     QStringList tail_;
 };
 
-// Huy hiệu phiên bản .ed: --fs-xs đậm, lề ngang --sp-3, bo --r; màu theo phiên bản (--c-ed-*), cảnh báo giấy phép
-// offline .ed.warn (--c-warn-soft, --c-warn). Cao 17 px của prototype ≈ chữ + 2 × --sp-1.
-class TitleBar::EditionBadge final : public QLabel {
-public:
-    EditionBadge()
-    {
-        setTextFormat(Qt::PlainText);
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    }
-
-    void set(const QString& text, tok::ColorId bg, tok::ColorId fg)
-    {
-        bg_ = bg;
-        fg_ = fg;
-        setText(text);
-        updateGeometry();
-        update();
-    }
-
-    QSize sizeHint() const override
-    {
-        const QFontMetrics fm(textFont());
-        return {fm.horizontalAdvance(text()) + 2 * px(tok::sp_3), fm.height() + 2 * px(tok::sp_1)};
-    }
-    QSize minimumSizeHint() const override { return sizeHint(); }
-
-protected:
-    void paintEvent(QPaintEvent*) override
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::Antialiasing);
-        const qreal rad = tm().px(tok::r);
-        p.setPen(Qt::NoPen);
-        p.setBrush(col(bg_));
-        p.drawRoundedRect(QRectF(rect()), rad, rad);
-        p.setFont(textFont());
-        p.setPen(col(fg_));
-        p.drawText(rect(), Qt::AlignCenter | Qt::TextSingleLine, text());
-    }
-
-private:
-    static QFont textFont() { return theme::font(TextRole::Caption, Weight::Bold); }
-
-    tok::ColorId bg_ = tok::c_ed_viewer, fg_ = tok::c_ed_viewer_t;
-};
-
 TitleBar::TitleBar(actions::ActionRegistry& actions, edition::EditionGate& gate, QWidget* parent)
     : QWidget(parent), actions_(actions), gate_(gate), app_(new AppButton), qat_(new Qat(actions, gate)),
-      title_(new DocTitle), badge_(new EditionBadge), search_(new CommandSearch(actions)),
+      title_(new DocTitle), badge_(new edition::EditionBadge(gate)), search_(new CommandSearch(actions)),
       user_(new ui::Button({}, ui::Button::Kind::Icon)), help_(new ui::Button({}, ui::Button::Kind::Icon)),
       userMenu_(new ui::Menu(this)), helpMenu_(new ui::Menu(this))
 {
@@ -276,6 +232,7 @@ TitleBar::TitleBar(actions::ActionRegistry& actions, edition::EditionGate& gate,
     connect(user_, &QAbstractButton::clicked, this, [this] { popupBelow(userMenu_, user_); });
     connect(help_, &QAbstractButton::clicked, this, [this] { popupBelow(helpMenu_, help_); });
     connect(&gate, &edition::EditionGate::editionChanged, this, &TitleBar::sync);
+    connect(&gate, &edition::EditionGate::statusChanged, this, &TitleBar::sync); // "… · còn N ngày" của menu tài khoản
     // Thôi "Hiện bên dưới ribbon": lấy QAT về sau nút menu ứng dụng (cửa sổ chính đã dời nó xuống dưới ribbon).
     connect(qat_, &Qat::belowRibbonChanged, this, [this, row](bool below) {
         if (!below && qat_->parentWidget() != this)
@@ -293,18 +250,6 @@ void TitleBar::setDocument(const DocInfo& doc)
 void TitleBar::setAccount(const Account& account)
 {
     account_ = account;
-    sync();
-}
-
-void TitleBar::setTrialDays(int days)
-{
-    trialDays_ = days;
-    sync();
-}
-
-void TitleBar::setOfflineDays(int days)
-{
-    offlineDays_ = days;
     sync();
 }
 
@@ -333,51 +278,26 @@ QSize TitleBar::minimumSizeHint() const
 
 void TitleBar::sync()
 {
-    // Phiên bản: tên trên thanh (" — TrionCAD Pro"), chữ và màu huy hiệu (edBadge của prototype).
-    QString name, badge;
-    tok::ColorId bg = tok::c_ed_pro, fg = tok::c_ed_pro_t;
+    // Tên phiên bản trên thanh (" — TrionCAD Pro"); huy hiệu (edBadge của prototype) tự theo EditionGate.
+    QString name;
     switch (gate_.edition()) {
     case Edition::Viewer:
         name = tr("TrionCAD Viewer");
-        badge = tr("Viewer");
-        bg = tok::c_ed_viewer;
-        fg = tok::c_ed_viewer_t;
         break;
     case Edition::ViewerPro:
         name = tr("TrionCAD Viewer Pro");
-        badge = tr("Viewer Pro");
-        bg = tok::c_ed_vp;
-        fg = tok::c_ed_vp_t;
         break;
     case Edition::Pro:
-        name = tr("TrionCAD Pro");
-        badge = tr("Pro");
-        break;
     case Edition::Trial:
         name = tr("TrionCAD Pro");
-        badge = tr("Dùng thử: còn %n ngày", nullptr, trialDays_);
-        bg = tok::c_ed_trial;
-        fg = tok::c_ed_trial_t;
         break;
     case Edition::Education:
         name = tr("TrionCAD Giáo dục");
-        badge = tr("Giáo dục");
-        bg = tok::c_ed_edu;
-        fg = tok::c_ed_edu_t;
         break;
     case Edition::Enterprise:
         name = tr("TrionCAD Doanh nghiệp");
-        badge = tr("Doanh nghiệp");
-        bg = tok::c_ed_ent;
-        fg = tok::c_ed_ent_t;
         break;
     }
-    if (offlineDays_ >= 0 && gate_.edition() != Edition::Viewer) { // .ed.warn: lâu chưa xác minh giấy phép
-        badge = tr("%1 · còn %n ngày offline", nullptr, offlineDays_).arg(badge);
-        bg = tok::c_warn_soft;
-        fg = tok::c_warn;
-    }
-    badge_->set(badge, bg, fg);
 
     // Tên bản vẽ, cờ; Viewer: bản vẽ chỉ xem (07.1 §2).
     QStringList tail;
@@ -419,7 +339,7 @@ void TitleBar::sync()
     if (account_.signedIn)
         userMenu_->addSection(u"%1 · %2"_s.arg(account_.name, account_.email));
     screen(userMenu_, u"license"_s,
-           gate_.edition() == Edition::Trial ? tr("%1 · còn %n ngày", nullptr, trialDays_).arg(name) : name,
+           gate_.edition() == Edition::Trial ? tr("%1 · còn %n ngày", nullptr, gate_.trialDays()).arg(name) : name,
            u"license"_s);
     screen(userMenu_, u"key"_s, tr("Trạng thái giấy phép"), u"license"_s);
     screen(userMenu_, u"key"_s, account_.signedIn ? tr("Kích hoạt, nhập key…") : tr("Đăng nhập, kích hoạt…"),

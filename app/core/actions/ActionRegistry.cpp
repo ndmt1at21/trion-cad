@@ -60,6 +60,7 @@ constexpr SysvarAction kSysvarActions[] = {
     {"LWDISPLAY", "LWDISPLAY", SysvarAction::Bit, 1, "V", "lw", QT_TRANSLATE_NOOP("actions", "Hiển thị độ dày nét")},
     {"TRANSPARENCYDISPLAY", "TRANSPARENCYDISPLAY", SysvarAction::Bit, 1, "V", "transp",
      QT_TRANSLATE_NOOP("actions", "Hiển thị độ trong suốt")},
+    {"MENUBAR", "MENUBAR", SysvarAction::Bit, 1, "V", "", QT_TRANSLATE_NOOP("actions", "Hiện thanh menu")}, // QAT
 };
 
 bool isOn(const SysvarAction& s, int v)

@@ -12,12 +12,12 @@
 #include "app/widgets/message/Messages.h"
 #include "app/widgets/model/BackgroundModel.h"
 #include "app/widgets/tooltip/RichTooltip.h"
+#include "app/widgets/views/TextCache.h"
 #include "app/widgets/views/VirtualTableView.h"
 #include "core/base/sched/Scheduler.h"
 #include "core/base/text/Fold.h"
 
 #include <QBoxLayout>
-#include <QCache>
 #include <QFileInfo>
 #include <QHash>
 #include <QHeaderView>
@@ -25,7 +25,6 @@
 #include <QLabel>
 #include <QPainter>
 #include <QRegularExpression>
-#include <QStaticText>
 #include <QtMath>
 
 #include <algorithm>
@@ -308,8 +307,8 @@ public:
         }
         case Count: // .tbl td.num: Mono, phải
             p->setPen(col(tok::c_text));
-            text(*p, theme::font(TextRole::MonoLabel), o.rect.adjusted(px(tok::sp_4), 0, -px(tok::sp_4), 0),
-                 i18n::formatCount(l.objects), Qt::AlignRight);
+            counts_.draw(*p, theme::font(TextRole::MonoLabel), o.rect.adjusted(px(tok::sp_4), 0, -px(tok::sp_4), 0),
+                         i18n::formatCount(l.objects), Qt::ElideRight, Qt::AlignRight);
             break;
         case Color: {
             QRect sw(0, 0, px(tok::sp_5), px(tok::sp_5)); // .sw
@@ -379,7 +378,7 @@ private:
         const QRect box = o.rect.adjusted(px(tok::sp_4), 0, -px(tok::sp_4), 0);
         const int tag = l.changed() ? tagWidth() : 0;
         p.setPen(col(tok::c_text));
-        const qreal drawn = text(p, o.font, box.adjusted(0, 0, -tag, 0), l.name, Qt::AlignLeft);
+        const qreal drawn = names_.draw(p, o.font, box.adjusted(0, 0, -tag, 0), l.name);
         if (!tag)
             return;
         const QFont badge = theme::font(TextRole::Badge, theme::Weight::Medium);
@@ -388,37 +387,13 @@ private:
         r.moveTop(box.center().y() - r.height() / 2);
         fill(p, r, col(tok::c_info_soft));
         p.setPen(col(tok::c_info));
-        text(p, badge, r.adjusted(px(tok::sp_2), 0, 0, 0), tagText(), Qt::AlignLeft);
-    }
-
-    // Chữ đã shaping (QStaticText) theo font, bề rộng ô và chữ: vẽ lại bảng sau mỗi phím lọc không shaping lại các
-    // dòng (~20–40 µs mỗi chuỗi, như TextCache của StartPage). Không vừa thì rút gọn "…". Trả bề rộng đã vẽ.
-    // ponytail: bản sao rút gọn TextCache (StartPage.cpp, nội bộ tệp); dời TextCache ra chỗ dùng chung thì dùng nó.
-    qreal text(QPainter& p, const QFont& font, const QRect& box, const QString& s, Qt::Alignment align) const
-    {
-        if (box.width() <= 0)
-            return 0;
-        const QString key = font.key() + u'|' + QString::number(box.width()) + u'|' + s;
-        QStaticText* line = texts_.object(key);
-        if (!line) {
-            const QFontMetricsF fm(font);
-            line = new QStaticText(fm.horizontalAdvance(s) > box.width() ? fm.elidedText(s, Qt::ElideRight, box.width())
-                                                                        : s);
-            line->setTextFormat(Qt::PlainText);
-            line->prepare(QTransform(), font);
-            texts_.insert(key, line);
-        }
-        p.setFont(font);
-        const qreal w = line->size().width();
-        p.drawStaticText(QPointF(align & Qt::AlignRight ? box.right() + 1 - w : box.left(),
-                                 box.top() + (box.height() - line->size().height()) / 2),
-                         *line);
-        return w;
+        tags_.draw(p, badge, r.adjusted(px(tok::sp_2), 0, 0, 0), tagText());
     }
 
     Model& model_;
     mutable QHash<QString, QPixmap> glyphs_;
-    mutable QCache<QString, QStaticText> texts_{2000};
+    // Chữ đã shaping, mỗi font một bản: vẽ lại bảng sau mỗi phím lọc không shaping lại các dòng.
+    mutable ui::TextCache names_, counts_, tags_;
 };
 
 // ------------------------------------------------------------------------------------------------- ViewerLayers

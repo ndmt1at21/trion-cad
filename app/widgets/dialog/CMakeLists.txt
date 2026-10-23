@@ -2,7 +2,7 @@
 # DialogHost (mở theo mã, một bản mỗi mã, nhớ vị trí và cỡ, danh sách mã cho CI).
 trion_add_library(trion_dialog
   SOURCES DialogFrame.h DialogFrame.cpp DialogHost.h DialogHost.cpp
-  LIBS trion_controls trion_fonts trion_appcore trion_theme trion_base Qt6::Widgets)
+  LIBS trion_controls trion_progress trion_fonts trion_appcore trion_theme trion_base Qt6::Widgets)
 
 trion_add_test(dialog_test SOURCES tests/dialog_test.cpp LIBS trion_dialog trion_i18n trion_perf LABELS dialog)
 # Ảnh baseline khung hộp thoại theo nền tảng × chủ đề × DPR, nhúng vào test (như controls); ghi lại:

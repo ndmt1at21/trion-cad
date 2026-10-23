@@ -11,9 +11,9 @@
 //   - F6 / Shift+F6 (hành động "pane" của Keymap sau setKeymap) đưa focus lần lượt qua các palette đang hiện rồi về
 //     vùng vẽ; Esc trong palette trả focus về widget trung tâm (vùng vẽ).
 //   - trợ năng của nhóm tab (DoD-U 7): dải tab Qt tạo khi gộp (QMainWindowTabBar; tên cho trình đọc màn hình là chữ
-//     của tab đang mở) có viền focus --c-focus quanh tab đang mở khi Tab tới. Qt cất palette ở tab nền và dải của
-//     nhóm còn dưới hai palette mở ra tọa độ âm mà vẫn isVisible(): palette cất bị vô hiệu, dải cất không nhận focus
-//     (không còn điểm dừng Tab không thấy); về chỗ thì trả lại.
+//     của tab đang mở) có viền focus --c-focus quanh tab đang mở khi Tab tới (TrionStyle vẽ). Qt cất palette ở tab
+//     nền và dải của nhóm còn dưới hai palette mở ra tọa độ âm mà vẫn isVisible(): palette cất bị vô hiệu, dải cất
+//     không nhận focus (không còn điểm dừng Tab không thấy); về chỗ thì trả lại.
 //
 // Dùng (UIA-001; sau ThemeManager, IconProvider; trước window.show()):
 //   auto* host = new PaletteHost(&window);                 // con của window, sống theo window
@@ -131,8 +131,8 @@ signals:
     void pinnedChanged(const QString& id, bool pinned);
 
 protected:
-    // Close của window → saveLayout; ChildPolished: dải tab của nhóm, nhóm tab nổi (watch). Dải tab: Move (cất),
-    // Paint (viền focus).
+    // Close của window → saveLayout; ChildPolished: dải tab của nhóm, nhóm tab nổi (watch). Dải tab: Move (cất); viền
+    // focus của tab do TrionStyle vẽ.
     bool eventFilter(QObject* watched, QEvent* e) override;
 
 private:

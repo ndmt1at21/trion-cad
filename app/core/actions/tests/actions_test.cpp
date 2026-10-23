@@ -83,6 +83,7 @@ const SysvarSpec kSysvarSpec[] = {
     {"PICKSTYLE", "PICKSTYLE", 3, "'PICKSTYLE 2", true},
     {"LWDISPLAY", "LWDISPLAY", 0, "'LWDISPLAY 1", false},
     {"TRANSPARENCYDISPLAY", "TRANSPARENCYDISPLAY", 1, "'TRANSPARENCYDISPLAY 0", true},
+    {"MENUBAR", "MENUBAR", 0, "'MENUBAR 1", false}, // "Hiện thanh menu" của QAT (UIA-101)
 };
 
 const SysvarSpec* sysvarSpec(const QString& id)
