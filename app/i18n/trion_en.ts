@@ -3980,6 +3980,13 @@ conversion</translation>
     </message>
 </context>
 <context>
+    <name>trion::shell::CanvasWidget</name>
+    <message>
+        <source>Vùng vẽ</source>
+        <translation>Drawing area</translation>
+    </message>
+</context>
+<context>
     <name>trion::shell::CommandSearch</name>
     <message>
         <source>Không tìm thấy “%1”. Thử từ khóa khác, ví dụ “đo”, “in”, “layer”.</source>
